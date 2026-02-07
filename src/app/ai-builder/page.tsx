@@ -8,10 +8,15 @@ import { Button } from '@/components/ui/button';
 import { Bot, Sparkles } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export default function AiBuilderPage() {
   const [mounted, setMounted] = useState(false);
   const [showModelBadge, setShowModelBadge] = useState(false);
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
 
   useEffect(() => {
     setMounted(true);
@@ -20,8 +25,8 @@ export default function AiBuilderPage() {
 
   return (
     <MainLayout
-      title="AI Builder"
-      subtitle="Transform your ideas into reality with the power of AI"
+      title={getT(TRANSLATION_KEYS.AI_BUILDER_TITLE, language, defaultLang)}
+      subtitle={getT(TRANSLATION_KEYS.AI_BUILDER_SUBTITLE, language, defaultLang)}
       icon="Sparkles"
       showEndLine={true}
     >
@@ -34,7 +39,7 @@ export default function AiBuilderPage() {
                 variant="outline"
                 className="text-xs font-medium bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800"
               >
-                AI Model Logging Enabled
+                {getT(TRANSLATION_KEYS.AI_BUILDER_AI_MODEL_LOGGING_ENABLED, language, defaultLang)}
               </Badge>
             </div>
           ) : (
@@ -43,7 +48,7 @@ export default function AiBuilderPage() {
           <Link href="/builder/ai-agents">
             <Button variant="outline" size="sm">
               <Bot className="h-4 w-4 me-2" />
-              Manage AI Agents
+              {getT(TRANSLATION_KEYS.AI_BUILDER_MANAGE_AGENTS, language, defaultLang)}
             </Button>
           </Link>
         </div>

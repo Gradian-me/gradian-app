@@ -18,7 +18,8 @@ import { MessageBox } from '@/gradian-ui/layout/message-box';
 import { AiAgentDeleteConfirmDialog } from './AiAgentDeleteConfirmDialog';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder';
 import { toast } from 'sonner';
-import { Save, ArrowLeft, RotateCcw, RefreshCw, Trash2 } from 'lucide-react';
+import { Save, RotateCcw, RefreshCw, Trash2 } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { AiAgentNotFound } from '../AiAgentNotFound';
 import { useRouter } from 'next/navigation';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -40,6 +41,7 @@ export function AiAgentTabbedEditor({
   onBack,
 }: AiAgentTabbedEditorProps) {
   const router = useRouter();
+  const BackIcon = useBackIcon();
   const [agent, setAgent] = useState<AiAgent | null>(null);
   const [originalAgent, setOriginalAgent] = useState<AiAgent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -190,7 +192,7 @@ export function AiAgentTabbedEditor({
         <div className="flex items-center justify-between gap-2 flex-wrap">
           {onBack && (
             <Button variant="ghost" onClick={onBack}>
-              <ArrowLeft className="h-4 w-4 md:me-2" />
+              <BackIcon className="h-4 w-4 md:me-2" />
               <span className="hidden md:inline">Back to AI Agents</span>
             </Button>
           )}
@@ -312,8 +314,8 @@ export function AiAgentTabbedEditor({
       <ConfirmationMessage
         isOpen={showResetDialog}
         onOpenChange={setShowResetDialog}
-        title="Reset Changes"
-        message="Are you sure you want to reset all changes? This will discard all unsaved modifications and restore the agent to its last saved state."
+        title={[{ en: 'Reset Changes' }, { fa: 'بازنشانی تغییرات' }, { ar: 'إعادة تعيين التغييرات' }, { es: 'Restablecer cambios' }, { fr: 'Réinitialiser les modifications' }, { de: 'Änderungen zurücksetzen' }, { it: 'Reimposta modifiche' }, { ru: 'Сбросить изменения' }]}
+        message={[{ en: 'Are you sure you want to reset all changes? This will discard all unsaved modifications and restore the agent to its last saved state.' }, { fa: 'آیا مطمئن هستید که می‌خواهید همه تغییرات را بازنشانی کنید؟ تمام تغییرات ذخیره‌نشده حذف شده و عامل به آخرین حالت ذخیره شده برمی‌گردد.' }, { ar: 'هل أنت متأكد أنك تريد إعادة تعيين جميع التغييرات؟ سيتم تجاهل جميع التعديلات غير المحفوظة واستعادة الوكيل إلى آخر حالة محفوظة.' }, { es: '¿Está seguro de que desea restablecer todos los cambios? Se descartarán todas las modificaciones no guardadas y se restaurará el agente a su último estado guardado.' }, { fr: 'Voulez-vous vraiment réinitialiser toutes les modifications ? Toutes les modifications non enregistrées seront annulées et l\'agent sera restauré à son dernier état enregistré.' }, { de: 'Möchten Sie wirklich alle Änderungen zurücksetzen? Alle ungespeicherten Änderungen werden verworfen und der Agent wird auf den zuletzt gespeicherten Zustand zurückgesetzt.' }, { it: 'Sei sicuro di voler reimpostare tutte le modifiche? Verranno scartate tutte le modifiche non salvate e l\'agente verrà ripristinato all\'ultimo stato salvato.' }, { ru: 'Вы уверены, что хотите сбросить все изменения? Все несохранённые изменения будут отменены, агент вернётся к последнему сохранённому состоянию.' }]}
         variant="warning"
         buttons={[
           {

@@ -25,6 +25,9 @@ import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule
 import type { BusinessRuleWithEffects, BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
 import { extractParametersBySectionId } from '../utils/ai-shared-utils';
 import { summarizePrompt } from '../utils/ai-summarization-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 // Separate component for field item to allow hook usage
 interface FieldItemProps {
@@ -290,6 +293,9 @@ export function AiBuilderForm({
 
   // Feature flag: show model badge only when AI_MODEL_LOG is enabled
   const showModelBadge = LOG_CONFIG[LogType.AI_MODEL_LOG] === true;
+
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
 
   // Check if agent has string output format
   const isStringOutput = selectedAgent?.requiredOutputFormat === 'string';
@@ -613,7 +619,7 @@ export function AiBuilderForm({
         const value = initialValues[field.name];
         const validationResult = validateField(value, field.validation);
         if (!validationResult.isValid) {
-          initialErrors[field.name] = validationResult.error || 'This field is required';
+          initialErrors[field.name] = validationResult.error || getT(TRANSLATION_KEYS.MESSAGE_FIELD_REQUIRED, language, defaultLang);
         }
       }
     });
@@ -912,14 +918,14 @@ export function AiBuilderForm({
         const value = formValues[field.name];
         const validationResult = validateField(value, field.validation);
         if (!validationResult.isValid) {
-          errors[field.name] = validationResult.error || 'This field is required';
+          errors[field.name] = validationResult.error || getT(TRANSLATION_KEYS.MESSAGE_FIELD_REQUIRED, language, defaultLang);
         }
       }
     });
     
     setFormErrors((prev) => ({ ...prev, ...errors }));
     return Object.keys(errors).length === 0;
-  }, [formFields, formValues]);
+  }, [formFields, formValues, language, defaultLang]);
 
   // Check if form is valid (all required fields filled)
   const isFormValid = useMemo(() => {
@@ -1193,11 +1199,11 @@ export function AiBuilderForm({
                           variant="outline"
                           size="sm"
                           className="h-9 w-full md:w-auto shrink-0"
-                          title="Edit Agent"
+                          title={getT(TRANSLATION_KEYS.AI_BUILDER_EDIT_AGENT, language, defaultLang)}
                         >
                           <PencilRuler className="h-4 w-4 me-2" />
-                          <span className="hidden md:inline">Edit Agent</span>
-                          <span className="md:hidden">Edit</span>
+                          <span className="hidden md:inline">{getT(TRANSLATION_KEYS.AI_BUILDER_EDIT_AGENT, language, defaultLang)}</span>
+                          <span className="md:hidden">{getT(TRANSLATION_KEYS.AI_BUILDER_EDIT_SHORT, language, defaultLang)}</span>
                         </Button>
                       </Link>
                     )}
@@ -1216,8 +1222,8 @@ export function AiBuilderForm({
                       <Link href="/ai-prompts" target="_blank" rel="noopener noreferrer" className="flex-1 md:flex-initial">
                         <Button variant="outline" size="sm" className="gap-2 w-full md:w-auto shrink-0">
                           <History className="h-4 w-4" />
-                          <span className="hidden md:inline">Prompt History</span>
-                          <span className="md:hidden">History</span>
+                          <span className="hidden md:inline">{getT(TRANSLATION_KEYS.AI_BUILDER_PROMPT_HISTORY, language, defaultLang)}</span>
+                          <span className="md:hidden">{getT(TRANSLATION_KEYS.AI_BUILDER_HISTORY_SHORT, language, defaultLang)}</span>
                         </Button>
                       </Link>
                     )}
@@ -1287,7 +1293,7 @@ export function AiBuilderForm({
                             config={{
                               name: 'output-language',
                               label: '',
-                              placeholder: 'Language',
+                              placeholder: getT(TRANSLATION_KEYS.AI_BUILDER_LABEL_LANGUAGE, language, defaultLang),
                             }}
                             value={selectedLanguage || 'fa'}
                             onChange={(lang) => {
@@ -1433,9 +1439,9 @@ export function AiBuilderForm({
                             <Label
                               htmlFor="summarize-before-search-image"
                               className="text-sm font-normal cursor-pointer"
-                              title="Summarize the prompt before sending to search and image generation for better results"
+                              title={getT(TRANSLATION_KEYS.AI_BUILDER_SUMMARIZE_TOOLTIP, language, defaultLang)}
                             >
-                              Summarize
+                              {getT(TRANSLATION_KEYS.AI_BUILDER_SUMMARIZE, language, defaultLang)}
                             </Label>
                           </div>
                         </>
@@ -1502,7 +1508,7 @@ export function AiBuilderForm({
                             // Show error for empty prompt
                             setFormErrors((prev) => ({
                               ...prev,
-                              userPrompt: 'Prompt is required',
+                              userPrompt: getT(TRANSLATION_KEYS.AI_BUILDER_PROMPT_REQUIRED, language, defaultLang),
                             }));
                             return;
                           }
@@ -1531,8 +1537,8 @@ export function AiBuilderForm({
                       className="h-10 shadow-sm w-full md:w-auto bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
                     >
                       <Sparkles className="h-4 w-4 me-2" />
-                      <span className="hidden md:inline">Do the Magic</span>
-                      <span className="md:hidden">Do the Magic</span>
+                      <span className="hidden md:inline">{getT(TRANSLATION_KEYS.AI_BUILDER_DO_THE_MAGIC, language, defaultLang)}</span>
+                      <span className="md:hidden">{getT(TRANSLATION_KEYS.AI_BUILDER_DO_THE_MAGIC, language, defaultLang)}</span>
                     </Button>
                   )}
                 </div>

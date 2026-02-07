@@ -1,10 +1,16 @@
+'use client';
+
 import React from 'react';
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { resolveFromTranslationsArray, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+
+export type FormAlertMessage = string | Array<Record<string, string>>;
 
 interface FormAlertProps {
   type: 'success' | 'error' | 'warning' | 'info';
-  message: string;
+  message: FormAlertMessage;
   subtitle?: string;
   className?: string;
   onDismiss?: () => void;
@@ -23,6 +29,13 @@ export const FormAlert: React.FC<FormAlertProps> = ({
   statusCode,
   action,
 }) => {
+  const lang = useLanguageStore((s) => s.getLanguage());
+  const defaultLang = getDefaultLanguage();
+  const resolvedMessage =
+    typeof message === 'string'
+      ? message
+      : resolveFromTranslationsArray(message, lang, defaultLang);
+
   const icons = {
     success: CheckCircle,
     error: XCircle,
@@ -68,7 +81,7 @@ export const FormAlert: React.FC<FormAlertProps> = ({
               {statusCode}
             </span>
           )}
-          <p className="text-sm font-medium">{message}</p>
+          <p className="text-xs font-medium">{resolvedMessage}</p>
         </div>
         {subtitle && (
           <p className="mt-1 text-sm text-current text-opacity-80">

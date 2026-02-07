@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { DynamicDetailPageRenderer, getPageTitle, getPageSubtitle } from '@/gradian-ui/data-display/components/DynamicDetailPageRenderer';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useDynamicEntity } from '@/gradian-ui/shared/hooks/use-dynamic-entity';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { MainLayout } from '@/components/layout/main-layout';
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryClientContext } from '@tanstack/react-query';
 import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 
@@ -69,7 +69,7 @@ export function DynamicDetailPageClient({
 }: DynamicDetailPageClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const queryClient = useQueryClient();
+  const queryClient = React.useContext(QueryClientContext);
   const showBack = searchParams?.get('showBack') === 'true';
   const [schemaState, setSchemaState] = useState<FormSchema>(() => {
     const reconstructed = reconstructRegExp(rawSchema) as FormSchema;
@@ -85,10 +85,9 @@ export function DynamicDetailPageClient({
   );
 
   useEffect(() => {
-    if (!reconstructedNavigationSchemas.length) {
+    if (!queryClient || !reconstructedNavigationSchemas.length) {
       return;
     }
-
     reconstructedNavigationSchemas.forEach((schema) => {
       if (schema?.id) {
         queryClient.setQueryData(['schemas', schema.id], schema);
@@ -115,19 +114,21 @@ export function DynamicDetailPageClient({
         if (response.success && response.data) {
           const updated = reconstructRegExp(response.data) as FormSchema;
           setSchemaState(ensureSchemaActions(updated));
-          queryClient.setQueryData(['schemas', schemaId], updated);
-          
+          if (queryClient) {
+            queryClient.setQueryData(['schemas', schemaId], updated);
+          }
+
           // Preload schemas for quick actions that open form modals
           const quickActions = updated.detailPageMetadata?.quickActions || [];
           const targetSchemas = quickActions
-            .filter((action) => 
-              (action.action === 'openFormDialog' || action.action === 'openActionForm') && 
+            .filter((action) =>
+              (action.action === 'openFormDialog' || action.action === 'openActionForm') &&
               action.targetSchema
             )
             .map((action) => action.targetSchema!)
             .filter((schemaId, index, self) => self.indexOf(schemaId) === index); // Remove duplicates
-          
-          if (targetSchemas.length > 0) {
+
+          if (queryClient && targetSchemas.length > 0) {
             // Preload all target schemas in parallel
             Promise.all(
               targetSchemas.map(async (targetSchemaId) => {
@@ -158,7 +159,6 @@ export function DynamicDetailPageClient({
 
   const refreshSchema = useCallback(async () => {
     try {
-      // Use the same endpoint as initial fetch, disable cache to get fresh data
       const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
         disableCache: true,
         callerName: 'DynamicDetailPageClient-refresh',
@@ -166,7 +166,9 @@ export function DynamicDetailPageClient({
       if (response.success && response.data) {
         const updated = reconstructRegExp(response.data) as FormSchema;
         setSchemaState(ensureSchemaActions(updated));
-        queryClient.setQueryData(['schemas', schemaId], updated);
+        if (queryClient) {
+          queryClient.setQueryData(['schemas', schemaId], updated);
+        }
       } else {
         console.warn(`Schema ${schemaId} could not be reloaded after cache clear.`);
       }

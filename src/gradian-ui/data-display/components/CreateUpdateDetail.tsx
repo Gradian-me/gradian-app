@@ -5,9 +5,12 @@
 "use client";
 
 import React from 'react';
-import { formatCreatedLabel, formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
+import { formatCreatedLabel, formatRelativeTime, formatFullDate, isLocaleRTL } from '@/gradian-ui/shared/utils/date-utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { useLanguageStore } from '@/stores/language.store';
 import { cn } from '@/gradian-ui/shared/utils';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '../utils';
@@ -208,19 +211,27 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
   const normalizedCreatedAt = normalizedDates.createdAt;
   const normalizedUpdatedAt = normalizedDates.updatedAt;
 
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
+  const localeCode = language || undefined;
+  const labelCreated = getT(TRANSLATION_KEYS.LABEL_CREATED, language, defaultLang);
+  const labelUpdated = getT(TRANSLATION_KEYS.LABEL_UPDATED, language, defaultLang);
+  const labelCreatedBy = getT(TRANSLATION_KEYS.LABEL_CREATED_BY, language, defaultLang);
+  const labelUpdatedBy = getT(TRANSLATION_KEYS.LABEL_UPDATED_BY, language, defaultLang);
+
   const hasCreated = Boolean(normalizedCreatedAt);
   const hasUpdated = Boolean(normalizedUpdatedAt);
   const hasAnyMetadata = hasCreated || hasUpdated;
 
   if (!hasAnyMetadata) return null;
 
-  const createdLabel = normalizedCreatedAt ? formatCreatedLabel(normalizedCreatedAt) : null;
-  const createdFullDate = normalizedCreatedAt ? formatFullDate(normalizedCreatedAt) : null;
+  const createdLabel = normalizedCreatedAt ? formatCreatedLabel(normalizedCreatedAt, localeCode) : null;
+  const createdFullDate = normalizedCreatedAt ? formatFullDate(normalizedCreatedAt, localeCode) : null;
   const createdByName = formatUserName(createdBy);
   const createdByAvatarUrl = getUserAvatarUrl(createdBy);
   const createdByInitials = getUserInitials(createdBy);
-  const updatedLabel = normalizedUpdatedAt ? formatRelativeTime(normalizedUpdatedAt, { addSuffix: true }) : null;
-  const updatedFullDate = normalizedUpdatedAt ? formatFullDate(normalizedUpdatedAt) : null;
+  const updatedLabel = normalizedUpdatedAt ? formatRelativeTime(normalizedUpdatedAt, { addSuffix: true, localeCode }) : null;
+  const updatedFullDate = normalizedUpdatedAt ? formatFullDate(normalizedUpdatedAt, localeCode) : null;
   const updatedByName = formatUserName(updatedBy);
   const updatedByAvatarUrl = getUserAvatarUrl(updatedBy);
   const updatedByInitials = getUserInitials(updatedBy);
@@ -257,10 +268,11 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                 className="z-100"
                 avoidCollisions={true}
                 collisionPadding={8}
+                dir={isLocaleRTL(localeCode) ? 'rtl' : undefined}
               >
                 <span>
-                  {createdByName ? `Created By ${createdByName}` : 'Created'}
-                  {createdFullDate ? ` . ${createdFullDate}` : createdLabel?.tooltip ? ` . ${createdLabel.tooltip}` : ''}
+                  {createdByName ? `${labelCreatedBy} ${createdByName}` : labelCreated}
+                  {createdFullDate ? ` ${createdFullDate}` : createdLabel?.tooltip ? ` ${createdLabel.tooltip}` : ''}
                 </span>
               </TooltipContent>
             </Tooltip>
@@ -293,10 +305,11 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                 className="z-100"
                 avoidCollisions={true}
                 collisionPadding={8}
+                dir={isLocaleRTL(localeCode) ? 'rtl' : undefined}
               >
                 <span>
-                  {updatedByName ? `Updated By ${updatedByName}` : 'Updated'}
-                  {updatedFullDate ? ` . ${updatedFullDate}` : ''}
+                  {updatedByName ? `${labelUpdatedBy} ${updatedByName}` : labelUpdated}
+                  {updatedFullDate ? ` ${updatedFullDate}` : ''}
                 </span>
               </TooltipContent>
             </Tooltip>
@@ -316,7 +329,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                 <TooltipTrigger asChild>
                   <div className="flex items-center gap-1.5 min-w-0">
                     <IconRenderer iconName="PlusCircle" className="h-3 w-3 shrink-0" />
-                    <span className="font-medium">Created</span>
+                    <span className="font-medium">{labelCreated}</span>
                     {createdLabel && (
                       <span className="text-gray-500 dark:text-gray-500">
                         {createdLabel.display}
@@ -330,10 +343,11 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                   className="z-100"
                   avoidCollisions={true}
                   collisionPadding={8}
+                  dir={isLocaleRTL(localeCode) ? 'rtl' : undefined}
                 >
                   <span>
-                    {createdByName ? `Created By ${createdByName}` : 'Created'}
-                    {createdFullDate ? ` . ${createdFullDate}` : createdLabel?.tooltip ? ` . ${createdLabel.tooltip}` : ''}
+                    {createdByName ? `${labelCreatedBy} ${createdByName}` : labelCreated}
+                    {createdFullDate ? ` ${createdFullDate}` : createdLabel?.tooltip ? ` ${createdLabel.tooltip}` : ''}
                   </span>
                 </TooltipContent>
               </Tooltip>
@@ -347,7 +361,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                       size="md"
                       showDialog={avatarType === 'user'}
                     />
-                    <span>by {createdByName}</span>
+                    <span>{createdByName}</span>
                   </div>
                 </>
               )}
@@ -359,7 +373,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                 <TooltipTrigger asChild>
                   <div className="flex items-center gap-1.5 min-w-0">
                     <IconRenderer iconName="Edit" className="h-3 w-3 shrink-0" />
-                    <span className="font-medium">Updated</span>
+                    <span className="font-medium">{labelUpdated}</span>
                     {updatedLabel && (
                       <span className="text-gray-500 dark:text-gray-500">
                         {updatedLabel}
@@ -373,10 +387,11 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                   className="z-100"
                   avoidCollisions={true}
                   collisionPadding={8}
+                  dir={isLocaleRTL(localeCode) ? 'rtl' : undefined}
                 >
                   <span>
-                    {updatedByName ? `Updated By ${updatedByName}` : 'Updated'}
-                    {updatedFullDate ? ` . ${updatedFullDate}` : ''}
+                    {updatedByName ? `${labelUpdatedBy} ${updatedByName}` : labelUpdated}
+                    {updatedFullDate ? ` ${updatedFullDate}` : ''}
                   </span>
                 </TooltipContent>
               </Tooltip>
@@ -390,7 +405,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                       size="md"
                       showDialog={avatarType === 'user'}
                     />
-                    <span>by {updatedByName}</span>
+                    <span>{updatedByName}</span>
                   </div>
                 </>
               )}
@@ -435,10 +450,11 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                   className="z-100"
               avoidCollisions={true}
               collisionPadding={8}
+              dir={isLocaleRTL(localeCode) ? 'rtl' : undefined}
             >
               <span>
-                {createdByName ? `Created By ${createdByName}` : 'Created'}
-                {createdFullDate ? ` . ${createdFullDate}` : createdLabel?.title ? ` . ${createdLabel.title}` : ''}
+                {createdByName ? `${labelCreatedBy} ${createdByName}` : labelCreated}
+                {createdFullDate ? ` ${createdFullDate}` : createdLabel?.title ? ` ${createdLabel.title}` : ''}
               </span>
             </TooltipContent>
           </Tooltip>
@@ -473,10 +489,11 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                   className="z-100"
               avoidCollisions={true}
               collisionPadding={8}
+              dir={isLocaleRTL(localeCode) ? 'rtl' : undefined}
             >
               <span>
-                {updatedByName ? `Updated By ${updatedByName}` : 'Updated'}
-                {updatedFullDate ? ` . ${updatedFullDate}` : ''}
+                {updatedByName ? `${labelUpdatedBy} ${updatedByName}` : labelUpdated}
+                {updatedFullDate ? ` ${updatedFullDate}` : ''}
               </span>
             </TooltipContent>
           </Tooltip>

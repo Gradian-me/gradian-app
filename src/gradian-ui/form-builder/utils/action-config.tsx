@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { X, RotateCcw, Save } from 'lucide-react';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface ActionConfig {
   type: 'submit' | 'cancel' | 'reset';
@@ -13,32 +14,44 @@ export interface ActionConfig {
   icon?: React.ReactNode;
 }
 
+/** Optional translator: (key, fallback) => string */
+export type ActionConfigTranslator = (key: string, fallback: string) => string;
+
 /**
- * Get action configuration for a form action
+ * Get action configuration for a form action.
+ * When t is provided, labels and loading text are translated.
  */
 export const getActionConfig = (
   actionType: 'submit' | 'cancel' | 'reset',
   singularName: string,
-  isEditMode: boolean = false
+  isEditMode: boolean = false,
+  t?: ActionConfigTranslator
 ): ActionConfig => {
+  const labelCreate = t ? t(TRANSLATION_KEYS.LABEL_CREATE, 'Create') : 'Create';
+  const labelUpdate = t ? t(TRANSLATION_KEYS.LABEL_UPDATE, 'Update') : 'Update';
+  const labelCancel = t ? t(TRANSLATION_KEYS.BUTTON_CANCEL, 'Cancel') : 'Cancel';
+  const labelReset = t ? t(TRANSLATION_KEYS.BUTTON_RESET, 'Reset') : 'Reset';
+  const msgCreating = t ? t(TRANSLATION_KEYS.MESSAGE_CREATING, 'Creating...') : 'Creating...';
+  const msgUpdating = t ? t(TRANSLATION_KEYS.MESSAGE_UPDATING, 'Updating...') : 'Updating...';
+
   const configs: Record<string, ActionConfig> = {
     submit: {
       type: 'submit',
-      label: isEditMode ? `Update ${singularName}` : `Create ${singularName}`,
+      label: isEditMode ? `${labelUpdate} ${singularName}` : `${labelCreate} ${singularName}`,
       variant: 'default',
-      loading: isEditMode ? `Updating ${singularName}...` : `Creating ${singularName}...`,
+      loading: isEditMode ? `${msgUpdating} ${singularName}...` : `${msgCreating} ${singularName}...`,
       icon: <Save className="h-4 w-4" />
     },
     cancel: {
       type: 'cancel',
-      label: 'Cancel',
+      label: labelCancel,
       variant: 'ghost',
       loading: undefined,
       icon: <X className="h-4 w-4" />
     },
     reset: {
       type: 'reset',
-      label: 'Reset',
+      label: labelReset,
       variant: 'outline',
       loading: undefined,
       icon: <RotateCcw className="h-4 w-4" />

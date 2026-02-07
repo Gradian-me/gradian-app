@@ -3,7 +3,8 @@
 import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, ArrowLeft, Trash2 } from 'lucide-react';
+import { Loader2, Save, Trash2 } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { useRelationManager } from '../hooks/useRelationManager';
 import { RelationTypeForm } from './RelationTypeForm';
 import { RelationManagerConfig } from '../types';
@@ -19,6 +20,7 @@ export function RelationTypeEditor({
   config,
   onBack 
 }: RelationTypeEditorProps) {
+  const BackIcon = useBackIcon();
   const { state, actions } = useRelationManager(config);
 
   useEffect(() => {
@@ -65,7 +67,7 @@ export function RelationTypeEditor({
         <h3 className="text-xl font-semibold mb-4">Relation Type not found</h3>
         <p className="text-gray-600 mb-6">Please try loading a different relation type.</p>
         <Button onClick={onBack}>
-          <ArrowLeft className="h-4 w-4 me-2" />
+          <BackIcon className="h-4 w-4 me-2" />
           Go Back
         </Button>
       </div>
@@ -90,7 +92,7 @@ export function RelationTypeEditor({
             variant="outline"
             onClick={onBack}
           >
-            <ArrowLeft className="h-4 w-4 me-2" />
+            <BackIcon className="h-4 w-4 me-2" />
             Back
           </Button>
           <Button

@@ -30,7 +30,6 @@ const Label = React.forwardRef<
     <LabelPrimitive.Root
       ref={ref}
       htmlFor={htmlFor}
-      dir="auto"
       className={labelClasses}
       {...props}
     >

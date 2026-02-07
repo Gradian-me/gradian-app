@@ -3,7 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, RefreshCw, Bot } from 'lucide-react';
+import { Plus, RefreshCw, Bot } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +28,7 @@ import { AiPromptHistory } from '@/domains/ai-prompts';
 
 export function AiAgentManagerWrapper() {
   const router = useRouter();
+  const BackIcon = useBackIcon();
   const [activeTab, setActiveTab] = useState('agents');
   const {
     loading,
@@ -120,7 +122,7 @@ export function AiAgentManagerWrapper() {
 
         <div className="flex items-center justify-between gap-2 mb-2">
           <Button variant="outline" onClick={() => router.push('/builder')}>
-            <ArrowLeft className="h-4 w-4 me-2" />
+            <BackIcon className="h-4 w-4 me-2" />
             Back to Builder
           </Button>
           <div className="flex items-center gap-2">

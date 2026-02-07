@@ -152,8 +152,8 @@ export function ResponseCardsTab({ agent, onUpdate, readonly = false }: Response
         <ConfirmationMessage
           isOpen={deleteConfirmIndex !== null}
           onOpenChange={(open) => !open && setDeleteConfirmIndex(null)}
-          title="Delete Response Card"
-          message={`Are you sure you want to delete response card ${(deleteConfirmIndex ?? 0) + 1}? This action cannot be undone.`}
+          title={[{ en: 'Delete Response Card' }, { fa: 'حذف کارت پاسخ' }, { ar: 'حذف بطاقة الاستجابة' }, { es: 'Eliminar tarjeta de respuesta' }, { fr: 'Supprimer la carte de réponse' }, { de: 'Antwortkarte löschen' }, { it: 'Elimina scheda risposta' }, { ru: 'Удалить карточку ответа' }]}
+          message={[{ en: `Are you sure you want to delete response card ${(deleteConfirmIndex ?? 0) + 1}? This action cannot be undone.` }, { fa: `آیا مطمئن هستید که می‌خواهید کارت پاسخ ${(deleteConfirmIndex ?? 0) + 1} را حذف کنید؟ این عمل قابل بازگشت نیست.` }, { ar: `هل أنت متأكد أنك تريد حذف بطاقة الاستجابة ${(deleteConfirmIndex ?? 0) + 1}؟ لا يمكن التراجع عن هذا الإجراء.` }, { es: `¿Está seguro de que desea eliminar la tarjeta de respuesta ${(deleteConfirmIndex ?? 0) + 1}? Esta acción no se puede deshacer.` }, { fr: `Voulez-vous vraiment supprimer la carte de réponse ${(deleteConfirmIndex ?? 0) + 1} ? Cette action est irréversible.` }, { de: `Möchten Sie die Antwortkarte ${(deleteConfirmIndex ?? 0) + 1} wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.` }, { it: `Sei sicuro di voler eliminare la scheda risposta ${(deleteConfirmIndex ?? 0) + 1}? Questa azione non può essere annullata.` }, { ru: `Вы уверены, что хотите удалить карточку ответа ${(deleteConfirmIndex ?? 0) + 1}? Это действие нельзя отменить.` }]}
           variant="warning"
           buttons={[
             {

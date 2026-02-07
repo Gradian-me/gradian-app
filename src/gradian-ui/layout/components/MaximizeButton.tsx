@@ -17,14 +17,21 @@ export interface MaximizeButtonProps {
    * - "inline": compact inline button (for headers/toolbars)
    */
   layout?: 'default' | 'inline';
+  /** Translated label for maximize (tooltip and aria-label) */
+  labelMaximize?: string;
+  /** Translated label for minimize (tooltip and aria-label) */
+  labelMinimize?: string;
 }
 
 export const MaximizeButton: React.FC<MaximizeButtonProps> = ({
   className,
   layout = 'default',
+  labelMaximize = 'Maximize view',
+  labelMinimize = 'Minimize view',
 }) => {
   const { isMaximized, toggleMaximize } = useLayoutContext();
   const isInline = layout === 'inline';
+  const tooltipLabel = isMaximized ? labelMinimize : labelMaximize;
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -40,7 +47,7 @@ export const MaximizeButton: React.FC<MaximizeButtonProps> = ({
                 : 'h-10 w-10 p-0 rounded-lg',
               className,
             )}
-            aria-label={isMaximized ? 'Minimize view' : 'Maximize view'}
+            aria-label={tooltipLabel}
           >
             {isMaximized ? (
               <Minimize2 className="h-4 w-4" />
@@ -50,7 +57,7 @@ export const MaximizeButton: React.FC<MaximizeButtonProps> = ({
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{isMaximized ? 'Minimize view' : 'Maximize view'}</p>
+          <p>{tooltipLabel}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

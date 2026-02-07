@@ -1101,11 +1101,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   <TooltipTrigger asChild>
                     <span className="flex items-center gap-1 cursor-default">
                       <Clock className="w-3 h-3" />
-                      {formatRelativeTime(message.createdAt)}
+                      {formatRelativeTime(message.createdAt, { addSuffix: true, localeCode: language || undefined })}
                     </span>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>{formatTime(message.createdAt)}</p>
+                    <p>{formatTime(message.createdAt, language || undefined)}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

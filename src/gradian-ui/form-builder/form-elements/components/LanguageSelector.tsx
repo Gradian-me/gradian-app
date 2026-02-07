@@ -4,6 +4,10 @@
 import React from 'react';
 import { FormElementProps } from '../types';
 import { Select, SelectOption } from './Select';
+import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { useLanguageStore } from '@/stores/language.store';
+import { SUPPORTED_LOCALES } from '@/gradian-ui/shared/utils/date-utils';
 
 export interface LanguageSelectorProps extends Omit<FormElementProps, 'config'> {
   config?: any;
@@ -19,65 +23,16 @@ export interface LanguageSelectorProps extends Omit<FormElementProps, 'config'> 
   defaultLanguage?: string;
 }
 
-// Default language options with icons and colors
-const DEFAULT_LANGUAGES: SelectOption[] = [
-  {
-    id: 'en',
-    value: 'en',
-    label: 'English',
-    icon: 'Languages',
-    color: 'default',
-  },
-  {
-    id: 'fa',
-    value: 'fa',
-    label: 'فارسی',
-    icon: 'Languages',
-    color: 'default',
-  },
-  {
-    id: 'ar',
-    value: 'ar',
-    label: 'العربية',
-    icon: 'Languages',
-    color: 'default',
-  },
-  {
-    id: 'es',
-    value: 'es',
-    label: 'Español',
-    icon: 'Languages',
-    color: 'default',
-  },
-  {
-    id: 'fr',
-    value: 'fr',
-    label: 'Français',
-    icon: 'Languages',
-    color: 'default',
-  },
-  {
-    id: 'de',
-    value: 'de',
-    label: 'Deutsch',
-    icon: 'Languages',
-    color: 'default',
-  },
-  {
-    id: 'it',
-    value: 'it',
-    label: 'Italiano',
-    icon: 'Languages',
-    color: 'default',
-  },
-  {
-    id: 'ru',
-    value: 'ru',
-    label: 'Русский',
-    icon: 'Languages',
-    color: 'default',
-  }
-];
+// Default language options from date-utils (each option includes locale e.g. 'en-US' for formatting)
+const DEFAULT_LANGUAGES: SelectOption[] = SUPPORTED_LOCALES.map(({ code, label, isRTL, locale }) => ({
+  id: code,
+  value: code,
+  label,
+  icon: 'Languages',
+  color: 'default',
+  isRTL,
+  locale,
+}));
 
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   config,
@@ -90,18 +45,23 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   required,
   className,
   placeholder,
-  defaultLanguage = 'en',
+  defaultLanguage,
   ...props
 }) => {
+  const defaultLang = defaultLanguage ?? getDefaultLanguage();
+  const language = useLanguageStore((s) => s.language) || defaultLang;
+  const defaultLabel = getT(TRANSLATION_KEYS.LABEL_LANGUAGE, language, defaultLang);
+  const defaultPlaceholder = getT(TRANSLATION_KEYS.PLACEHOLDER_SELECT_LANGUAGE, language, defaultLang);
+
   // Get languages from config or use defaults
   const languages = config?.options || DEFAULT_LANGUAGES;
-  
+
   // Get field configuration
   const fieldName = config?.name || config?.id || 'language';
-  // Use label from config if provided and not empty, otherwise default to 'Language'
+  // Use label from config if provided and not empty, otherwise default to translated 'Language'
   // Empty string means explicitly hide the label (when form builder renders its own)
-  const fieldLabel = config?.label === '' ? '' : (config?.label || 'Language');
-  const fieldPlaceholder = placeholder || config?.placeholder || 'Select language...';
+  const fieldLabel = config?.label === '' ? '' : (config?.label || defaultLabel);
+  const fieldPlaceholder = placeholder || config?.placeholder || defaultPlaceholder;
   const fieldIcon = config?.icon;
   const fieldColor = config?.color;
   
@@ -130,7 +90,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   };
 
   // Use default language if no value is provided
-  const currentValue = value || (config?.defaultValue !== undefined ? config.defaultValue : defaultLanguage);
+  const currentValue = value || (config?.defaultValue !== undefined ? config.defaultValue : defaultLang);
 
   // Extract onBlur and onFocus from props since Select doesn't support them
   // Note: onBlur and onFocus are separate parameters, not in props

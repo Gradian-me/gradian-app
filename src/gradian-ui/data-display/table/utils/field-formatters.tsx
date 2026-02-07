@@ -1157,11 +1157,11 @@ export const formatFieldValue = (
     );
   }
 
-  // View rating: by role or by component (e.g. project-proposal, lean-management rating fields)
+  // View rating: by role or by component (e.g. project-proposal, lean-management rating fields) – view-only, cursor default
   if (field?.role === 'rating' || field?.component === 'rating') {
     return wrapWithForceIcon(
-      <div className="inline-flex items-center">
-        {renderRatingValue(value, { size: 'sm', showValue: true })}
+      <div className="inline-flex items-center cursor-default">
+        {renderRatingValue(value, { size: 'sm', showValue: true, readOnly: true })}
       </div>,
       isForce,
       field,

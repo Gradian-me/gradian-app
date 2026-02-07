@@ -1,9 +1,14 @@
 // Data Display Pagination Component
 
+'use client';
+
 import React, { useCallback, useMemo } from 'react';
 import { DataDisplayPaginationProps } from '../types';
 import { cn } from '../../shared/utils';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const DataDisplayPagination: React.FC<DataDisplayPaginationProps> = ({
   config,
@@ -33,6 +38,16 @@ export const DataDisplayPagination: React.FC<DataDisplayPaginationProps> = ({
     const newPageSize = parseInt(e.target.value);
     onPageSizeChange(newPageSize);
   }, [onPageSizeChange]);
+
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const rtl = isRTL(language ?? defaultLang);
+  const labelShowing = getT(TRANSLATION_KEYS.PAGINATION_SHOWING, language, defaultLang);
+  const labelTo = getT(TRANSLATION_KEYS.PAGINATION_TO, language, defaultLang);
+  const labelOf = getT(TRANSLATION_KEYS.PAGINATION_OF, language, defaultLang);
+  const labelResults = getT(TRANSLATION_KEYS.PAGINATION_RESULTS, language, defaultLang);
+  const labelShow = getT(TRANSLATION_KEYS.PAGINATION_SHOW, language, defaultLang);
+  const labelPerPage = getT(TRANSLATION_KEYS.PAGINATION_PER_PAGE, language, defaultLang);
 
   const pageNumbers = useMemo(() => {
     const pages = [];
@@ -64,28 +79,28 @@ export const DataDisplayPagination: React.FC<DataDisplayPaginationProps> = ({
     <div className={paginationClasses} {...props}>
       {/* Page Info */}
       {showPageInfo && (
-        <div className="flex items-center text-sm text-gray-700">
+        <div className="flex items-center text-sm text-gray-700 dark:text-gray-300">
           <span>
-            Showing{' '}
+            {labelShowing}{' '}
             <span className="font-medium">
               {Math.min((pagination.currentPage - 1) * pagination.pageSize + 1, pagination.totalItems)}
             </span>{' '}
-            to{' '}
+            {labelTo}{' '}
             <span className="font-medium">
               {Math.min(pagination.currentPage * pagination.pageSize, pagination.totalItems)}
             </span>{' '}
-            of{' '}
+            {labelOf}{' '}
             <span className="font-medium">{pagination.totalItems}</span>{' '}
-            results
+            {labelResults}
           </span>
         </div>
       )}
 
       {/* Page Size Selector */}
       {showPageSizeSelector && (
-        <div className="flex items-center space-x-2">
-          <label htmlFor="page-size" className="text-sm text-gray-700">
-            Show:
+        <div className="flex items-center gap-2">
+          <label htmlFor="page-size" className="text-sm text-gray-700 dark:text-gray-300">
+            {labelShow}
           </label>
           <select
             id="page-size"
@@ -99,7 +114,7 @@ export const DataDisplayPagination: React.FC<DataDisplayPaginationProps> = ({
               </option>
             ))}
           </select>
-          <span className="text-sm text-gray-700">per page</span>
+          <span className="text-sm text-gray-700 dark:text-gray-300">{labelPerPage}</span>
         </div>
       )}
 
@@ -161,7 +176,7 @@ export const DataDisplayPagination: React.FC<DataDisplayPaginationProps> = ({
               'hover:bg-gray-100 rounded-md transition-colors'
             )}
           >
-            <ChevronRight className="h-4 w-4" />
+            {rtl ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           </button>
         )}
 
@@ -175,7 +190,7 @@ export const DataDisplayPagination: React.FC<DataDisplayPaginationProps> = ({
               'hover:bg-gray-100 rounded-md transition-colors'
             )}
           >
-            <ChevronsRight className="h-4 w-4" />
+            {rtl ? <ChevronsLeft className="h-4 w-4" /> : <ChevronsRight className="h-4 w-4" />}
           </button>
         )}
       </div>

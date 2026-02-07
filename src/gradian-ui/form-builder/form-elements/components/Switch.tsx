@@ -78,7 +78,6 @@ export const Switch = forwardRef<FormElementRef, SwitchProps>(
           {config.label && (
             <Label
               htmlFor={config.name}
-              dir="auto"
               className={getLabelClasses({
                 error: Boolean(error),
                 required,

@@ -2,8 +2,11 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Bot, ArrowLeft, Home, RefreshCw, Loader2, LayoutDashboard } from 'lucide-react';
+import { Bot, Home, RefreshCw, Loader2, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
+import { getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Card } from '@/components/ui/card';
 
 interface AiAgentNotFoundProps {
@@ -29,6 +32,7 @@ export function AiAgentNotFound({
   onRefresh,
   refreshing = false,
 }: AiAgentNotFoundProps) {
+  const BackIcon = useBackIcon();
   const handleGoBack = () => {
     if (onGoBack) {
       onGoBack();
@@ -100,10 +104,10 @@ export function AiAgentNotFound({
                   <Button
                     onClick={handleGoBack}
                     variant="outline"
-                    className="flex items-center space-x-2"
+                    className="flex items-center gap-2"
                   >
-                    <ArrowLeft className="h-4 w-4" />
-                    <span>Go Back</span>
+                    <BackIcon className="h-4 w-4" />
+                    <span>{getT(TRANSLATION_KEYS.BUTTON_GO_BACK)}</span>
                   </Button>
                 )}
                 {onRefresh && (

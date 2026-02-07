@@ -73,6 +73,8 @@ export interface TableProps<T = any> {
   onRowClick?: (row: T, index: number) => void;
   onCellClick?: (value: any, row: T, column: TableColumn<T>, index: number) => void;
   highlightQuery?: string;
+  /** When 'rtl', table columns order and alignment follow RTL. Omit to inherit from parent or use auto. */
+  dir?: 'ltr' | 'rtl';
 }
 
 export interface TableState {

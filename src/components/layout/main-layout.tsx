@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Bell, PanelLeftOpen, PencilRuler, Plus } from 'lucide-react';
+import { Bell, PanelLeftOpen, PanelRightOpen, PencilRuler, Plus } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState, useEffect, useMemo, useRef, useCallback, startTransition } from 'react';
 import { GoToTop, Header } from '@/gradian-ui/layout';
@@ -32,6 +32,9 @@ import { useTheme } from 'next-themes';
 import { useDialogContext } from '@/gradian-ui/shared/contexts/DialogContext';
 import { cn } from '@/gradian-ui/shared/utils';
 import { useLayoutContext, LayoutProvider } from '@/gradian-ui/layout/contexts/LayoutContext';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage, getT, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -137,6 +140,9 @@ function MainLayoutContent({
   const { selectedCompany } = useCompanyStore();
   const { closeAllDialogs, hasOpenDialogs, registerDialog, unregisterDialog } = useDialogContext();
   const { isMaximized, setTitle, setIcon } = useLayoutContext();
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const rtl = isRTL(language || 'en');
   const pageTitle = title ? `${title} | Gradian` : 'Gradian';
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isNotificationsDropdownOpen, setIsNotificationsDropdownOpen] = useState(false);
@@ -367,7 +373,7 @@ function MainLayoutContent({
         className="md:hidden text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 shrink-0"
         aria-label="Toggle sidebar"
       >
-        <PanelLeftOpen className="h-5 w-5" />
+        {rtl ? <PanelRightOpen className="h-5 w-5" /> : <PanelLeftOpen className="h-5 w-5" />}
       </Button>
       <div className="flex flex-col min-w-0 flex-1">
         <motion.div
@@ -392,14 +398,15 @@ function MainLayoutContent({
               />
             </motion.div>
           )}
-          <motion.h1
+          <motion.h2
+            dir="auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.15 }}
-            className="text-xl md:text-2xl font-semibold text-gray-900 dark:text-gray-100 truncate min-w-0"
+            className="text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100 truncate min-w-0 leading-relaxed"
           >
             {title}
-          </motion.h1>
+          </motion.h2>
           {isAdmin && editSchemaPath && ENABLE_BUILDER && (
             <TooltipProvider delayDuration={200}>
               <Tooltip>
@@ -416,7 +423,7 @@ function MainLayoutContent({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Edit schema (Middle-click to view page in new tab)</p>
+                  <p>{getT(TRANSLATION_KEYS.TOOLTIP_EDIT_SCHEMA, language, defaultLang)}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -424,10 +431,11 @@ function MainLayoutContent({
         </motion.div>
         {subtitle && (
           <motion.div
+            dir="auto"
             initial={{ opacity: 0, x: 5 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
-            className="text-sm text-violet-600 dark:text-violet-400 mt-0.5 hidden lg:block truncate min-w-0"
+            className="text-sm text-violet-600 dark:text-violet-400 mt-0.5 hidden lg:block truncate min-w-0 leading-relaxed"
           >
             {subtitle}
           </motion.div>
@@ -452,7 +460,7 @@ function MainLayoutContent({
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{DEMO_MODE ? 'Demo Mode' : 'Live Mode'}</p>
+              <p>{DEMO_MODE ? getT(TRANSLATION_KEYS.LABEL_DEMO_MODE, language, defaultLang) : getT(TRANSLATION_KEYS.LABEL_LIVE_MODE, language, defaultLang)}</p>
             </TooltipContent>
           </Tooltip>
           {/* Organization settings button that wraps tenant & company selection */}
@@ -529,11 +537,12 @@ function MainLayoutContent({
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-950 relative">
-      {/* Desktop Sidebar - Fixed Position */}
+      {/* Desktop Sidebar - Fixed Position (left in LTR, right in RTL) */}
       {/* Keep sidebar mounted but hidden when maximized to preserve state */}
       <div 
         className={cn(
-          "fixed left-0 top-0 h-full z-30",
+          "fixed top-0 h-full z-30",
+          rtl ? "right-0" : "left-0",
           isMaximized ? "hidden" : "hidden md:block"
         )}
         key="sidebar-container" // Stable key to prevent remounting
@@ -547,6 +556,7 @@ function MainLayoutContent({
             id: selectedCompany.id
           } : undefined}
           navigationSchemas={navigationSchemas}
+          isRtl={rtl}
         />
       </div>
       
@@ -563,13 +573,16 @@ function MainLayoutContent({
               onClick={toggleMobileMenu}
             />
             
-            {/* Mobile Sidebar */}
+            {/* Mobile Sidebar (slides from left in LTR, from right in RTL) */}
             <motion.div
-              initial={{ x: -280 }}
+              initial={rtl ? { x: 280 } : { x: -280 }}
               animate={{ x: 0 }}
-              exit={{ x: -280 }}
+              exit={rtl ? { x: 280 } : { x: -280 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="fixed left-0 top-0 h-full w-80 bg-gray-950 text-white z-50 md:hidden"
+              className={cn(
+                "fixed top-0 h-full w-80 bg-gray-950 text-white z-50 md:hidden",
+                rtl ? "right-0" : "left-0"
+              )}
             >
               <Sidebar 
                 isCollapsed={false} 
@@ -581,19 +594,30 @@ function MainLayoutContent({
                   id: selectedCompany.id
                 } : undefined}
                 navigationSchemas={navigationSchemas}
+                isRtl={rtl}
               />
             </motion.div>
           </>
         )}
       </AnimatePresence>
       
-      {/* Main Content - Adjust margin based on sidebar width */}
+      {/* Main Content - Margin opposite to sidebar (left in LTR, right in RTL) */}
       <motion.div 
         className="flex-1 flex flex-col min-h-0"
-        initial={{ marginLeft: isMaximized ? 0 : sidebarWidth }}
-        animate={{ 
-          marginLeft: isMaximized ? 0 : sidebarWidth
-        }}
+        initial={
+          isMaximized
+            ? { marginLeft: 0, marginRight: 0 }
+            : rtl
+              ? { marginRight: sidebarWidth, marginLeft: 0 }
+              : { marginLeft: sidebarWidth }
+        }
+        animate={
+          isMaximized
+            ? { marginLeft: 0, marginRight: 0 }
+            : rtl
+              ? { marginRight: sidebarWidth, marginLeft: 0 }
+              : { marginLeft: sidebarWidth }
+        }
         transition={{ 
           duration: shouldAnimateSidebar ? 0.3 : 0,
           ease: "easeOut" 

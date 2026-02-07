@@ -86,10 +86,10 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
     };
 
     const textareaClasses = cn(
-      'w-full direction-auto px-3 py-2 border rounded-lg border-gray-300 bg-white text-sm text-gray-900 ring-offset-background placeholder:text-gray-400 transition-colors',
+      'w-full direction-auto px-3 py-2 border rounded-lg border-gray-300 bg-white text-xs text-gray-900 ring-offset-background placeholder:text-gray-400 transition-colors',
       'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-violet-300 focus-visible:ring-offset-1 focus-visible:border-violet-400',
       'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 disabled:text-gray-500',
-      'dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-100 dark:placeholder:text-gray-400 dark:ring-offset-gray-900 dark:focus-visible:ring-violet-500 dark:focus-visible:border-violet-500 dark:disabled:bg-gray-800/30 dark:disabled:text-gray-300',
+      'dark:border-gray-600 dark:bg-gray-900/60 dark:text-gray-400 dark:placeholder:text-gray-400 dark:ring-offset-gray-900 dark:focus-visible:ring-violet-500 dark:focus-visible:border-violet-500 dark:disabled:bg-gray-800/30 dark:disabled:text-gray-300',
       error
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',
@@ -106,7 +106,6 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
         {config.label && (
           <label
             htmlFor={config.name}
-            dir="auto"
             className={getLabelClasses({ error: Boolean(error), required })}
           >
             {config.label}
@@ -130,7 +129,6 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           disabled={disabled}
           className={textareaClasses}
           style={(aiAgentId || enableVoiceInput) ? { paddingRight: '3rem' } : undefined}
-          dir="auto"
           {...props}
         />
           <div className="absolute right-3 top-2 flex items-center gap-1">
@@ -159,7 +157,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           </p>
         )}
         {config.validation?.maxLength && (
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-end">
             {value.length}/{config.validation.maxLength}
           </p>
         )}

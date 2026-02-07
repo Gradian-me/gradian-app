@@ -117,16 +117,17 @@ export function TableBody<T = any>({
       // Use better word breaking for columns with maxWidth - break on words, not characters
       column.maxWidth && 'wrap-break-word',
       column.align === 'center' && 'text-center',
-      column.align === 'right' && 'text-right',
+      (column.align === 'left' || !column.align) && 'text-start',
+      column.align === 'right' && 'text-end',
       // For sticky columns, match the row background for zebra striping, selection, and incomplete
-      column.sticky === 'left' && 'sticky left-0 z-10',
-      column.sticky === 'right' && 'sticky right-0 z-10',
+      column.sticky === 'left' && 'sticky left-0 rtl:left-auto rtl:right-0 z-10',
+      column.sticky === 'right' && 'sticky right-0 rtl:right-auto rtl:left-0 z-10',
       // Set background for sticky columns based on row state (selected > incomplete > striped > default)
       column.sticky === 'left' && (isSelected ? 'bg-blue-50' : (isIncomplete ? 'bg-amber-50/50 dark:bg-amber-950/20' : (striped && rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800'))),
       column.sticky === 'right' && (isSelected ? 'bg-blue-50' : (isIncomplete ? 'bg-amber-50/50 dark:bg-amber-950/20' : (striped && rowIndex % 2 === 1 ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800'))),
       // For non-sticky columns, use transparent to show row background
       !column.sticky && striped && 'bg-transparent',
-      bordered && 'border-r border-gray-200 dark:border-gray-700 last:border-r-0'
+      bordered && 'border-r border-gray-200 dark:border-gray-700 last:border-r-0 rtl:border-r-0 rtl:border-l rtl:last:border-l-0'
     );
   };
 

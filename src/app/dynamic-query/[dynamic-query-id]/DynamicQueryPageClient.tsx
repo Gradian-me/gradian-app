@@ -6,6 +6,9 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { DynamicFilterPane } from '@/gradian-ui/shared/components/DynamicFilterPane';
 import { FormModal } from '@/gradian-ui/form-builder';
 import { DynamicQueryActionsConfig } from '@/gradian-ui/data-display/dynamic-query-table/utils/action-helpers';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 interface DynamicQueryPageClientProps {
   dynamicQueryId: string;
@@ -31,6 +34,10 @@ export function DynamicQueryPageClient({
   const [isSuccess, setIsSuccess] = useState(true); // Default to true to show filter pane initially
   const [editEntityId, setEditEntityId] = useState<{ schemaId: string; entityId: string } | null>(null);
   const refreshFnRef = useRef<(() => Promise<void>) | null>(null);
+
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const searchPlaceholder = getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH_RESULTS, language ?? defaultLang, defaultLang);
   
   // Sync viewMode with flatten state: hierarchy for flatten=false, table for flatten=true
   const viewMode: 'hierarchy' | 'table' = flatten ? 'table' : 'hierarchy';
@@ -104,7 +111,7 @@ export function DynamicQueryPageClient({
             onAddNew={handleAddNew}
             onRefresh={handleRefresh}
             isRefreshing={isRefreshing}
-            searchPlaceholder="Search results..."
+            searchPlaceholder={searchPlaceholder}
             addButtonText="Add New"
             showHierarchy={true}
             showOnlyViews={['hierarchy', 'table']}

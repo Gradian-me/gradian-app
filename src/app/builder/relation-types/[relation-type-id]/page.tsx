@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { DynamicDetailPageClient } from '@/app/page/[schema-id]/[data-id]/DynamicDetailPageClient';
 import { useEffect, useState } from 'react';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -44,6 +44,7 @@ interface PageProps {
 
 export default function RelationTypeDetailPage({ params }: { params: PageProps['params'] }) {
   const router = useRouter();
+  const BackIcon = useBackIcon();
   const [schema, setSchema] = useState<FormSchema | null>(null);
   const [relationTypeId, setRelationTypeId] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -129,7 +130,7 @@ export default function RelationTypeDetailPage({ params }: { params: PageProps['
             onClick={() => router.push('/builder/relation-types')}
             className="mt-4"
           >
-            <ArrowLeft className="h-4 w-4 me-2" />
+            <BackIcon className="h-4 w-4 me-2" />
             Back to Relation Types
           </Button>
         </div>
@@ -150,7 +151,7 @@ export default function RelationTypeDetailPage({ params }: { params: PageProps['
           onClick={() => router.push('/builder/relation-types')}
           className="mb-2"
         >
-          <ArrowLeft className="h-4 w-4 me-2" />
+          <BackIcon className="h-4 w-4 me-2" />
           Back to Relation Types
         </Button>
 

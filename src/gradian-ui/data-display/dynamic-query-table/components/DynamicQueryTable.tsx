@@ -10,7 +10,10 @@ import { SchemaNotFound } from '@/gradian-ui/schema-manager/components';
 import { AccessDenied } from '@/gradian-ui/schema-manager/components';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, RefreshCw, Loader2, ArrowLeft } from 'lucide-react';
+import { AlertCircle, RefreshCw, Loader2 } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
+import { getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { cn } from '@/gradian-ui/shared/utils';
 import { FlatTableSkeleton } from './FlatTableSkeleton';
 import { NestedTableSkeleton } from './NestedTableSkeleton';
@@ -32,6 +35,7 @@ export function DynamicQueryTable({
   dynamicQueryActions,
   onEditEntity,
 }: DynamicQueryTableProps) {
+  const BackIcon = useBackIcon();
   const [internalFlatten, setInternalFlatten] = useState(controlledFlatten);
   const [internalShowIds, setInternalShowIds] = useState(controlledShowIds);
   const [refreshing, setRefreshing] = useState(false);
@@ -236,10 +240,10 @@ export function DynamicQueryTable({
                 <Button
                   variant="outline"
                   onClick={() => window.history.back()}
-                  className="flex items-center space-x-2"
+                  className="flex items-center gap-2"
                 >
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Go Back</span>
+                  <BackIcon className="h-4 w-4" />
+                  <span>{getT(TRANSLATION_KEYS.BUTTON_GO_BACK)}</span>
                 </Button>
               </motion.div>
 

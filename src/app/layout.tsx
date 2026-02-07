@@ -8,6 +8,7 @@ import { SecurityProvider } from "@/components/security/SecurityProvider";
 import { IdleTimeoutProvider } from "@/gradian-ui/shared/providers/IdleTimeoutProvider";
 import { AuthEventListener } from "@/gradian-ui/shared/components/AuthEventListener";
 import { AuthGuard } from "@/components/auth/AuthGuard";
+import { LayoutDirLang } from "@/components/layout/LayoutDirLang";
 
 export const metadata: Metadata = {
   title: "Gradian",
@@ -52,8 +53,9 @@ export default function RootLayout({
         className="font-sans antialiased"
         suppressHydrationWarning={true}
       >
-        <SecurityProvider>
-          <QueryProvider>
+        <QueryProvider>
+          <SecurityProvider>
+            <LayoutDirLang />
             <DialogProvider>
               <ThemeProvider
                 attribute="class"
@@ -70,8 +72,8 @@ export default function RootLayout({
                 </IdleTimeoutProvider>
               </ThemeProvider>
             </DialogProvider>
-          </QueryProvider>
-        </SecurityProvider>
+          </SecurityProvider>
+        </QueryProvider>
       </body>
     </html>
   );

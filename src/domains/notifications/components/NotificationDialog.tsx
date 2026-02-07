@@ -25,6 +25,9 @@ import {
 } from 'lucide-react';
 import { formatRelativeTime, formatFullDate, formatDateTime } from '@/gradian-ui/shared/utils/date-utils';
 import { BadgeRenderer } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
+import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
 
 interface NotificationDialogProps {
   notification: Notification | null;
@@ -33,9 +36,14 @@ interface NotificationDialogProps {
   onMarkAsRead: (id: string) => void;
   onAcknowledge?: (id: string) => void;
   onMarkAsUnread?: (id: string) => void;
+  /** Optional locale for date/time formatting (e.g. 'en', 'fa'). Uses store if not provided. */
+  localeCode?: string | null;
 }
 
-export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead, onAcknowledge, onMarkAsUnread }: NotificationDialogProps) {
+export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead, onAcknowledge, onMarkAsUnread, localeCode: localeCodeProp }: NotificationDialogProps) {
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const localeCode = localeCodeProp ?? language ?? undefined;
   const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
   const [isAcknowledging, setIsAcknowledging] = useState(false);
   const [isMarkingAsUnread, setIsMarkingAsUnread] = useState(false);
@@ -151,7 +159,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                   </Badge>
                   {!notification.isRead && (
                     <Badge variant="default" className="text-xs bg-violet-600">
-                      Unread
+                      {getT(TRANSLATION_KEYS.LABEL_UNREAD, language, defaultLang)}
                     </Badge>
                   )}
                 </div>
@@ -167,7 +175,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center space-x-2 text-gray-900 dark:text-gray-100">
                   <AlertCircle className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                  <span>Message</span>
+                  <span>{getT(TRANSLATION_KEYS.LABEL_MESSAGE, language, defaultLang)}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -183,7 +191,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center space-x-2 text-gray-900 dark:text-gray-100">
                     <Tag className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                    <span>Details</span>
+                    <span>{getT(TRANSLATION_KEYS.LABEL_DETAILS, language, defaultLang)}</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -226,38 +234,38 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center space-x-2 text-gray-900 dark:text-gray-100">
                   <Clock className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                  <span>Timeline</span>
+                  <span>{getT(TRANSLATION_KEYS.LABEL_TIMELINE, language, defaultLang)}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Created</span>
-                    <div className="text-sm text-gray-900 dark:text-gray-200">
-                      {formatFullDate(notification.createdAt)}
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{getT(TRANSLATION_KEYS.LABEL_CREATED, language, defaultLang)}</span>
+                    <div className="text-sm text-gray-900 dark:text-gray-200" dir="ltr">
+                      {formatFullDate(notification.createdAt, localeCode)}
                       <span className="text-gray-500 dark:text-gray-400 ms-2">
-                        ({formatRelativeTime(notification.createdAt)})
+                        ({formatRelativeTime(notification.createdAt, { addSuffix: true, localeCode })})
                       </span>
                     </div>
                   </div>
                   {notification.readAt && (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Read</span>
-                      <div className="text-sm text-gray-900 dark:text-gray-200">
-                        {formatFullDate(notification.readAt)}
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{getT(TRANSLATION_KEYS.LABEL_READ, language, defaultLang)}</span>
+                      <div className="text-sm text-gray-900 dark:text-gray-200" dir="ltr">
+                        {formatFullDate(notification.readAt, localeCode)}
                         <span className="text-gray-500 dark:text-gray-400 ms-2">
-                          ({formatRelativeTime(notification.readAt)})
+                          ({formatRelativeTime(notification.readAt, { addSuffix: true, localeCode })})
                         </span>
                       </div>
                     </div>
                   )}
                   {notification.acknowledgedAt && (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Acknowledged</span>
-                      <div className="text-sm text-gray-900 dark:text-gray-200">
-                        {formatFullDate(notification.acknowledgedAt)}
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{getT(TRANSLATION_KEYS.LABEL_ACKNOWLEDGED, language, defaultLang)}</span>
+                      <div className="text-sm text-gray-900 dark:text-gray-200" dir="ltr">
+                        {formatFullDate(notification.acknowledgedAt, localeCode)}
                         <span className="text-gray-500 dark:text-gray-400 ms-2">
-                          ({formatRelativeTime(notification.acknowledgedAt)})
+                          ({formatRelativeTime(notification.acknowledgedAt, { addSuffix: true, localeCode })})
                         </span>
                       </div>
                     </div>
@@ -282,7 +290,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                       className="text-sm bg-violet-600 hover:bg-violet-700 text-white border-violet-600"
                     >
                       <CheckCheck className="h-4 w-4 me-2" />
-                      {isAcknowledging ? 'Acknowledging...' : 'Acknowledge'}
+                      {isAcknowledging ? getT(TRANSLATION_KEYS.MESSAGE_ACKNOWLEDGING, language, defaultLang) : getT(TRANSLATION_KEYS.BUTTON_ACKNOWLEDGE, language, defaultLang)}
                     </Button>
                   ) : null
                 ) : (
@@ -293,7 +301,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                     className="text-sm"
                   >
                     <CheckCircle2 className="h-4 w-4 me-2" />
-                    {isMarkingAsRead ? 'Marking...' : 'Mark as Read'}
+                    {isMarkingAsRead ? getT(TRANSLATION_KEYS.MESSAGE_MARKING, language, defaultLang) : getT(TRANSLATION_KEYS.BUTTON_MARK_AS_READ, language, defaultLang)}
                   </Button>
                 )
               ) : (
@@ -305,7 +313,7 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                     className="text-sm"
                   >
                     <Circle className="h-4 w-4 me-2" />
-                    {isMarkingAsUnread ? 'Marking...' : 'Mark as Unread'}
+                    {isMarkingAsUnread ? getT(TRANSLATION_KEYS.MESSAGE_MARKING, language, defaultLang) : getT(TRANSLATION_KEYS.BUTTON_MARK_AS_UNREAD, language, defaultLang)}
                   </Button>
                 )
               )}
@@ -319,11 +327,11 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                   className="bg-violet-600 hover:bg-violet-700"
                 >
                   <ExternalLink className="h-4 w-4 me-2" />
-                  View Details
+                  {getT(TRANSLATION_KEYS.BUTTON_VIEW_DETAILS, language, defaultLang)}
                 </Button>
               )}
               <Button variant="outline" onClick={onClose}>
-                Close
+                {getT(TRANSLATION_KEYS.BUTTON_CLOSE, language, defaultLang)}
               </Button>
             </div>
           </div>

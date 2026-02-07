@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import React from 'react';
-import { ArrowLeft, Edit, RefreshCw, Trash2, LayoutList } from 'lucide-react';
+import { Edit, RefreshCw, Trash2, LayoutList } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
 import { AvatarUser } from './AvatarUser';
@@ -27,6 +27,10 @@ import { CodeBadge } from '../../form-builder/form-elements';
 import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
 import { FormModal } from '../../form-builder';
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { useLanguageStore } from '@/stores/language.store';
 import { Skeleton } from '../../../components/ui/skeleton';
 import Link from 'next/link';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -40,6 +44,7 @@ import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer
 import { CardWrapper, CardHeader, CardContent, CardTitle } from '../card/components/CardWrapper';
 import { EndLine } from '../../layout/end-line/components/EndLine';
 import { EntityNotFound } from '@/gradian-ui/schema-manager/components';
+import { getSchemaTranslatedSingularName, getSchemaTranslatedPluralName, getSectionTranslatedTitle, getSectionTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
 
 export interface DynamicDetailPageRendererProps {
   schema: FormSchema;
@@ -416,6 +421,18 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   preloadedSchemas = [],
   customQuickActionHandler,
 }) => {
+  const BackIcon = useBackIcon();
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const labelBack = getT(TRANSLATION_KEYS.BUTTON_BACK, language ?? undefined, defaultLang);
+  const labelViewList = getT(TRANSLATION_KEYS.BUTTON_VIEW_LIST, language ?? undefined, defaultLang);
+  const labelRefresh = getT(TRANSLATION_KEYS.BUTTON_REFRESH, language ?? undefined, defaultLang);
+  const labelRefreshing = getT(TRANSLATION_KEYS.MESSAGE_REFRESHING, language ?? undefined, defaultLang);
+  const labelEdit = getT(TRANSLATION_KEYS.BUTTON_EDIT, language ?? undefined, defaultLang);
+  const labelDelete = getT(TRANSLATION_KEYS.BUTTON_DELETE, language ?? undefined, defaultLang);
+  const translatedPluralName = getSchemaTranslatedPluralName(schema, language ?? defaultLang, schema?.plural_name || schema?.title || schema?.name || 'Schema');
+  const translatedSingularName = getSchemaTranslatedSingularName(schema, language ?? defaultLang, schema?.singular_name || schema?.name || 'Entity');
+
   const [editEntityId, setEditEntityId] = useState<string | null>(null);
   const [relatedSchemas, setRelatedSchemas] = useState<string[]>([]);
   const [isLoadingAutoTables, setIsLoadingAutoTables] = useState(false);
@@ -443,7 +460,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   const isFetchingRef = useRef(false);
   const [documentTitle, setDocumentTitle] = useState<string>('');
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const refreshLabel = schema.singular_name || 'Record';
+  const refreshLabel = translatedSingularName;
 
   const handleRefreshAction = useCallback(async () => {
     if (!onRefreshData) {
@@ -500,8 +517,8 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
           id: `auto-table-${section.id}`,
           schemaId: schema.id,
           sectionId: section.id,
-          title: section.title || section.id,
-          description: section.description,
+          title: getSectionTranslatedTitle(section, language ?? defaultLang, section.title || section.id),
+          description: getSectionTranslatedDescription(section, language ?? defaultLang, section.description ?? ''),
           ...(isRelationBased && section.repeatingConfig ? {
             targetSchema: section.repeatingConfig.targetSchema,
             relationTypeId: section.repeatingConfig.relationTypeId,
@@ -509,7 +526,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
         };
         return tableRenderer;
       });
-  }, [schema?.sections, schema?.id, tableRenderersFromMetadata]);
+  }, [schema?.sections, schema?.id, tableRenderersFromMetadata, language, defaultLang]);
 
   // Combine explicit and auto-generated table renderers
   const allTableRenderers = useMemo(() => {
@@ -760,18 +777,17 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     }
 
     const previousTitle = document.title;
-    const schemaTitle = schema?.plural_name || schema?.title || schema?.name || 'Schema';
     const dynamicTitle = headerInfo.title || headerInfo.subtitle || headerInfo.code || pageData?.name || '';
     const fullTitle = dynamicTitle
-      ? `${schemaTitle} - ${dynamicTitle} | Gradian`
-      : `${schemaTitle} | Gradian`;
+      ? `${translatedPluralName} - ${dynamicTitle} | Gradian`
+      : `${translatedPluralName} | Gradian`;
 
     document.title = fullTitle;
 
     return () => {
       document.title = previousTitle;
     };
-  }, [schema?.plural_name, schema?.title, schema?.name, headerInfo.title, headerInfo.subtitle, headerInfo.code, pageData?.name]);
+  }, [translatedPluralName, headerInfo.title, headerInfo.subtitle, headerInfo.code, pageData?.name]);
 
   // Show skeleton when loading or refreshing
   if (isLoading || isRefreshing) {
@@ -1009,7 +1025,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   // Only show error if not refreshing and not a standalone page
   // Standalone pages can render without data
   if (error && !isRefreshing && !isStandalonePage) {
-    const entityName = schema.singular_name || schema.name || 'Entity';
+    const entityName = translatedSingularName;
     // Try to extract entity ID from data, URL, or error message
     const entityId = data?.id || (() => {
       if (typeof window !== 'undefined') {
@@ -1168,11 +1184,11 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
             <div className='flex items-center justify-between w-full'>
               {showBackButton && (onBack || backUrl) && (
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   onClick={onBack}
                 >
-                  <ArrowLeft className="h-4 w-4 me-2" />
-                  {showBack ? 'Back' : (schema.plural_name || 'Back')}
+                  <BackIcon className="h-4 w-4 me-2" />
+                  {showBack ? labelBack : (schema.plural_name || labelBack)}
                 </Button>
               )}
 
@@ -1182,7 +1198,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     <Button variant="outline" asChild className="px-4 py-2 gap-2">
                       <Link href={`/page/${schema.id}`}>
                         <LayoutList className="h-4 w-4" />
-                        <span className="hidden md:block">View List</span>
+                        <span className="hidden md:block">{labelViewList}</span>
                       </Link>
                     </Button>
                   )}
@@ -1194,19 +1210,19 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       className="px-4 py-2 gap-2"
                     >
                       <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                      <span className="hidden md:block">{isRefreshing ? 'Refreshing...' : 'Refresh'}</span>
+                      <span className="hidden md:block">{isRefreshing ? labelRefreshing : labelRefresh}</span>
                     </Button>
                   )}
                   {onEdit && (
                     <Button variant="outline" onClick={handleEdit} className="px-4 py-2 gap-2">
                       <Edit className="h-4 w-4  " />
-                      <span className='hidden md:block'>Edit</span>
+                      <span className='hidden md:block'>{labelEdit}</span>
                     </Button>
                   )}
                   {onDelete && (
                     <Button variant="outline" onClick={onDelete} className="text-red-600 hover:text-red-700 px-4 py-2 gap-2">
                       <Trash2 className="h-4 w-4 " />
-                      <span className='hidden md:block'>Delete</span>
+                      <span className='hidden md:block'>{labelDelete}</span>
                     </Button>
                   )}
                 </div>

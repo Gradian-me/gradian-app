@@ -7,6 +7,9 @@ import { Copy, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { cn } from '../../../shared/utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 interface CopyContentProps {
   content: string | number;
@@ -20,6 +23,12 @@ export const CopyContent: React.FC<CopyContentProps> = ({
   disabled = false,
 }) => {
   const [copied, setCopied] = useState(false);
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const labelCopy = getT(TRANSLATION_KEYS.ACTION_COPY_TO_CLIPBOARD, language ?? undefined, defaultLang);
+  const labelCopied = getT(TRANSLATION_KEYS.MESSAGE_COPIED, language ?? undefined, defaultLang);
+  const toastCopied = getT(TRANSLATION_KEYS.MESSAGE_COPIED_TO_CLIPBOARD, language ?? undefined, defaultLang);
+  const toastFailed = getT(TRANSLATION_KEYS.MESSAGE_FAILED_TO_COPY, language ?? undefined, defaultLang);
 
   const handleCopy = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -85,8 +94,8 @@ export const CopyContent: React.FC<CopyContentProps> = ({
         copied && 'text-green-600 hover:text-green-600',
         className
       )}
-      title={copied ? 'Copied!' : 'Copy to clipboard'}
-      aria-label="Copy to clipboard"
+      title={copied ? labelCopied : labelCopy}
+      aria-label={labelCopy}
     >
       <div className="relative w-4 h-4">
         <Copy 

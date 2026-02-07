@@ -2,8 +2,11 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FileQuestion, ArrowLeft, Home, RefreshCw, Loader2, LayoutDashboard } from 'lucide-react';
+import { FileQuestion, Home, RefreshCw, Loader2, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
+import { getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Card } from '@/components/ui/card';
 
 interface SchemaNotFoundProps {
@@ -31,6 +34,7 @@ export function SchemaNotFound({
   refreshing = false,
   errorCodeText,
 }: SchemaNotFoundProps) {
+  const BackIcon = useBackIcon();
   const handleGoBack = () => {
     if (onGoBack) {
       onGoBack();
@@ -102,10 +106,10 @@ export function SchemaNotFound({
                   <Button
                     onClick={handleGoBack}
                     variant="outline"
-                    className="flex items-center space-x-2"
+                    className="flex items-center gap-2"
                   >
-                    <ArrowLeft className="h-4 w-4" />
-                    <span>Go Back</span>
+                    <BackIcon className="h-4 w-4" />
+                    <span>{getT(TRANSLATION_KEYS.BUTTON_GO_BACK)}</span>
                   </Button>
                 )}
                 {onRefresh && (

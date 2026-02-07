@@ -7,30 +7,52 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CompanySelector } from './CompanySelector';
 import { TenantSelector } from './TenantSelector';
+import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useCompanyStore } from '@/stores/company.store';
+import { useLanguageStore } from '@/stores/language.store';
 import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { cn } from '@/gradian-ui/shared/utils';
 import { useTheme } from 'next-themes';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export function OrganizationSettings() {
   const { selectedTenant } = useTenantStore();
   const { selectedCompany } = useCompanyStore();
+  const language = useLanguageStore((s) => s.language);
+  const setLanguage = useLanguageStore((s) => s.setLanguage);
   const { resolvedTheme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
+  const defaultLang = getDefaultLanguage();
 
-  const tenantLabel =
-    selectedTenant && (selectedTenant.title || selectedTenant.name)
-      ? String(selectedTenant.title || selectedTenant.name).trim()
-      : 'None';
+  const hasTenant = !!(selectedTenant && (selectedTenant.title || selectedTenant.name));
+  const tenantLabel = hasTenant
+    ? String(selectedTenant!.title || selectedTenant!.name).trim()
+    : 'None';
 
+  const isAllCompanies = selectedCompany?.id === -1;
   const companyLabel =
     selectedCompany && selectedCompany.name
       ? String(selectedCompany.name).trim()
       : 'None';
 
-  const tooltipText = `Tenant: ${tenantLabel} Company: ${companyLabel}`;
-  const hasSelection = tenantLabel !== 'None' || companyLabel !== 'None';
+  const labelOrganization = getT(TRANSLATION_KEYS.LABEL_ORGANIZATION, language, defaultLang);
+  const labelSelectOrganization = getT(TRANSLATION_KEYS.LABEL_SELECT_ORGANIZATION, language, defaultLang);
+  const labelTenant = getT(TRANSLATION_KEYS.LABEL_TENANT, language, defaultLang);
+  const labelCompany = getT(TRANSLATION_KEYS.LABEL_COMPANY, language, defaultLang);
+  const labelNone = getT(TRANSLATION_KEYS.LABEL_NONE, language, defaultLang);
+  const labelAllCompanies = getT(TRANSLATION_KEYS.LABEL_ALL_COMPANIES, language, defaultLang);
+
+  const tenantDisplay = tenantLabel === 'None' ? labelNone : tenantLabel;
+  const companyDisplay =
+    !selectedCompany || companyLabel === 'None'
+      ? labelNone
+      : isAllCompanies || companyLabel === 'All Companies'
+        ? labelAllCompanies
+        : companyLabel;
+  const tooltipText = `${labelTenant}: ${tenantDisplay} • ${labelCompany}: ${companyDisplay}`;
+  const hasSelection = hasTenant || companyLabel !== 'None';
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -57,7 +79,7 @@ export function OrganizationSettings() {
           >
             <Building2 className="h-4 w-4" />
             <span className="hidden sm:inline text-xs font-medium">
-              {hasSelection ? 'Organization' : 'Select organization'}
+              {hasSelection ? labelOrganization : labelSelectOrganization}
             </span>
             <ChevronDown className="h-4 w-4 shrink-0 text-gray-500" />
           </Button>
@@ -88,7 +110,7 @@ export function OrganizationSettings() {
               >
                 <Building2 className="h-4 w-4" />
                 <span className="hidden sm:inline text-xs font-medium">
-                  {hasSelection ? 'Organization' : 'Select organization'}
+                  {hasSelection ? labelOrganization : labelSelectOrganization}
                 </span>
                 <ChevronDown
                   className={cn(
@@ -102,16 +124,16 @@ export function OrganizationSettings() {
             <PopoverContent className="w-72 p-2 space-y-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg">
               <div className="px-1 pb-2 border-b border-gray-200 dark:border-gray-700">
                 <p className="text-xs font-semibold text-gray-800 dark:text-gray-100">
-                  Organization
+                  {labelOrganization}
                 </p>
                 <p className="mt-0.5 text-[11px] text-gray-500 dark:text-gray-400 truncate">
-                  Tenant: {tenantLabel} • Company: {companyLabel}
+                  {labelTenant}: {tenantDisplay} • {labelCompany}: {companyDisplay}
                 </p>
               </div>
 
               <div className="space-y-1 pt-1">
                 <p className="text-[11px] font-medium text-gray-600 dark:text-gray-300">
-                  Tenant
+                  {labelTenant}
                 </p>
                 {/* Always show TenantSelector: interactive in demo, disabled in live */}
                 <TenantSelector disabled={!DEMO_MODE} fullWidth />
@@ -119,9 +141,17 @@ export function OrganizationSettings() {
 
               <div className="space-y-1 pt-1">
                 <p className="text-[11px] font-medium text-gray-600 dark:text-gray-300">
-                  Company
+                  {labelCompany}
                 </p>
                 <CompanySelector fullWidth showLogo="sidebar-avatar" />
+              </div>
+
+              <div className="space-y-1 pt-2 border-t border-gray-200 dark:border-gray-700">
+                <LanguageSelector
+                  value={language}
+                  onChange={setLanguage}
+                  className="w-full"
+                />
               </div>
             </PopoverContent>
           </Popover>

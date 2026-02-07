@@ -170,7 +170,6 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            dir="auto"
             className={getLabelClasses({ error: Boolean(error), required: Boolean(required) })}
           >
             {fieldLabel}
@@ -198,7 +197,7 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
           {...props}
         />
           {canCopy && (value !== '' && value !== null && value !== undefined && (typeof value !== 'number' || !isNaN(value))) && (
-            <div className="absolute right-1 top-1/2 -translate-y-1/2">
+            <div className="absolute end-1 top-1/2 -translate-y-1/2">
               <CopyContent content={value} />
             </div>
           )}

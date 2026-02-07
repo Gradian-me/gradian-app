@@ -253,7 +253,7 @@ export const CodeViewer: React.FC<CodeViewerProps> = ({
               'focus:ring-0 focus:outline-none',
               'overflow-auto'
             )}
-            dir="auto"
+            dir="ltr"
             style={{
               fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace',
               whiteSpace: 'pre',

@@ -4,6 +4,9 @@ import { TableColumn, ColumnWidthMap } from '../types';
 import { buildTableColumns } from '../utils';
 import { ForceIcon } from '@/gradian-ui/form-builder/form-elements/components/ForceIcon';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { useLanguageStore } from '@/stores/language.store';
 
 export interface UseRepeatingTableColumnsOptions {
   fields: any[];
@@ -22,6 +25,9 @@ export function useRepeatingTableColumns({
   getRowId,
   showForceColumn = true, // Default to true for backward compatibility
 }: UseRepeatingTableColumnsOptions): TableColumn[] {
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+
   const baseColumns = useMemo(() => {
     if (!schemaForColumns) {
       return [];
@@ -32,8 +38,8 @@ export function useRepeatingTableColumns({
       return [];
     }
 
-    return buildTableColumns(fields, schemaForColumns, columnWidths);
-  }, [columnWidths, fields, schemaForColumns]);
+    return buildTableColumns(fields, schemaForColumns, columnWidths, language, defaultLang);
+  }, [columnWidths, fields, schemaForColumns, language, defaultLang]);
 
   const columnsWithActions = useMemo(() => {
     if (!renderActionCell) {
@@ -42,7 +48,7 @@ export function useRepeatingTableColumns({
 
     const viewColumn: TableColumn = {
       id: 'actions',
-      label: 'Actions',
+      label: getT(TRANSLATION_KEYS.LABEL_ACTIONS, language, defaultLang),
       accessor: 'id',
       sortable: false,
       align: 'center',
@@ -122,7 +128,7 @@ export function useRepeatingTableColumns({
     }
 
     return [viewColumn, ...baseColumns];
-  }, [baseColumns, getRowId, renderActionCell, showForceColumn]);
+  }, [baseColumns, getRowId, renderActionCell, showForceColumn, language, defaultLang]);
 
   return columnsWithActions;
 }

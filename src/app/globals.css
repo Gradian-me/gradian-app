@@ -215,6 +215,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+label {
+  font-size: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
 /* Modern minimal scrollbar */
 * {
   scrollbar-width: thin;

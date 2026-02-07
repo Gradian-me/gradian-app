@@ -18,6 +18,9 @@ import { MaximizeButton } from './MaximizeButton';
 import { useLayoutContext } from '../contexts/LayoutContext';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { ModeToggle } from '../mode-toggle';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 // Dynamically import QRCodeDialog to avoid SSR issues with HTMLCanvasElement
 const QRCodeDialog = dynamic(
@@ -55,6 +58,16 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
   const [currentValue, setCurrentValue] = useState<string>('');
   const pathname = usePathname();
   const { isMaximized, title, icon } = useLayoutContext();
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const labelGoToApps = getT(TRANSLATION_KEYS.ACTION_GO_TO_APPS, language, defaultLang);
+  const labelToggleTheme = getT(TRANSLATION_KEYS.ACTION_TOGGLE_THEME, language, defaultLang);
+  const labelShowQRCode = getT(TRANSLATION_KEYS.ACTION_SHOW_QR_CODE, language, defaultLang);
+  const labelShare = getT(TRANSLATION_KEYS.ACTION_SHARE, language, defaultLang);
+  const labelMaximizeView = getT(TRANSLATION_KEYS.ACTION_MAXIMIZE_VIEW, language, defaultLang);
+  const labelMinimizeView = getT(TRANSLATION_KEYS.ACTION_MINIMIZE_VIEW, language, defaultLang);
+  const titleSharePage = getT(TRANSLATION_KEYS.TITLE_SHARE_THIS_PAGE, language, defaultLang);
+  const textSharePage = getT(TRANSLATION_KEYS.TEXT_CHECK_OUT_THIS_PAGE, language, defaultLang);
 
   useEffect(() => {
     // Use provided value or current URL
@@ -89,7 +102,7 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
                 variant="outline"
                 size="sm"
                 className="h-10 w-10 p-0 rounded-lg"
-                aria-label="Go to Apps"
+                aria-label={labelGoToApps}
               >
                 <Link href={URL_HOME}>
                   <LayoutDashboard className="h-4 w-4" />
@@ -97,7 +110,7 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Go to Apps</p>
+              <p>{labelGoToApps}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -147,7 +160,11 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
 
       {/* Right side / inline actions */}
       <div className={cn('flex items-center gap-2', isInline && 'justify-end')}>
-        <MaximizeButton layout={isInline ? 'inline' : 'default'} />
+        <MaximizeButton
+          layout={isInline ? 'inline' : 'default'}
+          labelMaximize={labelMaximizeView}
+          labelMinimize={labelMinimizeView}
+        />
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -162,7 +179,7 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Toggle theme</p>
+              <p>{labelToggleTheme}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -179,13 +196,13 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
                       ? 'h-11 w-11 p-0 rounded-xl'
                       : 'h-10 w-10 p-0 rounded-lg',
                   )}
-                  aria-label="Show QR Code"
+                  aria-label={labelShowQRCode}
                 >
                   <QrCode className="h-4 w-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Show QR Code</p>
+                <p>{labelShowQRCode}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -194,8 +211,9 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
         {showShare && (
           <ShareButton
             value={currentValue}
-            title="Share this page"
-            text="Check out this page"
+            title={titleSharePage}
+            text={textSharePage}
+            tooltipLabel={labelShare}
             variant="outline"
             size={isInline ? 'sm' : 'md'}
             className={cn(

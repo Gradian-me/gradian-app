@@ -35,10 +35,15 @@ import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { useDashboard } from '../hooks/useDashboard';
 import { LoadingSpinner, UserWelcome } from '@/gradian-ui/layout/components';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export function DashboardPage() {
   const user = useUserStore((state) => state.user);
   const language = useLanguageStore((state) => state.language || 'en');
+  const defaultLang = getDefaultLanguage();
+  const dashboardTitle = getT(TRANSLATION_KEYS.TITLE_DASHBOARD, language, defaultLang);
+  const loadingSubtitle = getT(TRANSLATION_KEYS.SUBTITLE_LOADING_DASHBOARD, language, defaultLang);
   const {
     stats,
     spendAnalysisData,
@@ -109,7 +114,7 @@ export function DashboardPage() {
   const subtitle = `Welcome back, ${userDisplayName}!`;
 
   return (
-    <MainLayout title="Dashboard" subtitle={subtitle} icon="LayoutDashboard">
+    <MainLayout title={dashboardTitle} subtitle={subtitle} icon="LayoutDashboard">
       <div className="space-y-6">
         <UserWelcome
           userName={userDisplayName}

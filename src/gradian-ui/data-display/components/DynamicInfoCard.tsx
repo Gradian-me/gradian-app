@@ -1,8 +1,13 @@
 // Dynamic Info Card Component
 // Renders key-value information cards for detail pages
 
+'use client';
+
 import { motion } from 'framer-motion';
 import React from 'react';
+import { useLanguageStore } from '@/stores/language.store';
+import { isRTL, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getSectionTranslatedTitle, getSectionTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { resolveFieldById } from '../../form-builder/form-elements/utils/field-resolver';
 import { CardContent, CardHeader, CardTitle, CardWrapper } from '../card/components/CardWrapper';
@@ -16,9 +21,9 @@ import { formatFieldValue } from '../table/utils/field-formatters';
 import { FormulaDisplay } from '@/gradian-ui/form-builder/form-elements/components/FormulaDisplay';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 
-/** CSS-only hover: slide right + subtle background. Standard Tailwind so it always applies. */
+/** CSS-only hover: slide toward inline-end + subtle background. RTL-aware so direction follows reading direction. */
 const FIELD_HOVER_CLASS =
-  'transition-[transform,background-color] duration-75 ease-out hover:translate-x-1 hover:bg-gray-50 dark:hover:bg-gray-600/30 rounded-lg -mx-1 px-1 py-0.5';
+  'transition-[transform,background-color] duration-75 ease-out hover:translate-x-1 rtl:hover:-translate-x-1 hover:bg-gray-50 dark:hover:bg-gray-600/30 rounded-lg -mx-1 px-1 py-0.5';
 
 export interface DynamicInfoCardProps {
   section: DetailPageSection;
@@ -61,6 +66,12 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
   disableAnimation = false,
   className
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
+  const isRtl = isRTL(language);
+  const sectionTitle = getSectionTranslatedTitle(section, language ?? defaultLang, section.title || section.id);
+  const sectionDescription = getSectionTranslatedDescription(section, language ?? defaultLang, section.description ?? '');
+
   // Default grid columns and gap (removed from schema)
   const gridColumns = 2 as 1 | 2 | 3;
   const gap = 4 as 2 | 3 | 4 | 6;
@@ -149,6 +160,7 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
             delay: index * 0.1
           }}
           className={cardClasses}
+          dir={isRtl ? 'rtl' : undefined}
         >
           <CardWrapper
             config={{
@@ -216,11 +228,12 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
         delay: index * 0.1
       }}
       className={cardClasses}
+      dir={isRtl ? 'rtl' : undefined}
     >
       <CardWrapper
         config={{
           id: section.id,
-          name: section.title,
+          name: sectionTitle,
           styling: {
             variant: 'default',
             size: 'md'
@@ -230,11 +243,11 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
       >
         <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
           <div className="flex items-center gap-2" dir="auto">
-            <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{section.title}</CardTitle>
+            <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{sectionTitle}</CardTitle>
             <ForceIcon isForce={data?.isForce === true} size="sm" />
           </div>
-          {section.description && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5" dir="auto">{section.description}</p>
+          {sectionDescription && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5" dir="auto">{sectionDescription}</p>
           )}
         </CardHeader>
         <CardContent>
@@ -298,14 +311,14 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                 );
               }
               
-              // Rating: label and stars on one row with justify-between
+              // Rating: label and stars on one row with justify-between (inherit dir so RTL flips row)
               if (isRating) {
                 return (
                   <div
                     key={field.id}
                     className={cn(fieldClasses, FIELD_HOVER_CLASS)}
                   >
-                    <div className="flex items-center justify-between gap-4 w-full" dir="auto">
+                    <div className="flex items-center justify-between gap-4 w-full">
                       <label dir="auto" className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 shrink-0">
                         {field.icon && (
                           <IconRenderer iconName={field.icon} className="h-4 w-4" />
@@ -320,14 +333,14 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                 );
               }
 
-              // Number: label and value on one row with justify-between
+              // Number: label and value on one row with justify-between (inherit dir so RTL flips row)
               if (isNumber) {
                 return (
                   <div
                     key={field.id}
                     className={cn(fieldClasses, FIELD_HOVER_CLASS)}
                   >
-                    <div className="flex items-center justify-between gap-4 w-full" dir="auto">
+                    <div className="flex items-center justify-between gap-4 w-full">
                       <label dir="auto" className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 shrink-0">
                         {field.icon && (
                           <IconRenderer iconName={field.icon} className="h-4 w-4" />
@@ -359,7 +372,7 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                   )} dir="auto">
                     <div className={cn(
                       "text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word",
-                      (isListInput || isPicker) ? "w-full" : "flex-1",
+                      (isListInput || isPicker) ? "w-full min-w-0" : "flex-1 min-w-0",
                       (isListInput || isPicker) && "min-w-0"
                     )} dir="auto">
                       {field.component === 'formula' && field.formula ? (

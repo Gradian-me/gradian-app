@@ -121,6 +121,16 @@ export const ENABLE_BUILDER: boolean = (() => {
 })();
 
 // ===========================================
+// Localization
+// ===========================================
+
+/**
+ * Default app language (e.g. 'en', 'fa'). Used when no language is persisted.
+ * Set via NEXT_PUBLIC_DEFAULT_LANGUAGE (client and server).
+ * Resolved in getDefaultLanguage() from translation-utils.
+ */
+
+// ===========================================
 // Convenience Exports
 // ===========================================
 

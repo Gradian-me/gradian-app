@@ -188,7 +188,7 @@ export const MarkdownInput = forwardRef<FormElementRef, TextareaProps>(
           </p>
         )}
         {config.validation?.maxLength && (
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-end">
             {value.length}/{config.validation.maxLength}
           </p>
         )}

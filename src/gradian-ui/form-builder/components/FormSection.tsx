@@ -6,6 +6,9 @@ import { FormElementFactory } from '../form-elements';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { cn } from '../../shared/utils';
 import { getFieldsForSection } from '../form-elements/utils/field-resolver';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const FormSection: React.FC<FormSectionProps> = ({
   section,
@@ -24,6 +27,9 @@ export const FormSection: React.FC<FormSectionProps> = ({
   // Get fields for this section from the schema
   const fields = getFieldsForSection(schema, section.id);
   const { title, description, layout, styling, isRepeatingSection } = section;
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const noItemsAddedYet = getT(TRANSLATION_KEYS.EMPTY_NO_ITEMS_ADDED_YET, language, defaultLang);
 
   const sectionClasses = cn(
     'space-y-3',
@@ -124,7 +130,7 @@ export const FormSection: React.FC<FormSectionProps> = ({
 
           {repeatingItems.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <p>No items added yet</p>
+              <p className="text-sm">{noItemsAddedYet}</p>
             </div>
           ) : (
             <div className="space-y-3">

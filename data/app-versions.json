@@ -6512,5 +6512,58 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50001000000000000001",
+    "timestamp": "2026-02-07T00:00:00.000Z",
+    "version": "1.50.001",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "FEATURE MAJOR: Translation support across app level, schema, and forms for full internationalization.",
+        "priority": "High",
+        "affectedDomains": [
+          "layout",
+          "schema-manager",
+          "form-builder",
+          "i18n"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Enhanced schema definitions in all-schemas.json to include multilingual translations for various fields, improving accessibility and user experience.",
+        "priority": "High",
+        "affectedDomains": [
+          "schema-manager",
+          "data"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Updated layout.tsx to integrate LayoutDirLang for better text direction handling.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Modified AI Builder and related pages to utilize BackIcon for consistent navigation experience.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ai-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved internationalization support and user interface consistency across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "i18n",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

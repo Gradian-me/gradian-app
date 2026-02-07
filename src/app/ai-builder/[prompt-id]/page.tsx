@@ -21,8 +21,9 @@ import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/com
 import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { config } from '@/lib/config';
 import { useUserStore } from '@/stores/user.store';
-import { ArrowLeft } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { extractParametersBySectionId } from '@/domains/ai-builder/utils/ai-shared-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -31,6 +32,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 export default function AiBuilderPromptPage() {
   const params = useParams();
   const router = useRouter();
+  const BackIcon = useBackIcon();
   const promptId = params['prompt-id'] as string;
   
   const [selectedAgentId, setSelectedAgentId] = useState<string>('');
@@ -490,7 +492,7 @@ export default function AiBuilderPromptPage() {
       <div className="space-y-6 max-w-5xl mx-auto">
         <div className="flex items-center justify-between">
           <Button onClick={() => router.push('/ai-builder')} variant="outline" size="sm">
-            <ArrowLeft className="h-4 w-4 me-2" />
+            <BackIcon className="h-4 w-4 me-2" />
             Back to AI Builder
           </Button>
         </div>
@@ -593,8 +595,8 @@ export default function AiBuilderPromptPage() {
         <ConfirmationMessage
           isOpen={showResetConfirm}
           onOpenChange={setShowResetConfirm}
-          title="Reset Everything"
-          message="Are you sure you want to reset everything? This will clear your prompt, selected agent, AI response, annotations, and all related data. This action cannot be undone."
+          title={[{ en: 'Reset Everything' }, { fa: 'بازنشانی همه' }, { ar: 'إعادة تعيين الكل' }, { es: 'Restablecer todo' }, { fr: 'Tout réinitialiser' }, { de: 'Alles zurücksetzen' }, { it: 'Reimposta tutto' }, { ru: 'Сбросить всё' }]}
+          message={[{ en: 'Are you sure you want to reset everything? This will clear your prompt, selected agent, AI response, annotations, and all related data. This action cannot be undone.' }, { fa: 'آیا مطمئن هستید که می‌خواهید همه را بازنشانی کنید؟ پرامپت، عامل انتخاب‌شده، پاسخ هوش مصنوعی، حاشیه‌نویسی‌ها و تمام داده‌های مرتبط پاک خواهند شد. این عمل قابل بازگشت نیست.' }, { ar: 'هل أنت متأكد أنك تريد إعادة تعيين كل شيء؟ سيؤدي ذلك إلى مسح المطالبة والوكيل المحدد واستجابة الذكاء الاصطناعي والتعليقات التوضيحية وجميع البيانات ذات الصلة. لا يمكن التراجع عن هذا الإجراء.' }, { es: '¿Está seguro de que desea restablecer todo? Se borrarán su solicitud, el agente seleccionado, la respuesta de IA, las anotaciones y todos los datos relacionados. Esta acción no se puede deshacer.' }, { fr: 'Voulez-vous vraiment tout réinitialiser ? Votre invite, l\'agent sélectionné, la réponse IA, les annotations et toutes les données associées seront effacés. Cette action est irréversible.' }, { de: 'Möchten Sie wirklich alles zurücksetzen? Ihre Eingabeaufforderung, der ausgewählte Agent, die KI-Antwort, Anmerkungen und alle zugehörigen Daten werden gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.' }, { it: 'Sei sicuro di voler reimpostare tutto? Verranno cancellati prompt, agente selezionato, risposta AI, annotazioni e tutti i dati correlati. Questa azione non può essere annullata.' }, { ru: 'Вы уверены, что хотите сбросить всё? Будут удалены ваш запрос, выбранный агент, ответ ИИ, аннотации и все связанные данные. Это действие нельзя отменить.' }]}
           variant="warning"
           buttons={[
             {

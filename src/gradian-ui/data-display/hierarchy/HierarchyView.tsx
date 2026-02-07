@@ -2,7 +2,10 @@
 
 import React, { useMemo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLanguageStore } from '@/stores/language.store';
+import { isRTL, getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Card, CardContent } from '@/components/ui/card';
 import { DynamicActionButtons } from '../components/DynamicActionButtons';
 import { RoleBasedAvatar } from '@/gradian-ui/data-display/utils';
@@ -117,6 +120,9 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
 
   const hasChildren = node.children.length > 0;
   const hasParent = Boolean(getParentIdFromEntity(entity));
+  const language = useLanguageStore((s) => s.language);
+  const rtl = isRTL(language || 'en');
+  const ExpandIcon = rtl ? ChevronLeft : ChevronRight;
   
   // Get status field definition and value
   const statusFieldDef = schema?.fields?.find(field => field.role === 'status');
@@ -270,7 +276,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                   isExpanded ? (
                     <ChevronDown className="h-4 w-4" />
                   ) : (
-                    <ChevronRight className="h-4 w-4" />
+                    <ExpandIcon className="h-4 w-4" />
                   )
                 ) : (
                   <span className="h-1 w-1 rounded-full bg-gray-400" />
@@ -404,7 +410,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
             animate="expanded"
             exit="collapsed"
             transition={{ duration: 0.18, ease: 'easeInOut' }}
-            className="mt-2 ps-6 border-l border-dashed border-gray-200 dark:border-gray-700"
+            className="mt-2 ps-6 border-s border-dashed border-gray-200 dark:border-gray-700"
           >
             {node.children.map((child, idx) => (
               <HierarchyNodeCard
@@ -449,6 +455,11 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
   showUserDetails = false,
 }) => {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const labelHierarchyView = getT(TRANSLATION_KEYS.LABEL_HIERARCHY_VIEW, language ?? undefined, defaultLang);
+  const labelLoading = getT(TRANSLATION_KEYS.PAGINATION_LOADING, language ?? undefined, defaultLang);
+  const labelItems = getT(TRANSLATION_KEYS.PAGINATION_ITEMS, language ?? undefined, defaultLang);
 
   const { roots, nodeMap } = useMemo(() => buildHierarchyTree(items || []), [items]);
 
@@ -570,7 +581,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
           </CardContent>
         </Card>
         {showNested && (
-          <div className="mt-2 ps-6 border-l border-dashed border-gray-200 dark:border-gray-700">
+          <div className="mt-2 ps-6 border-s border-dashed border-gray-200 dark:border-gray-700">
             <HierarchySkeleton depth={depth + 1} index={index} />
           </div>
         )}
@@ -581,7 +592,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
   return (
     <div className="space-y-4">
       <div className="text-xs text-gray-500 dark:text-gray-400">
-        Hierarchy view • {isLoading ? 'Loading...' : `${items?.length || 0} item(s)`}
+        {labelHierarchyView} • {isLoading ? labelLoading : `${items?.length || 0} ${labelItems}`}
       </div>
 
       <div>

@@ -911,8 +911,8 @@ export const TodoList: React.FC<TodoListProps> = ({
             setTodoToDelete(null);
           }
         }}
-        title="Delete Todo"
-        message={`Are you sure you want to delete "${todoToDelete?.title}"? This action cannot be undone.`}
+        title={[{ en: 'Delete Todo' }, { fa: 'حذف کار' }, { ar: 'حذف المهمة' }, { es: 'Eliminar tarea' }, { fr: 'Supprimer la tâche' }, { de: 'Aufgabe löschen' }, { it: 'Elimina attività' }, { ru: 'Удалить задачу' }]}
+        message={[{ en: `Are you sure you want to delete "${todoToDelete?.title}"? This action cannot be undone.` }, { fa: `آیا مطمئن هستید که می‌خواهید "${todoToDelete?.title}" را حذف کنید؟ این عمل قابل بازگشت نیست.` }, { ar: `هل أنت متأكد أنك تريد حذف "${todoToDelete?.title}"؟ لا يمكن التراجع عن هذا الإجراء.` }, { es: `¿Está seguro de que desea eliminar "${todoToDelete?.title}"? Esta acción no se puede deshacer.` }, { fr: `Voulez-vous vraiment supprimer « ${todoToDelete?.title} » ? Cette action est irréversible.` }, { de: `Möchten Sie "${todoToDelete?.title}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.` }, { it: `Sei sicuro di voler eliminare "${todoToDelete?.title}"? Questa azione non può essere annullata.` }, { ru: `Вы уверены, что хотите удалить «${todoToDelete?.title}»? Это действие нельзя отменить.` }]}
         variant="destructive"
         size="md"
         buttons={[

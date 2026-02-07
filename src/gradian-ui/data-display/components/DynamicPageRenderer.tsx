@@ -24,7 +24,7 @@ import { LoadingState } from './LoadingState';
 import { GoToTop } from '@/gradian-ui/layout/go-to-top/components/GoToTop';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { DynamicFilterPane } from '@/gradian-ui/shared/components';
-import { asFormSchema } from '@/gradian-ui/schema-manager/utils/schema-utils';
+import { asFormSchema, getSchemaTranslatedSingularName, getSchemaTranslatedPluralName, getSectionTranslatedTitle } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import { useDynamicEntity } from '@/gradian-ui/shared/hooks';
 import { FormModal } from '../../form-builder';
 import { ConfirmationMessage } from '../../form-builder';
@@ -57,7 +57,10 @@ import { Table2 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { EntityMetadata } from './CreateUpdateDetail';
 import { normalizeCreateUpdateDates } from './CreateUpdateDetail';
-import { formatCreatedLabel, formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
+import { formatCreatedLabel, formatRelativeTime, formatFullDate, isLocaleRTL } from '@/gradian-ui/shared/utils/date-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '../utils';
 import { Switch } from '@/components/ui/switch';
@@ -100,6 +103,18 @@ function reconstructRegExp(obj: any): any {
 
 export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationSchemas }: DynamicPageRendererProps) {
   const router = useRouter();
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
+  const localeCode = language || undefined;
+  const labelCreated = getT(TRANSLATION_KEYS.LABEL_CREATED, language, defaultLang);
+  const labelUpdated = getT(TRANSLATION_KEYS.LABEL_UPDATED, language, defaultLang);
+  const labelBy = getT(TRANSLATION_KEYS.LABEL_BY, language, defaultLang);
+  const labelAdd = getT(TRANSLATION_KEYS.BUTTON_ADD, language, defaultLang);
+  const labelUserDetails = getT(TRANSLATION_KEYS.LABEL_USER_DETAILS, language, defaultLang);
+  const toastSelectCompanyToCreate = getT(TRANSLATION_KEYS.TOAST_SELECT_COMPANY_TO_CREATE, language, defaultLang);
+  const toastSelectCompanyToCreateDescription = getT(TRANSLATION_KEYS.TOAST_SELECT_COMPANY_TO_CREATE_DESCRIPTION, language, defaultLang);
+  const emptySelectUserToViewTasks = getT(TRANSLATION_KEYS.EMPTY_SELECT_USER_TO_VIEW_TASKS, language, defaultLang);
+  const emptySelectUserToViewTasksDescription = getT(TRANSLATION_KEYS.EMPTY_SELECT_USER_TO_VIEW_TASKS_DESCRIPTION, language, defaultLang);
   // Reconstruct RegExp objects in the schema
   const schema = reconstructRegExp(rawSchema) as FormSchema;
   const reconstructedNavigationSchemas = useMemo(
@@ -107,20 +122,20 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     [navigationSchemas]
   );
 
-  const pluralName = schema.plural_name || schema.title || schema.name || `${entityName}s`;
+  const pluralName = getSchemaTranslatedPluralName(schema, language, schema.plural_name || schema.title || schema.name || `${entityName}s`);
+  const singularName = getSchemaTranslatedSingularName(schema, language, schema.singular_name || 'Entity');
   useEffect(() => {
     if (typeof document === 'undefined') {
       return;
     }
 
     const previousTitle = document.title;
-    const schemaTitle = schema.plural_name || schema.title || schema.name || 'Listing';
-    document.title = `${schemaTitle} | Gradian`;
+    document.title = `${pluralName} | Gradian`;
 
     return () => {
       document.title = previousTitle;
     };
-  }, [schema.plural_name, schema.title, schema.name]);
+  }, [pluralName]);
   
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table' | 'hierarchy'>(
     schema?.allowHierarchicalParent === true ? 'hierarchy' : 'table'
@@ -310,8 +325,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     if (isCompanyBased) {
       // Check if a company is selected (not "All Companies" with id === -1)
       if (!selectedCompany || selectedCompany.id === -1) {
-        toast.warning('Please select a company to create a new record', {
-          description: 'Select a company from the dropdown to add a new record.',
+        toast.warning(toastSelectCompanyToCreate, {
+          description: toastSelectCompanyToCreateDescription,
         });
         return;
       }
@@ -753,17 +768,18 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       (field: any) => !field.hidden && !repeatingSectionFieldIds.has(field.id)
     );
     
-    // Build columns from fields
-    const baseColumns = buildTableColumns(visibleFields, schema);
+    // Build columns from fields (with translated labels for current language)
+    const baseColumns = buildTableColumns(visibleFields, schema, undefined, language, defaultLang);
     
     // Add columns for repeating sections
     const repeatingSectionColumns: TableColumn[] = repeatingSections.map((section) => {
       // Check if this is a relation-based repeating section (connectToSchema)
       const isRelationBased = !!(section.repeatingConfig?.targetSchema && section.repeatingConfig?.relationTypeId);
       
+      const sectionTitleResolved = getSectionTranslatedTitle(section, language, section.title || section.id);
       return {
         id: `repeating-section-${section.id}`,
-        label: section.title || section.id,
+        label: sectionTitleResolved,
         accessor: (row: any) => {
           if (isRelationBased) {
             // For relation-based sections, we can't get count from entity data
@@ -817,7 +833,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     // Add action column
     const actionColumn: TableColumn = {
       id: 'actions',
-      label: 'Actions',
+      label: getT(TRANSLATION_KEYS.LABEL_ACTIONS, language, defaultLang),
       accessor: 'id',
       sortable: false,
       align: 'center',
@@ -898,14 +914,14 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     const metadataColumns: TableColumn[] = [
       {
         id: 'createdAt',
-        label: 'Created',
+        label: labelCreated,
         accessor: (row: any) => row.createdAt,
         sortable: true,
         align: 'left',
         width: 200,
         render: (value: any, row: any) => {
           if (!value) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
-          const createdLabel = formatCreatedLabel(value);
+          const createdLabel = formatCreatedLabel(value, localeCode);
           const createdBy = row.createdBy;
           const createdByName = getUserName(createdBy);
           const createdByAvatarUrl = getUserAvatarUrl(createdBy);
@@ -929,8 +945,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                     collisionPadding={8}
                   >
                     <span>
-                      Created {createdLabel.tooltip}
-                      {createdByName ? ` by ${createdByName}` : ''}
+                      {labelCreated} {createdLabel.tooltip}
+                      {createdByName ? ` ${labelBy} ${createdByName}` : ''}
                     </span>
                   </TooltipContent>
                 </Tooltip>
@@ -954,7 +970,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       },
       {
         id: 'updatedAt',
-        label: 'Updated',
+        label: labelUpdated,
         accessor: (row: any) => {
           // Always return updatedAt, or fall back to createdAt if updatedAt is missing
           return row.updatedAt || row.createdAt;
@@ -970,8 +986,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           // If no date available, show dash
           if (!updatedAt) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
           
-          const updatedLabel = formatRelativeTime(updatedAt, { addSuffix: true });
-          const updatedFullDate = formatFullDate(updatedAt);
+          const updatedLabel = formatRelativeTime(updatedAt, { addSuffix: true, localeCode });
+          const updatedFullDate = formatFullDate(updatedAt, localeCode);
           const updatedByName = getUserName(updatedBy);
           const updatedByAvatarUrl = getUserAvatarUrl(updatedBy);
           const updatedByInitials = getUserInitials(updatedBy);
@@ -992,10 +1008,11 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                     className="z-100"
                     avoidCollisions={true}
                     collisionPadding={8}
+                    dir={isLocaleRTL(localeCode) ? 'rtl' : undefined}
                   >
                     <span>
-                      Updated {updatedFullDate}
-                      {updatedByName ? ` by ${updatedByName}` : ''}
+                      {labelUpdated} {updatedFullDate}
+                      {updatedByName ? ` ${labelBy} ${updatedByName}` : ''}
                     </span>
                   </TooltipContent>
                 </Tooltip>
@@ -1025,7 +1042,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       : [actionColumn, ...baseColumns, ...repeatingSectionColumns];
     
     return finalColumns;
-  }, [schema, repeatingSections, repeatingSectionFieldIds, handleViewDetailPage, handleEditEntity, handleDeleteWithConfirmation, isEditLoading, showMetadataColumns]);
+  }, [schema, repeatingSections, repeatingSectionFieldIds, handleViewDetailPage, handleEditEntity, handleDeleteWithConfirmation, isEditLoading, showMetadataColumns, localeCode, labelCreated, labelUpdated, labelBy, language, defaultLang]);
 
   // Create table config
   const tableConfig: TableConfig = useMemo(
@@ -1160,8 +1177,6 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     ));
   }, []);
 
-  const singularName = schema.singular_name || 'Entity';
-
   // Check if user is admin (mock implementation - replace with actual auth context)
   const isAdmin = true; // TODO: Replace with actual user profile check
   
@@ -1254,8 +1269,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           onAddNew={handleOpenCreateModal}
           onRefresh={handleManualRefresh}
           isRefreshing={(!(allowAssignmentSwitcher && !assignmentSelectedUser?.id) && (isLoading || isManualRefresh))}
-          searchPlaceholder={`Search ${pluralName.toLowerCase()}...`}
-          addButtonText={`Add ${singularName}`}
+          addButtonText={`${labelAdd} ${singularName}`}
           onExpandAllHierarchy={() => setHierarchyExpandToken((prev) => prev + 1)}
           onCollapseAllHierarchy={() => setHierarchyCollapseToken((prev) => prev + 1)}
           showHierarchy={schema?.allowHierarchicalParent === true}
@@ -1269,7 +1283,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                 htmlFor="metadata-toggle"
                 className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer whitespace-nowrap"
               >
-                User Details
+                {labelUserDetails}
               </Label>
               <Switch
                 id="metadata-toggle"
@@ -1321,8 +1335,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               icon={
                 <IconRenderer iconName="UserCircle2" className="h-12 w-12 text-gray-400" />
               }
-              title="Select a user to view tasks"
-              description="Use the assignment switcher above to choose whose assigned or initiated tasks you want to see."
+              title={emptySelectUserToViewTasks}
+              description={emptySelectUserToViewTasksDescription}
             />
           </motion.div>
         ) : viewMode === 'hierarchy' ? (
@@ -1348,7 +1362,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             {Object.entries(groupedEntities.grouped).map(([companyId, companyEntities]) => {
               const companyInfo = getCompanyInfo(companyId);
               return (
-                <AccordionItem key={companyId} value={companyId} className="border border-gray-200 dark:border-gray-700 rounded-2xl px-2 md:px-4 bg-gray-50 dark:bg-gray-800/30 border-b border-b-gray-200 dark:border-b-gray-500">
+                <AccordionItem key={companyId} value={companyId} className="border border-gray-200 dark:border-gray-700 rounded-2xl px-2 md:px-4 bg-gray-50 dark:bg-gray-800/30">
                   <AccordionTrigger className="hover:no-underline py-3 [&>svg]:text-violet-600">
                     <div className="flex items-center gap-2">
                       {isLoadingCompanies ? (
@@ -1433,7 +1447,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             
             {/* Ungrouped entities */}
             {groupedEntities.ungrouped.length > 0 && (
-              <AccordionItem value="ungrouped" className="border border-violet-200 dark:border-violet-500 rounded-lg px-2 md:px-4 bg-gray-50 dark:bg-gray-800/30 border-b border-b-gray-200 dark:border-b-gray-500">
+              <AccordionItem value="ungrouped" className="border border-violet-200 dark:border-violet-500 rounded-lg px-2 md:px-4 bg-gray-50 dark:bg-gray-800/30">
                 <AccordionTrigger className="hover:no-underline py-3 [&>svg]:text-violet-600">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Ungrouped</span>
@@ -1585,11 +1599,11 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   <Building className="h-12 w-12 text-gray-400" />
                 )
               }
-              title={`No ${pluralName.toLowerCase()} found`}
+              title={getT(TRANSLATION_KEYS.EMPTY_NO_X_FOUND, language, defaultLang).replace('{name}', pluralName)}
               description={
                 searchTermLocal
-                  ? 'Try adjusting your search criteria.'
-                  : `Get started by adding your first ${singularName.toLowerCase()}.`
+                  ? getT(TRANSLATION_KEYS.EMPTY_TRY_ADJUSTING_SEARCH, language, defaultLang)
+                  : getT(TRANSLATION_KEYS.EMPTY_GET_STARTED_ADD_FIRST, language, defaultLang).replace('{name}', singularName)
               }
               action={
                 <Button
@@ -1597,7 +1611,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   className="bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
                 >
                   <Plus className="h-4 w-4 me-2" />
-                  Add {singularName}
+                  {labelAdd} {singularName}
                 </Button>
               }
             />
@@ -1766,7 +1780,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       <ConfirmationMessage
         isOpen={deleteConfirmDialog.open}
         onOpenChange={(open: boolean) => setDeleteConfirmDialog({ open, entity: deleteConfirmDialog.entity })}
-        title={`Delete ${singularName}`}
+        title={[{ en: `Delete ${singularName}` }, { fa: `حذف ${singularName}` }, { ar: `حذف ${singularName}` }, { es: `Eliminar ${singularName}` }, { fr: `Supprimer ${singularName}` }, { de: `${singularName} löschen` }, { it: `Elimina ${singularName}` }, { ru: `Удалить ${singularName}` }]}
         message={
           deleteConfirmDialog.entity ? (
             <>
@@ -1899,8 +1913,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           schemaId={schema.id}
           schema={schema as any}
           onSelect={handleParentSelected}
-          title={`Change parent for ${schema.singular_name || 'item'}`}
-          description={`Select a new parent ${schema.singular_name || 'item'} for this ${schema.singular_name || 'item'}`}
+          title={`Change parent for ${singularName}`}
+          description={`Select a new parent ${singularName} for this ${singularName}`}
           excludeIds={entityForParentChange?.id ? [String(entityForParentChange.id)] : []}
           selectedIds={getParentIdFromEntity(entityForParentChange) ? [getParentIdFromEntity(entityForParentChange)!] : []}
           canViewList={true}

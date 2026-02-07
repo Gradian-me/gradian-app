@@ -1067,8 +1067,8 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
       <ConfirmationMessage
         isOpen={showRefreshConfirmation}
         onOpenChange={setShowRefreshConfirmation}
-        title="Refresh AI Analysis"
-        message="Are you sure you want to refresh this analysis? This will regenerate the AI response and may take some time."
+        title={[{ en: 'Refresh AI Analysis' }, { fa: 'بروزرسانی تحلیل هوش مصنوعی' }, { ar: 'تحديث تحليل الذكاء الاصطناعي' }, { es: 'Actualizar análisis IA' }, { fr: 'Actualiser l\'analyse IA' }, { de: 'KI-Analyse aktualisieren' }, { it: 'Aggiorna analisi IA' }, { ru: 'Обновить анализ ИИ' }]}
+        message={[{ en: 'Are you sure you want to refresh this analysis? This will regenerate the AI response and may take some time.' }, { fa: 'آیا مطمئن هستید که می‌خواهید این تحلیل را بروزرسانی کنید؟ پاسخ هوش مصنوعی دوباره تولید شده و ممکن است زمان ببرد.' }, { ar: 'هل أنت متأكد أنك تريد تحديث هذا التحليل؟ سيتم إعادة إنشاء استجابة الذكاء الاصطناعي وقد يستغرق ذلك بعض الوقت.' }, { es: '¿Está seguro de que desea actualizar este análisis? Se regenerará la respuesta de IA y puede tardar un poco.' }, { fr: 'Voulez-vous vraiment actualiser cette analyse ? La réponse IA sera régénérée et cela peut prendre du temps.' }, { de: 'Möchten Sie diese Analyse wirklich aktualisieren? Die KI-Antwort wird neu generiert und kann einige Zeit dauern.' }, { it: 'Sei sicuro di voler aggiornare questa analisi? La risposta IA verrà rigenerata e potrebbe richiedere tempo.' }, { ru: 'Вы уверены, что хотите обновить этот анализ? Ответ ИИ будет сгенерирован заново и это может занять время.' }]}
         buttons={[
           {
             label: 'Cancel',

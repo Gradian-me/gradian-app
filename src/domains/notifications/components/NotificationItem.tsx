@@ -20,6 +20,9 @@ import {
   Circle
 } from 'lucide-react';
 import { formatRelativeTime, formatFullDate, formatDateTime } from '@/gradian-ui/shared/utils/date-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -30,7 +33,11 @@ interface NotificationItemProps {
 
 export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, onMarkAsUnread }: NotificationItemProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const localeCode = language || undefined;
+  const t = (key: string) => getT(key, language, defaultLang);
+
   // Determine if this notification needs acknowledgment
   const needsAcknowledgement = notification.interactionType === 'needsAcknowledgement';
   
@@ -145,31 +152,31 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
                   {notification.createdBy && (
                     <div className="flex items-center gap-1.5">
                       <User className="h-3 w-3" />
-                      <span>Created by: <span className="text-gray-700 dark:text-gray-200 font-medium">{notification.createdBy}</span></span>
+                      <span>{t(TRANSLATION_KEYS.LABEL_CREATED_BY)}: <span className="text-gray-700 dark:text-gray-200 font-medium">{notification.createdBy}</span></span>
                     </div>
                   )}
                   {notification.assignedTo && notification.assignedTo.length > 0 && (
                     <div className="flex items-center gap-1.5">
                       <Users className="h-3 w-3" />
-                      <span>Assigned to: <span className="text-gray-700 dark:text-gray-200 font-medium">{notification.assignedTo.length} user{notification.assignedTo.length > 1 ? 's' : ''}</span></span>
+                      <span>{t(TRANSLATION_KEYS.LABEL_ASSIGNED_TO)}: <span className="text-gray-700 dark:text-gray-200 font-medium">{notification.assignedTo.length} user{notification.assignedTo.length > 1 ? 's' : ''}</span></span>
                     </div>
                   )}
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-1.5">
                     <Clock className="h-3 w-3" />
-                    <span>Created <span className="text-gray-700 dark:text-gray-200 font-medium" title={formatFullDate(notification.createdAt)}>• {formatRelativeTime(notification.createdAt)}</span></span>
+                    <span>{t(TRANSLATION_KEYS.LABEL_CREATED)} <span className="text-gray-700 dark:text-gray-200 font-medium" dir="ltr" title={formatFullDate(notification.createdAt, localeCode)}>• {formatRelativeTime(notification.createdAt, { addSuffix: true, localeCode })}</span></span>
                   </div>
                   {notification.readAt && (
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-3 w-3" />
-                      <span>Read: <span className="text-gray-700 dark:text-gray-200 font-medium">{formatDateTime(notification.readAt)}</span></span>
+                      <span>{t(TRANSLATION_KEYS.LABEL_READ)}: <span className="text-gray-700 dark:text-gray-200 font-medium" dir="ltr">{formatDateTime(notification.readAt, localeCode)}</span></span>
                     </div>
                   )}
                   {notification.acknowledgedAt && (
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-3 w-3" />
-                      <span>Acknowledged: <span className="text-gray-700 dark:text-gray-200 font-medium">{formatDateTime(notification.acknowledgedAt)}</span></span>
+                      <span>{t(TRANSLATION_KEYS.LABEL_ACKNOWLEDGED)}: <span className="text-gray-700 dark:text-gray-200 font-medium" dir="ltr">{formatDateTime(notification.acknowledgedAt, localeCode)}</span></span>
                     </div>
                   )}
                 </div>
@@ -195,7 +202,7 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
                       }}
                     >
                       <CheckCheck className="h-3 w-3 me-1" />
-                      Acknowledge
+                      {t(TRANSLATION_KEYS.BUTTON_ACKNOWLEDGE)}
                     </Button>
                   ) : onMarkAsUnread ? (
                     <Button
@@ -208,7 +215,7 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
                       }}
                     >
                       <Circle className="h-3 w-3 me-1" />
-                      Mark Unread
+                      {t(TRANSLATION_KEYS.BUTTON_MARK_AS_UNREAD)}
                     </Button>
                   ) : null
                 ) : !notification.isRead ? (
@@ -222,7 +229,7 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
                     }}
                   >
                     <CheckCircle2 className="h-3 w-3 me-1" />
-                    Mark Read
+                    {t(TRANSLATION_KEYS.BUTTON_MARK_AS_READ)}
                   </Button>
                 ) : (
                   onMarkAsUnread && (
@@ -236,7 +243,7 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
                       }}
                     >
                       <Circle className="h-3 w-3 me-1" />
-                      Mark Unread
+                      {t(TRANSLATION_KEYS.BUTTON_MARK_AS_UNREAD)}
                     </Button>
                   )
                 )}
@@ -254,6 +261,7 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
         onMarkAsRead={onMarkAsRead}
         onAcknowledge={onAcknowledge}
         onMarkAsUnread={onMarkAsUnread}
+        localeCode={localeCode}
       />
     </>
   );

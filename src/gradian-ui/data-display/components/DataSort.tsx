@@ -21,10 +21,12 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
-import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { SortConfig } from '@/gradian-ui/shared/utils/sort-utils';
+import { getDefaultLanguage, getT, resolveSchemaFieldLabel } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 interface DataSortProps {
   /**
@@ -63,6 +65,17 @@ interface DataSortProps {
    * @default true
    */
   showHeader?: boolean;
+
+  /**
+   * When true, selections are kept in draft until Apply is clicked; otherwise changes apply immediately
+   * @default false
+   */
+  requireApply?: boolean;
+
+  /**
+   * Callback when Apply is clicked (e.g. to close the dialog). Only used when requireApply is true.
+   */
+  onApply?: () => void;
 }
 
 /**
@@ -101,49 +114,49 @@ const SortableItem: React.FC<SortableItemProps> = ({
   return (
     <div ref={setNodeRef} style={style} className="relative">
       <div className={cn(
-        "w-full rounded border transition-all duration-200",
+        "w-full flex items-center gap-2 rounded border p-2 transition-all",
         isDragging
-          ? 'border-violet-400 dark:border-violet-500 shadow-md ring-2 ring-violet-200 dark:ring-violet-800 bg-white dark:bg-gray-800'
-          : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-800'
+          ? 'border-violet-400 dark:border-violet-500 bg-white dark:bg-gray-800 shadow-md'
+          : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50'
       )}>
-        <div className="p-2">
-          <div className="flex items-center gap-2">
-            {isSortable && (
-              <button
-                {...attributes}
-                {...listeners}
-                className="cursor-grab active:cursor-grabbing text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-0.5 shrink-0"
-                aria-label="Drag to reorder"
-              >
-                <GripVertical className="h-3.5 w-3.5" />
-              </button>
-            )}
-            <div className="flex-1 min-w-0">
-              <span className="text-sm text-gray-900 dark:text-gray-100">{columnLabel}</span>
-            </div>
-            <button
-              onClick={onToggleDirection}
-              className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors shrink-0"
-              aria-label={item.isAscending ? 'Change to descending' : 'Change to ascending'}
-              title={item.isAscending ? 'Ascending - Click to change to descending' : 'Descending - Click to change to ascending'}
-            >
-              {item.isAscending ? (
-                <ArrowUpNarrowWide className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-              ) : (
-                <ArrowDownWideNarrow className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-              )}
-            </button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onRemove}
-              className="h-6 w-6 p-0 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 shrink-0"
-              aria-label="Remove from sort"
-            >
-              <X className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+        <button
+          {...attributes}
+          {...listeners}
+          type="button"
+          disabled={!isSortable}
+          className={cn(
+            "cursor-grab active:cursor-grabbing text-gray-400 hover:text-gray-600 p-0.5 shrink-0",
+            !isSortable && "cursor-default opacity-50"
+          )}
+          aria-label="Drag to reorder"
+        >
+          <GripVertical className="h-3.5 w-3.5" />
+        </button>
+        <div className="flex-1 min-w-0">
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{columnLabel}</span>
         </div>
+        <button
+          type="button"
+          onClick={onToggleDirection}
+          className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors shrink-0"
+          aria-label={item.isAscending ? 'Change to descending' : 'Change to ascending'}
+        >
+          {item.isAscending ? (
+            <ArrowUpNarrowWide className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          ) : (
+            <ArrowDownWideNarrow className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+          )}
+        </button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onRemove}
+          className="h-6 w-6 p-0 text-gray-400 hover:text-red-600 shrink-0"
+          aria-label="Remove from sort"
+        >
+          <X className="h-3.5 w-3.5" />
+        </Button>
       </div>
     </div>
   );
@@ -161,7 +174,11 @@ export const DataSort: React.FC<DataSortProps> = ({
   excludeMetadataFields = false,
   excludedFieldIds,
   showHeader = true,
+  requireApply = false,
+  onApply,
 }) => {
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -169,38 +186,44 @@ export const DataSort: React.FC<DataSortProps> = ({
     })
   );
 
-  // System fields that are always available for sorting
-  // For system fields, the id and name are the same (they're already field names)
+  // System fields that are always available for sorting (labels resolved by language)
   const systemFields = useMemo(() => {
-    const fields = [
-      { id: 'status', name: 'status', label: 'Status' },
-      { id: 'entityType', name: 'entityType', label: 'Type' },
-      { id: 'updatedBy', name: 'updatedBy', label: 'Updated By' },
-      { id: 'updatedAt', name: 'updatedAt', label: 'Updated At' },
-      { id: 'createdBy', name: 'createdBy', label: 'Created By' },
-      { id: 'createdAt', name: 'createdAt', label: 'Created At' },
+    const baseFields: Array<{ id: string; name: string; labelKey: string }> = [
+      { id: 'status', name: 'status', labelKey: TRANSLATION_KEYS.LABEL_STATUS },
+      { id: 'entityType', name: 'entityType', labelKey: TRANSLATION_KEYS.LABEL_ENTITY_TYPE },
+      { id: 'updatedBy', name: 'updatedBy', labelKey: TRANSLATION_KEYS.LABEL_UPDATED_BY },
+      { id: 'updatedAt', name: 'updatedAt', labelKey: TRANSLATION_KEYS.LABEL_UPDATED_AT },
+      { id: 'createdBy', name: 'createdBy', labelKey: TRANSLATION_KEYS.LABEL_CREATED_BY },
+      { id: 'createdAt', name: 'createdAt', labelKey: TRANSLATION_KEYS.LABEL_CREATED_AT },
     ];
 
-    // Add company field if schema is company-based
+    const fields: Array<{ id: string; name: string; label: string }> = baseFields.map((f) => ({
+      id: f.id,
+      name: f.name,
+      label: getT(f.labelKey, language, defaultLang),
+    }));
+
     if (schema && !schema.isNotCompanyBased) {
-      fields.push({ id: 'companyId', name: 'companyId', label: 'Company' });
+      fields.push({
+        id: 'companyId',
+        name: 'companyId',
+        label: getT(TRANSLATION_KEYS.LABEL_COMPANY, language, defaultLang),
+      });
     }
 
     return fields;
-  }, [schema]);
+  }, [schema, language, defaultLang]);
 
-  // Get available columns from schema
+  // Get available columns from schema (labels resolved by language)
   const availableColumns = useMemo(() => {
     if (!schema?.fields || schema.fields.length === 0) {
       return [];
     }
 
-    // Filter out hidden fields and excluded fields
     const visibleFields = schema.fields.filter((field: any) => {
       if (field.hidden) return false;
       if (excludedFieldIds && excludedFieldIds.has(field.id)) return false;
       if (excludeMetadataFields) {
-        // Optionally exclude common metadata fields
         if (field.id === 'id' || field.id === 'createdAt' || field.id === 'updatedAt') {
           return false;
         }
@@ -210,17 +233,23 @@ export const DataSort: React.FC<DataSortProps> = ({
 
     return visibleFields.map((field: any) => ({
       id: field.id,
-      label: field.label || field.name || field.id,
+      label: resolveSchemaFieldLabel(field, language, defaultLang) || field.name || field.id,
       name: field.name || field.id,
       isSystemField: false,
     }));
-  }, [schema, excludeMetadataFields, excludedFieldIds]);
+  }, [schema, excludeMetadataFields, excludedFieldIds, language, defaultLang]);
 
-  // Use ref to track the latest value to avoid stale closure issues
-  const valueRef = useRef(value);
+  // Draft state when requireApply - edits go to draft, Apply commits to parent
+  const [draftValue, setDraftValue] = React.useState<SortConfig[]>(value);
   useEffect(() => {
-    valueRef.current = value;
+    setDraftValue(value);
   }, [value]);
+
+  const displayValue = requireApply ? draftValue : value;
+  const valueRef = useRef(displayValue);
+  useEffect(() => {
+    valueRef.current = displayValue;
+  }, [displayValue]);
 
   const handleToggleColumn = useCallback((columnId: string) => {
     const currentValue = valueRef.current;
@@ -232,30 +261,28 @@ export const DataSort: React.FC<DataSortProps> = ({
     const fieldName = column.name;
     const isSelected = currentValue.some(item => item.column === fieldName);
 
-    if (isSelected) {
-      // Remove from selected
-      onChange(currentValue.filter(item => item.column !== fieldName));
-    } else {
-      // Add to selected (default to ascending) - use field name
-      onChange([...currentValue, { column: fieldName, isAscending: true }]);
-    }
-  }, [availableColumns, systemFields, onChange]);
+    const next = isSelected
+      ? currentValue.filter(item => item.column !== fieldName)
+      : [...currentValue, { column: fieldName, isAscending: true }];
+    if (requireApply) setDraftValue(next);
+    else onChange(next);
+  }, [availableColumns, systemFields, onChange, requireApply]);
 
   const handleRemoveColumn = useCallback((fieldName: string) => {
     const currentValue = valueRef.current;
-    onChange(currentValue.filter(item => item.column !== fieldName));
-  }, [onChange]);
+    const next = currentValue.filter(item => item.column !== fieldName);
+    if (requireApply) setDraftValue(next);
+    else onChange(next);
+  }, [onChange, requireApply]);
 
   const handleToggleDirection = useCallback((fieldName: string) => {
     const currentValue = valueRef.current;
-    onChange(
-      currentValue.map(item =>
-        item.column === fieldName
-          ? { ...item, isAscending: !item.isAscending }
-          : item
-      )
+    const next = currentValue.map(item =>
+      item.column === fieldName ? { ...item, isAscending: !item.isAscending } : item
     );
-  }, [onChange]);
+    if (requireApply) setDraftValue(next);
+    else onChange(next);
+  }, [onChange, requireApply]);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
@@ -267,179 +294,172 @@ export const DataSort: React.FC<DataSortProps> = ({
 
     if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
       const reordered = arrayMove(currentValue, oldIndex, newIndex);
-      onChange(reordered);
+      if (requireApply) setDraftValue(reordered);
+      else onChange(reordered);
     }
-  }, [onChange]);
+  }, [onChange, requireApply]);
 
   const handleClearAll = useCallback(() => {
-    onChange([]);
-  }, [onChange]);
+    if (requireApply) setDraftValue([]);
+    else onChange([]);
+  }, [onChange, requireApply]);
 
-  const getAvailableColumns = () => {
-    const selectedFieldNames = new Set(value.map(item => item.column));
-    return availableColumns.filter(column => !selectedFieldNames.has(column.name));
-  };
+  const handleApply = useCallback(() => {
+    onChange(draftValue);
+    onApply?.();
+  }, [draftValue, onChange, onApply]);
 
-  const getAvailableSystemFields = () => {
-    const selectedFieldNames = new Set(value.map(item => item.column));
-    return systemFields.filter(field => !selectedFieldNames.has(field.name));
-  };
+  const selectedFieldNames = useMemo(
+    () => new Set(displayValue.map((item) => item.column)),
+    [displayValue]
+  );
 
-  const unselectedColumns = getAvailableColumns();
-  const unselectedSystemFields = getAvailableSystemFields();
+  const isColumnSelected = (fieldName: string) => selectedFieldNames.has(fieldName);
 
   const getColumnLabel = (fieldName: string): string => {
     const column = availableColumns.find(c => c.name === fieldName) || systemFields.find(f => f.name === fieldName);
     return column?.label || fieldName;
   };
 
+  const hasColumns = availableColumns.length > 0 || systemFields.length > 0;
+
+  const renderLeftPanel = () => (
+    <div className="flex-1 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-lg p-3 space-y-3">
+      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 shrink-0">
+        {getT(TRANSLATION_KEYS.LABEL_COLUMNS, language ?? defaultLang, defaultLang)}
+      </p>
+      {!hasColumns ? (
+        <p className="text-sm text-muted-foreground">
+          {getT(TRANSLATION_KEYS.MESSAGE_NO_COLUMNS_AVAILABLE_FOR_SORTING, language ?? defaultLang, defaultLang)}
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {availableColumns.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                {getT(TRANSLATION_KEYS.LABEL_COLUMNS, language ?? defaultLang, defaultLang)}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {availableColumns.map((column) => {
+                  const checked = isColumnSelected(column.name);
+                  return (
+                    <label
+                      key={column.id}
+                      className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
+                    >
+                      <Checkbox
+                        checked={checked}
+                        onCheckedChange={() => handleToggleColumn(column.id)}
+                      />
+                      <span>{column.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+          {systemFields.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
+                {getT(TRANSLATION_KEYS.LABEL_SYSTEM, language ?? defaultLang, defaultLang)}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {systemFields.map((field) => {
+                  const checked = isColumnSelected(field.name);
+                  return (
+                    <label
+                      key={field.id}
+                      className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
+                    >
+                      <Checkbox
+                        checked={checked}
+                        onCheckedChange={() => handleToggleColumn(field.id)}
+                      />
+                      <span>{field.label}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  const renderRightPanel = () => (
+    <div className="w-80 shrink-0 flex flex-col border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {getT(TRANSLATION_KEYS.LABEL_SORT_ORDER, language ?? defaultLang, defaultLang)}
+        </p>
+        {displayValue.length > 0 && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 text-xs text-muted-foreground hover:text-red-600"
+            onClick={handleClearAll}
+          >
+            {getT(TRANSLATION_KEYS.BUTTON_CLEAR_ALL, language ?? defaultLang, defaultLang)}
+          </Button>
+        )}
+      </div>
+      <div className="flex-1 overflow-y-auto space-y-1 min-h-[120px]">
+        {displayValue.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4">
+            {getT(TRANSLATION_KEYS.MESSAGE_SELECT_COLUMNS_FROM_LEFT, language ?? defaultLang, defaultLang)}
+          </p>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={displayValue.map((item) => item.column)}
+              strategy={verticalListSortingStrategy}
+            >
+              {displayValue.map((item) => (
+                <SortableItem
+                  key={item.column}
+                  item={item}
+                  columnLabel={getColumnLabel(item.column)}
+                  onRemove={() => handleRemoveColumn(item.column)}
+                  onToggleDirection={() => handleToggleDirection(item.column)}
+                  isSortable={displayValue.length > 1}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <div className={cn("w-full", className)}>
-      {/* Header */}
       {showHeader && (
         <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Sort</span>
-            {value.length > 0 && (
-              <span className="text-xs text-gray-500 dark:text-gray-400">({value.length})</span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {value.length > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearAll}
-                className="h-7 px-2 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-              >
-                Clear
-              </Button>
-            )}
-          </div>
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Sort</span>
+          {displayValue.length > 0 && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">({displayValue.length})</span>
+          )}
         </div>
       )}
 
-      <div className="space-y-4">
-          {/* Selected Sort Columns */}
-          {value.length > 0 && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Sort Order</p>
-                {value.length > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleClearAll}
-                    className="h-7 px-2 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
-                  >
-                    Clear All
-                  </Button>
-                )}
-              </div>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={value.map(item => item.column)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  <div className="space-y-2">
-                    {value.map((item) => (
-                      <SortableItem
-                        key={item.column}
-                        item={item}
-                        columnLabel={getColumnLabel(item.column)}
-                        onRemove={() => handleRemoveColumn(item.column)}
-                        onToggleDirection={() => handleToggleDirection(item.column)}
-                        isSortable={value.length > 1}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
-            </div>
-          )}
-
-          {/* Available Columns - Two Column Layout */}
-          {(unselectedColumns.length > 0 || unselectedSystemFields.length > 0) && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {unselectedColumns.length > 0 && (
-                <div className="space-y-1.5">
-                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                    Columns
-                  </p>
-                  <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md p-1 space-y-0.5">
-                    {unselectedColumns.map((column) => (
-                      <div
-                        key={column.id}
-                        className="flex items-center space-x-2 px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                        onClick={() => handleToggleColumn(column.id)}
-                      >
-                        <Checkbox
-                          id={`sort-column-${column.id}`}
-                          checked={false}
-                          onCheckedChange={() => handleToggleColumn(column.id)}
-                          className="h-3.5 w-3.5"
-                        />
-                        <label
-                          htmlFor={`sort-column-${column.id}`}
-                          className="text-xs font-normal cursor-pointer flex-1 text-gray-700 dark:text-gray-300"
-                        >
-                          {column.label}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* System Fields */}
-              {unselectedSystemFields.length > 0 && (
-                <div className="space-y-1.5">
-                  <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
-                    System
-                  </p>
-                  <div className="max-h-64 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md p-1 space-y-0.5">
-                    {unselectedSystemFields.map((field) => (
-                      <div
-                        key={field.id}
-                        className="flex items-center space-x-2 px-2 py-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                        onClick={() => handleToggleColumn(field.id)}
-                      >
-                        <Checkbox
-                          id={`sort-system-${field.id}`}
-                          checked={false}
-                          onCheckedChange={() => handleToggleColumn(field.id)}
-                          className="h-3.5 w-3.5"
-                        />
-                        <label
-                          htmlFor={`sort-system-${field.id}`}
-                          className="text-xs font-normal cursor-pointer flex-1 text-gray-700 dark:text-gray-300"
-                        >
-                          {field.label}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {unselectedColumns.length === 0 && unselectedSystemFields.length === 0 && value.length === 0 && (
-            <div className="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
-              No columns available for sorting
-            </div>
-          )}
-
-          {unselectedColumns.length === 0 && unselectedSystemFields.length === 0 && value.length > 0 && (
-            <div className="text-center py-2 text-xs text-gray-500 dark:text-gray-400">
-              All available columns are selected
-            </div>
-          )}
+      <div className="flex flex-1 gap-4 overflow-hidden min-h-0">
+        {renderLeftPanel()}
+        {renderRightPanel()}
       </div>
+
+      {requireApply && (
+        <div className="flex justify-end gap-2 pt-3 mt-3 border-t border-gray-200 dark:border-gray-700">
+          <Button onClick={handleApply} size="sm" className="px-4">
+            {getT(TRANSLATION_KEYS.BUTTON_APPLY, language ?? defaultLang, defaultLang)}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

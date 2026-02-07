@@ -14,11 +14,30 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
   isMobile,
   onToggle,
   className,
+  isRtl = false,
 }) => {
   const displaySubtitle = brand?.subtitle || 'Trust Your Decisions';
 
+  // LTR: sidebar on left — collapsed = PanelLeftOpen (expand), expanded = PanelRightOpen (collapse).
+  // RTL: sidebar on right — collapsed = PanelRightOpen (expand toward left), expanded = PanelLeftOpen (collapse toward right).
+  const toggleIcon =
+    isMobile ? (
+      <PanelRightOpen className="h-5 w-5" />
+    ) : isRtl ? (
+      isCollapsed ? <PanelRightOpen className="h-5 w-5" /> : <PanelLeftOpen className="h-5 w-5" />
+    ) : (
+      isCollapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelRightOpen className="h-5 w-5" />
+    );
+
+  // No flex-row-reverse: with dir=rtl inherited from document, flex puts first child at start (right),
+  // second at end (left), so the toggle stays on the content edge (left side of sidebar in RTL).
   return (
-    <div className={cn("flex items-center justify-center h-16 border-b border-gray-700 px-4", className)}>
+    <div
+      className={cn(
+        "flex items-center justify-between h-16 border-b border-gray-700 px-4 w-full gap-3",
+        className
+      )}
+    >
       <AnimatePresence mode="wait">
         {isCollapsed && !isMobile ? (
           <motion.div
@@ -27,19 +46,18 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-          >
-
-          </motion.div>
+            className="min-w-0 flex-1"
+          />
         ) : (
           <motion.div
             key="expanded"
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: isRtl ? 20 : -20 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
+            exit={{ opacity: 0, x: isRtl ? 20 : -20 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="flex items-center space-x-3 w-full"
+            className="flex items-center gap-3 min-w-0 flex-1"
           >
-            <div className="flex flex-col items-start space-x-3 w-full">
+            <div className="flex flex-col items-start gap-1 w-full min-w-0">
               <Logo
                 variant="white"
                 width={120}
@@ -60,15 +78,11 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
         variant="ghost"
         size="icon"
         onClick={onToggle}
-        className="text-gray-100 hover:text-white hover:bg-gray-800 rounded-lg dark:text-violet-300"
+        className="text-gray-100 hover:text-white hover:bg-gray-800 rounded-lg dark:text-violet-300 shrink-0"
       >
-        {isMobile ? (
-          <PanelRightOpen className="h-5 w-5" />
-        ) : (
-          isCollapsed ? <PanelLeftOpen className="h-5 w-5" /> : <PanelRightOpen className="h-5 w-5" />
-        )}
+        {toggleIcon}
       </Button>
-    </div >
+    </div>
   );
 };
 

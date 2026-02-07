@@ -6,13 +6,14 @@ import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
-import { ArrowLeft } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { motion } from 'framer-motion';
 import { LoadingSpinner } from '@/gradian-ui/layout/components';
 
 function ConfigureIntegrationPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const BackIcon = useBackIcon();
   const integrationId = searchParams.get('id');
   const isEdit = !!integrationId;
 
@@ -29,7 +30,7 @@ function ConfigureIntegrationPageContent() {
             onClick={() => router.back()}
             className="mb-4"
           >
-            <ArrowLeft className="h-4 w-4 me-2" />
+            <BackIcon className="h-4 w-4 me-2" />
             Back to Integrations
           </Button>
 

@@ -4,6 +4,7 @@
 
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface SystemSectionFieldConfig {
   field: Partial<FormField>;
@@ -15,13 +16,26 @@ export interface SystemSectionFieldConfig {
   order?: number;
 }
 
+/** Optional translator: (key, fallback, params?) => string. Params are used to replace {key} in the result. */
+export type SystemSectionTranslator = (key: string, fallback: string, params?: Record<string, string>) => string;
+
+export interface GetSystemSectionFieldsOptions {
+  t?: SystemSectionTranslator;
+  /** Resolve display name for a schema (e.g. for "Choose a parent {entity}" description). */
+  getEntityDisplayName?: (schema: FormSchema) => string;
+}
+
 /**
- * Get system section field configurations based on schema settings
+ * Get system section field configurations based on schema settings.
+ * When options.t is provided, labels, placeholders, and descriptions are translated.
  */
 export const getSystemSectionFields = (
   schema: FormSchema,
-  values: any
+  values: any,
+  options?: GetSystemSectionFieldsOptions
 ): SystemSectionFieldConfig[] => {
+  const t = options?.t ?? ((_key: string, fallback: string, _params?: Record<string, string>) => fallback);
+  const getEntityName = options?.getEntityDisplayName ?? ((s: FormSchema) => s.singular_name || 'item');
   const hasStatusGroup = Array.isArray(schema.statusGroup) && schema.statusGroup.length > 0;
   const hasEntityTypeGroup = Array.isArray(schema.entityTypeGroup) && schema.entityTypeGroup.length > 0;
   const statusGroupId = hasStatusGroup && schema.statusGroup && Array.isArray(schema.statusGroup) && schema.statusGroup.length > 0
@@ -41,7 +55,7 @@ export const getSystemSectionFields = (
       field: {
         id: 'system-inactive',
         name: 'inactive',
-        label: 'Inactive',
+        label: t(TRANSLATION_KEYS.LABEL_INACTIVE, 'Inactive'),
         sectionId: 'system-section',
         component: 'switch',
         order: 1,
@@ -50,7 +64,7 @@ export const getSystemSectionFields = (
       getFieldConfig: () => ({
         id: 'system-inactive',
         name: 'inactive',
-        label: 'Inactive',
+        label: t(TRANSLATION_KEYS.LABEL_INACTIVE, 'Inactive'),
         sectionId: 'system-section',
         component: 'switch',
       }),
@@ -66,7 +80,7 @@ export const getSystemSectionFields = (
       field: {
         id: 'system-force',
         name: 'isForce',
-        label: 'Force',
+        label: t(TRANSLATION_KEYS.LABEL_FORCE, 'Force'),
         sectionId: 'system-section',
         component: 'switch',
         order: 2,
@@ -75,7 +89,7 @@ export const getSystemSectionFields = (
       getFieldConfig: () => ({
         id: 'system-force',
         name: 'isForce',
-        label: 'Force',
+        label: t(TRANSLATION_KEYS.LABEL_FORCE, 'Force'),
         sectionId: 'system-section',
         component: 'switch',
       }),
@@ -91,7 +105,7 @@ export const getSystemSectionFields = (
       field: {
         id: 'system-bookmark',
         name: 'isBookmarked',
-        label: 'Bookmark',
+        label: t(TRANSLATION_KEYS.LABEL_BOOKMARK, 'Bookmark'),
         sectionId: 'system-section',
         component: 'switch',
         order: 2.5,
@@ -100,7 +114,7 @@ export const getSystemSectionFields = (
       getFieldConfig: () => ({
         id: 'system-bookmark',
         name: 'isBookmarked',
-        label: 'Bookmark',
+        label: t(TRANSLATION_KEYS.LABEL_BOOKMARK, 'Bookmark'),
         sectionId: 'system-section',
         component: 'switch',
       }),
@@ -117,26 +131,28 @@ export const getSystemSectionFields = (
       field: {
         id: 'system-force-reason',
         name: 'forceReason',
-        label: 'Force Reason',
+        label: t(TRANSLATION_KEYS.LABEL_FORCE_REASON, 'Force Reason'),
         sectionId: 'system-section',
         component: 'textarea',
-        placeholder: 'Enter the reason for forcing this record...',
+        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_FORCE_REASON, 'Enter the reason for forcing this record...'),
         validation: {
           required: false,
         },
+        colSpan: 2,
         order: 3,
       },
       shouldShow: () => schema.allowDataForce === true && forceValue === true,
       getFieldConfig: () => ({
         id: 'system-force-reason',
         name: 'forceReason',
-        label: 'Force Reason',
+        label: t(TRANSLATION_KEYS.LABEL_FORCE_REASON, 'Force Reason'),
         sectionId: 'system-section',
         component: 'textarea',
-        placeholder: 'Enter the reason for forcing this record...',
+        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_FORCE_REASON, 'Enter the reason for forcing this record...'),
         validation: {
           required: false,
         },
+        colSpan: 2,
       }),
       getValue: (vals) => vals?.forceReason || '',
       onChange: (value, onChange) => onChange('forceReason', value),
@@ -151,10 +167,10 @@ export const getSystemSectionFields = (
       field: {
         id: 'system-assigned-to',
         name: 'assignedTo',
-        label: 'Assigned To',
+        label: t(TRANSLATION_KEYS.LABEL_ASSIGNED_TO, 'Assigned To'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: 'Select user',
+        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_USER, 'Select user'),
         targetSchema: 'users',
         validation: {
           required: false,
@@ -168,10 +184,10 @@ export const getSystemSectionFields = (
       getFieldConfig: () => ({
         id: 'system-assigned-to',
         name: 'assignedTo',
-        label: 'Assigned To',
+        label: t(TRANSLATION_KEYS.LABEL_ASSIGNED_TO, 'Assigned To'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: 'Select user',
+        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_USER, 'Select user'),
         targetSchema: 'users',
         validation: {
           required: false,
@@ -192,10 +208,10 @@ export const getSystemSectionFields = (
       field: {
         id: 'system-due-date',
         name: 'dueDate',
-        label: 'Due Date',
+        label: t(TRANSLATION_KEYS.LABEL_DUE_DATE, 'Due Date'),
         sectionId: 'system-section',
         component: 'date',
-        placeholder: 'Select due date',
+        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_DUE_DATE, 'Select due date'),
         role: 'duedate',
         validation: {
           required: false,
@@ -206,10 +222,10 @@ export const getSystemSectionFields = (
       getFieldConfig: () => ({
         id: 'system-due-date',
         name: 'dueDate',
-        label: 'Due Date',
+        label: t(TRANSLATION_KEYS.LABEL_DUE_DATE, 'Due Date'),
         sectionId: 'system-section',
         component: 'date',
-        placeholder: 'Select due date',
+        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_DUE_DATE, 'Select due date'),
         role: 'duedate',
         validation: {
           required: false,
@@ -262,11 +278,11 @@ export const getSystemSectionFields = (
         return {
           id: 'system-status',
           name: 'status',
-          label: 'Status',
+          label: t(TRANSLATION_KEYS.LABEL_STATUS, 'Status'),
           sectionId: 'system-section',
           component: 'picker',
-          placeholder: 'Select status',
-          description: 'Status for this record from the configured status group.',
+          placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_STATUS, 'Select status'),
+          description: t(TRANSLATION_KEYS.DESCRIPTION_STATUS_FROM_GROUP, 'Status for this record from the configured status group.'),
           targetSchema: 'status-items',
           referenceSchema: 'status-groups',
           referenceRelationTypeId: 'HAS_STATUS_ITEM',
@@ -336,11 +352,11 @@ export const getSystemSectionFields = (
         return {
           id: 'system-entity-type',
           name: 'entityType',
-          label: 'Entity Type',
+          label: t(TRANSLATION_KEYS.LABEL_ENTITY_TYPE, 'Entity Type'),
           sectionId: 'system-section',
           component: 'picker',
-          placeholder: 'Select entity type',
-          description: 'Entity type for this record from the configured entity type group.',
+          placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_ENTITY_TYPE, 'Select entity type'),
+          description: t(TRANSLATION_KEYS.DESCRIPTION_ENTITY_TYPE_FROM_GROUP, 'Entity type for this record from the configured entity type group.'),
           targetSchema: 'entity-type-items',
           referenceSchema: 'entity-type-groups',
           referenceRelationTypeId: 'HAS_ENTITY_TYPE_ITEM',
@@ -376,12 +392,12 @@ export const getSystemSectionFields = (
       field: {
         id: 'system-parent',
         name: 'parent',
-        label: 'Parent (hierarchical)',
+        label: t(TRANSLATION_KEYS.LABEL_PARENT_HIERARCHICAL, 'Parent (hierarchical)'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: 'Select parent (optional)',
+        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_PARENT_OPTIONAL, 'Select parent (optional)'),
         targetSchema: schema.id,
-        description: `Choose a parent ${schema.singular_name || 'item'} for hierarchical view`,
+        description: t(TRANSLATION_KEYS.DESCRIPTION_PARENT_HIERARCHICAL, 'Choose a parent {entity} for hierarchical view', { entity: getEntityName(schema) }),
         validation: {
           required: false,
         },
@@ -391,12 +407,12 @@ export const getSystemSectionFields = (
       getFieldConfig: (sch) => ({
         id: 'system-parent',
         name: 'parent',
-        label: 'Parent (hierarchical)',
+        label: t(TRANSLATION_KEYS.LABEL_PARENT_HIERARCHICAL, 'Parent (hierarchical)'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: 'Select parent (optional)',
+        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_PARENT_OPTIONAL, 'Select parent (optional)'),
         targetSchema: sch.id,
-        description: `Choose a parent ${sch.singular_name || 'item'} for hierarchical view`,
+        description: t(TRANSLATION_KEYS.DESCRIPTION_PARENT_HIERARCHICAL, 'Choose a parent {entity} for hierarchical view', { entity: getEntityName(sch) }),
         validation: {
           required: false,
         },
@@ -421,14 +437,14 @@ export const getSystemSectionFields = (
       field: {
         id: 'system-related-companies',
         name: 'relatedCompanies',
-        label: 'Related Companies',
+        label: t(TRANSLATION_KEYS.LABEL_RELATED_COMPANIES, 'Related Companies'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: 'Select related companies (optional)',
+        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_RELATED_COMPANIES_OPTIONAL, 'Select related companies (optional)'),
         targetSchema: 'companies',
         description: schema.isNotCompanyBased === true
-          ? 'Choose one or more companies related to this record (optional).'
-          : 'Choose one or more companies related to this record. Required for company-based schemas.',
+          ? t(TRANSLATION_KEYS.DESCRIPTION_RELATED_COMPANIES_OPTIONAL, 'Choose one or more companies related to this record (optional).')
+          : t(TRANSLATION_KEYS.DESCRIPTION_RELATED_COMPANIES_REQUIRED, 'Choose one or more companies related to this record. Required for company-based schemas.'),
         validation: {
           required: schema.isNotCompanyBased !== true,
         },
@@ -468,12 +484,12 @@ export const getSystemSectionFields = (
       field: {
         id: 'system-related-tenants',
         name: 'relatedTenants',
-        label: 'Related Tenants',
+        label: t(TRANSLATION_KEYS.LABEL_RELATED_TENANTS, 'Related Tenants'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: 'Select related tenants (optional)',
+        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_RELATED_TENANTS_OPTIONAL, 'Select related tenants (optional)'),
         targetSchema: 'tenants',
-        description: 'Choose one or more tenants related to this record (optional).',
+        description: t(TRANSLATION_KEYS.DESCRIPTION_RELATED_TENANTS_OPTIONAL, 'Choose one or more tenants related to this record (optional).'),
         validation: {
           required: false,
         },
@@ -486,12 +502,12 @@ export const getSystemSectionFields = (
       getFieldConfig: () => ({
         id: 'system-related-tenants',
         name: 'relatedTenants',
-        label: 'Related Tenants',
+        label: t(TRANSLATION_KEYS.LABEL_RELATED_TENANTS, 'Related Tenants'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: 'Select related tenants (optional)',
+        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_RELATED_TENANTS_OPTIONAL, 'Select related tenants (optional)'),
         targetSchema: 'tenants',
-        description: 'Choose one or more tenants related to this record (optional).',
+        description: t(TRANSLATION_KEYS.DESCRIPTION_RELATED_TENANTS_OPTIONAL, 'Choose one or more tenants related to this record (optional).'),
         validation: {
           required: false,
         },

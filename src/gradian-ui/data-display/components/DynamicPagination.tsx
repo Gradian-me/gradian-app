@@ -1,11 +1,16 @@
 // Dynamic Pagination Component
 // Reusable pagination component with support for "all" option
 
+'use client';
+
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
 import { cn } from '../../shared/utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface DynamicPaginationProps {
   currentPage: number;
@@ -30,6 +35,13 @@ export function DynamicPagination({
   onPageSizeChange,
   className,
 }: DynamicPaginationProps) {
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const labelRows = getT(TRANSLATION_KEYS.PAGINATION_ROWS, language, defaultLang);
+  const labelOf = getT(TRANSLATION_KEYS.PAGINATION_OF, language, defaultLang);
+  const labelAll = getT(TRANSLATION_KEYS.PAGINATION_ALL, language, defaultLang);
+  const rtl = isRTL(language ?? defaultLang);
+
   const isAllSelected = pageSize === 'all';
   const effectivePageSize = isAllSelected ? totalItems : pageSize;
   const startItem = isAllSelected ? 1 : (currentPage - 1) * effectivePageSize + 1;
@@ -93,7 +105,7 @@ export function DynamicPagination({
       <div className="flex items-center gap-2">
         {showPageSizeSelector && (
           <div className="flex items-center gap-1.5">
-            <span className="text-xs text-gray-500 dark:text-gray-400">Rows:</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{labelRows}:</span>
             <Select 
               value={isAllSelected ? 'all' : pageSize.toString()} 
               onValueChange={(value) => {
@@ -110,7 +122,7 @@ export function DynamicPagination({
               <SelectContent>
                 {pageSizeOptions.map((size) => (
                   <SelectItem key={size === 'all' ? 'all' : size.toString()} value={size === 'all' ? 'all' : size.toString()}>
-                    {size === 'all' ? 'All' : size}
+                    {size === 'all' ? labelAll : size}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -118,7 +130,7 @@ export function DynamicPagination({
           </div>
         )}
         <span className="text-xs text-gray-500 dark:text-gray-400">
-          {startItem}-{endItem} of {totalItems}
+          {startItem}-{endItem} {labelOf} {totalItems}
         </span>
       </div>
 
@@ -131,7 +143,7 @@ export function DynamicPagination({
             disabled={currentPage === 1}
             className="h-7 w-7 p-0 hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-900/20 dark:hover:text-violet-300 disabled:opacity-30"
           >
-            <ChevronLeft className="h-3.5 w-3.5" />
+            {rtl ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
           </Button>
 
           <div className="flex items-center gap-0.5">
@@ -171,7 +183,7 @@ export function DynamicPagination({
             disabled={currentPage === totalPages}
             className="h-7 w-7 p-0 hover:bg-violet-50 hover:text-violet-600 dark:hover:bg-violet-900/20 dark:hover:text-violet-300 disabled:opacity-30"
           >
-            <ChevronRight className="h-3.5 w-3.5" />
+            {rtl ? <ChevronLeft className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
           </Button>
         </div>
       )}

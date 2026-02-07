@@ -98,6 +98,14 @@ export const DELIVERY_TERMS = [
   { value: 'EXW', label: 'EXW (Ex Works)' },
 ] as const;
 
+// Translations (key-based app strings)
+export {
+  TRANSLATION_KEYS,
+  TRANSLATIONS,
+  type TranslationEntry,
+  type TranslationKey,
+} from './translations';
+
 // Re-export from config files
 export { AUTH_CONFIG, EXCLUDED_LOGIN_ROUTES, FORBIDDEN_ROUTES_PRODUCTION } from '../configs/auth-config';
 export { UI_PARAMS, URL_HOME } from '../configs/ui-config';

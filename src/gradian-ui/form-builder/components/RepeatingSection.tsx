@@ -6,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui
 import { Button } from '../../../components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
 import { cn } from '../../shared/utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const RepeatingSection: React.FC<RepeatingSectionProps> = ({
   section,
@@ -30,7 +33,10 @@ export const RepeatingSection: React.FC<RepeatingSectionProps> = ({
 
   const canAdd = !maxItems || items.length < maxItems;
   const canRemove = items.length > minItems;
-  
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const noItemsAddedYet = getT(TRANSLATION_KEYS.EMPTY_NO_ITEMS_ADDED_YET, language, defaultLang);
+
   // Get section-level error
   const sectionError = errors?.[section.id];
   const headerSectionMessage = sectionError;
@@ -56,7 +62,7 @@ export const RepeatingSection: React.FC<RepeatingSectionProps> = ({
 
       {items.length === 0 ? (
         <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-          <p>No items added yet</p>
+          <p>{noItemsAddedYet}</p>
         </div>
       ) : (
         <div className="space-y-3">

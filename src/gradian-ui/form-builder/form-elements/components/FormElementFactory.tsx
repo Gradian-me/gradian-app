@@ -2,6 +2,14 @@
 
 import React from 'react';
 import { FormElementConfig, FormElementProps, ToggleGroupOption } from '../types';
+import { useLanguageStore } from '@/stores/language.store';
+import {
+  getDefaultLanguage,
+  getT,
+  resolveSchemaFieldLabel,
+  resolveSchemaFieldPlaceholder,
+} from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -62,6 +70,11 @@ export interface FormElementFactoryProps extends Omit<FormElementProps, 'config'
 }
 
 export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => {
+  // Hooks must run unconditionally before any early return
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const addItemFallback = getT(TRANSLATION_KEYS.LABEL_ADD_ITEM, language, defaultLang);
+
   // Support both config and field interfaces
   const isFieldInterface = !!props.field;
   
@@ -117,6 +130,15 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   if ((config as any).inactive === true) {
     return null;
   }
+
+  // Resolve label and placeholder from field translations (by current language)
+  const resolvedLabel = resolveSchemaFieldLabel(config, language, defaultLang);
+  const resolvedPlaceholder = resolveSchemaFieldPlaceholder(config, language, defaultLang);
+  config = {
+    ...config,
+    label: resolvedLabel ?? config.label,
+    placeholder: resolvedPlaceholder ?? config.placeholder,
+  };
 
   // Use component if available, otherwise fall back to type
   const elementType = (config as any).component || config.type;
@@ -603,8 +625,8 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         <ListInput
           value={listInputValue}
           onChange={(items) => restProps.onChange?.(listInputItemsToChecklist(items))}
-          placeholder={(config as any).placeholder || 'Add item'}
-          addButtonText={(config as any).addButtonText || 'Add item'}
+          placeholder={(config as any).placeholder || addItemFallback}
+          addButtonText={(config as any).addButtonText || addItemFallback}
           label={(config as any).label}
           disabled={restProps.disabled}
           error={restProps.error}
@@ -626,7 +648,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           value={restProps.value || []}
           onChange={(items) => restProps.onChange?.(items)}
           placeholder={(config as any).placeholder || 'Enter annotation...'}
-          addButtonText={(config as any).addButtonText || 'Add Item'}
+          addButtonText={(config as any).addButtonText || getT(TRANSLATION_KEYS.BUTTON_ADD, language, defaultLang)}
           className={restProps.className}
           label={(config as any).label}
           required={restProps.required}

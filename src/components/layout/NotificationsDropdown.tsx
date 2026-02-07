@@ -13,6 +13,7 @@ import { useRouter } from 'next/navigation';
 import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
+import { useLanguageStore } from '@/stores/language.store';
 import { NotificationDialog } from '@/domains/notifications/components/NotificationDialog';
 import { Notification as NotificationType } from '@/domains/notifications/types';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -32,6 +33,8 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
   const [selectedNotification, setSelectedNotification] = useState<NotificationType | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const router = useRouter();
+  const language = useLanguageStore((s) => s.language);
+  const localeCode = language || undefined;
 
   // Handle open state changes and notify parent
   const handleOpenChange = React.useCallback((open: boolean) => {
@@ -402,9 +405,9 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
                             <Clock className="h-3 w-3 text-gray-400 dark:text-gray-400 shrink-0" />
                             <span 
                               className="text-xs text-gray-400 dark:text-gray-400 whitespace-nowrap"
-                              title={formatFullDate(notification.createdAt)}
+                              title={formatFullDate(notification.createdAt, localeCode)}
                             >
-                              {formatRelativeTime(notification.createdAt)}
+                              {formatRelativeTime(notification.createdAt, { addSuffix: true, localeCode })}
                             </span>
                           </div>
                         </div>
@@ -436,6 +439,7 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
     {/* Notification Dialog */}
     {isMounted && selectedNotification && (
       <NotificationDialog
+                localeCode={localeCode}
         notification={selectedNotification}
         isOpen={isDialogOpen}
         onClose={() => {

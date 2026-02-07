@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
 import { getZustandDevToolsConfig } from '@/gradian-ui/shared/utils/zustand-devtools.util';
+import { getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 
 type Language = string; // e.g., 'en', 'fr', 'es', etc.
 
@@ -14,14 +15,14 @@ export const useLanguageStore = create<LanguageState>()(
   devtools(
     persist(
       (set, get) => ({
-        language: 'en', // Default to English
-        
+        language: getDefaultLanguage(),
+
         setLanguage: (language: Language) => {
           set({ language }, false, 'setLanguage');
         },
-        
+
         getLanguage: () => {
-          return get().language || 'en';
+          return get().language || getDefaultLanguage();
         },
       }),
       {

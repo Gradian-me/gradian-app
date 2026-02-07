@@ -83,7 +83,7 @@ export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            dir="auto"
+            dir="ltr"
             className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}
@@ -105,6 +105,7 @@ export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
             required={required ?? config.required ?? config.validation?.required ?? false}
             disabled={disabled}
             autoComplete="current-password"
+            dir="ltr"
             className={inputClasses}
             {...props}
           />
@@ -127,7 +128,7 @@ export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
           </p>
         )}
         {config.validation?.maxLength && (
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-end">
             {value.length}/{config.validation.maxLength}
           </p>
         )}

@@ -13,6 +13,7 @@ import { PopupPicker, SearchInput, Select, ConfirmationMessage } from '@/gradian
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
+import { useLanguageStore } from '@/stores/language.store';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { extractDomainFromRoute } from '@/gradian-ui/shared/utils/url-utils';
@@ -285,6 +286,8 @@ interface EmailTemplateSyncResponse {
 
 export default function IntegrationsPage() {
   const router = useRouter();
+  const language = useLanguageStore((s) => s.language);
+  const localeCode = language || undefined;
   const [integrations, setIntegrations] = useState<Integration[]>([]);
   // Store selected tenant per integration card (keyed by integration ID)
   const [cardTenants, setCardTenants] = useState<Record<string, { id: string | number; name: string; domain?: string; [key: string]: any } | null>>({});
@@ -945,7 +948,7 @@ export default function IntegrationsPage() {
       <ConfirmationMessage
         isOpen={showSyncAllConfirm}
         onOpenChange={setShowSyncAllConfirm}
-        title="Sync All Integrations"
+        title={[{ en: 'Sync All Integrations' }, { fa: 'همگام‌سازی همه یکپارچه‌سازی‌ها' }, { ar: 'مزامنة جميع التكاملات' }, { es: 'Sincronizar todas las integraciones' }, { fr: 'Synchroniser toutes les intégrations' }, { de: 'Alle Integrationen synchronisieren' }, { it: 'Sincronizza tutte le integrazioni' }, { ru: 'Синхронизировать все интеграции' }]}
         message={
           <div className="space-y-2">
             <p className="text-sm text-gray-700 dark:text-gray-300">
@@ -1349,7 +1352,7 @@ export default function IntegrationsPage() {
                       <div className="text-xs sm:text-sm">
                         <div className="flex items-center gap-1.5">
                           <Clock className="h-3.5 w-3.5 text-gray-500 dark:text-gray-400" />
-                          <span className="text-gray-500 dark:text-gray-400"><span className="font-medium text-gray-900 dark:text-gray-100">{integration.lastSynced ? formatRelativeTime(integration.lastSynced) : 'Never'}</span></span>
+                          <span className="text-gray-500 dark:text-gray-400"><span className="font-medium text-gray-900 dark:text-gray-100">{integration.lastSynced ? formatRelativeTime(integration.lastSynced, { addSuffix: true, localeCode }) : 'Never'}</span></span>
                           {integration.lastSyncMessage && (
                             <TooltipProvider>
                               <Tooltip>

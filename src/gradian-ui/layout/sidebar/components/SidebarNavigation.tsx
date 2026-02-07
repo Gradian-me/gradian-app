@@ -14,6 +14,8 @@ import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { SIDEBAR_HIGHLIGHT_CLASS } from '../utils';
 import { SidebarNavigationDynamic } from './SidebarNavigationDynamic';
 import { Menu } from 'lucide-react';
+import { useLanguageStore } from '@/stores/language.store';
+import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 
 export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   items,
@@ -28,6 +30,8 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   const pathname = usePathname();
   const currentPath = activePath || pathname;
   const shouldShowTooltip = isCollapsed && !isMobile;
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const tooltipSide = isRTL(language) ? 'left' : 'right';
   
   const filteredItems = React.useMemo(() => {
     return filterNavigationItems(items, searchQuery || '');
@@ -56,7 +60,11 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <ScrollArea className={cn("h-full px-2", className)} scrollbarVariant="minimal">
+      <ScrollArea
+        className={cn("h-full px-2", className)}
+        scrollbarVariant="minimal"
+        dir={isRTL(language) ? 'rtl' : undefined}
+      >
         <div className="space-y-1 pt-2 pb-4">
           {/* Home link - always shown, outside Menu */}
           <div className="space-y-1">
@@ -67,7 +75,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                     <div
                       className={cn(
                         "flex items-center py-2 rounded-lg transition-colors duration-150",
-                        isCollapsed && !isMobile ? "justify-center px-0" : "space-x-3 px-3",
+                        isCollapsed && !isMobile ? "justify-center px-0" : "gap-3 px-3",
                         homeActive
                           ? "bg-gray-800 text-white"
                           : "text-gray-300 hover:bg-gray-800 hover:text-white"
@@ -82,7 +90,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                     </div>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="right" className="bg-gray-900 text-white border-gray-700">
+                <TooltipContent side={tooltipSide} className="bg-gray-900 text-white border-gray-700">
                   <p>{FALLBACK_HOME_MENU_ITEM.name}</p>
                 </TooltipContent>
               </Tooltip>
@@ -91,7 +99,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                 <div
                   className={cn(
                     "flex items-center py-2 rounded-lg transition-colors duration-150",
-                    isCollapsed && !isMobile ? "justify-center px-0" : "space-x-3 px-3",
+                    isCollapsed && !isMobile ? "justify-center px-0" : "gap-3 px-3",
                     homeActive
                       ? "bg-gray-800 text-white"
                       : "text-gray-300 hover:bg-gray-800 hover:text-white"
@@ -117,12 +125,12 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                     "px-3 py-2 hover:no-underline rounded-lg transition-colors",
                     "text-gray-300 hover:text-white hover:bg-gray-800/50",
                     "data-[state=open]:text-white data-[state=open]:bg-gray-800/70",
-                    "border-l-2 border-l-transparent data-[state=open]:border-l-violet-500"
+                    "border-s-2 border-s-transparent data-[state=open]:border-s-violet-500"
                   )}
                 >
                   <div className={cn(
                     "flex items-center flex-1",
-                    isCollapsed && !isMobile ? "justify-center" : "space-x-2"
+                    isCollapsed && !isMobile ? "justify-center" : "gap-2"
                   )}>
                     <Menu className="h-4 w-4 shrink-0" />
                     <AnimatePresence mode="wait">
@@ -152,7 +160,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="space-y-1 mt-1 border-l-2 border-l-violet-500/30 ml-3 pl-1.5"
+                        className="space-y-1 mt-1 border-s-2 border-s-violet-500/30 me-2 pe-1"
                       >
                         {filteredItems.map((item, index) => {
                           const isActive = isActiveNavigationItem(item, currentPath);
@@ -170,7 +178,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                                 }}
                             className={cn(
                               "flex items-center py-2 rounded-lg transition-colors duration-150",
-                              isCollapsed && !isMobile ? "justify-center px-0" : "space-x-3 px-3",
+                              isCollapsed && !isMobile ? "justify-center px-0" : "gap-3 px-3",
                               isActive
                                 ? "bg-gray-800 text-white"
                                 : "text-gray-300 hover:bg-gray-800 hover:text-white"
@@ -210,7 +218,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                             <TooltipTrigger asChild>
                               {content}
                             </TooltipTrigger>
-                            <TooltipContent side="right" className="bg-gray-900 text-white border-gray-700">
+                            <TooltipContent side={tooltipSide} className="bg-gray-900 text-white border-gray-700">
                               <p>{item.name}</p>
                             </TooltipContent>
                           </Tooltip>

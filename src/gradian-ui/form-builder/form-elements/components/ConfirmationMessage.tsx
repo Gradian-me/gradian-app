@@ -13,6 +13,61 @@ import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/gradian-ui/shared/utils';
 import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+
+/**
+ * Title/message can be a plain string or inline translations:
+ * - string: "Delete Item"
+ * - array: [{"en": "Delete Item"}, {"fa": "حذف آیتم"}]
+ * - object: {"en": "Delete Item", "fa": "حذف آیتم"}
+ */
+export type TranslatableText = string | Array<Record<string, string>> | Record<string, string>;
+
+function resolveTranslatable(
+  value: TranslatableText | undefined,
+  lang: string,
+  defaultLang: string,
+  fallback: string
+): string {
+  if (value == null) return fallback;
+  if (typeof value === 'string') return value;
+  const merged: Record<string, string> = {};
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      if (entry && typeof entry === 'object') {
+        for (const [l, v] of Object.entries(entry)) {
+          if (v != null && String(v).trim() !== '') merged[l] = String(v).trim();
+        }
+      }
+    }
+  } else if (typeof value === 'object') {
+    for (const [l, v] of Object.entries(value)) {
+      if (v != null && String(v).trim() !== '') merged[l] = String(v).trim();
+    }
+  }
+  if (merged[lang]) return merged[lang];
+  if (merged[defaultLang]) return merged[defaultLang];
+  const first = Object.values(merged).find(Boolean);
+  return first ?? fallback;
+}
+
+function isTranslatableMessage(
+  message: string | React.ReactNode | TranslatableText
+): message is TranslatableText {
+  if (typeof message === 'string') return true;
+  if (React.isValidElement(message)) return false;
+  if (Array.isArray(message)) {
+    return message.length > 0 && message.every(
+      (item) => typeof item === 'object' && item !== null && !React.isValidElement(item) && Object.values(item).every((v) => typeof v === 'string')
+    );
+  }
+  if (typeof message === 'object' && message !== null) {
+    return Object.values(message).every((v) => typeof v === 'string');
+  }
+  return false;
+}
 
 export interface ConfirmationButton {
   label: string;
@@ -28,77 +83,61 @@ export interface ConfirmationMessageProps {
    * Whether the dialog is open
    */
   isOpen: boolean;
-  
   /**
    * Callback when dialog state changes
    */
   onOpenChange?: (open: boolean) => void;
-  
   /**
-   * Title of the confirmation dialog
+   * Title: plain string or inline translations (array of {lang: text} or object {lang: text})
    */
-  title: string;
-  
+  title: TranslatableText;
   /**
-   * Optional subtitle or additional description
+   * Optional subtitle: plain string or inline translations
    */
-  subtitle?: string;
-  
+  subtitle?: TranslatableText;
   /**
-   * Main message/content of the confirmation
+   * Main message: plain string, React node, or inline translations
    */
-  message: string | React.ReactNode;
-  
+  message: string | React.ReactNode | TranslatableText;
   /**
-   * Array of buttons to display
-   * Default: [{ label: 'Cancel', variant: 'outline', action: closes dialog }]
+   * Array of buttons. Default: [{ label: 'Cancel', variant: 'outline', action: closes dialog }]
    */
   buttons?: ConfirmationButton[];
-  
-  /**
-   * Size of the dialog
-   */
   size?: 'sm' | 'md' | 'lg';
-  
-  /**
-   * Additional className for the dialog content
-   */
   className?: string;
-  
-  /**
-   * Show warning/destructive styling
-   */
   variant?: 'default' | 'warning' | 'destructive';
 }
 
 export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
   isOpen,
   onOpenChange,
-  title,
-  subtitle,
-  message,
+  title: titleProp,
+  subtitle: subtitleProp,
+  message: messageProp,
   buttons,
   size = 'md',
   className,
   variant = 'default',
 }) => {
-  // Register dialog for back button handling on mobile
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
+
   const handleClose = React.useCallback(() => {
     onOpenChange?.(false);
   }, [onOpenChange]);
-  
+
   useDialogBackHandler(isOpen, handleClose, 'dialog', 'confirmation-message');
 
-  const sizeClasses = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-  };
+  const title = resolveTranslatable(titleProp, language, defaultLang, typeof titleProp === 'string' ? titleProp : '');
+  const subtitle = subtitleProp != null ? resolveTranslatable(subtitleProp, language, defaultLang, typeof subtitleProp === 'string' ? subtitleProp : '') : '';
+  const resolvedMessage = isTranslatableMessage(messageProp)
+    ? resolveTranslatable(messageProp, language, defaultLang, typeof messageProp === 'string' ? messageProp : '')
+    : messageProp;
 
-  // Default buttons if none provided
+  const cancelLabel = getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang);
   const defaultButtons: ConfirmationButton[] = [
     {
-      label: 'Cancel',
+      label: cancelLabel,
       variant: 'outline',
       action: () => onOpenChange?.(false),
     },
@@ -106,6 +145,11 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
 
   const finalButtons = buttons && buttons.length > 0 ? buttons : defaultButtons;
 
+  const sizeClasses = {
+    sm: 'max-w-md',
+    md: 'max-w-lg',
+    lg: 'max-w-2xl',
+  };
   const variantStyles = {
     default: '',
     warning: 'border-amber-200',
@@ -125,12 +169,12 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
             </DialogDescription>
           )}
         </DialogHeader>
-        
+
         <div className="py-4 text-gray-700 dark:text-gray-300">
-          {typeof message === 'string' ? (
-            <p className="text-sm leading-relaxed">{message}</p>
+          {typeof resolvedMessage === 'string' ? (
+            <p className="text-sm leading-relaxed">{resolvedMessage}</p>
           ) : (
-            message
+            resolvedMessage
           )}
         </div>
 

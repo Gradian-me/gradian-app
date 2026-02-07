@@ -4,11 +4,12 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { AiPromptHistory } from '@/domains/ai-prompts';
 
 export default function AiPromptsPage() {
   const router = useRouter();
+  const BackIcon = useBackIcon();
 
   return (
     <MainLayout
@@ -23,7 +24,7 @@ export default function AiPromptsPage() {
           onClick={() => router.push('/ai-builder')}
           className="mb-2"
         >
-          <ArrowLeft className="h-4 w-4 me-2" />
+          <BackIcon className="h-4 w-4 me-2" />
           Back to AI Builder
         </Button>
 

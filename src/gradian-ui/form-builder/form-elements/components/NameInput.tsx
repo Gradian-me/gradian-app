@@ -120,7 +120,6 @@ export const NameInput = forwardRef<FormElementRef, NameInputProps>(
             {fieldLabel ? (
               <label
                 htmlFor={fieldName}
-                dir="auto"
                 className={getLabelClasses({
                   error: Boolean(error),
                   required: required ?? config?.required ?? config?.validation?.required ?? false,
@@ -165,7 +164,7 @@ export const NameInput = forwardRef<FormElementRef, NameInputProps>(
             {...props}
           />
 
-          <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          <div className="absolute end-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
             {canCopy && hasValue && (
               <CopyContent content={value} />
             )}

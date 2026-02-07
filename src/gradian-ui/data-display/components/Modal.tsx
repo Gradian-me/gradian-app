@@ -66,7 +66,7 @@ export const Modal: React.FC<ModalProps> = ({
         ) : (title || description || headerActions) && (
           <DialogHeader className="px-6 pt-2 pb-2 shrink-0">
             <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
+              <div className="min-w-0 gap-2 flex flex-col">
                 {title && <DialogTitle>{title}</DialogTitle>}
                 {description && <DialogDescription>{description}</DialogDescription>}
               </div>

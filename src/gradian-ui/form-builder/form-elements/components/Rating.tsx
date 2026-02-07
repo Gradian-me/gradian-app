@@ -105,14 +105,14 @@ export const Rating: React.FC<RatingProps> = ({
   return (
     <div className={cn("w-full", className)}>
       {label && (
-        <label dir="auto" className={getLabelClasses({ error: Boolean(error), required })}>
+        <label className={getLabelClasses({ error: Boolean(error), required })}>
           {label}
         </label>
       )}
       <div 
         className={cn(
           "flex items-center gap-0.5 flex-nowrap whitespace-nowrap",
-          isEditable && "cursor-pointer"
+          isEditable ? "cursor-pointer" : "cursor-default"
         )}
         onMouseLeave={handleMouseLeave}
       >

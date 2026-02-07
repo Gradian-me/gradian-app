@@ -98,7 +98,7 @@ export const FileInput = forwardRef<FormElementRef, FileInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            dir="auto"
+            dir="ltr"
             className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}
@@ -127,7 +127,7 @@ export const FileInput = forwardRef<FormElementRef, FileInputProps>(
           </p>
         )}
         {maxFileSize && (
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-end">
             Max file size: {(maxFileSize / 1024 / 1024).toFixed(2)} MB
           </p>
         )}

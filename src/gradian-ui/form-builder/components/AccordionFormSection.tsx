@@ -31,6 +31,10 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DynamicCardRenderer } from '../../data-display/components/DynamicCardRenderer';
 import { toast } from 'sonner';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage, getTranslationsArray } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getSectionTranslatedTitle, getSectionTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
 
 
 export const AccordionFormSection: React.FC<FormSectionProps> = ({
@@ -56,13 +60,17 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   // Get fields for this section from the schema
   const fields = getFieldsForSection(schema, section.id);
   const { 
-    title, 
-    description, 
+    title: sectionTitle, 
+    description: sectionDescription, 
     columns = 2, // Default to 2 columns if not specified
     gap = 4, // Default gap
     styling, 
     isRepeatingSection 
   } = section;
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const title = getSectionTranslatedTitle(section, language, sectionTitle ?? section.id);
+  const description = getSectionTranslatedDescription(section, language, sectionDescription ?? '');
   
   // Check if this is a relation-based repeating section
   const isRelationBased = isRepeatingSection && section.repeatingConfig?.targetSchema && section.repeatingConfig?.relationTypeId;
@@ -86,7 +94,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     willEnable: boolean;
   }>({ open: false, willEnable: false });
   const queryClient = useQueryClient();
-  
+  const editTitle = getT(TRANSLATION_KEYS.BUTTON_EDIT, language, defaultLang);
+  const deleteTitle = getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang);
+  const addLabel = getT(TRANSLATION_KEYS.BUTTON_ADD, language, defaultLang);
+  const addRelationText = getT(TRANSLATION_KEYS.BUTTON_ADD_RELATION, language, defaultLang);
+  const noItemsAddedYet = getT(TRANSLATION_KEYS.EMPTY_NO_ITEMS_ADDED_YET, language, defaultLang);
+
   // Get current entity ID from form values (for creating relations)
   const currentEntityId = values?.id || (values as any)?.[schema.id]?.id;
   const sourceSchemaId = schema.id;
@@ -1125,12 +1138,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               {hasCodeField && codeField && (
                 <CodeBadge code={codeField} />
               )}
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate flex-1 min-w-0">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate flex-1 min-w-0 leading-relaxed">
                 {title}
               </h4>
             </div>
             {subtitle && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5 leading-relaxed">
                 {subtitle}
               </p>
             )}
@@ -1209,14 +1222,14 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             <CardHeader 
               className={cn(
                 "pb-4 px-6 pt-4 transition-colors rounded-2xl",
-                isCollapsible && "cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
+                isCollapsible && "cursor-pointer bg-gray-100 dark:bg-gray-800 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
               )}
               onClick={isCollapsible ? toggleExpanded : undefined}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CardTitle dir="auto" className={cn(
-                    "w-full text-base font-medium text-gray-900 dark:text-gray-100",
+                    "w-full text-base font-medium text-gray-900 dark:text-gray-100 leading-relaxed",
                     isNotApplicable && "opacity-50"
                   )}>{title}</CardTitle>
                   <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
@@ -1246,6 +1259,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   {/* N.A Switch */}
                   {showNotApplicableSwitch && (
                     <div 
+                      dir="auto"
                       className="flex items-center gap-1.5"
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -1398,7 +1412,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                             transition={{ duration: 0.3, ease: 'easeOut' }}
                             className="text-center py-8 text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700"
                           >
-                            <p>No items added yet</p>
+                            <p className="text-sm">{noItemsAddedYet}</p>
                           </motion.div>
                         ) : (
                         <motion.div 
@@ -1504,7 +1518,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                             if (relation) handleEditEntity((entity as any).id, relation.id);
                                           }}
                                           className="h-7 w-7"
-                                          title="Edit"
+                                          title={editTitle}
                                           disabled={disabled}
                                         >
                                           <Edit className="h-3.5 w-3.5" />
@@ -1516,7 +1530,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                             size="icon"
                                             onClick={(e) => handleDeleteClick(relation.id, e)}
                                             className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                            title="Delete"
+                                            title={deleteTitle}
                                             disabled={disabled}
                                           >
                                             <Trash2 className="h-3.5 w-3.5" />
@@ -1538,7 +1552,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                         <div className="space-y-2">
                           <div className="flex justify-center mb-4">
                             <AddButtonFull
-                              label={`Add ${title}`}
+                              label={`${addLabel} ${title}`}
                               onClick={onAddRepeatingItem}
                               disabled={disabled || !currentEntityId || isNotApplicable}
                               loading={isAddingItem}
@@ -1554,7 +1568,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                           {!currentEntityId && (
                             <FormAlert 
                               type="info" 
-                              message="Please save the form first before adding related items"
+                              message={getTranslationsArray(TRANSLATION_KEYS.MESSAGE_SAVE_FIRST_BEFORE_ADDING_RELATED)}
                               dismissible={false}
                             />
                           )}
@@ -1623,7 +1637,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                       transition={{ duration: 0.3, ease: 'easeOut' }}
                       className="text-center py-8 text-gray-500 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700"
                     >
-                      <p>No items added yet</p>
+                      <p className="text-xs">{noItemsAddedYet}</p>
                     </motion.div>
                   ) : (
                   <motion.div 
@@ -1728,7 +1742,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                       if (relation) handleEditEntity((entity as any).id, relation.id);
                                     }}
                                     className="h-7 w-7"
-                                    title="Edit"
+                                    title={editTitle}
                                     disabled={disabled}
                                   >
                                     <Edit className="h-3.5 w-3.5" />
@@ -1740,7 +1754,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                       size="icon"
                                       onClick={(e) => handleDeleteClick(relation.id, e)}
                                       className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                      title="Delete"
+                                      title={deleteTitle}
                                       disabled={disabled}
                                     >
                                       <Trash2 className="h-3.5 w-3.5" />
@@ -1762,7 +1776,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   <div className="space-y-2">
                     <div className="flex justify-center mb-4">
                       <AddButtonFull
-                        label={`Add ${title}`}
+                        label={`${addLabel} ${title}`}
                         onClick={onAddRepeatingItem}
                         disabled={disabled || !currentEntityId || isNotApplicable}
                         loading={isAddingItem}
@@ -1778,7 +1792,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                     {!currentEntityId && (
                       <FormAlert 
                         type="info" 
-                        message="Please save the form first before adding related items"
+                        message={getTranslationsArray(TRANSLATION_KEYS.MESSAGE_SAVE_FIRST_BEFORE_ADDING_RELATED)}
                         dismissible={false}
                       />
                     )}
@@ -1812,12 +1826,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           <ConfirmationMessage
             isOpen={deleteConfirmDialog.open}
             onOpenChange={(open) => setDeleteConfirmDialog({ open, relationId: deleteConfirmDialog.relationId })}
-            title={section.repeatingConfig?.deleteType === 'relationOnly' ? 'Remove Relation' : 'Delete Item'}
-            message={
-              section.repeatingConfig?.deleteType === 'relationOnly'
-                ? 'Are you sure you want to remove this relation? The related item will remain but will no longer be linked to this record.'
-                : 'Are you sure you want to delete this item and its relation? This action cannot be undone.'
-            }
+            title={section.repeatingConfig?.deleteType === 'relationOnly' ? [{ en: 'Remove Relation' }, { fa: 'حذف ارتباط' }, { ar: 'إزالة العلاقة' }, { es: 'Quitar relación' }, { fr: 'Supprimer la relation' }, { de: 'Beziehung entfernen' }, { it: 'Rimuovi relazione' }, { ru: 'Удалить связь' }] : [{ en: 'Delete Item' }, { fa: 'حذف آیتم' }, { ar: 'حذف العنصر' }, { es: 'Eliminar elemento' }, { fr: 'Supprimer l\'élément' }, { de: 'Element löschen' }, { it: 'Elimina elemento' }, { ru: 'Удалить элемент' }]}
+            message={section.repeatingConfig?.deleteType === 'relationOnly' ? [{ en: 'Are you sure you want to remove this relation? The related item will remain but will no longer be linked to this record.' }, { fa: 'آیا مطمئن هستید که می‌خواهید این ارتباط را حذف کنید؟ آیتم مرتبط باقی می‌ماند اما دیگر به این رکورد متصل نخواهد بود.' }, { ar: 'هل أنت متأكد أنك تريد إزالة هذه العلاقة؟ سيبقى العنصر المرتبط لكنه لن يكون مرتبطًا بهذا السجل.' }, { es: '¿Está seguro de que desea quitar esta relación? El elemento relacionado permanecerá pero ya no estará vinculado a este registro.' }, { fr: 'Voulez-vous vraiment supprimer cette relation ? L\'élément associé restera mais ne sera plus lié à cet enregistrement.' }, { de: 'Möchten Sie diese Beziehung wirklich entfernen? Das zugehörige Element bleibt erhalten, ist aber nicht mehr mit diesem Datensatz verknüpft.' }, { it: 'Sei sicuro di voler rimuovere questa relazione? L\'elemento correlato rimarrà ma non sarà più collegato a questo record.' }, { ru: 'Вы уверены, что хотите удалить эту связь? Связанный элемент останется, но больше не будет связан с этой записью.' }] : [{ en: 'Are you sure you want to delete this item and its relation? This action cannot be undone.' }, { fa: 'آیا مطمئن هستید که می‌خواهید این آیتم و ارتباط آن را حذف کنید؟ این عمل قابل بازگشت نیست.' }, { ar: 'هل أنت متأكد أنك تريد حذف هذا العنصر وعلاقته؟ لا يمكن التراجع عن هذا الإجراء.' }, { es: '¿Está seguro de que desea eliminar este elemento y su relación? Esta acción no se puede deshacer.' }, { fr: 'Voulez-vous vraiment supprimer cet élément et sa relation ? Cette action est irréversible.' }, { de: 'Möchten Sie dieses Element und seine Beziehung wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.' }, { it: 'Sei sicuro di voler eliminare questo elemento e la sua relazione? Questa azione non può essere annullata.' }, { ru: 'Вы уверены, что хотите удалить этот элемент и его связь? Это действие нельзя отменить.' }]}
             variant={section.repeatingConfig?.deleteType === 'relationOnly' ? 'default' : 'destructive'}
             buttons={[
               {
@@ -1852,7 +1862,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               canViewList={true}
               viewListUrl={`/page/${targetSchema}`}
               allowMultiselect={true}
-              confirmButtonText="Add Relation"
+              confirmButtonText={addRelationText}
             />
           )}
           
@@ -1927,6 +1937,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               {/* N.A Switch */}
               {showNotApplicableSwitch && (
                 <div 
+                  dir="auto"
                   className="flex items-center gap-1.5"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -1979,7 +1990,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 <div className="space-y-4">
                   {(repeatingItems || []).length === 0 ? (
                     <div className="text-center py-8 text-gray-500 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
-                      <p>No items added yet</p>
+                      <p className="text-sm">{noItemsAddedYet}</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -2022,7 +2033,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                     <div className="space-y-2">
                       <div className="flex justify-center mb-4">
                         <AddButtonFull
-                          label={`Add ${title}`}
+                          label={`${addLabel} ${title}`}
                           onClick={onAddRepeatingItem}
                           disabled={disabled || isNotApplicable}
                           loading={isAddingItem}
@@ -2047,7 +2058,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           <div className="space-y-4">
             {(repeatingItems || []).length === 0 ? (
               <div className="text-center py-8 text-gray-500 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
-                <p>No items added yet</p>
+                <p className="text-sm">{noItemsAddedYet}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -2090,7 +2101,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               <div className="space-y-2">
                 <div className="flex justify-center mb-4">
                   <AddButtonFull
-                    label={`Add ${title}`}
+                    label={`${addLabel} ${title}`}
                     onClick={onAddRepeatingItem}
                     disabled={disabled}
                     loading={isAddingItem}
@@ -2114,8 +2125,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       <ConfirmationMessage
         isOpen={naConfirmDialog.open}
         onOpenChange={(open) => setNaConfirmDialog({ open, willEnable: naConfirmDialog.willEnable })}
-        title="Mark Section as Not Applicable"
-        message="Are you sure you want to mark this section as Not Applicable? This will clear all field values in this section. This action cannot be undone."
+        title={[{ en: 'Mark Section as Not Applicable' }, { fa: 'علامت‌گذاری بخش به عنوان نامربوط' }, { ar: 'تعليم القسم كغير قابل للتطبيق' }, { es: 'Marcar sección como no aplicable' }, { fr: 'Marquer la section comme non applicable' }, { de: 'Bereich als nicht zutreffend markieren' }, { it: 'Segna sezione come non applicabile' }, { ru: 'Отметить раздел как неприменимый' }]}
+        message={[{ en: 'Are you sure you want to mark this section as Not Applicable? This will clear all field values in this section. This action cannot be undone.' }, { fa: 'آیا مطمئن هستید که می‌خواهید این بخش را نامربوط علامت بزنید؟ تمام مقادیر فیلدهای این بخش پاک خواهند شد. این عمل قابل بازگشت نیست.' }, { ar: 'هل أنت متأكد أنك تريد تعليم هذا القسم كغير قابل للتطبيق؟ سيؤدي ذلك إلى مسح جميع قيم الحقول في هذا القسم. لا يمكن التراجع عن هذا الإجراء.' }, { es: '¿Está seguro de que desea marcar esta sección como no aplicable? Se borrarán todos los valores de los campos de esta sección. Esta acción no se puede deshacer.' }, { fr: 'Voulez-vous vraiment marquer cette section comme non applicable ? Toutes les valeurs des champs de cette section seront effacées. Cette action est irréversible.' }, { de: 'Möchten Sie diesen Bereich wirklich als nicht zutreffend markieren? Alle Feldwerte in diesem Bereich werden gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.' }, { it: 'Sei sicuro di voler segnare questa sezione come non applicabile? Verranno cancellati tutti i valori dei campi in questa sezione. Questa azione non può essere annullata.' }, { ru: 'Вы уверены, что хотите отметить этот раздел как неприменимый? Все значения полей в этом разделе будут очищены. Это действие нельзя отменить.' }]}
         variant="destructive"
         buttons={[
           {
@@ -2147,7 +2158,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         <CardHeader 
           className={cn(
             "pb-4 px-6 pt-4 transition-colors rounded-2xl",
-            isCollapsible && "cursor-pointer hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
+            isCollapsible && "cursor-pointer bg-gray-100 dark:bg-gray-800 hover:bg-gray-100/50 dark:hover:bg-gray-700/50"
           )}
           onClick={isCollapsible ? toggleExpanded : undefined}
         >
@@ -2155,7 +2166,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             <div className="flex-1 me-2">
               <div className="flex items-center gap-2">
                 <CardTitle dir="auto" className={cn(
-                  "w-full text-base font-medium text-gray-900 dark:text-gray-100",
+                  "w-full text-base font-medium text-gray-900 dark:text-gray-100 leading-relaxed",
                   isNotApplicable && "opacity-50"
                 )}>{title}</CardTitle>
                 {displaySectionError && (
@@ -2172,6 +2183,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             {/* N.A Switch */}
             {showNotApplicableSwitch && (
               <div 
+                dir="auto"
                 className="flex items-center gap-1.5"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -2245,8 +2257,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       <ConfirmationMessage
         isOpen={naConfirmDialog.open}
         onOpenChange={(open) => setNaConfirmDialog({ open, willEnable: naConfirmDialog.willEnable })}
-        title="Mark Section as Not Applicable"
-        message="Are you sure you want to mark this section as Not Applicable? This will clear all field values in this section. This action cannot be undone."
+        title={[{ en: 'Mark Section as Not Applicable' }, { fa: 'علامت‌گذاری بخش به عنوان نامربوط' }, { ar: 'تعليم القسم كغير قابل للتطبيق' }, { es: 'Marcar sección como no aplicable' }, { fr: 'Marquer la section comme non applicable' }, { de: 'Bereich als nicht zutreffend markieren' }, { it: 'Segna sezione come non applicabile' }, { ru: 'Отметить раздел как неприменимый' }]}
+        message={[{ en: 'Are you sure you want to mark this section as Not Applicable? This will clear all field values in this section. This action cannot be undone.' }, { fa: 'آیا مطمئن هستید که می‌خواهید این بخش را نامربوط علامت بزنید؟ تمام مقادیر فیلدهای این بخش پاک خواهند شد. این عمل قابل بازگشت نیست.' }, { ar: 'هل أنت متأكد أنك تريد تعليم هذا القسم كغير قابل للتطبيق؟ سيؤدي ذلك إلى مسح جميع قيم الحقول في هذا القسم. لا يمكن التراجع عن هذا الإجراء.' }, { es: '¿Está seguro de que desea marcar esta sección como no aplicable? Se borrarán todos los valores de los campos de esta sección. Esta acción no se puede deshacer.' }, { fr: 'Voulez-vous vraiment marquer cette section comme non applicable ? Toutes les valeurs des champs de cette section seront effacées. Cette action est irréversible.' }, { de: 'Möchten Sie diesen Bereich wirklich als nicht zutreffend markieren? Alle Feldwerte in diesem Bereich werden gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.' }, { it: 'Sei sicuro di voler segnare questa sezione come non applicabile? Verranno cancellati tutti i valori dei campi in questa sezione. Questa azione non può essere annullata.' }, { ru: 'Вы уверены, что хотите отметить этот раздел как неприменимый? Все значения полей в этом разделе будут очищены. Это действие нельзя отменить.' }]}
         variant="destructive"
         buttons={[
           {

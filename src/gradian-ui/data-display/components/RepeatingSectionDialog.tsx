@@ -598,16 +598,8 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
         onOpenChange={(open) =>
           setDeleteConfirmDialog((prev) => ({ ...prev, open }))
         }
-        title={
-          repeatingConfig?.deleteType === 'relationOnly'
-            ? 'Remove Relation'
-            : 'Delete Item'
-        }
-        message={
-          repeatingConfig?.deleteType === 'relationOnly'
-            ? 'Are you sure you want to remove this relation? The related item will remain but will no longer be linked to this record.'
-            : 'Are you sure you want to delete this item and its relation? This action cannot be undone.'
-        }
+        title={repeatingConfig?.deleteType === 'relationOnly' ? [{ en: 'Remove Relation' }, { fa: 'حذف ارتباط' }, { ar: 'إزالة العلاقة' }, { es: 'Quitar relación' }, { fr: 'Supprimer la relation' }, { de: 'Beziehung entfernen' }, { it: 'Rimuovi relazione' }, { ru: 'Удалить связь' }] : [{ en: 'Delete Item' }, { fa: 'حذف آیتم' }, { ar: 'حذف العنصر' }, { es: 'Eliminar elemento' }, { fr: 'Supprimer l\'élément' }, { de: 'Element löschen' }, { it: 'Elimina elemento' }, { ru: 'Удалить элемент' }]}
+        message={repeatingConfig?.deleteType === 'relationOnly' ? [{ en: 'Are you sure you want to remove this relation? The related item will remain but will no longer be linked to this record.' }, { fa: 'آیا مطمئن هستید که می‌خواهید این ارتباط را حذف کنید؟ آیتم مرتبط باقی می‌ماند اما دیگر به این رکورد متصل نخواهد بود.' }, { ar: 'هل أنت متأكد أنك تريد إزالة هذه العلاقة؟ سيبقى العنصر المرتبط لكنه لن يكون مرتبطًا بهذا السجل.' }, { es: '¿Está seguro de que desea quitar esta relación? El elemento relacionado permanecerá pero ya no estará vinculado a este registro.' }, { fr: 'Voulez-vous vraiment supprimer cette relation ? L\'élément associé restera mais ne sera plus lié à cet enregistrement.' }, { de: 'Möchten Sie diese Beziehung wirklich entfernen? Das zugehörige Element bleibt erhalten, ist aber nicht mehr mit diesem Datensatz verknüpft.' }, { it: 'Sei sicuro di voler rimuovere questa relazione? L\'elemento correlato rimarrà ma non sarà più collegato a questo record.' }, { ru: 'Вы уверены, что хотите удалить эту связь? Связанный элемент останется, но больше не будет связан с этой записью.' }] : [{ en: 'Are you sure you want to delete this item and its relation? This action cannot be undone.' }, { fa: 'آیا مطمئن هستید که می‌خواهید این آیتم و ارتباط آن را حذف کنید؟ این عمل قابل بازگشت نیست.' }, { ar: 'هل أنت متأكد أنك تريد حذف هذا العنصر وعلاقته؟ لا يمكن التراجع عن هذا الإجراء.' }, { es: '¿Está seguro de que desea eliminar este elemento y su relación? Esta acción no se puede deshacer.' }, { fr: 'Voulez-vous vraiment supprimer cet élément et sa relation ? Cette action est irréversible.' }, { de: 'Möchten Sie dieses Element und seine Beziehung wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.' }, { it: 'Sei sicuro di voler eliminare questo elemento e la sua relazione? Questa azione non può essere annullata.' }, { ru: 'Вы уверены, что хотите удалить этот элемент и его связь? Это действие нельзя отменить.' }]}
         variant={repeatingConfig?.deleteType === 'relationOnly' ? 'default' : 'destructive'}
         buttons={[
           {

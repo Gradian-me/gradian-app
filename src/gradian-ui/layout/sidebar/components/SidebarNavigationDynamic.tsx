@@ -16,6 +16,9 @@ import { useSchemas } from '@/gradian-ui/schema-manager/hooks/use-schemas';
 import { useTenantStore } from '@/stores/tenant.store';
 import { filterFormSchemas, SIDEBAR_HIGHLIGHT_CLASS } from '../utils';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
+import { useLanguageStore } from '@/stores/language.store';
+import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { getSchemaTranslatedPluralName, getSchemaTranslatedSingularName } from '@/gradian-ui/schema-manager/utils/schema-utils';
 
 interface SidebarNavigationDynamicProps {
   isCollapsed: boolean;
@@ -35,6 +38,9 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   searchQuery,
 }) => {
   const pathname = usePathname();
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const rtl = isRTL(language);
+  const tooltipSide = rtl ? 'left' : 'right';
   const tenantId = useTenantStore((state) => state.getTenantId());
   const selectedTenant = useTenantStore((state) => state.selectedTenant);
   // Check if tenant name is "local" - if so, don't filter by tenantIds in API call
@@ -233,7 +239,11 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
         
         // Check if any schema in this group matches the search
         const schemaMatch = group.schemas.some((schema) => {
+          const translatedPlural = getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? '');
+          const translatedSingular = getSchemaTranslatedSingularName(schema, language, schema.singular_name ?? '');
           return (
+            translatedPlural.toLowerCase().includes(searchLower) ||
+            translatedSingular.toLowerCase().includes(searchLower) ||
             schema.plural_name?.toLowerCase().includes(searchLower) ||
             schema.singular_name?.toLowerCase().includes(searchLower) ||
             schema.id?.toLowerCase().includes(searchLower) ||
@@ -308,7 +318,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
     )}>
       <div className={cn(
         "flex items-center flex-1",
-        isCollapsed && !isMobile ? "justify-center" : "space-x-3"
+        isCollapsed && !isMobile ? "justify-center" : "gap-3"
       )}>
         <LayoutGrid className="h-5 w-5 shrink-0" />
         <AnimatePresence mode="wait">
@@ -351,7 +361,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                   <TooltipTrigger asChild>
                     {accordionTrigger}
                   </TooltipTrigger>
-                  <TooltipContent side="right" className="bg-gray-900 text-white border-gray-700">
+                  <TooltipContent side={tooltipSide} className="bg-gray-900 text-white border-gray-700">
                     <p>Applications</p>
                   </TooltipContent>
                 </Tooltip>
@@ -387,7 +397,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                     transition={{ duration: 0.35, delay: schemaIndex * 0.03, ease: "easeIn" }}
                                     className={cn(
                                       "flex items-center py-2 rounded-lg transition-colors duration-150",
-                                      isCollapsed && !isMobile ? "justify-center px-0" : "space-x-3 px-3",
+                                      isCollapsed && !isMobile ? "justify-center px-0" : "gap-3 px-3",
                                       active ? "bg-gray-800 text-white" : "text-gray-300 hover:bg-gray-800 hover:text-white"
                                     )}
                                   >
@@ -406,8 +416,8 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                           className="text-xs font-medium overflow-hidden whitespace-nowrap"
                                         >
                                           {searchQuery?.trim()
-                                            ? renderHighlightedText(schema.plural_name ?? '', searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
-                                            : (schema.plural_name ?? '')}
+                                            ? renderHighlightedText(getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? ''), searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
+                                            : getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? '')}
                                         </motion.span>
                                       )}
                                     </AnimatePresence>
@@ -418,8 +428,8 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                 return (
                                   <Tooltip key={schema.id}>
                                     <TooltipTrigger asChild>{schemaItem}</TooltipTrigger>
-                                    <TooltipContent side="right" className="bg-gray-900 text-white border-gray-700">
-                                      <p>{schema.plural_name}</p>
+                                    <TooltipContent side={tooltipSide} className="bg-gray-900 text-white border-gray-700">
+                                      <p>{getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? '')}</p>
                                     </TooltipContent>
                                   </Tooltip>
                                 );
@@ -464,12 +474,12 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                     "px-3 py-2.5 hover:no-underline rounded-lg transition-colors",
                                     "text-gray-300 hover:text-white hover:bg-gray-800/50",
                                     "data-[state=open]:text-white data-[state=open]:bg-gray-800/70",
-                                    "border-l-2 border-l-transparent data-[state=open]:border-l-violet-500"
+                                    "border-s-2 border-s-transparent data-[state=open]:border-s-violet-500"
                                   )}
                                 >
                                   <div className={cn(
                                     "flex items-center flex-1",
-                                    isCollapsed && !isMobile ? "justify-center" : "space-x-2"
+                                    isCollapsed && !isMobile ? "justify-center" : "gap-2"
                                   )}>
                                     {group.application?.icon ? (
                                       <IconRenderer 
@@ -500,7 +510,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                   </div>
                                 </AccordionTrigger>
                               </TooltipTrigger>
-                              <TooltipContent side="right" className="bg-gray-900 text-white border-gray-700">
+                              <TooltipContent side={tooltipSide} className="bg-gray-900 text-white border-gray-700">
                                 <p>{group.key}</p>
                               </TooltipContent>
                             </Tooltip>
@@ -510,12 +520,12 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                 "px-3 py-2.5 hover:no-underline rounded-lg transition-colors",
                                 "text-gray-300 hover:text-white hover:bg-gray-800/50",
                                 "data-[state=open]:text-white data-[state=open]:bg-gray-800/70",
-                                "border-l-2 border-l-transparent data-[state=open]:border-l-violet-500"
+                                "border-s-2 border-s-transparent data-[state=open]:border-s-violet-500"
                               )}
                             >
                               <div className={cn(
                                 "flex items-center flex-1",
-                                isCollapsed && !isMobile ? "justify-center" : "space-x-2"
+                                isCollapsed && !isMobile ? "justify-center" : "gap-2"
                               )}>
                                 {group.application?.icon ? (
                                   <IconRenderer 
@@ -557,7 +567,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.2 }}
-                                className="space-y-1 mt-1 border-l-2 border-l-violet-500/30 ms-2 ps-1"
+                                className="space-y-1 mt-1 border-s-2 border-s-violet-500/30 ms-2 ps-1"
                               >
                                 {group.schemas.map((schema, schemaIndex) => {
                                   const active = isActive(schema.id);
@@ -573,7 +583,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                         }}
                                     className={cn(
                                       "flex items-center py-2 rounded-lg transition-colors duration-150",
-                                      isCollapsed && !isMobile ? "justify-center px-0" : "space-x-3 px-3",
+                                      isCollapsed && !isMobile ? "justify-center px-0" : "gap-3 px-3",
                                       active
                                         ? "bg-gray-800 text-white"
                                         : "text-gray-300 hover:bg-gray-800 hover:text-white"
@@ -600,8 +610,8 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                           className="text-xs font-medium overflow-hidden whitespace-nowrap"
                                         >
                                           {searchQuery?.trim()
-                                            ? renderHighlightedText(schema.plural_name ?? '', searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
-                                            : (schema.plural_name ?? '')}
+                                            ? renderHighlightedText(getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? ''), searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
+                                            : getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? '')}
                                         </motion.span>
                                       )}
                                     </AnimatePresence>
@@ -615,8 +625,8 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                     <TooltipTrigger asChild>
                                       {schemaItem}
                                     </TooltipTrigger>
-                                    <TooltipContent side="right" className="bg-gray-900 text-white border-gray-700">
-                                      <p>{schema.plural_name}</p>
+                                    <TooltipContent side={tooltipSide} className="bg-gray-900 text-white border-gray-700">
+                                      <p>{getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? '')}</p>
                                     </TooltipContent>
                                   </Tooltip>
                                 );
@@ -647,7 +657,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
           <div className="px-3 py-2 text-gray-300">
             <div className={cn(
               "flex items-center flex-1",
-              isCollapsed && !isMobile ? "justify-center" : "space-x-3"
+              isCollapsed && !isMobile ? "justify-center" : "gap-3"
             )}>
               <LayoutGrid className="h-5 w-5 shrink-0" />
               {(!isCollapsed || isMobile) && (

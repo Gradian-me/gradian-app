@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save, RefreshCw, Trash2 } from 'lucide-react';
+import { Save, RefreshCw, Trash2 } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,6 +34,7 @@ export function AiAgentEditor({
   onBack,
 }: AiAgentEditorProps) {
   const router = useRouter();
+  const BackIcon = useBackIcon();
   const [agent, setAgent] = useState<AiAgent | null>(null);
   const [originalAgent, setOriginalAgent] = useState<AiAgent | null>(null);
   const [loading, setLoading] = useState(true);
@@ -182,7 +184,7 @@ export function AiAgentEditor({
 
         <div className="flex items-center justify-between gap-2">
           <Button variant="outline" onClick={onBack || (() => router.push('/builder/ai-agents'))}>
-            <ArrowLeft className="h-4 w-4 me-2" />
+            <BackIcon className="h-4 w-4 me-2" />
             Back to AI Agents
           </Button>
           <div className="flex items-center gap-2">

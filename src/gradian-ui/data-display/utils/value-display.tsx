@@ -148,6 +148,8 @@ interface RenderRatingOptions {
   size?: 'sm' | 'md' | 'lg';
   showValue?: boolean;
   className?: string;
+  /** When true, rating is view-only (no interaction, cursor default). */
+  readOnly?: boolean;
 }
 
 export const renderRatingValue = (
@@ -160,6 +162,7 @@ export const renderRatingValue = (
       size={options.size ?? 'sm'}
       showValue={options.showValue ?? false}
       className={options.className}
+      disabled={options.readOnly}
     />
   );
 };

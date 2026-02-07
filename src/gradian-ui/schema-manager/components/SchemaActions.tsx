@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Save, ArrowLeft, RotateCcw, Loader2, LayoutList, RefreshCw } from 'lucide-react';
+import { Save, RotateCcw, Loader2, LayoutList, RefreshCw } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 
 interface SchemaActionsProps {
   onBack?: () => void;
@@ -35,11 +36,12 @@ export function SchemaActions({
   refreshing = false,
   refreshLabel = 'Refresh'
 }: SchemaActionsProps) {
+  const BackIcon = useBackIcon();
   return (
     <div className="flex items-center justify-between gap-2 flex-wrap">
       {onBack && (
         <Button variant="ghost" onClick={onBack}>
-          <ArrowLeft className="h-4 w-4 md:me-2" />
+          <BackIcon className="h-4 w-4 md:me-2" />
           <span className="hidden md:inline">{backLabel}</span>
         </Button>
       )}

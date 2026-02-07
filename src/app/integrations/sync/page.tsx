@@ -7,7 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SyncButton } from '@/gradian-ui/form-builder/form-elements';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
-import { ArrowLeft, CheckCircle, AlertCircle, MessageCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, MessageCircle } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { motion } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -41,6 +42,7 @@ interface EmailTemplateSyncResponse {
 
 function SyncIntegrationPageContent() {
   const router = useRouter();
+  const BackIcon = useBackIcon();
   const searchParams = useSearchParams();
   const integrationId = searchParams.get('id');
   const { selectedTenant } = useTenantStore();
@@ -252,7 +254,7 @@ function SyncIntegrationPageContent() {
             onClick={() => router.back()}
             className="mb-4"
           >
-            <ArrowLeft className="h-4 w-4 me-2" />
+            <BackIcon className="h-4 w-4 me-2" />
             Back to Integrations
           </Button>
 

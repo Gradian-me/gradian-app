@@ -1,19 +1,21 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Filter, Plus, RefreshCw, ArrowUpDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { DataSort } from '@/gradian-ui/data-display/components/DataSort';
 import { SearchBar } from '@/gradian-ui/data-display/components/SearchBar';
 import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
-import { HierarchyExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { DataSort } from '@/gradian-ui/data-display/components/DataSort';
-import { SortConfig } from '@/gradian-ui/shared/utils/sort-utils';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
-import { useState, useMemo } from 'react';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { SortConfig } from '@/gradian-ui/shared/utils/sort-utils';
+import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { motion } from 'framer-motion';
+import { ArrowUpDown, Filter, Plus, RefreshCw } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 interface DynamicFilterPaneProps {
   searchTerm: string;
@@ -48,7 +50,7 @@ export const DynamicFilterPane = ({
   onAddNew,
   onRefresh,
   isRefreshing = false,
-  searchPlaceholder = "Search...",
+  searchPlaceholder: searchPlaceholderProp,
   addButtonText = "Add New",
   className = "",
   onExpandAllHierarchy,
@@ -65,6 +67,10 @@ export const DynamicFilterPane = ({
   showAddButton = true, // Default to showing the button
 }: DynamicFilterPaneProps) => {
   const [isSortDialogOpen, setIsSortDialogOpen] = useState(false);
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const defaultSearchPlaceholder = getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH, language ?? defaultLang, defaultLang);
+  const searchPlaceholder = searchPlaceholderProp ?? defaultSearchPlaceholder;
 
   // Generate tooltip text for sort configuration
   const sortTooltipText = useMemo(() => {
@@ -192,7 +198,7 @@ export const DynamicFilterPane = ({
           )}
           {showIds !== undefined && onShowIdsChange && (
             <div className="flex items-center gap-2 border-l border-gray-300 dark:border-gray-500 ps-2">
-              <Label htmlFor="show-ids-switch-filter" className="text-sm cursor-pointer whitespace-nowrap">
+              <Label htmlFor="show-ids-switch-filter" className="text-xs cursor-pointer whitespace-nowrap">
                 Show IDs
               </Label>
               <Switch
@@ -206,7 +212,7 @@ export const DynamicFilterPane = ({
             <Button 
               variant="default" 
               size="sm" 
-              className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap text-xs sm:text-sm shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+              className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap text-xs shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
               onClick={onAddNew}
             >
               <Plus className="h-4 w-4 sm:me-2" />
@@ -223,18 +229,18 @@ export const DynamicFilterPane = ({
       <Dialog open={isSortDialogOpen} onOpenChange={setIsSortDialogOpen}>
         <DialogContent className="max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col">
           <DialogHeader className="pb-3">
-            <DialogTitle>Sort Data</DialogTitle>
+            <DialogTitle>{getT(TRANSLATION_KEYS.TITLE_SORT_DATA, language ?? defaultLang, defaultLang)}</DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-y-auto pr-1">
             <DataSort
               schema={schema}
               value={sortConfig}
-              onChange={(newSortConfig) => {
-                onSortChange(newSortConfig);
-              }}
+              onChange={(newSortConfig) => onSortChange(newSortConfig)}
               excludedFieldIds={excludedFieldIds}
               className="border-0"
               showHeader={false}
+              requireApply
+              onApply={() => setIsSortDialogOpen(false)}
             />
           </div>
         </DialogContent>

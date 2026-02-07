@@ -1,11 +1,16 @@
 // Dynamic Action Buttons Component
 // A reusable component for rendering view, edit, delete action buttons
 
+'use client';
+
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/gradian-ui/form-builder/form-elements';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/gradian-ui/shared/utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export type ActionType = 'view' | 'edit' | 'delete';
 
@@ -52,22 +57,27 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
   stopPropagation = true,
 }) => {
   const router = useRouter();
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const labelView = getT(TRANSLATION_KEYS.BUTTON_VIEW, language, defaultLang);
+  const labelEdit = getT(TRANSLATION_KEYS.BUTTON_EDIT, language, defaultLang);
+  const labelDelete = getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang);
 
   const getActionConfig = (type: ActionType) => {
     const configs: Record<ActionType, { icon: string; label: string; hoverClass: string }> = {
       view: {
         icon: 'Eye',
-        label: 'View',
+        label: labelView,
         hoverClass: 'hover:bg-sky-50 hover:border-sky-300 hover:text-sky-400',
       },
       edit: {
         icon: 'Edit',
-        label: 'Edit',
+        label: labelEdit,
         hoverClass: 'hover:bg-violet-50 hover:border-violet-300 hover:text-violet-400',
       },
       delete: {
         icon: 'Trash2',
-        label: 'Delete',
+        label: labelDelete,
         hoverClass: 'hover:bg-red-50 hover:border-red-300 hover:text-red-400',
       },
     };

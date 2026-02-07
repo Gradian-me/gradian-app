@@ -11,6 +11,8 @@ export interface ShareButtonProps {
   value: string;
   title?: string;
   text?: string;
+  /** Translated label for tooltip and aria-label */
+  tooltipLabel?: string;
   className?: string;
   variant?: 'default' | 'outline' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
@@ -21,11 +23,13 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
   value,
   title,
   text,
+  tooltipLabel,
   className,
   variant = 'outline',
   size = 'md',
   disabled = false,
 }) => {
+  const label = tooltipLabel ?? 'Share';
   const handleShare = async () => {
     // Check if Web Share API is available
     if (navigator.share) {
@@ -69,13 +73,13 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
             disabled={disabled}
             variant={variant}
             className={cn(sizeClasses[size], 'p-0', className)}
-            aria-label="Share"
+            aria-label={label}
           >
             <Share2 className="h-4 w-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Share</p>
+          <p>{label}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

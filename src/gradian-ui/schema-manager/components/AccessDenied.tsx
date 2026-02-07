@@ -3,8 +3,11 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { ArrowLeft, LayoutDashboard, Loader2, OctagonMinus, RefreshCw } from 'lucide-react';
+import { LayoutDashboard, Loader2, OctagonMinus, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
+import { getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 import { AccessCheckResult } from '@/gradian-ui/shared/utils/access-control';
 
@@ -33,6 +36,7 @@ export function AccessDenied({
   refreshing = false,
   accessCheck,
 }: AccessDeniedProps) {
+  const BackIcon = useBackIcon();
   // Use accessCheck to enhance the message if provided
   const finalTitle = accessCheck?.code === 'UNAUTHORIZED' ? 'Authentication Required' : title;
   const finalDescription = accessCheck?.reason || description;
@@ -110,10 +114,10 @@ export function AccessDenied({
                   <Button
                     onClick={handleGoBack}
                     variant="outline"
-                    className="flex items-center space-x-2"
+                    className="flex items-center gap-2"
                   >
-                    <ArrowLeft className="h-4 w-4" />
-                    <span>Go Back</span>
+                    <BackIcon className="h-4 w-4" />
+                    <span>{getT(TRANSLATION_KEYS.BUTTON_GO_BACK)}</span>
                   </Button>
                 )}
                 {onRefresh && (

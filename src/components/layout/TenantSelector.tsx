@@ -15,6 +15,9 @@ import { useTheme } from 'next-themes';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { useQueryClient } from '@tanstack/react-query';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { SCHEMAS_QUERY_KEY, SCHEMAS_SUMMARY_QUERY_KEY } from '@/gradian-ui/schema-manager/hooks/use-schemas';
 import { clearSchemaCache } from '@/gradian-ui/indexdb-manager/schema-cache';
 import { SCHEMA_SUMMARY_CACHE_KEY, SCHEMA_CACHE_KEY } from '@/gradian-ui/indexdb-manager/types';
@@ -335,14 +338,19 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
     router.refresh();
   };
 
+  const defaultLang = getDefaultLanguage();
+  const language = useLanguageStore((s) => s.language) || defaultLang;
+  const labelNoneUseDomain = getT(TRANSLATION_KEYS.LABEL_NONE_USE_DOMAIN, language, defaultLang);
+
   const getTenantName = (tenant?: Tenant | null) => {
-    if (!tenant) return 'None (Use Domain)';
+    if (!tenant) return labelNoneUseDomain;
     return (tenant.title || tenant.name || String(tenant.id)).trim() || 'Untitled tenant';
   };
 
   const tenantInitials = (() => {
+    if (!selectedTenant) return 'TN';
     const name = getTenantName(selectedTenant);
-    if (!name || name === 'None (Use Domain)') {
+    if (!name) {
       return 'TN';
     }
     return name
@@ -601,7 +609,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
               )}
               onSelect={() => handleTenantSelect(null)}
             >
-              None (Use Domain)
+              {labelNoneUseDomain}
             </DropdownMenuPrimitive.Item>
             
             {tenants

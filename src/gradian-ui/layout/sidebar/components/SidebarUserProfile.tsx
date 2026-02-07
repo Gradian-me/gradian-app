@@ -34,7 +34,7 @@ export const SidebarUserProfile: React.FC<SidebarUserProfileProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="flex items-center space-x-3"
+            className="flex items-center gap-3"
           >
             <Avatar className="h-10 w-10">
               <AvatarImage src={displayUser.avatar} alt={displayUser.name} />

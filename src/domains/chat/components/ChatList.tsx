@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { Plus, BotMessageSquare, Clock, RefreshCw, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
+import { useLanguageStore } from '@/stores/language.store';
 import type { Chat } from '../types';
 import { CardWrapper, CardContent } from '@/gradian-ui/data-display/card/components/CardWrapper';
 import { Button } from '@/gradian-ui/form-builder/form-elements';
@@ -38,6 +39,8 @@ const ChatListComponent: React.FC<ChatListProps> = ({
   className,
 }) => {
   const router = useRouter();
+  const language = useLanguageStore((s) => s.language);
+  const localeCode = language || undefined;
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [chatToDelete, setChatToDelete] = useState<Chat | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -203,7 +206,7 @@ const ChatListComponent: React.FC<ChatListProps> = ({
                             <div className="mt-1 pt-1 border-t border-gray-200 dark:border-gray-700">
                               <span className="text-xs flex items-center gap-1 text-gray-500 dark:text-gray-400">
                                 <Clock className="w-3 h-3" />
-                                {formatRelativeTime(chat.lastMessageAt)}
+                                {formatRelativeTime(chat.lastMessageAt, { addSuffix: true, localeCode })}
                               </span>
                             </div>
                           )}
@@ -240,7 +243,7 @@ const ChatListComponent: React.FC<ChatListProps> = ({
       <ConfirmationMessage
         isOpen={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
-        title="Delete Chat"
+        title={[{ en: 'Delete Chat' }, { fa: 'حذف چت' }, { ar: 'حذف المحادثة' }, { es: 'Eliminar chat' }, { fr: 'Supprimer la conversation' }, { de: 'Chat löschen' }, { it: 'Elimina chat' }, { ru: 'Удалить чат' }]}
         message={
           chatToDelete
             ? `Are you sure you want to delete "${chatToDelete.title}"? This action cannot be undone and will delete all messages in this chat.`

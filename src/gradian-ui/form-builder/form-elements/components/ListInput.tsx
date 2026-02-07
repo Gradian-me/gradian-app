@@ -28,6 +28,9 @@ import { validateField } from '@/gradian-ui/shared/utils';
 import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { FormContext } from '@/gradian-ui/schema-manager/context/FormContext';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface AnnotationItem {
   id: string;
@@ -91,6 +94,14 @@ const SortableListItem: React.FC<{
   validationPattern,
   onCommitAndAddNew,
 }) => {
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const saveTitle = getT(TRANSLATION_KEYS.BUTTON_SAVE, language, defaultLang);
+  const cancelTitle = getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang);
+  const editTitle = getT(TRANSLATION_KEYS.BUTTON_EDIT, language, defaultLang);
+  const deleteTitle = getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang);
+  const deleteItemTitle = getT(TRANSLATION_KEYS.TITLE_DELETE_ITEM, language, defaultLang);
+
   const [internalIsEditing, setInternalIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(item.label);
   const [itemError, setItemError] = useState<string | null>(null);
@@ -331,18 +342,18 @@ const SortableListItem: React.FC<{
       <ConfirmationMessage
         isOpen={showDeleteConfirmation}
         onOpenChange={setShowDeleteConfirmation}
-        title="Delete Item"
-        message={`Are you sure you want to delete "${item.label}"? This action cannot be undone.`}
+        title={deleteItemTitle}
+        message={[{ en: `Are you sure you want to delete "${item.label}"? This action cannot be undone.` }, { fa: `آیا مطمئن هستید که می‌خواهید "${item.label}" را حذف کنید؟ این عمل قابل بازگشت نیست.` }, { ar: `هل أنت متأكد أنك تريد حذف "${item.label}"؟ لا يمكن التراجع عن هذا الإجراء.` }, { es: `¿Está seguro de que desea eliminar "${item.label}"? Esta acción no se puede deshacer.` }, { fr: `Voulez-vous vraiment supprimer « ${item.label} » ? Cette action est irréversible.` }, { de: `Möchten Sie "${item.label}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.` }, { it: `Sei sicuro di voler eliminare "${item.label}"? Questa azione non può essere annullata.` }, { ru: `Вы уверены, что хотите удалить «${item.label}»? Это действие нельзя отменить.` }]}
         variant="destructive"
         size="sm"
         buttons={[
           {
-            label: 'Cancel',
+            label: cancelTitle,
             variant: 'outline',
             action: handleCancelDelete,
           },
           {
-            label: 'Delete',
+            label: deleteTitle,
             variant: 'destructive',
             action: handleConfirmDelete,
             icon: 'Trash2',
@@ -430,7 +441,7 @@ const SortableListItem: React.FC<{
                 <>
                   <ButtonMinimal
                     icon={Check}
-                    title="Save"
+                    title={saveTitle}
                     color="green"
                     size="sm"
                     type="button"
@@ -438,7 +449,7 @@ const SortableListItem: React.FC<{
                   />
                   <ButtonMinimal
                     icon={XIcon}
-                    title="Cancel"
+                    title={cancelTitle}
                     color="red"
                     size="sm"
                     type="button"
@@ -449,7 +460,7 @@ const SortableListItem: React.FC<{
                 <>
                   <ButtonMinimal
                     icon={Edit2}
-                    title="Edit"
+                    title={editTitle}
                     color="blue"
                     size="sm"
                     type="button"
@@ -457,7 +468,7 @@ const SortableListItem: React.FC<{
                   />
                   <ButtonMinimal
                     icon={X}
-                    title="Delete"
+                    title={deleteTitle}
                     color="red"
                     size="sm"
                     type="button"
@@ -502,6 +513,9 @@ export const ListInput: React.FC<ListInputProps> = ({
   config,
 }) => {
   const formContext = React.useContext(FormContext);
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const emptyClickToAddOne = getT(TRANSLATION_KEYS.EMPTY_CLICK_BUTTON_TO_ADD_ONE, language, defaultLang);
   // allowReorder takes precedence when provided (e.g. from config); otherwise use enableReordering
   const reorderingEnabled = allowReorder !== undefined ? allowReorder : enableReordering;
   // Extract validation pattern from config
@@ -814,7 +828,7 @@ export const ListInput: React.FC<ListInputProps> = ({
         </label>
       )}
       {error && (
-        <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>
+        <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p>
       )}
       {displayValue.length > 0 ? (
         reorderingEnabled ? (
@@ -834,8 +848,8 @@ export const ListInput: React.FC<ListInputProps> = ({
           listContent
         )
       ) : (
-        <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-6 px-4 border border-dashed border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-800/30">
-          Click the button below to add one.
+        <div className="text-xs text-gray-500 dark:text-gray-400 text-center py-6 px-4 border border-dashed border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-800/30">
+          {emptyClickToAddOne}
         </div>
       )}
 

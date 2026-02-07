@@ -1,10 +1,15 @@
 // Table Pagination Component
 
+'use client';
+
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../../components/ui/select';
 import { cn } from '../../../shared/utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface TablePaginationProps {
   currentPage: number;
@@ -27,6 +32,12 @@ export function TablePagination({
   onPageChange,
   onPageSizeChange,
 }: TablePaginationProps) {
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const labelRows = getT(TRANSLATION_KEYS.PAGINATION_ROWS, language, defaultLang);
+  const labelOf = getT(TRANSLATION_KEYS.PAGINATION_OF, language, defaultLang);
+  const rtl = isRTL(language ?? defaultLang);
+
   const startItem = (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalItems);
 
@@ -98,8 +109,8 @@ export function TablePagination({
             </Select>
           </div>
         )}
-        <span className="text-xs text-gray-500">
-          {startItem}-{endItem} of {totalItems}
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          {startItem}-{endItem} {labelOf} {totalItems}
         </span>
       </div>
 
@@ -111,7 +122,7 @@ export function TablePagination({
           disabled={currentPage === 1}
           className="h-7 w-7 p-0 hover:bg-violet-50 hover:text-violet-600 disabled:opacity-30"
         >
-          <ChevronLeft className="h-3.5 w-3.5" />
+          {rtl ? <ChevronRight className="h-3.5 w-3.5" /> : <ChevronLeft className="h-3.5 w-3.5" />}
         </Button>
 
         <div className="flex items-center gap-0.5">
@@ -151,7 +162,7 @@ export function TablePagination({
           disabled={currentPage === totalPages}
           className="h-7 w-7 p-0 hover:bg-violet-50 hover:text-violet-600 disabled:opacity-30"
         >
-          <ChevronRight className="h-3.5 w-3.5" />
+          {rtl ? <ChevronLeft className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
         </Button>
       </div>
     </div>

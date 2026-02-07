@@ -1,6 +1,94 @@
 import { FormSchema as SharedFormSchema } from '../types/form-schema';
 import { FormSchema as FormBuilderFormSchema } from '../types/form-schema';
 
+/** Schema with optional translation arrays for names */
+type SchemaWithNameTranslations = {
+  singular_name?: string;
+  plural_name?: string;
+  singular_name_translations?: Array<Record<string, string>>;
+  plural_name_translations?: Array<Record<string, string>>;
+};
+
+/**
+ * Resolve a translated string from schema name translations array.
+ * Format: [{"en": "Task"}, {"fa": "وظیفه"}]
+ */
+function resolveFromNameTranslations(
+  translations: Array<Record<string, string>> | undefined,
+  lang: string | undefined,
+  fallback: string
+): string {
+  if (!lang || !Array.isArray(translations)) return fallback;
+  for (const entry of translations) {
+    if (entry && typeof entry === 'object' && lang in entry && entry[lang]) return entry[lang];
+  }
+  return fallback;
+}
+
+/**
+ * Get the singular name for a schema in the given language.
+ * Uses singular_name_translations when present and lang is set; otherwise returns schema.singular_name or fallback.
+ */
+export function getSchemaTranslatedSingularName(
+  schema: SchemaWithNameTranslations | null | undefined,
+  lang: string | undefined,
+  fallback = 'Entity'
+): string {
+  if (!schema) return fallback;
+  const base = schema.singular_name || fallback;
+  return resolveFromNameTranslations(schema.singular_name_translations, lang, base);
+}
+
+/**
+ * Get the plural name for a schema in the given language.
+ * Uses plural_name_translations when present and lang is set; otherwise returns schema.plural_name or fallback.
+ */
+export function getSchemaTranslatedPluralName(
+  schema: SchemaWithNameTranslations | null | undefined,
+  lang: string | undefined,
+  fallback = 'Entities'
+): string {
+  if (!schema) return fallback;
+  const base = schema.plural_name || fallback;
+  return resolveFromNameTranslations(schema.plural_name_translations, lang, base);
+}
+
+/** Section with optional title/description translation arrays */
+type SectionWithTranslations = {
+  title?: string;
+  description?: string;
+  titleTranslations?: Array<Record<string, string>>;
+  descriptionTranslations?: Array<Record<string, string>>;
+};
+
+/**
+ * Get the section title in the given language.
+ * Uses titleTranslations when present; otherwise returns section.title or fallback.
+ */
+export function getSectionTranslatedTitle(
+  section: SectionWithTranslations | null | undefined,
+  lang: string | undefined,
+  fallback = ''
+): string {
+  if (!section) return fallback;
+  const base = section.title ?? fallback;
+  return resolveFromNameTranslations(section.titleTranslations, lang, base);
+}
+
+/**
+ * Get the section description in the given language.
+ * Uses descriptionTranslations when present; otherwise returns section.description or fallback.
+ */
+export function getSectionTranslatedDescription(
+  section: SectionWithTranslations | null | undefined,
+  lang: string | undefined,
+  fallback = ''
+): string {
+  if (!section) return fallback;
+  const base = section.description ?? fallback;
+  return resolveFromNameTranslations(section.descriptionTranslations, lang, base);
+}
+
 // Extended form schema with additional properties
 export type ExtendedFormSchema = SharedFormSchema & {
   // Add any extended properties here if needed

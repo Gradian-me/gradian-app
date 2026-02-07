@@ -5,7 +5,10 @@ import { FormSchema, FormData, FormErrors, FormTouched } from '@/gradian-ui/sche
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '../../shared/utils';
 import { FormElementFactory } from '../form-elements/components/FormElementFactory';
-import { getSystemSectionFields } from '../configs/system-section-fields';
+import { getSystemSectionFields, type SystemSectionTranslator } from '../configs/system-section-fields';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getSchemaTranslatedSingularName } from '@/gradian-ui/schema-manager/utils/schema-utils';
 
 export interface FormSystemSectionProps {
   schema: FormSchema;
@@ -26,10 +29,25 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
   onBlur,
   disabled = false,
 }) => {
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
+  const t: SystemSectionTranslator = useMemo(() => {
+    return (key, fallback, params) => {
+      const s = getT(key, language ?? defaultLang, defaultLang) || fallback;
+      if (params && s) {
+        return Object.entries(params).reduce((acc, [k, v]) => acc.replace(new RegExp(`\\{${k}\\}`, 'g'), v), s);
+      }
+      return s;
+    };
+  }, [language, defaultLang]);
+
   // Get system section field configurations
   const systemFields = useMemo(() => {
-    return getSystemSectionFields(schema, values);
-  }, [schema, values]);
+    return getSystemSectionFields(schema, values, {
+      t,
+      getEntityDisplayName: (s: FormSchema) => getSchemaTranslatedSingularName(s, language ?? defaultLang, s.singular_name || 'item'),
+    });
+  }, [schema, values, t, language, defaultLang]);
 
   // Hide system section if no fields are available
   if (systemFields.length === 0) {

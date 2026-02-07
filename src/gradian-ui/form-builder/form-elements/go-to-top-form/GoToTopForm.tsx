@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronUp } from 'lucide-react';
 import { Button } from '../../../../components/ui/button';
 import { cn } from '../../../shared/utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 
 export interface GoToTopFormProps {
   /**
@@ -48,6 +50,8 @@ export const GoToTopForm: React.FC<GoToTopFormProps> = ({
   show = true,
   scrollContainerSelector
 }) => {
+  const language = useLanguageStore((s) => s.getLanguage()) ?? 'en';
+  const rtl = isRTL(language);
   const [isVisible, setIsVisible] = useState(false);
   const scrollContainerRef = useRef<HTMLElement | null>(null);
 
@@ -220,23 +224,35 @@ export const GoToTopForm: React.FC<GoToTopFormProps> = ({
   }, [threshold, scrollContainerSelector]);
 
   const scrollToTop = useCallback(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    } else {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
+    const startTime = performance.now();
+    const duration = 500;
+
+    const easeInOutCubic = (t: number) =>
+      t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeInOutCubic(progress);
+
+      if (scrollContainerRef.current) {
+        const start = scrollContainerRef.current.scrollTop;
+        scrollContainerRef.current.scrollTop = start * (1 - eased);
+      } else {
+        const start = window.scrollY ?? document.documentElement.scrollTop;
+        window.scrollTo(0, start * (1 - eased));
+      }
+
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+
+    requestAnimationFrame(animate);
   }, []);
 
-  const positionClasses = {
-    'bottom-right': 'bottom-6 right-4 md:right-6',
-    'bottom-left': 'bottom-6 left-6',
-    'bottom-center': 'bottom-6 left-1/2 -translate-x-1/2'
+  const positionClasses: Record<typeof position, string> = {
+    'bottom-right': 'bottom-6 end-4 md:end-6',
+    'bottom-left': 'bottom-6 start-6',
+    'bottom-center': 'bottom-6 start-1/2 -translate-x-1/2'
   };
 
   // For dialogs/forms with ScrollArea, position relative to avoid scrollbar
@@ -244,12 +260,19 @@ export const GoToTopForm: React.FC<GoToTopFormProps> = ({
     (document.querySelector('[role="dialog"]') !== null || 
      document.getElementById('form-dialog-form') !== null);
 
+  const dialogPositionClasses: Record<typeof position, string> = {
+    'bottom-right': 'bottom-5 end-10',
+    'bottom-left': 'bottom-5 start-10',
+    'bottom-center': 'bottom-8 start-1/2 -translate-x-1/2'
+  };
+
   if (!show) return null;
 
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
+          dir={rtl ? 'rtl' : 'ltr'}
           initial={{ opacity: 0, scale: 0.5, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.5, y: 20 }}
@@ -259,8 +282,7 @@ export const GoToTopForm: React.FC<GoToTopFormProps> = ({
           }}
           className={cn(
             'fixed z-100',
-            // Position inside ScrollArea viewport when in dialog to avoid scrollbar
-            isInDialog && position === 'bottom-right' ? 'bottom-8 right-20' : positionClasses[position],
+            isInDialog ? dialogPositionClasses[position] : positionClasses[position],
             className
           )}
         >

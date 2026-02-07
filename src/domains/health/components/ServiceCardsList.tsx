@@ -16,6 +16,7 @@ import { HealthService, ServiceHealthStatus } from '../types';
 import type { MetricItem } from '@/gradian-ui/analytics/indicators/metric-card/types';
 import { getStatusColor, getStatusText, getStatusIcon } from '../utils';
 import { formatDateTimeWithFallback, formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
+import { useLanguageStore } from '@/stores/language.store';
 import { cn } from '@/gradian-ui/shared/utils';
 import { Countdown } from '@/gradian-ui/form-builder/form-elements/components/Countdown';
 
@@ -53,6 +54,8 @@ export function ServiceCardsList({
   viewMode = 'wide',
 }: ServiceCardsListProps) {
   const prevStatusesRef = useRef<Record<string, ServiceHealthStatus>>({});
+  const language = useLanguageStore((s) => s.language);
+  const localeCode = language ?? undefined;
 
   // Function to get raw metric values for ping tracking
   const getMetricValueForPing = (metricId: string, status: ServiceHealthStatus, isTestUnhealthy: boolean): any => {
@@ -168,7 +171,7 @@ export function ServiceCardsList({
                               }
                               return (
                                 <span className="text-xs text-gray-500 dark:text-gray-400">
-                                  Last checked: {formatRelativeTime(date)}
+                                  Last checked: {formatRelativeTime(date, { addSuffix: true, localeCode })}
                                 </span>
                               );
                             } catch {
@@ -306,7 +309,7 @@ export function ServiceCardsList({
                         }
                         return (
                           <div className="text-xs text-gray-500 dark:text-gray-400 ms-12">
-                            Last checked: {formatRelativeTime(date)}
+                            Last checked: {formatRelativeTime(date, { addSuffix: true, localeCode })}
                           </div>
                         );
                       } catch {

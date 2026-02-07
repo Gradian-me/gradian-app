@@ -14,7 +14,7 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, ChevronRight, List, Loader2, RefreshCw } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, List, Loader2, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -45,6 +45,11 @@ import { Plus } from 'lucide-react';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { fetchOptionsFromSchemaOrUrl } from '../utils/fetch-options-utils';
 import { CompanySelector } from '@/components/layout/CompanySelector';
+import { getT, getDefaultLanguage, isRTL, resolveFromTranslationsArray } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { useLanguageStore } from '@/stores/language.store';
+import { getSchemaTranslatedSingularName, getSchemaTranslatedPluralName } from '@/gradian-ui/schema-manager/utils/schema-utils';
+import type { FormAlertMessage } from '@/components/ui/form-alert';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 8, scale: 0.99 },
@@ -73,7 +78,8 @@ interface PendingSelection {
   raw?: any | null;
 }
 
-const COMPANY_REQUIRED_MESSAGE = 'Please select a company to view these records.';
+
+const COMPANY_REQUIRED_ERROR_KEY = '__COMPANY_REQUIRED__';
 
 const normalizeIdList = (ids?: Array<string | number>): string[] =>
   (ids ?? []).map((id) => String(id));
@@ -352,8 +358,8 @@ export interface PopupPickerProps {
   sourceUrl?: string;
   schema?: FormSchema;
   onSelect: (selections: NormalizedOption[], rawItems: any[]) => Promise<void> | void;
-  title?: string;
-  description?: string;
+  title?: FormAlertMessage;
+  description?: FormAlertMessage;
   excludeIds?: string[]; // IDs to exclude from selection (already selected items)
   includeIds?: string[]; // IDs to include in selection (only show these items)
   selectedIds?: string[]; // IDs of items that are already selected (will be shown with distinct styling)
@@ -384,7 +390,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   canViewList = false,
   viewListUrl,
   allowMultiselect = false,
-  confirmButtonText = 'Apply',
+  confirmButtonText,
   columnMap,
   staticItems,
   pageSize = 200,
@@ -551,7 +557,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         return;
       }
       if (shouldFilterByCompany && !companyQueryParam) {
-        setError(COMPANY_REQUIRED_MESSAGE);
+        setError(getT(TRANSLATION_KEYS.MESSAGE_COMPANY_REQUIRED_PICKER));
         if (!append) {
           setItems([]);
           setFilteredItems([]);
@@ -656,7 +662,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         return;
       }
       if (shouldFilterByCompany && !companyQueryParam) {
-        setError(COMPANY_REQUIRED_MESSAGE);
+        setError(getT(TRANSLATION_KEYS.MESSAGE_COMPANY_REQUIRED_PICKER));
         if (!append) {
           setItems([]);
           setFilteredItems([]);
@@ -763,7 +769,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       }
 
       if (!staticItems && shouldFilterByCompany && !companyQueryParam) {
-        setError(COMPANY_REQUIRED_MESSAGE);
+        setError(getT(TRANSLATION_KEYS.MESSAGE_COMPANY_REQUIRED_PICKER));
         setItems([]);
         setFilteredItems([]);
         return;
@@ -1660,7 +1666,25 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     );
   };
 
-  const schemaName = schema?.plural_name || schema?.singular_name || schemaId;
+  const language = useLanguageStore((s) => s.getLanguage()) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const rtl = isRTL(language);
+  const rawSchemaName = schema?.plural_name || schema?.singular_name || schemaId;
+  const schemaName = effectiveSchema
+    ? getSchemaTranslatedPluralName(effectiveSchema, language, rawSchemaName)
+    : rawSchemaName;
+  const translatedSingularName = effectiveSchema
+    ? getSchemaTranslatedSingularName(effectiveSchema, language, effectiveSchema.singular_name || getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang))
+    : getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang);
+  const resolvedTitle =
+    !title
+      ? `${schemaName}`
+      : typeof title === 'string'
+        ? title
+        : resolveFromTranslationsArray(title, language, defaultLang);
+ 
+  const effectiveConfirmButtonText = confirmButtonText ?? getT(TRANSLATION_KEYS.BUTTON_APPLY, language, defaultLang);
+  const applyingLabel = getT(TRANSLATION_KEYS.LABEL_APPLYING, language, defaultLang);
 
   // Hierarchy helpers (used when schema.allowHierarchicalParent is true)
   const { roots: hierarchyRoots, nodeMap: hierarchyNodeMap } = useMemo(() => {
@@ -1796,7 +1820,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       const iconColorClasses = getAvatarColorClasses(resolvedColorId);
       
       return (
-        <motion.div key={item.id || index} {...motionProps} style={{ marginLeft: depth * 16 }}>
+        <motion.div key={item.id || index} {...motionProps} style={{ marginInlineStart: depth * 16 }}>
           <div
             onClick={(e) => {
               e.preventDefault();
@@ -1822,6 +1846,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 {hasChildren ? (
                   isExpanded ? (
                     <ChevronDown className="h-4 w-4" />
+                  ) : rtl ? (
+                    <ChevronLeft className="h-4 w-4" />
                   ) : (
                     <ChevronRight className="h-4 w-4" />
                   )
@@ -1955,7 +1981,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       : null;
 
     return (
-      <div key={item.id || index} className="space-y-1" style={{ marginLeft: depth * 16 }}>
+      <div key={item.id || index} className="space-y-1" style={{ marginInlineStart: depth * 16 }}>
         <motion.div {...motionProps}>
           <div
             onClick={() => toggleSelection(item)}
@@ -1978,6 +2004,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 {hasChildren ? (
                   isExpanded ? (
                     <ChevronDown className="h-4 w-4" />
+                  ) : rtl ? (
+                    <ChevronLeft className="h-4 w-4" />
                   ) : (
                     <ChevronRight className="h-4 w-4" />
                   )
@@ -2073,7 +2101,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               animate="visible"
               exit="hidden"
             >
-              <div className="space-y-1 border-l border-dashed border-gray-200 dark:border-gray-700 ms-4 ps-3">
+              <div className="space-y-1 border-s border-dashed border-gray-200 dark:border-gray-700 ms-4 ps-3">
                 {node.children.map((child, idx) =>
                   renderHierarchyNode(child, depth + 1, index + idx + 1)
                 )}
@@ -2093,7 +2121,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         onClose();
       }
     }}>
-      <DialogContent className="max-w-3xl w-full h-full rounded-none md:rounded-2xl md:max-h-[85vh] flex flex-col" onPointerDownOutside={(e) => {
+      <DialogContent className="max-w-3xl w-full h-full rounded-none md:rounded-2xl md:max-h-[85vh] flex flex-col" dir={rtl ? 'rtl' : undefined} onPointerDownOutside={(e) => {
         // Prevent closing on outside click during loading or submission
         if (isLoading || isSubmitting) {
           e.preventDefault();
@@ -2107,8 +2135,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         <DialogHeader>
             <div className="flex items-center justify-between">
             <div className="flex-1">
-              <DialogTitle>{title || `Select ${schemaName}`}</DialogTitle>
-              {description && <DialogDescription>{description}</DialogDescription>}
+              <DialogTitle>{resolvedTitle}</DialogTitle>
             </div>
             <div className="flex items-center gap-2 me-8">
               <Button
@@ -2117,7 +2144,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 size="icon"
                 onClick={handleRefresh}
                 disabled={isLoading || isSubmitting}
-                aria-label="Refresh items"
+                aria-label={getT(TRANSLATION_KEYS.ARIA_REFRESH_ITEMS, language, defaultLang)}
               >
                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin text-violet-600 dark:text-violet-300' : ''}`} />
               </Button>
@@ -2145,7 +2172,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   className="flex items-center gap-2"
                 >
                   <Plus className="h-4 w-4" />
-                  Add {effectiveSchema.singular_name || 'Item'}
+                  {getT(TRANSLATION_KEYS.BUTTON_ADD, language, defaultLang)} {translatedSingularName}
                 </Button>
               )}
               {canViewList && (
@@ -2162,7 +2189,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   className="flex items-center gap-2"
                 >
                   <List className="h-4 w-4" />
-                  View List
+                  {getT(TRANSLATION_KEYS.BUTTON_VIEW_LIST, language, defaultLang)}
                 </Button>
               )}
             </div>
@@ -2172,7 +2199,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         {/* Search */}
         <div className="mb-4">
           <SearchInput
-            config={{ name: 'picker-search', placeholder: `Search ${schemaName}...` }}
+            config={{ name: 'picker-search', placeholder: `${getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH).replace('...', '')} ${schemaName}...` }}
             value={searchQuery}
             onChange={(value) => setSearchQuery(value)}
             onClear={() => setSearchQuery('')}
@@ -2184,14 +2211,18 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           {isLoading && filteredItems.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-              <span className="ms-2 text-sm text-gray-500">Loading items...</span>
+              <span className="ms-2 text-sm text-gray-500">{getT(TRANSLATION_KEYS.MESSAGE_LOADING_ITEMS, language, defaultLang)}</span>
             </div>
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-12 gap-4 px-4">
-              <div className="text-center text-red-500 text-sm">{error}</div>
-              {error === COMPANY_REQUIRED_MESSAGE && (
+              <div className="text-center text-red-500 text-sm">
+                {error === COMPANY_REQUIRED_ERROR_KEY
+                  ? getT(TRANSLATION_KEYS.MESSAGE_COMPANY_REQUIRED_PICKER)
+                  : error}
+              </div>
+              {error === COMPANY_REQUIRED_ERROR_KEY && (
                 <div className="flex flex-col items-center gap-2 w-full max-w-md">
-                  <p className="text-xs font-medium opacity-80 text-center">Select a company:</p>
+                  <p className="text-xs font-medium opacity-80 text-center">{getT(TRANSLATION_KEYS.MESSAGE_SELECT_COMPANY, language, defaultLang)}</p>
                   <div className="w-full">
                     <CompanySelector onCompanyChange={handleCompanyChange} />
                   </div>
@@ -2200,14 +2231,16 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
             </div>
           ) : filteredItems.length === 0 && !isLoading ? (
             <div className="text-center py-12 text-gray-500 text-sm">
-              {searchQuery ? `No items found matching "${searchQuery}"` : 'No items available'}
+              {searchQuery
+                ? getT(TRANSLATION_KEYS.MESSAGE_NO_ITEMS_FOUND_MATCHING).replace('{0}', searchQuery)
+                : getT(TRANSLATION_KEYS.MESSAGE_NO_ITEMS_AVAILABLE)}
             </div>
           ) : (
             <div className="relative">
               {isLoading && filteredItems.length > 0 && (
                 <div className="absolute top-2 right-2 z-10 flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
                   <Loader2 className="h-4 w-4 animate-spin text-violet-600 dark:text-violet-400" />
-                  <span className="text-xs text-gray-600 dark:text-gray-400">Searching...</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-400">{getT(TRANSLATION_KEYS.MESSAGE_SEARCHING, language, defaultLang)}</span>
                 </div>
               )}
               {isHierarchical ? (
@@ -2225,7 +2258,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       {isFetchingMore && (
                         <div className="col-span-full flex items-center justify-center py-4 text-sm text-gray-500">
                           <Loader2 className="h-4 w-4 animate-spin me-2" />
-                          Loading more icons...
+                          {getT(TRANSLATION_KEYS.MESSAGE_LOADING_MORE, language, defaultLang)}
                         </div>
                       )}
                       {!pageMeta.hasMore && filteredItems.length > 0 && !isFetchingMore && (
@@ -2236,7 +2269,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       {pageMeta.hasMore && (
                         <div className="col-span-full">
                           <AddButtonFull
-                            label="Load More"
+                            label={getT(TRANSLATION_KEYS.BUTTON_LOAD_MORE, language, defaultLang)}
                             onClick={handleLoadMore}
                             loading={isFetchingMore}
                             disabled={isLoading || isFetchingMore}
@@ -2263,7 +2296,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
             }}
             disabled={isSubmitting}
           >
-            Cancel
+            {getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang)}
           </Button>
           {allowMultiselect && (
             <Button
@@ -2276,7 +2309,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               }}
               disabled={isSubmitting || selectedCount === 0}
             >
-              Clear Selection
+              {getT(TRANSLATION_KEYS.BUTTON_CLEAR_SELECTION, language, defaultLang)}
             </Button>
           )}
           {allowMultiselect && (
@@ -2292,8 +2325,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
             >
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {isSubmitting
-                ? `${confirmButtonText}ing...`
-                : `${confirmButtonText}${hasPendingSelections ? ` (${selectedCount})` : ''}`}
+                ? applyingLabel
+                : `${effectiveConfirmButtonText}${hasPendingSelections ? ` (${selectedCount})` : ''}`}
             </Button>
           )}
         </div>

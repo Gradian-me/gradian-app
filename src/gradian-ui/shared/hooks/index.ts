@@ -403,3 +403,6 @@ export type { UseFormModalOptions, UseFormModalReturn, FormModalMode } from '../
 // Re-export print hook
 export { usePrint } from './use-print';
 export type { UsePrintReturn } from './use-print';
+
+// RTL-aware back navigation icon
+export { useBackIcon } from './use-back-icon';

@@ -99,7 +99,7 @@ export const IconInput = forwardRef<FormElementRef, IconInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            dir="auto"
+            dir="ltr"
             className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}
@@ -137,11 +137,12 @@ export const IconInput = forwardRef<FormElementRef, IconInputProps>(
             placeholder={fieldPlaceholder}
             required={required ?? config.required ?? config.validation?.required ?? false}
             disabled={disabled}
+            dir="ltr"
             className={inputClasses}
             {...props}
           />
           {(shouldShowLibraryButton || (!isEmpty && !canCopy) || (canCopy && !isEmpty)) && (
-            <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            <div className="absolute end-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
               {shouldShowLibraryButton && (
                 <Button
                   type="button"

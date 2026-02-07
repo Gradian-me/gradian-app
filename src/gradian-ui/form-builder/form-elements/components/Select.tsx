@@ -31,6 +31,9 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
+import { getT, getDefaultLanguage, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { useLanguageStore } from '@/stores/language.store';
 
 export interface SelectOption {
   id?: string;
@@ -40,6 +43,9 @@ export interface SelectOption {
   icon?: string;
   color?: string; // Can be a badge variant (success, warning, etc.), custom hex color, or Tailwind classes
   category?: string; // Category for grouping options
+  isRTL?: boolean; // Right-to-left script (e.g. Arabic, Persian)
+  /** BCP 47 locale string (e.g. 'en-US', 'fa-IR') for date/number formatting. Used by LanguageSelector. */
+  locale?: string;
 }
 
 export interface SelectWithBadgesProps extends Omit<SelectProps, 'children'> {
@@ -113,6 +119,13 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   enableGrouping = true,
   ...props
 }) => {
+  const language = useLanguageStore((s) => s.getLanguage()) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const [isMounted, setIsMounted] = React.useState(false);
+  React.useEffect(() => setIsMounted(true), []);
+  const rtl = isMounted ? isRTL(language) : false;
+  const noOptionsFoundLabel = getT(TRANSLATION_KEYS.MESSAGE_NO_OPTIONS_FOUND, language, defaultLang);
+
   // State for search functionality
   const [searchValue, setSearchValue] = React.useState('');
   const searchInputRef = React.useRef<HTMLInputElement>(null);
@@ -347,7 +360,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   };
 
   // Base classes from SelectTrigger - we'll merge with size and error
-  const baseSelectClasses = 'rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800/50 text-sm text-gray-900 dark:text-gray-100 shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 ring-offset-background dark:ring-offset-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:ring-offset-1 focus:border-violet-400 dark:focus:border-violet-500 data-[state=open]:outline-none data-[state=open]:ring-1 data-[state=open]:ring-violet-300 dark:data-[state=open]:ring-violet-500 data-[state=open]:ring-offset-1 data-[state=open]:border-violet-400 dark:data-[state=open]:border-violet-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-800/30 disabled:text-gray-500 dark:disabled:text-gray-300 transition-colors';
+  const baseSelectClasses = 'rounded-lg border border-gray-300 dark:border-gray-600 bg-white text-xs dark:bg-gray-900/60 dark:text-gray-400 dark:placeholder:text-gray-400 shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 ring-offset-background dark:ring-offset-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:ring-offset-1 focus:border-violet-400 dark:focus:border-violet-500 data-[state=open]:outline-none data-[state=open]:ring-1 data-[state=open]:ring-violet-300 dark:data-[state=open]:ring-violet-500 data-[state=open]:ring-offset-1 data-[state=open]:border-violet-400 dark:data-[state=open]:border-violet-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-800/30 disabled:text-gray-500 dark:disabled:text-gray-300 transition-colors';
   
   const selectClasses = cn(
     baseSelectClasses,
@@ -362,7 +375,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
   const renderFieldLabel = () =>
     fieldLabel ? (
-      <label htmlFor={fieldName} dir="auto" className={getLabelClasses({ error: Boolean(error), required: Boolean(required) })}>
+      <label htmlFor={fieldName} className={getLabelClasses({ error: Boolean(error), required: Boolean(required) })}>
         {fieldLabel}
       </label>
     ) : null;
@@ -598,7 +611,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       <div className="w-full">
         {renderFieldLabel()}
         <div className={cn(selectClasses, 'flex items-center justify-center text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700')}>
-          Loading options...
+          {getT(TRANSLATION_KEYS.MESSAGE_LOADING_OPTIONS, language, defaultLang)}
         </div>
         {renderErrorMessage(optionsError ?? undefined)}
         {renderErrorMessage(error)}
@@ -729,6 +742,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
           disabled={disabled}
           open={controlledOpen}
           onOpenChange={handleOpenChange}
+          dir={rtl ? 'rtl' : undefined}
           {...props}
         >
           <SelectTrigger className={cn(selectClasses)} id={fieldName}>
@@ -836,7 +850,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                         e.stopPropagation();
                       }}
                       placeholder="Search options..."
-                      className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:border-violet-400 dark:focus:border-violet-500"
+                      className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-700 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:border-violet-400 dark:focus:border-violet-500"
                     />
                     {searchValue && (
                       <button
@@ -869,8 +883,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
             }
           >
             {validOptions.length === 0 && searchValue ? (
-              <div className="px-2 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
-                No options found
+              <div className="px-2 py-6 text-center text-xs text-gray-500 dark:text-gray-400">
+                {noOptionsFoundLabel}
               </div>
             ) : enableGrouping && Object.keys(groupedOptions.groups).length > 0 ? (
               <>
@@ -971,7 +985,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   return (
     <div className="w-full">
       {renderFieldLabel()}
-      <RadixSelect value={fallbackSelectValue} onValueChange={onValueChange} {...props}>
+      <RadixSelect value={fallbackSelectValue} onValueChange={onValueChange} dir={rtl ? 'rtl' : undefined} {...props}>
         <SelectTrigger className={selectClasses} id={fieldName}>
           <SelectValue placeholder={fieldPlaceholder} />
         </SelectTrigger>

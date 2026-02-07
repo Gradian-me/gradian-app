@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Layers, ArrowLeft, Layout, FileText } from 'lucide-react';
+import { Settings, Layers, Layout, FileText } from 'lucide-react';
 import { FormSchema, FormField, FormSection } from '../types/form-schema';
 import { GeneralInfoTab } from './GeneralInfoTab';
 import { SectionsTab } from './SectionsTab';

@@ -3,12 +3,18 @@ import { TableColumn } from '../types';
 import { formatFieldValue, getFieldValue } from './field-formatters';
 import { ColumnWidthMap } from '../types';
 import { resolveColumnWidth, shouldAllowWrap } from './column-config';
+import { resolveSchemaFieldLabel } from '@/gradian-ui/shared/utils/translation-utils';
 
 export const buildTableColumns = (
   fields: any[],
   schema: any,
-  columnWidths?: ColumnWidthMap
+  columnWidths?: ColumnWidthMap,
+  lang?: string,
+  defaultLang?: string
 ): TableColumn[] => {
+  const effectiveLang = lang ?? 'en';
+  const effectiveDefaultLang = defaultLang ?? 'en';
+
   return fields.map((field) => {
     const widthSettings = resolveColumnWidth(field, columnWidths);
     const align =
@@ -16,9 +22,14 @@ export const buildTableColumns = (
         ? 'right'
         : 'left';
 
+    const resolvedLabel =
+      resolveSchemaFieldLabel(field, effectiveLang, effectiveDefaultLang) ||
+      field.label ||
+      field.name;
+
     return {
       id: field.id,
-      label: field.label || field.name,
+      label: resolvedLabel,
       accessor: (row: any) => getFieldValue(field, row),
       sortable: true,
       align,

@@ -21,6 +21,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({
   company,
   className,
   navigationSchemas,
+  isRtl = false,
 }) => {
   const width = isMobile ? 320 : (isCollapsed ? config.styling?.collapsedWidth || 80 : config.styling?.expandedWidth || 280);
   const prevWidthRef = useRef<number>(width);
@@ -39,15 +40,18 @@ const SidebarComponent: React.FC<SidebarProps> = ({
     <motion.div
       initial={false}
       animate={{ width }}
-      transition={{ 
+      transition={{
         duration: shouldAnimate ? 0.3 : 0,
-        ease: "easeOut" 
+        ease: "easeOut"
       }}
       className={cn(
         "relative h-full bg-gray-900 text-white flex flex-col",
-        !isMobile && "border-r border-gray-800",
         className
       )}
+      style={{
+        ...(!isMobile ? { borderInlineEnd: '1px solid rgb(31 41 55)' } : {}),
+        direction: isRtl ? 'rtl' : 'ltr',
+      }}
     >
       {/* Header */}
       <SidebarHeader
@@ -55,6 +59,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({
         isCollapsed={isCollapsed}
         isMobile={isMobile}
         onToggle={onToggle}
+        isRtl={isRtl}
       />
 
       {/* Company Selector */}

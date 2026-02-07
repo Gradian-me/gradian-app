@@ -520,7 +520,7 @@ export const InputOTP = React.forwardRef<FormElementRef, OTPInputProps>((props, 
   return (
     <div ref={formRef} className={cn('w-full space-y-3', className)}>
       {resolvedLabel && (
-        <label dir="auto" className={getLabelClasses({ required: resolvedRequired })}>
+        <label className={getLabelClasses({ required: resolvedRequired })}>
           {resolvedLabel}
         </label>
       )}

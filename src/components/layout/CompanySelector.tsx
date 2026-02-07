@@ -14,6 +14,9 @@ import { useUserStore } from '@/stores/user.store';
 import { useTheme } from 'next-themes';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 interface Company {
   id: string | number;
@@ -231,11 +234,18 @@ export function CompanySelector({
     }
   };
 
+  const defaultLang = getDefaultLanguage();
+  const language = useLanguageStore((s) => s.language) || defaultLang;
+  const labelAllCompanies = getT(TRANSLATION_KEYS.LABEL_ALL_COMPANIES, language, defaultLang);
+
   const getCompanyName = (company?: Company | null) =>
     company?.name && company.name.trim().length > 0 ? company.name.trim() : 'Untitled company';
 
+  const getCompanyDisplayName = (company?: Company | null) =>
+    company?.id === -1 ? labelAllCompanies : getCompanyName(company);
+
   const companyInitials = (() => {
-    const name = getCompanyName(selectedCompany);
+    const name = getCompanyDisplayName(selectedCompany);
     if (!name) {
       return 'CO';
     }
@@ -303,7 +313,7 @@ export function CompanySelector({
             fullWidth ? "flex-1 text-left truncate" : ""
           )}
         >
-          {getCompanyName(selectedCompany) || 'Loading...'}
+          {getCompanyDisplayName(selectedCompany) || 'Loading...'}
         </span>
         <ChevronDown
           className={cn(
@@ -398,7 +408,7 @@ export function CompanySelector({
                   fullWidth ? "flex-1" : ""
                 )}
               >
-                {getCompanyName(selectedCompany) || 'Select company'}
+                {getCompanyDisplayName(selectedCompany) || 'Select company'}
               </span>
               <ChevronDown
                 className={cn(
@@ -411,8 +421,8 @@ export function CompanySelector({
             {selectedCompany && selectedCompany.id !== -1 && (
               <div
                 className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-500 border border-white shadow-sm"
-                title={getCompanyName(selectedCompany)}
-                aria-label={getCompanyName(selectedCompany)}
+                title={getCompanyDisplayName(selectedCompany)}
+                aria-label={getCompanyDisplayName(selectedCompany)}
               />
             )}
             </div>
@@ -447,7 +457,7 @@ export function CompanySelector({
               )}
               onSelect={() => handleCompanySelect(company)}
             >
-              {getCompanyName(company)}
+              {getCompanyDisplayName(company)}
             </DropdownMenuPrimitive.Item>
           ))}
         </DropdownMenuPrimitive.Content>

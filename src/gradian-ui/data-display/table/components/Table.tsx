@@ -18,6 +18,7 @@ export function Table<T = any>({
   onRowClick,
   onCellClick,
   highlightQuery,
+  dir,
 }: TableProps<T>) {
   const {
     state,
@@ -103,7 +104,7 @@ export function Table<T = any>({
           </table>
         </div>
       ) : (
-        <table className={tableClasses} style={tableStyle} dir="auto">
+        <table className={tableClasses} style={tableStyle} dir={dir ?? 'auto'}>
           <TableHeader
             columns={config.columns}
             sortBy={state.sortBy}

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { DynamicPageRenderer } from '@/gradian-ui/data-display/components/DynamicPageRenderer';
 import { useEffect, useRef, useState } from 'react';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -38,6 +38,7 @@ function processSchema(schema: any): FormSchema {
 
 export default function CompaniesBuilderPage() {
   const router = useRouter();
+  const BackIcon = useBackIcon();
   const [mounted, setMounted] = useState(false);
   const [schema, setSchema] = useState<FormSchema | null>(null);
   const [loading, setLoading] = useState(true);
@@ -126,7 +127,7 @@ export default function CompaniesBuilderPage() {
             onClick={() => router.push('/builder')}
             className="mt-4"
           >
-            <ArrowLeft className="h-4 w-4 me-2" />
+            <BackIcon className="h-4 w-4 me-2" />
             Back to Builder
           </Button>
         </div>
@@ -147,7 +148,7 @@ export default function CompaniesBuilderPage() {
           onClick={() => router.push('/builder')}
           className="mb-2"
         >
-          <ArrowLeft className="h-4 w-4 me-2" />
+          <BackIcon className="h-4 w-4 me-2" />
           Back to Builder
         </Button>
 

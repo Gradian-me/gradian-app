@@ -711,7 +711,6 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       {fieldLabel && (
         <label
           htmlFor={fieldName}
-          dir="auto"
           className={getLabelClasses({ error: Boolean(error), required })}
         >
           {fieldLabel}
@@ -972,7 +971,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                 onBlur={onBlur}
                 disabled={disabled}
                 className={cn(
-                  'cursor-pointer',
+                  'cursor-pointer text-xs',
                   error
                     ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500'
                     : ''
@@ -992,7 +991,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                   setIsPickerOpen(true);
                 }}
                 disabled={disabled}
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                className="absolute end-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
               >
                 <Search className="h-4 w-4" />
               </Button>

@@ -9,6 +9,9 @@ import { AccordionItem, AccordionTrigger, AccordionContent } from '@/components/
 import { NotificationService } from '../services/notification.service';
 import { CTAButton } from '@/gradian-ui/form-builder/form-elements/components/CTAButton';
 import { cn } from '@/gradian-ui/shared/utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 interface NotificationGroupProps {
   group: NotificationGroupType;
@@ -24,6 +27,9 @@ export function NotificationGroup({ group, groupBy = 'category', onMarkAsRead, o
   const [displayCount, setDisplayCount] = useState(10); // Start with 10 items
   const INITIAL_COUNT = 10;
   const LOAD_MORE_COUNT = 20;
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const t = (key: string) => getT(key, language, defaultLang);
 
   // Reset display count when group changes
   useEffect(() => {
@@ -37,19 +43,19 @@ export function NotificationGroup({ group, groupBy = 'category', onMarkAsRead, o
   const handleShowMore = () => {
     setDisplayCount(prev => prev + LOAD_MORE_COUNT);
   };
-  const getGroupLabel = (category: string, groupBy: GroupByOption): string => {
+  const getGroupLabel = (category: string, groupByOpt: GroupByOption): string => {
     // Special case for "Need Acknowledgement" group
     if (category === 'needs_acknowledgement') {
-      return 'Need Acknowledgement';
+      return t(TRANSLATION_KEYS.LABEL_NEED_ACKNOWLEDGEMENT);
     }
-    
-    switch (groupBy) {
+
+    switch (groupByOpt) {
       case 'type':
         return NotificationService.getTypeLabel(category);
       case 'priority':
         return NotificationService.getPriorityLabel(category);
       case 'status':
-        return category === 'read' ? 'Read' : 'Unread';
+        return category === 'read' ? t(TRANSLATION_KEYS.LABEL_READ) : t(TRANSLATION_KEYS.LABEL_UNREAD);
       case 'category':
       default:
         return NotificationService.getCategoryLabel(category);
@@ -74,11 +80,11 @@ export function NotificationGroup({ group, groupBy = 'category', onMarkAsRead, o
           </CardTitle>
           <div className="flex items-center space-x-2">
             <Badge variant="secondary" className="text-xs">
-              {group.totalCount || group.notifications.length} total
+              {group.totalCount || group.notifications.length} {t(TRANSLATION_KEYS.LABEL_TOTAL)}
             </Badge>
             {group.unreadCount > 0 && (
               <Badge variant="default" className="text-xs">
-                {group.unreadCount} unread
+                {group.unreadCount} {t(TRANSLATION_KEYS.LABEL_UNREAD)}
               </Badge>
             )}
           </div>

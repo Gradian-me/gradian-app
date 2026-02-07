@@ -5,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, X, GripVertical, Copy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 interface RepeatingSectionProps {
   title: string;
@@ -33,6 +36,9 @@ export function RepeatingSection({
 }: RepeatingSectionProps) {
   const canAdd = maxItems ? items.length < maxItems : true;
   const canRemove = items.length > minItems;
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const noItemsAddedYet = getT(TRANSLATION_KEYS.EMPTY_NO_ITEMS_ADDED_YET, language, defaultLang);
 
   return (
     <Card className={className}>
@@ -47,7 +53,7 @@ export function RepeatingSection({
       <CardContent>
         {items.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p>No items added yet</p>
+            <p>{noItemsAddedYet}</p>
             {canAdd && (
               <Button
                 type="button"

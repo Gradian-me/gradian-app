@@ -67,7 +67,7 @@ export const AddButtonFull: React.FC<AddButtonFullProps> = ({
   loading = false,
   className,
   iconSize = 'w-5 h-5',
-  textSize,
+  textSize = 'text-xs',
   fullWidth = true,
 }) => {
   return (

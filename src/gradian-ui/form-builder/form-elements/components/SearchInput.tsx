@@ -89,7 +89,6 @@ export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            dir="auto"
             className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}
@@ -114,6 +113,7 @@ export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
             required={required ?? (config as any).validation?.required ?? false}
             disabled={disabled}
             autoComplete="off"
+            dir="auto"
             className={inputClasses}
             {...props}
           />
@@ -146,7 +146,7 @@ export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
           </p>
         )}
         {config.validation?.maxLength && (
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-end">
             {value.length}/{config.validation.maxLength}
           </p>
         )}

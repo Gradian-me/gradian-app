@@ -1,4 +1,8 @@
+'use client';
+
 import React, { useMemo } from 'react';
+import { useLanguageStore } from '@/stores/language.store';
+import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { LoadingSkeleton } from '@/gradian-ui/layout/components';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Table } from './Table';
@@ -49,6 +53,9 @@ export function TableWrapper<T = any>({
   highlightQuery,
   schema,
 }: TableWrapperProps<T>) {
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const isRtl = isRTL(language);
+
   // Add dynamic columns for relatedCompanies and status if schema supports them
   const enhancedColumns = useMemo(() => {
     const additionalColumns: TableColumn<T>[] = [];
@@ -378,7 +385,7 @@ export function TableWrapper<T = any>({
 
   if (isLoading) {
     return (
-      <>
+      <div className="w-full min-w-0" dir={isRtl ? 'rtl' : undefined}>
         {showCards ? (
           <TableCardSkeleton count={effectiveCardCount} columnCount={effectiveColumnCount} cardColumns={cardColumns} />
         ) : (
@@ -387,12 +394,12 @@ export function TableWrapper<T = any>({
         {aggregations.length > 0 && (
           <AggregationSkeleton count={aggregations.length} gridColumns={aggregationColumns} />
         )}
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="w-full min-w-0" dir={isRtl ? 'rtl' : undefined}>
       {showCards ? (
         <>
           <TableCardView
@@ -415,7 +422,7 @@ export function TableWrapper<T = any>({
       ) : (
         <>
           <div className="mx-0 min-w-0">
-            <Table config={enhancedTableConfig} onRowClick={onRowClick} highlightQuery={highlightQuery} />
+            <Table config={enhancedTableConfig} onRowClick={onRowClick} highlightQuery={highlightQuery} dir={isRtl ? 'rtl' : undefined} />
           </div>
           {aggregations.length > 0 && (
             <TableAggregations
@@ -428,7 +435,7 @@ export function TableWrapper<T = any>({
           )}
         </>
       )}
-    </>
+    </div>
   );
 }
 

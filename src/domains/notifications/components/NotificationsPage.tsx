@@ -24,8 +24,30 @@ import {
 import { motion } from 'framer-motion';
 import { Accordion } from '@/components/ui/accordion';
 import { HierarchyExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+
+const TYPE_TO_KEY: Record<string, string> = {
+  success: TRANSLATION_KEYS.LABEL_SUCCESS,
+  info: TRANSLATION_KEYS.LABEL_INFO,
+  warning: TRANSLATION_KEYS.LABEL_WARNING,
+  important: TRANSLATION_KEYS.LABEL_IMPORTANT,
+};
+
+const CATEGORY_TO_KEY: Record<string, string> = {
+  quotation: TRANSLATION_KEYS.LABEL_QUOTATIONS,
+  purchase_order: TRANSLATION_KEYS.LABEL_PURCHASE_ORDERS,
+  shipment: TRANSLATION_KEYS.LABEL_SHIPMENTS,
+  vendor: TRANSLATION_KEYS.LABEL_VENDORS,
+  tender: TRANSLATION_KEYS.LABEL_TENDERS,
+  system: TRANSLATION_KEYS.LABEL_SYSTEM,
+};
 
 export function NotificationsPage() {
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const t = (key: string) => getT(key, language, defaultLang);
   const {
     notifications,
     groupedNotifications,
@@ -129,50 +151,50 @@ export function NotificationsPage() {
 
   // Define options for Type filter
   const typeOptions: SelectOption[] = [
-    { id: 'all', label: `All Types (${filterCounts.all || 0})` },
-    { id: 'success', label: `Success (${filterCounts.success || 0})`, color: 'success', icon: 'CheckCircle' },
-    { id: 'info', label: `Info (${filterCounts.info || 0})`, color: 'info', icon: 'Info' },
-    { id: 'warning', label: `Warning (${filterCounts.warning || 0})`, color: 'warning', icon: 'AlertTriangle' },
-    { id: 'important', label: `Important (${filterCounts.important || 0})`, color: 'destructive', icon: 'XCircle' }
+    { id: 'all', label: `${t(TRANSLATION_KEYS.LABEL_ALL_TYPES)} (${filterCounts.all || 0})` },
+    { id: 'success', label: `${t(TRANSLATION_KEYS.LABEL_SUCCESS)} (${filterCounts.success || 0})`, color: 'success', icon: 'CheckCircle' },
+    { id: 'info', label: `${t(TRANSLATION_KEYS.LABEL_INFO)} (${filterCounts.info || 0})`, color: 'info', icon: 'Info' },
+    { id: 'warning', label: `${t(TRANSLATION_KEYS.LABEL_WARNING)} (${filterCounts.warning || 0})`, color: 'warning', icon: 'AlertTriangle' },
+    { id: 'important', label: `${t(TRANSLATION_KEYS.LABEL_IMPORTANT)} (${filterCounts.important || 0})`, color: 'destructive', icon: 'XCircle' }
   ];
 
   // Define options for Category filter
   const categoryOptions: SelectOption[] = [
-    { id: 'all', label: 'All Categories' },
-    { id: 'quotation', label: 'Quotations' },
-    { id: 'purchase_order', label: 'Purchase Orders' },
-    { id: 'shipment', label: 'Shipments' },
-    { id: 'vendor', label: 'Vendors' },
-    { id: 'tender', label: 'Tenders' },
-    { id: 'system', label: 'System' }
+    { id: 'all', label: t(TRANSLATION_KEYS.LABEL_ALL_CATEGORIES) },
+    { id: 'quotation', label: t(TRANSLATION_KEYS.LABEL_QUOTATIONS) },
+    { id: 'purchase_order', label: t(TRANSLATION_KEYS.LABEL_PURCHASE_ORDERS) },
+    { id: 'shipment', label: t(TRANSLATION_KEYS.LABEL_SHIPMENTS) },
+    { id: 'vendor', label: t(TRANSLATION_KEYS.LABEL_VENDORS) },
+    { id: 'tender', label: t(TRANSLATION_KEYS.LABEL_TENDERS) },
+    { id: 'system', label: t(TRANSLATION_KEYS.LABEL_SYSTEM) }
   ];
 
   // Define options for Status filter
   const statusOptions: SelectOption[] = [
-    { id: 'all', label: 'All Status' },
-    { id: 'unread', label: `Unread (${filterCounts.unread || 0})`, color: 'warning' },
-    { id: 'read', label: 'Read', color: 'success' }
+    { id: 'all', label: t(TRANSLATION_KEYS.LABEL_ALL_STATUS) },
+    { id: 'unread', label: `${t(TRANSLATION_KEYS.LABEL_UNREAD)} (${filterCounts.unread || 0})`, color: 'warning' },
+    { id: 'read', label: t(TRANSLATION_KEYS.LABEL_READ), color: 'success' }
   ];
 
   // Define options for Source filter
   const sourceOptions: SelectOption[] = [
-    { id: 'all', label: 'All Sources' },
-    { id: 'createdByMe', label: 'Created by Me' },
-    { id: 'assignedToMe', label: 'Assigned to Me' }
+    { id: 'all', label: t(TRANSLATION_KEYS.LABEL_ALL_SOURCES) },
+    { id: 'createdByMe', label: t(TRANSLATION_KEYS.LABEL_CREATED_BY_ME) },
+    { id: 'assignedToMe', label: t(TRANSLATION_KEYS.LABEL_ASSIGNED_TO_ME) }
   ];
 
   // Define options for Group By select
   const groupByOptions: SelectOption[] = [
-    { id: 'category', label: 'By Category', icon: 'FolderTree' },
-    { id: 'type', label: 'By Type', icon: 'Shapes' },
-    { id: 'priority', label: 'By Priority', icon: 'Flag' },
-    { id: 'status', label: 'By Status', icon: 'ListChecks' }
+    { id: 'category', label: t(TRANSLATION_KEYS.LABEL_BY_CATEGORY), icon: 'FolderTree' },
+    { id: 'type', label: t(TRANSLATION_KEYS.LABEL_BY_TYPE), icon: 'Shapes' },
+    { id: 'priority', label: t(TRANSLATION_KEYS.LABEL_BY_PRIORITY), icon: 'Flag' },
+    { id: 'status', label: t(TRANSLATION_KEYS.LABEL_BY_STATUS), icon: 'ListChecks' }
   ];
 
   const cardClass = 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm';
 
   return (
-    <MainLayout title="Notifications" icon="Bell">
+    <MainLayout title={t(TRANSLATION_KEYS.TITLE_NOTIFICATIONS)} icon="Bell">
       <div className="space-y-6">
         {/* Header Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -181,7 +203,7 @@ export function NotificationsPage() {
               <div className="flex items-center space-x-2">
                 <Bell className="h-5 w-5 text-violet-600" />
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t(TRANSLATION_KEYS.LABEL_TOTAL)}</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{filterCounts.all}</p>
                 </div>
               </div>
@@ -193,7 +215,7 @@ export function NotificationsPage() {
               <div className="flex items-center space-x-2">
                 <AlertTriangle className="h-5 w-5 text-amber-600" />
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Unread</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t(TRANSLATION_KEYS.LABEL_UNREAD)}</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{filterCounts.unread}</p>
                 </div>
               </div>
@@ -205,7 +227,7 @@ export function NotificationsPage() {
               <div className="flex items-center space-x-2">
                 <CheckCheck className="h-5 w-5 text-violet-600" />
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Need Acknowledgement</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t(TRANSLATION_KEYS.LABEL_NEED_ACKNOWLEDGEMENT)}</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{filterCounts.needsAcknowledgement || 0}</p>
                 </div>
               </div>
@@ -217,7 +239,7 @@ export function NotificationsPage() {
               <div className="flex items-center space-x-2">
                 <X className="h-5 w-5 text-red-600" />
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Important</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t(TRANSLATION_KEYS.LABEL_IMPORTANT)}</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{filterCounts.important || 0}</p>
                 </div>
               </div>
@@ -230,7 +252,7 @@ export function NotificationsPage() {
           <CardHeader>
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
-                <CardTitle className="text-lg text-gray-900 dark:text-gray-100">Search & Filter</CardTitle>
+                <CardTitle className="text-lg text-gray-900 dark:text-gray-100">{t(TRANSLATION_KEYS.LABEL_SEARCH_AND_FILTER)}</CardTitle>
                 <div className="flex items-center gap-2">
                   <HierarchyExpandCollapseControls
                     onExpandAll={handleExpandAll}
@@ -248,8 +270,8 @@ export function NotificationsPage() {
                       className="bg-violet-600 hover:bg-violet-700 text-white shrink-0"
                     >
                       <CheckCircle2 className="h-4 w-4 me-2" />
-                      <span className="hidden sm:inline">Mark All Read</span>
-                      <span className="sm:hidden">Mark Read</span>
+                      <span className="hidden sm:inline">{t(TRANSLATION_KEYS.BUTTON_MARK_ALL_READ)}</span>
+                      <span className="sm:hidden">{t(TRANSLATION_KEYS.BUTTON_MARK_AS_READ)}</span>
                     </Button>
                   )}
                 </div>
@@ -260,7 +282,7 @@ export function NotificationsPage() {
                     options={groupByOptions}
                     value={groupBy}
                     onValueChange={(value) => updateGroupBy(value as any)}
-                    placeholder="Group by..."
+                    placeholder={t(TRANSLATION_KEYS.PLACEHOLDER_GROUP_BY)}
                     config={{ name: 'groupBy', label: '' }}
                     size="sm"
                     className="w-full [&>button]:h-10"
@@ -273,7 +295,7 @@ export function NotificationsPage() {
                   className="shrink-0"
                   >
                     <Filter className="h-4 w-4 me-2" />
-                    Filters
+                    {t(TRANSLATION_KEYS.LABEL_FILTERS)}
                   </Button>
               </div>
             </div>
@@ -282,7 +304,7 @@ export function NotificationsPage() {
             <div className="space-y-4">
               {/* Search */}
               <SearchInput
-                config={{ name: 'search', placeholder: 'Search notifications...' }}
+                config={{ name: 'search', placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SEARCH_NOTIFICATIONS) }}
                 value={searchTerm}
                 onChange={(value) => handleSearch(value)}
                 onClear={() => handleSearch('')}
@@ -300,8 +322,8 @@ export function NotificationsPage() {
                     options={typeOptions}
                     value={filters.type || 'all'}
                     onValueChange={(value) => handleFilterChange('type', value)}
-                    placeholder="Select type..."
-                    config={{ name: 'type', label: 'Type' }}
+                    placeholder={t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_TYPE)}
+                    config={{ name: 'type', label: t(TRANSLATION_KEYS.LABEL_TYPE) }}
                     size="md"
                   />
 
@@ -309,8 +331,8 @@ export function NotificationsPage() {
                     options={categoryOptions}
                     value={filters.category || 'all'}
                     onValueChange={(value) => handleFilterChange('category', value)}
-                    placeholder="Select category..."
-                    config={{ name: 'category', label: 'Category' }}
+                    placeholder={t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_CATEGORY)}
+                    config={{ name: 'category', label: t(TRANSLATION_KEYS.LABEL_CATEGORY) }}
                     size="md"
                   />
 
@@ -318,8 +340,8 @@ export function NotificationsPage() {
                     options={statusOptions}
                     value={filters.isRead === undefined ? 'all' : filters.isRead ? 'read' : 'unread'}
                     onValueChange={(value) => handleReadStatusChange(value)}
-                    placeholder="Select status..."
-                    config={{ name: 'status', label: 'Status' }}
+                    placeholder={t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_STATUS)}
+                    config={{ name: 'status', label: t(TRANSLATION_KEYS.LABEL_STATUS) }}
                     size="md"
                   />
 
@@ -327,8 +349,8 @@ export function NotificationsPage() {
                     options={sourceOptions}
                     value={filters.sourceType || 'all'}
                     onValueChange={(value) => handleSourceChange(value)}
-                    placeholder="Select source..."
-                    config={{ name: 'sourceType', label: 'Source' }}
+                    placeholder={t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_SOURCE)}
+                    config={{ name: 'sourceType', label: t(TRANSLATION_KEYS.LABEL_SOURCE) }}
                     size="md"
                   />
                 </motion.div>
@@ -337,20 +359,20 @@ export function NotificationsPage() {
               {/* Active Filters */}
               {(filters.type || filters.category || filters.isRead !== undefined) && (
                 <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-200 dark:border-gray-800">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">{t(TRANSLATION_KEYS.LABEL_ACTIVE_FILTERS)}</span>
                   {filters.type && (
                     <Badge variant="info" className="text-xs">
-                      Type: {NotificationService.getTypeLabel(filters.type)}
+                      {t(TRANSLATION_KEYS.LABEL_TYPE)}: {TYPE_TO_KEY[filters.type] ? t(TYPE_TO_KEY[filters.type]) : NotificationService.getTypeLabel(filters.type)}
                     </Badge>
                   )}
                   {filters.category && (
                     <Badge variant="info" className="text-xs">
-                      Category: {NotificationService.getCategoryLabel(filters.category)}
+                      {t(TRANSLATION_KEYS.LABEL_CATEGORY)}: {CATEGORY_TO_KEY[filters.category] ? t(CATEGORY_TO_KEY[filters.category]) : NotificationService.getCategoryLabel(filters.category)}
                     </Badge>
                   )}
                   {filters.isRead !== undefined && (
                     <Badge variant="info" className="text-xs">
-                      Status: {filters.isRead ? 'Read' : 'Unread'}
+                      {t(TRANSLATION_KEYS.LABEL_STATUS)}: {filters.isRead ? t(TRANSLATION_KEYS.LABEL_READ) : t(TRANSLATION_KEYS.LABEL_UNREAD)}
                     </Badge>
                   )}
                   <Button
@@ -359,7 +381,7 @@ export function NotificationsPage() {
                     onClick={clearFilters}
                     className="text-xs"
                   >
-                    Clear all
+                    {t(TRANSLATION_KEYS.BUTTON_CLEAR_ALL)}
                   </Button>
                 </div>
               )}
@@ -371,13 +393,13 @@ export function NotificationsPage() {
         {isLoading ? (
           <div className="text-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600 mx-auto"></div>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">Loading notifications...</p>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">{t(TRANSLATION_KEYS.MESSAGE_LOADING_NOTIFICATIONS)}</p>
           </div>
         ) : error ? (
           <Card className={cardClass}>
             <CardContent className="p-6 text-center">
               <X className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Error Loading Notifications</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t(TRANSLATION_KEYS.TITLE_ERROR_LOADING_NOTIFICATIONS)}</h3>
               <p className="text-gray-600 dark:text-gray-400">{error}</p>
             </CardContent>
           </Card>
@@ -385,8 +407,8 @@ export function NotificationsPage() {
           <Card className={cardClass}>
             <CardContent className="p-6 text-center">
               <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No Notifications Found</h3>
-              <p className="text-gray-600 dark:text-gray-400">Try adjusting your search or filter criteria.</p>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{t(TRANSLATION_KEYS.TITLE_NO_NOTIFICATIONS_FOUND)}</h3>
+              <p className="text-gray-600 dark:text-gray-400">{t(TRANSLATION_KEYS.MESSAGE_TRY_ADJUSTING_FILTERS)}</p>
             </CardContent>
           </Card>
         ) : (

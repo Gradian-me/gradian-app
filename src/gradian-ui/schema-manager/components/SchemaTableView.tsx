@@ -8,6 +8,8 @@ import { PencilRuler, LayoutList, Trash2, Database, Users2, Circle, Hash, FileTe
 import { FormSchema } from '../types';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
+import { getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 interface SchemaTableViewProps {
   schemas: FormSchema[];
@@ -33,7 +35,7 @@ export function SchemaTableView({
   const tableColumns = useMemo<TableColumn<FormSchema>[]>(() => [
     {
       id: 'actions',
-      label: 'Actions',
+      label: getT(TRANSLATION_KEYS.LABEL_ACTIONS, 'en', 'en'),
       accessor: 'id',
       sortable: false,
       align: 'center',

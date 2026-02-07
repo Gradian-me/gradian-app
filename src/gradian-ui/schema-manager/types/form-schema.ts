@@ -10,6 +10,10 @@ export interface FormField {
   sectionId: string; // Reference to the section this field belongs to
   component: 'text' | 'email' | 'tel' | 'number' | 'password' | 'url' | 'textarea' | 'json' | 'select' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'datetime-local' | 'datetime' | 'file' | 'picker' | 'icon' | 'image-text' | 'image-viewer' | 'name' | 'avatar' | 'color-picker' | 'rating' | 'badge' | 'countdown' | 'code-viewer' | 'list-input' | 'tag-input' | 'toggle' | 'toggle-group' | 'switch' | 'formula' | 'checklist';
   placeholder?: string;
+  /** Localized label: array of { langCode: string } (e.g. [{ en: "Schema ID" }, { fa: "شناسه schema" }]). Resolved by translation-utils. */
+  translations?: Array<Record<string, string>>;
+  /** Localized placeholder. Same format as translations. */
+  placeholderTranslations?: Array<Record<string, string>>;
   icon?: string;
   displayType?: 'text' | 'number' | 'currency' | 'percentage' | 'array' | 'computed';
   truncate?: boolean;
@@ -98,6 +102,10 @@ export interface FormSection {
   id: string;
   title: string;
   description?: string;
+  /** Localized section title: [{"en": "Task Information"}, {"fa": "اطلاعات وظیفه"}] */
+  titleTranslations?: Array<Record<string, string>>;
+  /** Localized section description; same format as titleTranslations */
+  descriptionTranslations?: Array<Record<string, string>>;
   icon?: string;
   order?: number;
   columns?: number; // Default: 2 if not specified
@@ -237,6 +245,10 @@ export interface DetailPageSection {
   id: string;
   title: string;
   description?: string;
+  /** Localized section title: [{"en": "..."}, {"fa": "..."}] */
+  titleTranslations?: Array<Record<string, string>>;
+  /** Localized section description; same format */
+  descriptionTranslations?: Array<Record<string, string>>;
   colSpan?: number; // Number of columns this section should span in the grid
   fieldIds: string[]; // Field IDs to display as key-value pairs
   columnArea?: 'main' | 'sidebar'; // Which area to place this section in (main or sidebar)
@@ -393,6 +405,10 @@ export interface FormSchema {
   // Primary naming (used in data storage)
   singular_name: string;
   plural_name: string;
+  /** Localized singular name: array of { langCode: value } e.g. [{"en": "Task"}, {"fa": "وظیفه"}] */
+  singular_name_translations?: Array<Record<string, string>>;
+  /** Localized plural name: same format as singular_name_translations */
+  plural_name_translations?: Array<Record<string, string>>;
   // Compatibility aliases for form-builder FormSchema
   name?: string; // Alias for singular_name
   title?: string; // Alias for plural_name
@@ -607,7 +623,7 @@ export interface FormSectionProps {
   initialState?: 'expanded' | 'collapsed'; // New prop for initial state
   isExpanded?: boolean; // Controlled expanded state
   onToggleExpanded?: () => void; // Callback to toggle expanded state
-  addItemError?: string | null; // Error message to display under the Add button
+  addItemError?: string | Array<Record<string, string>> | null; // Error message to display under the Add button (string or translation array)
   refreshRelationsTrigger?: number; // Trigger to refresh relations (increments when relations change)
   isAddingItem?: boolean; // Whether the add item modal is currently open (for loading state)
 }

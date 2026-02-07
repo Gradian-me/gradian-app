@@ -4,6 +4,9 @@ import React, { useState, useCallback } from 'react';
 import { Search, X } from 'lucide-react';
 import { cn } from '../../../shared/utils';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface SidebarSearchboxProps {
   /**
@@ -60,8 +63,13 @@ export const SidebarSearchbox: React.FC<SidebarSearchboxProps> = ({
   isCollapsed,
   isMobile,
   className,
-  placeholder = 'Search applications...',
+  placeholder: placeholderProp,
 }) => {
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const defaultPlaceholder = getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH_APPLICATIONS, language, defaultLang);
+  const placeholder = placeholderProp ?? defaultPlaceholder;
+
   const [isFocused, setIsFocused] = useState(false);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +98,7 @@ export const SidebarSearchbox: React.FC<SidebarSearchboxProps> = ({
       <div className="relative">
         <Search 
           className={cn(
-            "absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none transition-colors",
+            "absolute start-3 top-1/2 -translate-y-1/2 h-4 w-4 pointer-events-none transition-colors",
             isFocused ? "text-gray-300" : "text-gray-500"
           )} 
         />
@@ -122,7 +130,7 @@ export const SidebarSearchbox: React.FC<SidebarSearchboxProps> = ({
               transition={{ duration: 0.15 }}
               type="button"
               onClick={handleClear}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200 focus:outline-none focus:text-gray-200 transition-colors rounded"
+              className="absolute end-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-200 focus:outline-none focus:text-gray-200 transition-colors rounded"
               aria-label="Clear search"
             >
               <X className="h-4 w-4" />

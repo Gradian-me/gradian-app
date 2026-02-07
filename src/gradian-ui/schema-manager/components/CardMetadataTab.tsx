@@ -296,8 +296,8 @@ export function CardMetadataTab({ schema, onUpdate }: CardMetadataTabProps) {
             setDeleteConfirmSectionId(null);
           }
         }}
-        title="Delete Card Section"
-        message="Are you sure you want to delete this card section? This action cannot be undone, but you can add a new section later."
+        title={[{ en: 'Delete Card Section' }, { fa: 'حذف بخش کارت' }, { ar: 'حذف قسم البطاقة' }, { es: 'Eliminar sección de tarjeta' }, { fr: 'Supprimer la section de carte' }, { de: 'Kartenbereich löschen' }, { it: 'Elimina sezione scheda' }, { ru: 'Удалить раздел карточки' }]}
+        message={[{ en: 'Are you sure you want to delete this card section? This action cannot be undone, but you can add a new section later.' }, { fa: 'آیا مطمئن هستید که می‌خواهید این بخش کارت را حذف کنید؟ این عمل قابل بازگشت نیست، اما می‌توانید بعداً بخش جدید اضافه کنید.' }, { ar: 'هل أنت متأكد أنك تريد حذف قسم البطاقة هذا؟ لا يمكن التراجع عن هذا الإجراء، لكن يمكنك إضافة قسم جديد لاحقًا.' }, { es: '¿Está seguro de que desea eliminar esta sección de tarjeta? Esta acción no se puede deshacer, pero puede agregar una nueva sección más tarde.' }, { fr: 'Voulez-vous vraiment supprimer cette section de carte ? Cette action est irréversible, mais vous pourrez ajouter une nouvelle section plus tard.' }, { de: 'Möchten Sie diesen Kartenbereich wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden, aber Sie können später einen neuen Bereich hinzufügen.' }, { it: 'Sei sicuro di voler eliminare questa sezione scheda? Questa azione non può essere annullata, ma puoi aggiungere una nuova sezione in seguito.' }, { ru: 'Вы уверены, что хотите удалить этот раздел карточки? Это действие нельзя отменить, но позже можно добавить новый раздел.' }]}
         variant="destructive"
         buttons={[
           {

@@ -2,8 +2,11 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { FileX, ArrowLeft, Home, RefreshCw, Loader2, LayoutDashboard } from 'lucide-react';
+import { FileX, Home, RefreshCw, Loader2, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
+import { getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Card } from '@/components/ui/card';
 
 interface EntityNotFoundProps {
@@ -39,6 +42,7 @@ export function EntityNotFound({
   refreshing = false,
   errorCodeText,
 }: EntityNotFoundProps) {
+  const BackIcon = useBackIcon();
   const handleGoBack = () => {
     if (onGoBack) {
       onGoBack();
@@ -118,19 +122,19 @@ export function EntityNotFound({
                   <Button
                     onClick={handleGoBack}
                     variant="outline"
-                    className="flex items-center space-x-2"
+                    className="flex items-center gap-2"
                   >
-                    <ArrowLeft className="h-4 w-4" />
-                    <span>Go Back</span>
+                    <BackIcon className="h-4 w-4" />
+                    <span>{getT(TRANSLATION_KEYS.BUTTON_GO_BACK)}</span>
                   </Button>
                 )}
                 {showListButton && listHref && (
                   <Link href={listHref}>
                     <Button
                       variant="outline"
-                      className="flex items-center space-x-2"
+                      className="flex items-center gap-2"
                     >
-                      <ArrowLeft className="h-4 w-4" />
+                      <BackIcon className="h-4 w-4" />
                       <span>View All {entityName}s</span>
                     </Button>
                   </Link>

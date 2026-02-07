@@ -15,6 +15,9 @@ import { FormSchema } from '../types';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { LoadingSkeleton } from '@/gradian-ui/layout/components';
+import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { useLanguageStore } from '@/stores/language.store';
 
 interface SchemaCardGridProps {
   schemas: FormSchema[];
@@ -36,6 +39,8 @@ interface SchemaCardSkeletonGridProps {
 }
 
 const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: SchemaCardProps) => {
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
   const animationDelay = Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX);
   const isInactive = schema.inactive;
   const isActionForm = schema.schemaType === 'action-form';
@@ -174,7 +179,7 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
                   }
                 }}
                 className="h-7 w-7 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:bg-violet-500/10 hover:bg-violet-50/80"
-                title="Edit Schema (Ctrl+Click or Middle-Click to open in new tab)"
+                title={getT(TRANSLATION_KEYS.TOOLTIP_EDIT_SCHEMA, language, defaultLang)}
               >
                 <PencilRuler className="h-3.5 w-3.5" />
               </Button>

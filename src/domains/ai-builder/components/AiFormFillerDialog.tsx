@@ -296,8 +296,8 @@ export function AiFormFillerDialog({
       <ConfirmationMessage
         isOpen={showConfirmation}
         onOpenChange={setShowConfirmation}
-        title="Replace Form Data?"
-        message="This will replace all current form values with the AI-generated data. Are you sure you want to continue?"
+        title={[{ en: 'Replace Form Data?' }, { fa: 'جایگزینی داده‌های فرم؟' }, { ar: 'استبدال بيانات النموذج؟' }, { es: '¿Reemplazar datos del formulario?' }, { fr: 'Remplacer les données du formulaire ?' }, { de: 'Formulardaten ersetzen?' }, { it: 'Sostituire i dati del modulo?' }, { ru: 'Заменить данные формы?' }]}
+        message={[{ en: 'This will replace all current form values with the AI-generated data. Are you sure you want to continue?' }, { fa: 'تمام مقادیر فعلی فرم با داده‌های تولیدشده توسط هوش مصنوعی جایگزین می‌شوند. آیا مطمئن هستید که می‌خواهید ادامه دهید؟' }, { ar: 'سيستبدل هذا جميع قيم النموذج الحالية ببيانات الذكاء الاصطناعي. هل أنت متأكد أنك تريد المتابعة؟' }, { es: 'Esto reemplazará todos los valores actuales del formulario con los datos generados por IA. ¿Está seguro de que desea continuar?' }, { fr: 'Cela remplacera toutes les valeurs actuelles du formulaire par les données générées par l\'IA. Voulez-vous vraiment continuer ?' }, { de: 'Dies ersetzt alle aktuellen Formularwerte durch die KI-generierten Daten. Möchten Sie fortfahren?' }, { it: 'Questo sostituirà tutti i valori attuali del modulo con i dati generati dall\'IA. Sei sicuro di voler continuare?' }, { ru: 'Все текущие значения формы будут заменены данными, сгенерированными ИИ. Вы уверены, что хотите продолжить?' }]}
         variant="warning"
         buttons={[
           {

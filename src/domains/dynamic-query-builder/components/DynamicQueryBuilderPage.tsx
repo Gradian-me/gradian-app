@@ -4,7 +4,8 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
-import { ArrowLeft, PanelRightClose, PanelRightOpen, Layers, ExternalLink } from 'lucide-react';
+import { PanelRightClose, PanelRightOpen, Layers, ExternalLink } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -91,6 +92,7 @@ export function DynamicQueryBuilderPage({
   onSaveSuccess,
 }: DynamicQueryBuilderPageProps) {
   const router = useRouter();
+  const BackIcon = useBackIcon();
   const isEditMode = !!initialEntity?.id;
   const { schemas } = useSchemaSummaries({ summary: false });
 
@@ -345,7 +347,7 @@ export function DynamicQueryBuilderPage({
       <header className="flex shrink-0 items-center gap-3 border-b border-gray-200 px-4 py-2 dark:border-gray-800">
         <Button variant="ghost" size="sm" asChild className="gap-1">
           <Link href="/builder">
-            <ArrowLeft className="h-4 w-4" />
+            <BackIcon className="h-4 w-4" />
             Builder
           </Link>
         </Button>

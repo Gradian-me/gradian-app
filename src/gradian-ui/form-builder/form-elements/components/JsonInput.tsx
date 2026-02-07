@@ -362,7 +362,7 @@ export const JsonInput = forwardRef<FormElementRef, JsonInputProps>(
             {config.label ? (
               <label
                 htmlFor={config.name}
-                dir="auto"
+                dir="ltr"
                 className={getLabelClasses({ error: Boolean(displayError), required })}
               >
                 {config.label}

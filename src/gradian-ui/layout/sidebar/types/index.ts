@@ -44,6 +44,11 @@ export interface SidebarProps extends BaseComponentProps {
    * Preloaded schemas for dynamic navigation
    */
   navigationSchemas?: FormSchema[];
+
+  /**
+   * Right-to-left layout (sidebar on right, content on left)
+   */
+  isRtl?: boolean;
 }
 
 export interface SidebarConfig {
@@ -169,6 +174,7 @@ export interface SidebarHeaderProps extends BaseComponentProps {
   isCollapsed: boolean;
   isMobile: boolean;
   onToggle: () => void;
+  isRtl?: boolean;
 }
 
 export interface SidebarNavigationProps extends BaseComponentProps {

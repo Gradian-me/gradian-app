@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
+import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { toast } from 'sonner';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +36,7 @@ import { ENABLE_BUILDER } from '@/gradian-ui/shared/configs/env-config';
 import { AccessDenied } from '@/gradian-ui/schema-manager/components/AccessDenied';
 
 export default function EmailTemplateBuilderPage() {
+  const BackIcon = useBackIcon();
   const [mounted, setMounted] = useState(false);
   const {
     templates,
@@ -494,7 +496,7 @@ export default function EmailTemplateBuilderPage() {
         <div>
           <Button asChild variant="ghost" size="sm" className="gap-2 px-3">
             <Link href="/builder">
-              <ArrowLeft className="h-4 w-4" />
+              <BackIcon className="h-4 w-4" />
               Back to builder
             </Link>
           </Button>
@@ -847,7 +849,7 @@ export default function EmailTemplateBuilderPage() {
       <ConfirmationMessage
         isOpen={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
-        title="Delete Template"
+        title={[{ en: 'Delete Template' }, { fa: 'حذف قالب' }, { ar: 'حذف القالب' }, { es: 'Eliminar plantilla' }, { fr: 'Supprimer le modèle' }, { de: 'Vorlage löschen' }, { it: 'Elimina modello' }, { ru: 'Удалить шаблон' }]}
         message={
           templateToDelete
             ? `Are you sure you want to delete "${templateToDelete.name}"? This action cannot be undone and will permanently remove the template and its file.`

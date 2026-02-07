@@ -2,7 +2,7 @@
 
 import { CompanySelector } from '@/components/layout/CompanySelector';
 import { Button } from '@/components/ui/button';
-import { FormAlert } from '@/components/ui/form-alert';
+import { FormAlert, FormAlertMessage } from '@/components/ui/form-alert';
 import {
   FormContextType,
   FormData,
@@ -23,6 +23,10 @@ import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store'
 import { useUserStore } from '@/stores/user.store';
 import { getActionConfig, getSingularName, isEditMode } from '../utils/action-config';
 import { AccordionFormSection } from './AccordionFormSection';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage, getTranslationsArray } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getSchemaTranslatedSingularName } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import { FormModal } from './FormModal';
 import { FormSystemSection } from './FormSystemSection';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
@@ -463,6 +467,11 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     } as FormSchema;
   }, [schema]);
 
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
+  const t = useCallback((key: string, fallback: string) => getT(key, language, defaultLang) || fallback, [language, defaultLang]);
+  const translatedSingularName = getSchemaTranslatedSingularName(schema, language, getSingularName(schema));
+
   // Ref for error alert to scroll to on 400 errors
   const errorAlertRef = useRef<HTMLDivElement>(null);
   const lastErrorStatusCodeRef = useRef<number | undefined>(undefined);
@@ -476,7 +485,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     isSubmitting: false,
   });
 
-  const [addItemErrors, setAddItemErrors] = React.useState<Record<string, string | null>>({});
+  const [addItemErrors, setAddItemErrors] = React.useState<Record<string, FormAlertMessage | null>>({});
   const [isIncomplete, setIsIncomplete] = React.useState(false);
   // Track if form has been submitted at least once (to show incomplete message only after submit)
   const [hasSubmitted, setHasSubmitted] = React.useState(false);
@@ -1096,7 +1105,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         // Entity must be saved first
         setAddItemErrors(prev => ({
           ...prev,
-          [sectionId]: 'Please save the form first before adding related items'
+          [sectionId]: getTranslationsArray(TRANSLATION_KEYS.MESSAGE_SAVE_FIRST_BEFORE_ADDING_RELATED)
         }));
         setTimeout(() => setAddItemErrors(prev => ({ ...prev, [sectionId]: null })), 5000);
         return;
@@ -1327,14 +1336,12 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
   // Get action configurations dynamically
   const editMode = isEditMode(initialValues);
-  const singularName = getSingularName(schema);
   const actionConfigs = useMemo(() => {
     const defaultActions: Array<'submit' | 'cancel' | 'reset'> = ['cancel', 'reset', 'submit'];
     const actions = schema.actions || defaultActions;
-    // Ensure actions is always an array
     const actionsArray = Array.isArray(actions) ? actions : defaultActions;
-    return actionsArray.map(actionType => getActionConfig(actionType, singularName, editMode));
-  }, [schema.actions, singularName, editMode]);
+    return actionsArray.map(actionType => getActionConfig(actionType, translatedSingularName, editMode, t));
+  }, [schema.actions, translatedSingularName, editMode, t]);
 
   const contextValue: FormContextType = {
     state,
@@ -1558,10 +1565,10 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                       variant="link"
                       onClick={() => setIsFormFillerOpen(true)}
                       disabled={disabled}
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 text-xs"
                     >
                       <Sparkles className="h-4 w-4" />
-                      <span className="hidden md:inline">Fill With AI</span>
+                      <span className="hidden md:inline">{getT(TRANSLATION_KEYS.BUTTON_FILL_WITH_AI, language, defaultLang)}</span>
                     </Button>
                   )}
                 </div>
@@ -1580,7 +1587,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                             submit();
                           }}
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 text-xs">
                             {!state.isSubmitting && config.icon}
                             {state.isSubmitting ? (
                               config.loading || 'Submitting...'
@@ -1602,7 +1609,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                           }}
                           disabled={disabled}
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 text-xs">
                             {config.icon}
                             <span className="hidden md:inline">{config.label}</span>
                           </div>
@@ -1617,7 +1624,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                           onClick={reset}
                           disabled={disabled}
                         >
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 text-xs">
                             {config.icon}
                             <span className="hidden md:inline">{config.label}</span>
                           </div>

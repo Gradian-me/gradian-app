@@ -339,6 +339,7 @@ export * from './number-formatter';
 export * from './highlighter';
 export * from './sort-utils';
 export * from './localization';
+export * from './translation-utils';
 export * from './url-utils';
 export * from './print-management';
 // system-token.util is server-only - import directly: '@/gradian-ui/shared/utils/system-token.util'

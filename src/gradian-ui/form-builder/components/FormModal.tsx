@@ -17,17 +17,12 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { FormDialogErrorBoundary } from './FormDialogErrorBoundary';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getSchemaTranslatedSingularName } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import { Maximize2, Minimize2 } from 'lucide-react';
+import { ConfirmationMessage } from '../form-elements/components/ConfirmationMessage';
 
 const EXCLUDED_TITLE_ROLES = new Set(['code', 'subtitle', 'description']);
 
@@ -447,8 +442,17 @@ export const FormModal: React.FC<FormModalProps> = ({
     (qa) => qa.action === 'callApi'
   );
 
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
+  const translatedSingular = targetSchema
+    ? getSchemaTranslatedSingularName(targetSchema, language, targetSchema.singular_name || targetSchema.name || getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang))
+    : getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang);
   const schemaDisplayName = targetSchema?.singular_name || targetSchema?.name || 'Item';
-  const defaultTitle = isEdit ? (entityDisplayTitle ? `Edit ${schemaDisplayName}: ${entityDisplayTitle}` : `Edit ${schemaDisplayName}`) : `Create New ${schemaDisplayName}`;
+  const defaultTitle = isEdit
+    ? (entityDisplayTitle
+        ? `${getT(TRANSLATION_KEYS.TITLE_EDIT, language, defaultLang)} ${translatedSingular}: ${entityDisplayTitle}`
+        : `${getT(TRANSLATION_KEYS.TITLE_EDIT, language, defaultLang)} ${translatedSingular}`)
+    : `${getT(TRANSLATION_KEYS.TITLE_CREATE_NEW, language, defaultLang)} ${translatedSingular}`;
 
   const schemaIconName = targetSchema?.icon;
 
@@ -483,8 +487,8 @@ export const FormModal: React.FC<FormModalProps> = ({
   }, [isEdit, entityData, entityId, initialValues]);
     
   const modalDescription = description || (isEdit
-    ? `Update ${(targetSchema?.singular_name || targetSchema?.name || 'item').toLowerCase()} information`
-    : `Add a new ${(targetSchema?.singular_name || targetSchema?.name || 'item').toLowerCase()} to your system`);
+    ? getT(TRANSLATION_KEYS.DESC_UPDATE_ENTITY_INFORMATION, language, defaultLang).replace('{name}', translatedSingular)
+    : getT(TRANSLATION_KEYS.DESC_ADD_NEW_ENTITY_TO_SYSTEM, language, defaultLang).replace('{name}', translatedSingular));
 
   if (!shouldRender) {
     return null;
@@ -540,7 +544,7 @@ export const FormModal: React.FC<FormModalProps> = ({
             <div className="flex flex-col items-center space-y-3 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-blue-100 dark:border-gray-700">
               <Spinner size="lg" variant="primary" />
               <span className="text-lg font-medium text-violet-700 dark:text-violet-300">
-                {isEdit ? 'Updating' : 'Creating'} {targetSchema?.name?.toLowerCase() || 'item'}...
+                {isEdit ? getT(TRANSLATION_KEYS.MESSAGE_UPDATING, language, defaultLang) : getT(TRANSLATION_KEYS.MESSAGE_CREATING, language, defaultLang)} {translatedSingular}...
               </span>
             </div>
           </div>
@@ -594,22 +598,25 @@ export const FormModal: React.FC<FormModalProps> = ({
     </Modal>
 
     {/* Unsaved changes confirmation */}
-    <AlertDialog open={showUnsavedConfirm} onOpenChange={(open) => !open && setShowUnsavedConfirm(false)}>
-      <AlertDialogContent className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 shadow-xl">
-        <AlertDialogHeader>
-          <AlertDialogTitle>Unsaved changes</AlertDialogTitle>
-          <AlertDialogDescription>
-            You have unsaved changes. Are you sure you want to leave? Your changes will be lost.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setShowUnsavedConfirm(false)}>Stay</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirmDiscard} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-            Discard
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <ConfirmationMessage
+      isOpen={showUnsavedConfirm}
+      onOpenChange={(open) => !open && setShowUnsavedConfirm(false)}
+      title={getT(TRANSLATION_KEYS.TITLE_UNSAVED_CHANGES, language, defaultLang)}
+      message={getT(TRANSLATION_KEYS.MESSAGE_UNSAVED_CHANGES_LEAVE, language, defaultLang)}
+      variant="warning"
+      buttons={[
+        {
+          label: getT(TRANSLATION_KEYS.BUTTON_STAY, language, defaultLang),
+          variant: 'outline',
+          action: () => setShowUnsavedConfirm(false),
+        },
+        {
+          label: getT(TRANSLATION_KEYS.BUTTON_DISCARD, language, defaultLang),
+          variant: 'destructive',
+          action: handleConfirmDiscard,
+        },
+      ]}
+    />
   </>
   );
 };
