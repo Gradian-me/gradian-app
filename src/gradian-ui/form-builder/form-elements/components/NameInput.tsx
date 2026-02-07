@@ -1,6 +1,7 @@
 import React, { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { cn, validateField } from '../../../shared/utils';
+import { getLabelClasses } from '../utils/field-styles';
 import { FormElementRef, NameInputProps } from '../types';
 import { CopyContent } from './CopyContent';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -119,11 +120,11 @@ export const NameInput = forwardRef<FormElementRef, NameInputProps>(
             {fieldLabel ? (
               <label
                 htmlFor={fieldName}
-                className={cn(
-                  'block text-xs font-medium',
-                  error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
-                  (required ?? config?.required ?? config?.validation?.required ?? false) && 'after:content-["*"] after:ms-1 after:text-red-500 dark:after:text-red-400'
-                )}
+                dir="auto"
+                className={getLabelClasses({
+                  error: Boolean(error),
+                  required: required ?? config?.required ?? config?.validation?.required ?? false,
+                })}
               >
                 {fieldLabel}
               </label>

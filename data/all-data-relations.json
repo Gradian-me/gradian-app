@@ -3313,17 +3313,6 @@
   },
   {
     "sourceSchema": "applications",
-    "sourceId": "01KGH1TMXDH89EPZRWA1MYR12Z",
-    "targetSchema": "schemas",
-    "targetId": "tasks",
-    "relationTypeId": "HAS_SCHEMA",
-    "id": "01KGH1V94J566PAVQ2YFGBDBEX",
-    "createdAt": "2026-02-03T06:08:13.969Z",
-    "updatedAt": "2026-02-03T06:08:18.472Z",
-    "inactive": true
-  },
-  {
-    "sourceSchema": "applications",
     "sourceId": "01KBFCM00000000000000000001",
     "targetSchema": "schemas",
     "targetId": "change-management-records",
@@ -3343,5 +3332,38 @@
     "fieldId": "virtual-assignedTo-tasks",
     "createdAt": "2026-02-05T09:03:10.333Z",
     "updatedAt": "2026-02-05T09:03:10.333Z"
+  },
+  {
+    "id": "01KGVF1X73TJT7EDFEJNSHG3PR",
+    "sourceSchema": "project-proposal",
+    "sourceId": "01KGVEN60BD590CB72NRY8343H",
+    "targetSchema": "external_nodes",
+    "targetId": "approved",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "project-proposal-approval-status",
+    "createdAt": "2026-02-07T07:11:26.947Z",
+    "updatedAt": "2026-02-07T07:11:26.947Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KGVJXCKW8X0GHS7EPFVK9KTX",
+    "targetSchema": "schemas",
+    "targetId": "project-proposal",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KGVK0YR581B7GARB95C4NTT3",
+    "createdAt": "2026-02-07T08:20:50.053Z",
+    "updatedAt": "2026-02-07T08:20:53.929Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KGVJXCKW8X0GHS7EPFVK9KTX",
+    "targetSchema": "schemas",
+    "targetId": "tasks",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KGVK1P0VKZ04M8Q2FHVG1Y96",
+    "createdAt": "2026-02-07T08:21:13.883Z",
+    "updatedAt": "2026-02-07T08:21:16.771Z",
+    "inactive": true
   }
 ]

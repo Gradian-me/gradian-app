@@ -17,7 +17,7 @@ export const getLabelClasses = ({
   className,
 }: LabelStyleOptions = {}) =>
   cn(
-    'block text-xs font-medium mb-2 transition-colors',
+    'block w-full text-xs font-medium mb-2 transition-colors direction-auto',
     error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
     disabled && 'text-gray-400 dark:text-gray-500 cursor-not-allowed opacity-70',
     required && 'after:content-["*"] after:ms-1 after:text-red-500 dark:after:text-red-400',

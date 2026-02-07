@@ -30,7 +30,7 @@ export interface EmphasisProps {
 
 export function Paragraph({ children }: ParagraphProps) {
   return (
-    <p className="mb-4 text-gray-700 dark:text-gray-300 leading-7">
+    <p dir="auto" className="mb-4 text-gray-700 dark:text-gray-300 leading-7">
       {children || ''}
     </p>
   );

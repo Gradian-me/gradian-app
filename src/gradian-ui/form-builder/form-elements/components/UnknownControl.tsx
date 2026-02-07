@@ -4,6 +4,7 @@
 import React from 'react';
 import { FormElementProps } from '../types';
 import { cn } from '../../../shared/utils';
+import { getLabelClasses } from '../utils/field-styles';
 import { AlertCircle } from 'lucide-react';
 
 export interface UnknownControlProps extends FormElementProps {
@@ -26,14 +27,7 @@ export const UnknownControl: React.FC<UnknownControlProps> = ({
   return (
     <div className={cn('w-full', className)}>
       {fieldLabel && (
-        <label
-          htmlFor={fieldName}
-          className={cn(
-            'block text-xs font-medium mb-2',
-            error ? 'text-red-700' : 'text-gray-700',
-            required && 'after:content-["*"] after:ms-1 after:text-red-500'
-          )}
-        >
+        <label htmlFor={fieldName} dir="auto" className={getLabelClasses({ error: Boolean(error), required })}>
           {fieldLabel}
         </label>
       )}

@@ -16,6 +16,10 @@ import { formatFieldValue } from '../table/utils/field-formatters';
 import { FormulaDisplay } from '@/gradian-ui/form-builder/form-elements/components/FormulaDisplay';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 
+/** CSS-only hover: slide right + subtle background. Standard Tailwind so it always applies. */
+const FIELD_HOVER_CLASS =
+  'transition-[transform,background-color] duration-75 ease-out hover:translate-x-1 hover:bg-gray-50 dark:hover:bg-gray-600/30 rounded-lg -mx-1 px-1 py-0.5';
+
 export interface DynamicInfoCardProps {
   section: DetailPageSection;
   schema: FormSchema;
@@ -158,12 +162,12 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
             className="h-auto bg-white dark:bg-gray-700  border border-gray-200 dark:border-gray-700 shadow-sm"
           >
             <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2" dir="auto">
                 <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{section.title}</CardTitle>
                 <ForceIcon isForce={data?.isForce === true} size="sm" />
               </div>
               {section.description && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5">{section.description}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5" dir="auto">{section.description}</p>
               )}
             </CardHeader>
             <CardContent>
@@ -225,12 +229,12 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
         className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
       >
         <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2" dir="auto">
             <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{section.title}</CardTitle>
             <ForceIcon isForce={data?.isForce === true} size="sm" />
           </div>
           {section.description && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5">{section.description}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5" dir="auto">{section.description}</p>
           )}
         </CardHeader>
         <CardContent>
@@ -239,6 +243,8 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
               const isTextarea = field.component === 'textarea';
               const isJson = field.component === 'json';
               const isListInput = field.component === 'list-input';
+              const isRating = field.component === 'rating' || field.role === 'rating';
+              const isNumber = field.component === 'number';
               const isPicker = field.component === 'picker' || 
                                field.component === 'popup-picker' ||
                                field.component === 'popuppicker' ||
@@ -267,13 +273,11 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                 }
                 
                 return (
-                  <motion.div
+                  <div
                     key={field.id}
-                    className={fieldClasses}
-                    whileHover={{ x: 2 }}
-                    transition={{ duration: 0.15 }}
+                    className={cn(fieldClasses, FIELD_HOVER_CLASS)}
                   >
-                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 mb-2">
+                    <label dir="auto" className="w-full text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 mb-2">
                       {field.icon && (
                         <IconRenderer iconName={field.icon} className="h-4 w-4" />
                       )}
@@ -288,20 +292,62 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                         className="mt-2"
                       />
                     ) : (
-                      <div className="text-sm text-gray-400 dark:text-gray-500 italic">No data</div>
+                      <div className="text-sm text-gray-400 dark:text-gray-500 italic" dir="auto">No data</div>
                     )}
-                  </motion.div>
+                  </div>
                 );
               }
               
+              // Rating: label and stars on one row with justify-between
+              if (isRating) {
+                return (
+                  <div
+                    key={field.id}
+                    className={cn(fieldClasses, FIELD_HOVER_CLASS)}
+                  >
+                    <div className="flex items-center justify-between gap-4 w-full" dir="auto">
+                      <label dir="auto" className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 shrink-0">
+                        {field.icon && (
+                          <IconRenderer iconName={field.icon} className="h-4 w-4" />
+                        )}
+                        {field.label}
+                      </label>
+                      <div className="shrink-0" dir="auto">
+                        {formatFieldValue(field, field.value, data, false)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Number: label and value on one row with justify-between
+              if (isNumber) {
+                return (
+                  <div
+                    key={field.id}
+                    className={cn(fieldClasses, FIELD_HOVER_CLASS)}
+                  >
+                    <div className="flex items-center justify-between gap-4 w-full" dir="auto">
+                      <label dir="auto" className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2 shrink-0">
+                        {field.icon && (
+                          <IconRenderer iconName={field.icon} className="h-4 w-4" />
+                        )}
+                        {field.label}
+                      </label>
+                      <div className="shrink-0" dir="auto">
+                        {formatFieldValue(field, field.value, data, false)}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
               return (
-                <motion.div
+                <div
                   key={field.id}
-                  className={fieldClasses}
-                  whileHover={{ x: 2 }}
-                  transition={{ duration: 0.15 }}
+                  className={cn(fieldClasses, FIELD_HOVER_CLASS)}
                 >
-                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                  <label dir="auto" className="w-full text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center gap-2">
                     {field.icon && (
                       <IconRenderer iconName={field.icon} className="h-4 w-4" />
                     )}
@@ -310,12 +356,12 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                   <div className={cn(
                     "flex items-center gap-2",
                     (isListInput || isPicker) && "flex-col items-start"
-                  )}>
+                  )} dir="auto">
                     <div className={cn(
                       "text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word",
                       (isListInput || isPicker) ? "w-full" : "flex-1",
                       (isListInput || isPicker) && "min-w-0"
-                    )}>
+                    )} dir="auto">
                       {field.component === 'formula' && field.formula ? (
                         <FormulaDisplay field={field} data={data} schema={schema} />
                       ) : (
@@ -332,7 +378,7 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                       </div>
                     )}
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>

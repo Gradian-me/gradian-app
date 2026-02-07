@@ -3,6 +3,7 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { CircularProgress } from '@/gradian-ui/analytics/indicators/kpi-list/components/CircularProgress';
 import type { FormElementRef } from '../types';
 import type { OTPInputProps } from '../types';
+import { getLabelClasses } from '../utils/field-styles';
 import { validateField } from '@/gradian-ui/shared/utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -517,9 +518,9 @@ export const InputOTP = React.forwardRef<FormElementRef, OTPInputProps>((props, 
   }, [resolvedSeparator, resolvedMaxLength]);
 
   return (
-    <div ref={formRef} className={cn('space-y-3', className)}>
+    <div ref={formRef} className={cn('w-full space-y-3', className)}>
       {resolvedLabel && (
-        <label className={cn('block text-xs font-medium text-gray-700 dark:text-gray-300', resolvedRequired && 'after:ms-1 after:text-red-500 after:content-["*"]')}>
+        <label dir="auto" className={getLabelClasses({ required: resolvedRequired })}>
           {resolvedLabel}
         </label>
       )}

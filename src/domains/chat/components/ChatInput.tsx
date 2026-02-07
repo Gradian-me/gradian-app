@@ -311,6 +311,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 {isActive && onStop ? (
                   <button
                     type="button"
+                    dir="auto"
                     className={cn(
                       'rounded-full w-10 h-10 flex items-center justify-center shadow-sm relative',
                       'bg-white dark:bg-gray-800',

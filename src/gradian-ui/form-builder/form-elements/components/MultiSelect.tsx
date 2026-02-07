@@ -253,6 +253,7 @@ export const MultiSelect: React.FC<MultiSelectWithBadgesProps> = ({
     return (
       <label
         htmlFor={fieldName}
+        dir="auto"
         className={cn(getLabelClasses(fieldRequired))}
       >
         {fieldLabel}

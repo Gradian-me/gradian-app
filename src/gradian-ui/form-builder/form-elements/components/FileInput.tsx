@@ -98,6 +98,7 @@ export const FileInput = forwardRef<FormElementRef, FileInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
+            dir="auto"
             className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}

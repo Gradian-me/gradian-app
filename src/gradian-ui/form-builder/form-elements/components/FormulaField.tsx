@@ -825,7 +825,7 @@ export const FormulaField: React.FC<FormulaFieldProps> = ({
 
   if (showEditor && isEditing) {
     return (
-      <div className={cn('space-y-2', className)}>
+      <div className={cn('w-full space-y-2', className)}>
         <FormulaInput
           value={localFormula}
           onChange={(newFormula) => {
@@ -868,13 +868,13 @@ export const FormulaField: React.FC<FormulaFieldProps> = ({
 
   const renderFieldLabel = () =>
     fieldLabel ? (
-      <label htmlFor={fieldName} className={getLabelClasses({ error: Boolean(error || evaluation.error), required, disabled: isDisabled })}>
+      <label htmlFor={fieldName} dir="auto" className={getLabelClasses({ error: Boolean(error || evaluation.error), required, disabled: isDisabled })}>
         {fieldLabel}
       </label>
     ) : null;
 
   return (
-    <div className={cn('space-y-1', className)}>
+    <div className={cn('w-full space-y-1', className)}>
       {renderFieldLabel()}
       <div className="relative">
         <Input

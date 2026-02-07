@@ -6477,5 +6477,40 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V48002000000000000002",
+    "timestamp": "2026-02-07T00:00:00.000Z",
+    "version": "1.48.002",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Introduced new 'project-proposal' schema with detailed project evaluation parameters and approval status, enhancing project management capabilities.",
+        "priority": "High",
+        "affectedDomains": [
+          "schema-manager",
+          "project-management",
+          "data"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated form elements across the application to support 'dir' attribute for better text direction handling.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved label handling in form elements to utilize a unified styling approach, enhancing consistency and maintainability. This update enhances user experience and data management across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

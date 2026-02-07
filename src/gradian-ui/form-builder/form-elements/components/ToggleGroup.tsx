@@ -425,6 +425,7 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
           <div className="flex items-center justify-between gap-2">
             <label
               htmlFor={fieldName}
+              dir="auto"
               className={getLabelClasses({ error: Boolean(error), required, disabled })}
             >
               {config?.label}

@@ -3,6 +3,7 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { TextareaProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
+import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { CopyContent } from './CopyContent';
 import { ProfessionalWritingModal } from '@/gradian-ui/communication/professional-writing';
 import { VoiceInputDialog } from '@/gradian-ui/communication/voice/components/VoiceInputDialog';
@@ -102,26 +103,14 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
 
     return (
       <div className="w-full">
-        {(config.label || (canCopy && value)) && (
-          <div className="flex items-center justify-between mb-1">
-            {config.label ? (
-              <label
-                htmlFor={config.name}
-                className={cn(
-                  'block text-xs font-medium',
-                  error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
-                  required && 'after:content-["*"] after:ms-1 after:text-red-500 dark:after:text-red-400'
-                )}
-              >
-                {config.label}
-              </label>
-            ) : (
-              <div></div>
-            )}
-            {canCopy && value && (
-              <CopyContent content={value} />
-            )}
-          </div>
+        {config.label && (
+          <label
+            htmlFor={config.name}
+            dir="auto"
+            className={getLabelClasses({ error: Boolean(error), required })}
+          >
+            {config.label}
+          </label>
         )}
         <div className="relative">
         <textarea
@@ -145,6 +134,9 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           {...props}
         />
           <div className="absolute right-3 top-2 flex items-center gap-1">
+            {canCopy && value && (
+              <CopyContent content={value} />
+            )}
             {aiAgentId && value && value.trim() && (
               <TextareaAiEnhanceButton
                 onClick={handleAiAgentClick}
@@ -162,7 +154,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           )}
         </div>
         {error && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+          <p className={errorTextClasses} role="alert">
             {error}
           </p>
         )}

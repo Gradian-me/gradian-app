@@ -5,6 +5,7 @@
 import React, { forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
 import { FormElementProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
+import { getLabelClasses } from '../utils/field-styles';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { extractIds, normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
@@ -369,13 +370,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
     return (
       <div className={cn('w-full space-y-2 border border-gray-300 dark:border-gray-700 rounded-lg p-2', className)}>
         {fieldLabel && (
-          <label
-            className={cn(
-              'block text-xs font-medium',
-              error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-400',
-              required && 'after:content-["*"] after:ms-1 after:text-red-500'
-            )}
-          >
+          <label htmlFor={fieldName} dir="auto" className={getLabelClasses({ error: Boolean(error), required })}>
             {fieldLabel}
           </label>
         )}

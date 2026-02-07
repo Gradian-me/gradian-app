@@ -7,7 +7,7 @@ import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button';
 import { TextInputProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
-import { baseInputClasses } from '../utils/field-styles';
+import { baseInputClasses, getLabelClasses } from '../utils/field-styles';
 import { IconRenderer, isValidLucideIcon } from '@/gradian-ui/shared/utils/icon-renderer';
 import { CopyContent } from './CopyContent';
 import { PopupPicker } from './PopupPicker';
@@ -99,11 +99,8 @@ export const IconInput = forwardRef<FormElementRef, IconInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            className={cn(
-              'block text-xs font-medium mb-2',
-              error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-slate-200',
-              required && 'after:content-["*"] after:ms-1 after:text-red-500'
-            )}
+            dir="auto"
+            className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}
           </label>

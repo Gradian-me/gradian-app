@@ -4,6 +4,7 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect } from 'react';
 import { TextareaProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
+import { getLabelClasses } from '../utils/field-styles';
 import { CopyContent } from './CopyContent';
 import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 import { AlertCircle, CheckCircle } from 'lucide-react';
@@ -361,11 +362,8 @@ export const JsonInput = forwardRef<FormElementRef, JsonInputProps>(
             {config.label ? (
               <label
                 htmlFor={config.name}
-                className={cn(
-                  'block text-xs font-medium',
-                  displayError ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
-                  required && 'after:content-["*"] after:ms-1 after:text-red-500 dark:after:text-red-400'
-                )}
+                dir="auto"
+                className={getLabelClasses({ error: Boolean(displayError), required })}
               >
                 {config.label}
               </label>

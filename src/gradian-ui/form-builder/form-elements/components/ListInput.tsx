@@ -806,6 +806,8 @@ export const ListInput: React.FC<ListInputProps> = ({
     <div ref={containerRef} className={cn('w-full space-y-3', className)}>
       {label && (
         <label
+          htmlFor={fieldName}
+          dir="auto"
           className={getLabelClasses({ error: Boolean(error), required, disabled })}
         >
           {label}

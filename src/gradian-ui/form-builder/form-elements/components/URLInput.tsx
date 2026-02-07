@@ -4,6 +4,7 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { TextInputProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
+import { getLabelClasses } from '../utils/field-styles';
 import { ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CopyContent } from './CopyContent';
@@ -96,11 +97,8 @@ export const URLInput = forwardRef<FormElementRef, TextInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            className={cn(
-              'block text-xs font-medium mb-2',
-              error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
-              required && 'after:content-["*"] after:ms-1 after:text-red-500 dark:after:text-red-400'
-            )}
+            dir="auto"
+            className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}
           </label>

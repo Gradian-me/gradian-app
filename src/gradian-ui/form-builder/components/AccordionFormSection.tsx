@@ -1135,7 +1135,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               </p>
             )}
             {description && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+              <p dir="auto" className="w-full text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
                 {description}
               </p>
             )}
@@ -1215,8 +1215,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <CardTitle className={cn(
-                    "text-base font-medium text-gray-900 dark:text-gray-100",
+                  <CardTitle dir="auto" className={cn(
+                    "w-full text-base font-medium text-gray-900 dark:text-gray-100",
                     isNotApplicable && "opacity-50"
                   )}>{title}</CardTitle>
                   <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
@@ -1904,10 +1904,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           onClick={toggleExpanded}
         >
           <div className="flex items-center justify-between">
-            <div className="flex-1">
+            <div className="flex-1 me-2">
               <div className="flex items-center gap-2">
-                <CardTitle className={cn(
-                  "text-base font-medium text-gray-900 dark:text-gray-100",
+                <CardTitle dir="auto" className={cn(
+                  "w-full text-base font-medium text-gray-900 dark:text-gray-100",
                   isNotApplicable && "opacity-50"
                 )}>{title}</CardTitle>
                 <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
@@ -1920,7 +1920,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 )}
               </div>
               {description && (
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{description}</p>
+                <p dir="auto" className="w-full text-xs text-gray-600 dark:text-gray-400 mt-1">{description}</p>
               )}
             </div>
             <div className="flex items-center gap-2">
@@ -2152,10 +2152,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           onClick={isCollapsible ? toggleExpanded : undefined}
         >
           <div className="flex items-center justify-between">
-            <div className="flex-1">
+            <div className="flex-1 me-2">
               <div className="flex items-center gap-2">
-                <CardTitle className={cn(
-                  "text-base font-medium text-gray-900 dark:text-gray-100",
+                <CardTitle dir="auto" className={cn(
+                  "w-full text-base font-medium text-gray-900 dark:text-gray-100",
                   isNotApplicable && "opacity-50"
                 )}>{title}</CardTitle>
                 {displaySectionError && (
@@ -2165,7 +2165,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 )}
             </div>
             {description && (
-              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{description}</p>
+              <p dir="auto" className="w-full text-xs text-gray-600 dark:text-gray-400 mt-1">{description}</p>
             )}
           </div>
           <div className="flex items-center gap-2">

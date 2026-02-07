@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Star } from 'lucide-react';
 import { cn } from '../../../shared/utils';
+import { getLabelClasses } from '../utils/field-styles';
 
 export interface RatingProps {
   value: number | string | any;
@@ -104,13 +105,7 @@ export const Rating: React.FC<RatingProps> = ({
   return (
     <div className={cn("w-full", className)}>
       {label && (
-        <label
-          className={cn(
-            "block text-xs font-medium mb-1",
-            error ? "text-red-700 dark:text-red-400" : "text-gray-700 dark:text-gray-300",
-            required && "after:content-['*'] after:ms-1 after:text-red-500 dark:after:text-red-400"
-          )}
-        >
+        <label dir="auto" className={getLabelClasses({ error: Boolean(error), required })}>
           {label}
         </label>
       )}

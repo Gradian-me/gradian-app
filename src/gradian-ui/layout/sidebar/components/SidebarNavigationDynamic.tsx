@@ -456,46 +456,96 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                           className="border-none"
                         >
                           {/* Application Group Header - Accordion Trigger */}
-                          <AccordionTrigger
-                          className={cn(
-                            "px-3 py-2.5 hover:no-underline rounded-lg transition-colors",
-                            "text-gray-300 hover:text-white hover:bg-gray-800/50",
-                            "data-[state=open]:text-white data-[state=open]:bg-gray-800/70",
-                            "border-l-2 border-l-transparent data-[state=open]:border-l-violet-500"
-                          )}
-                        >
-                          <div className={cn(
-                            "flex items-center flex-1",
-                            isCollapsed && !isMobile ? "justify-center" : "space-x-2"
-                          )}>
-                            {group.application?.icon ? (
-                              <IconRenderer 
-                                iconName={group.application.icon} 
-                                className="h-4 w-4 shrink-0" 
-                              />
-                            ) : group.key === 'Uncategorized' ? (
-                              <Package className="h-4 w-4 shrink-0" />
-                            ) : null}
-                            <AnimatePresence mode="wait">
-                              {(!isCollapsed || isMobile) && (
-                                <motion.span
-                                  initial={{ opacity: 0, width: 0 }}
-                                  animate={{ opacity: 1, width: "auto" }}
-                                  exit={{ opacity: 0, width: 0 }}
-                                  transition={{ 
-                                    duration: 0.15,
-                                    ease: 'easeOut'
-                                  }}
-                                  className="text-xs font-semibold tracking-wider truncate"
+                          {shouldShowTooltip ? (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <AccordionTrigger
+                                  className={cn(
+                                    "px-3 py-2.5 hover:no-underline rounded-lg transition-colors",
+                                    "text-gray-300 hover:text-white hover:bg-gray-800/50",
+                                    "data-[state=open]:text-white data-[state=open]:bg-gray-800/70",
+                                    "border-l-2 border-l-transparent data-[state=open]:border-l-violet-500"
+                                  )}
                                 >
-                                  {searchQuery?.trim()
-                                    ? renderHighlightedText(group.key, searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
-                                    : group.key}
-                                </motion.span>
+                                  <div className={cn(
+                                    "flex items-center flex-1",
+                                    isCollapsed && !isMobile ? "justify-center" : "space-x-2"
+                                  )}>
+                                    {group.application?.icon ? (
+                                      <IconRenderer 
+                                        iconName={group.application.icon} 
+                                        className="h-4 w-4 shrink-0" 
+                                      />
+                                    ) : group.key === 'Uncategorized' ? (
+                                      <Package className="h-4 w-4 shrink-0" />
+                                    ) : null}
+                                    <AnimatePresence mode="wait">
+                                      {(!isCollapsed || isMobile) && (
+                                        <motion.span
+                                          initial={{ opacity: 0, width: 0 }}
+                                          animate={{ opacity: 1, width: "auto" }}
+                                          exit={{ opacity: 0, width: 0 }}
+                                          transition={{ 
+                                            duration: 0.15,
+                                            ease: 'easeOut'
+                                          }}
+                                          className="text-xs font-semibold tracking-wider truncate"
+                                        >
+                                          {searchQuery?.trim()
+                                            ? renderHighlightedText(group.key, searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
+                                            : group.key}
+                                        </motion.span>
+                                      )}
+                                    </AnimatePresence>
+                                  </div>
+                                </AccordionTrigger>
+                              </TooltipTrigger>
+                              <TooltipContent side="right" className="bg-gray-900 text-white border-gray-700">
+                                <p>{group.key}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          ) : (
+                            <AccordionTrigger
+                              className={cn(
+                                "px-3 py-2.5 hover:no-underline rounded-lg transition-colors",
+                                "text-gray-300 hover:text-white hover:bg-gray-800/50",
+                                "data-[state=open]:text-white data-[state=open]:bg-gray-800/70",
+                                "border-l-2 border-l-transparent data-[state=open]:border-l-violet-500"
                               )}
-                            </AnimatePresence>
-                          </div>
-                        </AccordionTrigger>
+                            >
+                              <div className={cn(
+                                "flex items-center flex-1",
+                                isCollapsed && !isMobile ? "justify-center" : "space-x-2"
+                              )}>
+                                {group.application?.icon ? (
+                                  <IconRenderer 
+                                    iconName={group.application.icon} 
+                                    className="h-4 w-4 shrink-0" 
+                                  />
+                                ) : group.key === 'Uncategorized' ? (
+                                  <Package className="h-4 w-4 shrink-0" />
+                                ) : null}
+                                <AnimatePresence mode="wait">
+                                  {(!isCollapsed || isMobile) && (
+                                    <motion.span
+                                      initial={{ opacity: 0, width: 0 }}
+                                      animate={{ opacity: 1, width: "auto" }}
+                                      exit={{ opacity: 0, width: 0 }}
+                                      transition={{ 
+                                        duration: 0.15,
+                                        ease: 'easeOut'
+                                      }}
+                                      className="text-xs font-semibold tracking-wider truncate"
+                                    >
+                                      {searchQuery?.trim()
+                                        ? renderHighlightedText(group.key, searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
+                                        : group.key}
+                                    </motion.span>
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                            </AccordionTrigger>
+                          )}
                         
                         {/* Schemas in this group - Accordion Content */}
                         <AccordionContent className="pe-0 pb-0 pt-0">
@@ -507,7 +557,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.2 }}
-                                className="space-y-1 mt-1 border-l-2 border-l-violet-500/30 ml-3 pl-1.5"
+                                className="space-y-1 mt-1 border-l-2 border-l-violet-500/30 ms-2 ps-1"
                               >
                                 {group.schemas.map((schema, schemaIndex) => {
                                   const active = isActive(schema.id);

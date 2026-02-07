@@ -4,6 +4,7 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { TextInputProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
+import { getLabelClasses } from '../utils/field-styles';
 import { Eye, EyeOff } from 'lucide-react';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -82,11 +83,8 @@ export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            className={cn(
-              'block text-xs font-medium mb-2',
-              error ? 'text-red-700 dark:text-red-400' : 'text-gray-700 dark:text-gray-300',
-              required && 'after:content-["*"] after:ms-1 after:text-red-500 dark:after:text-red-400'
-            )}
+            dir="auto"
+            className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}
           </label>

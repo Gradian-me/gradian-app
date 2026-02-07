@@ -3,6 +3,7 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { ToggleProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
+import { getLabelClasses } from '../utils/field-styles';
 import { Toggle as UIToggle } from '@/components/ui/toggle';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 
@@ -65,19 +66,21 @@ export const Toggle = forwardRef<FormElementRef, ToggleProps>(
     return (
       <div className="w-full space-y-2">
         {config?.label && (
-          <div
-            className={cn(
-              'flex items-center justify-between gap-2 text-xs font-medium',
-              error ? 'text-red-700' : 'text-gray-700',
-              required && 'after:content-["*"] after:ms-1 after:text-red-500',
-              disabled && 'opacity-60 cursor-not-allowed'
-            )}
+          <label
+            htmlFor={config?.name}
+            dir="auto"
+            className={getLabelClasses({
+              error: Boolean(error),
+              required: required ?? config?.required ?? config?.validation?.required ?? false,
+              disabled,
+              className: 'flex items-center justify-between gap-2 mb-0!',
+            })}
           >
             <span>{config.label}</span>
             {typeof config.helper === 'string' && (
               <span className="text-xs font-normal text-gray-500">{config.helper}</span>
             )}
-          </div>
+          </label>
         )}
         <UIToggle
           ref={toggleRef}

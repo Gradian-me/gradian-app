@@ -81,9 +81,9 @@ const wrapWithForceIcon = (content: React.ReactNode, isForce: boolean, field?: a
   const isInactive = isRecordInactive(row);
   const isTitle = field?.role === 'title';
   
-  // Apply bold styling to title fields
+  // Apply bold styling to title fields; dir="auto" for correct text direction (RTL/LTR); w-full for full cell width
   let wrappedContent = isTitle ? (
-    <span className="font-semibold">{content}</span>
+    <span className="font-semibold w-full block" dir="auto">{content}</span>
   ) : content;
   
   // Apply strike-through to title if inactive
@@ -165,6 +165,7 @@ export const formatFieldValue = (
         <DialogTrigger asChild>
           <button
             type="button"
+            dir="auto"
             className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium font-mono text-left max-w-full"
             onClick={(e) => {
               e.stopPropagation();
@@ -209,7 +210,7 @@ export const formatFieldValue = (
   if (value === null || value === undefined || value === '') {
     // Still show ForceIcon even if value is empty (only for title role)
     if (isForce && isTitle) {
-      const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+      const emptyContent = <span className={cn("text-gray-400 w-full block", isTitle && "font-semibold")} dir="auto">—</span>;
       const inactiveContent = isInactive ? <span className="line-through">{emptyContent}</span> : emptyContent;
       return (
         <span className="inline-flex items-center gap-1.5">
@@ -218,7 +219,7 @@ export const formatFieldValue = (
         </span>
       );
     }
-    const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+    const emptyContent = <span className={cn("text-gray-400 w-full block", isTitle && "font-semibold")} dir="auto">—</span>;
     return isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
   }
 
@@ -507,7 +508,7 @@ export const formatFieldValue = (
       : String(selectValue);
     
     if (displayValue) {
-      return wrapWithForceIcon(<span>{String(displayValue)}</span>, isForce, field, row);
+      return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(displayValue)}</span>, isForce, field, row);
     }
   }
 
@@ -536,7 +537,7 @@ export const formatFieldValue = (
     }
     const listItems = Array.isArray(value) ? value : [value];
     return wrapWithForceIcon(
-      <ul className="list-none space-y-1 text-sm text-gray-700 dark:text-gray-300 pl-0">
+      <ul className="list-none space-y-1 text-sm text-gray-700 dark:text-gray-300 pl-0 w-full" dir="auto">
         {listItems.map((item: any, index: number) => {
           const text = getListItemLabel(item);
           const isDone =
@@ -553,7 +554,7 @@ export const formatFieldValue = (
                   <Square className="h-4 w-4 text-gray-400 dark:text-gray-500" aria-label="Not done" />
                 )}
               </span>
-              <span className={cn(isDone && 'line-through text-gray-500 dark:text-gray-400')}>
+              <span className={cn("w-full block", isDone && 'line-through text-gray-500 dark:text-gray-400')} dir="auto">
                 {text || '—'}
               </span>
             </li>
@@ -579,9 +580,9 @@ export const formatFieldValue = (
       return <span className="text-gray-400">—</span>;
     }
     return wrapWithForceIcon(
-      <ul className="list-disc list-inside space-y-0.5 text-sm text-gray-700 dark:text-gray-300">
+      <ul className="list-disc list-inside space-y-0.5 text-sm text-gray-700 dark:text-gray-300" dir="auto">
         {itemLabels.map((label: string, index: number) => (
-          <li key={index} className="break-words overflow-wrap-anywhere">{label}</li>
+          <li key={index} className="break-words overflow-wrap-anywhere" dir="auto">{label}</li>
         ))}
       </ul>,
       isForce,
@@ -750,17 +751,17 @@ export const formatFieldValue = (
       // Try to get display value from the object
       const pickerDisplay = getPickerDisplayValue(field, value, { row });
       if (pickerDisplay) {
-        return wrapWithForceIcon(<span>{pickerDisplay}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{pickerDisplay}</span>, isForce, field, row);
       }
       
       // Fallback: try to extract label/name/title/id directly
       const fallbackDisplay = value.label || value.name || value.title || value.value || value.id;
       if (fallbackDisplay !== undefined && fallbackDisplay !== null) {
-        return wrapWithForceIcon(<span>{String(fallbackDisplay)}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(fallbackDisplay)}</span>, isForce, field, row);
       }
       
       // If still no display value, show empty instead of [object Object]
-      const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+      const emptyContent = <span className={cn("text-gray-400 w-full block", isTitle && "font-semibold")} dir="auto">—</span>;
       const inactiveContent = isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
       return isForce && isTitle ? (
         <span className="inline-flex items-center gap-1.5">
@@ -770,17 +771,17 @@ export const formatFieldValue = (
       ) : inactiveContent;
     } else if (Array.isArray(value) && value.length === 0) {
       // Empty array
-      const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+      const emptyContent = <span className={cn("text-gray-400 w-full block", isTitle && "font-semibold")} dir="auto">—</span>;
       return isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
     } else {
       // For non-object values, use getPickerDisplayValue
       const pickerDisplay = getPickerDisplayValue(field, value, { row });
       if (pickerDisplay) {
-        return wrapWithForceIcon(<span>{pickerDisplay}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{pickerDisplay}</span>, isForce, field, row);
       }
     }
     
-    const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+    const emptyContent = <span className={cn("text-gray-400 w-full block", isTitle && "font-semibold")} dir="auto">—</span>;
     const inactiveContent = isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
     return isForce && isTitle ? (
       <span className="inline-flex items-center gap-1.5">
@@ -816,7 +817,7 @@ export const formatFieldValue = (
     const passwordLength = String(value).length;
     const maskedValue = '•'.repeat(Math.max(8, Math.min(passwordLength, 20)));
     return (
-      <span className="font-mono text-gray-600 dark:text-gray-400">
+      <span className="font-mono text-gray-600 dark:text-gray-400 w-full block" dir="auto">
         {maskedValue}
       </span>
     );
@@ -913,7 +914,7 @@ export const formatFieldValue = (
     }
     
     if (!isValidLucideIcon(iconName)) {
-      return <span className="text-gray-600 dark:text-gray-300">{iconName}</span>;
+      return <span className="text-gray-600 dark:text-gray-300 w-full block" dir="auto">{iconName}</span>;
     }
     
     return (
@@ -1066,15 +1067,15 @@ export const formatFieldValue = (
       <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="inline-flex items-center whitespace-nowrap">
+            <div className="inline-flex items-center whitespace-nowrap w-full">
               <Badge variant={badgeVariant}>
                 {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
-                <span className="text-xs">{badgeLabel}</span>
+                <span className="text-xs" dir="auto">{badgeLabel}</span>
               </Badge>
             </div>
           </TooltipTrigger>
           <TooltipContent side="top" className="max-w-sm">
-            <span>{badgeLabel}</span>
+            <span dir="auto">{badgeLabel}</span>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>,
@@ -1138,15 +1139,15 @@ export const formatFieldValue = (
       <TooltipProvider delayDuration={300}>
         <Tooltip>
           <TooltipTrigger asChild>
-            <div className="inline-flex items-center whitespace-nowrap">
+            <div className="inline-flex items-center whitespace-nowrap w-full">
               <Badge variant={badgeVariant}>
                 {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
-                <span className="text-xs">{badgeLabel}</span>
+                <span className="text-xs" dir="auto">{badgeLabel}</span>
               </Badge>
             </div>
           </TooltipTrigger>
           <TooltipContent side="top" className="max-w-sm">
-            <span>{badgeLabel}</span>
+            <span dir="auto">{badgeLabel}</span>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>,
@@ -1156,11 +1157,15 @@ export const formatFieldValue = (
     );
   }
 
-  if (field?.role === 'rating') {
-    return (
+  // View rating: by role or by component (e.g. project-proposal, lean-management rating fields)
+  if (field?.role === 'rating' || field?.component === 'rating') {
+    return wrapWithForceIcon(
       <div className="inline-flex items-center">
         {renderRatingValue(value, { size: 'sm', showValue: true })}
-      </div>
+      </div>,
+      isForce,
+      field,
+      row
     );
   }
 
@@ -1220,7 +1225,7 @@ export const formatFieldValue = (
         });
     
     return wrapWithForceIcon(
-      <span className="text-gray-700 dark:text-gray-300">{formattedDate}</span>,
+      <span className="text-gray-700 dark:text-gray-300 w-full block" dir="auto">{formattedDate}</span>,
       isForce,
       field,
       row
@@ -1272,7 +1277,7 @@ export const formatFieldValue = (
           size="sm"
           showDialog={true}
         />
-        <span className="text-sm text-gray-700 dark:text-gray-300">{personLabel}</span>
+        <span className="text-sm text-gray-700 dark:text-gray-300 min-w-0 flex-1" dir="auto">{personLabel}</span>
       </div>,
       isForce,
       field,
@@ -1395,7 +1400,7 @@ export const formatFieldValue = (
       const dateValue = typeof value === 'string' ? new Date(value) : value;
       if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
         return wrapWithForceIcon(
-          <span>
+          <span className="w-full block" dir="auto">
             {formatDate(dateValue, {
               month: 'short',
               day: 'numeric',
@@ -1419,7 +1424,7 @@ export const formatFieldValue = (
   switch (displayType) {
     case 'currency':
       return wrapWithForceIcon(
-        <span className="whitespace-nowrap">
+        <span className="whitespace-nowrap w-full block" dir="auto">
           {formatCurrency(typeof value === 'number' ? value : parseFloat(value) || 0)}
         </span>,
         isForce,
@@ -1429,7 +1434,7 @@ export const formatFieldValue = (
     case 'percentage': {
       const numValue = typeof value === 'number' ? value : parseFloat(value) || 0;
       return wrapWithForceIcon(
-        <span className="whitespace-nowrap">{numValue.toFixed(2)}%</span>,
+        <span className="whitespace-nowrap w-full block" dir="auto">{numValue.toFixed(2)}%</span>,
         isForce,
         field,
         row
@@ -1437,7 +1442,7 @@ export const formatFieldValue = (
     }
     case 'number':
       return wrapWithForceIcon(
-        <span className="whitespace-nowrap">
+        <span className="whitespace-nowrap w-full block" dir="auto">
           {formatNumber(typeof value === 'number' ? value : parseFloat(value) || 0)}
         </span>,
         isForce,
@@ -1449,7 +1454,7 @@ export const formatFieldValue = (
         const dateValue = typeof value === 'string' ? new Date(value) : value;
         if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
           return wrapWithForceIcon(
-            <span>
+            <span className="w-full block" dir="auto">
               {formatDate(dateValue, {
                 month: 'short',
                 day: 'numeric',
@@ -1461,9 +1466,9 @@ export const formatFieldValue = (
             row
           );
         }
-        return wrapWithForceIcon(<span>{String(value)}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span dir="auto">{String(value)}</span>, isForce, field, row);
       } catch {
-        return wrapWithForceIcon(<span>{String(value)}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span dir="auto">{String(value)}</span>, isForce, field, row);
       }
     case 'datetime':
     case 'datetime-local':
@@ -1471,7 +1476,7 @@ export const formatFieldValue = (
         const dateValue = typeof value === 'string' ? new Date(value) : value;
         if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
           return wrapWithForceIcon(
-            <span>
+            <span className="w-full block" dir="auto">
               {formatDate(dateValue, {
                 month: 'short',
                 day: 'numeric',
@@ -1486,9 +1491,9 @@ export const formatFieldValue = (
             row
           );
         }
-        return wrapWithForceIcon(<span>{String(value)}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(value)}</span>, isForce, field, row);
       } catch {
-        return wrapWithForceIcon(<span>{String(value)}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(value)}</span>, isForce, field, row);
       }
     case 'url': {
       const stringValue = String(value);
@@ -1518,22 +1523,22 @@ export const formatFieldValue = (
     case 'array':
     case 'checkbox':
       if (displayStrings.length > 0) {
-        return wrapWithForceIcon(<span>{displayStrings.join(', ')}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{displayStrings.join(', ')}</span>, isForce, field, row);
       }
       if (Array.isArray(value)) {
-        return wrapWithForceIcon(<span>{value.join(', ')}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{value.join(', ')}</span>, isForce, field, row);
       }
-      return wrapWithForceIcon(<span>{String(value)}</span>, isForce, field, row);
+      return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(value)}</span>, isForce, field, row);
     default:
       if (hasStructuredOptions) {
         const joined = getJoinedDisplayString(value);
         if (joined) {
-          return wrapWithForceIcon(<span>{joined}</span>, isForce, field, row);
+          return wrapWithForceIcon(<span className="w-full block" dir="auto">{joined}</span>, isForce, field, row);
         }
       }
       if (normalizedOptions.length > 0 && !(Array.isArray(value) || typeof value === 'object')) {
         const label = normalizedOptions[0].label ?? normalizedOptions[0].id;
-        return wrapWithForceIcon(<span>{String(label)}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(label)}</span>, isForce, field, row);
       }
       
       // Handle object values that weren't caught by picker field check
@@ -1541,10 +1546,10 @@ export const formatFieldValue = (
         // Try to extract a display value from the object
         const objectDisplay = value.label || value.name || value.title || value.value || value.id;
         if (objectDisplay !== undefined && objectDisplay !== null) {
-          return wrapWithForceIcon(<span>{String(objectDisplay)}</span>, isForce, field, row);
+          return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(objectDisplay)}</span>, isForce, field, row);
         }
         // If no display value found, show empty instead of [object Object]
-        const emptyContent = <span className={cn("text-gray-400", isTitle && "font-semibold")}>—</span>;
+        const emptyContent = <span className={cn("text-gray-400 w-full block", isTitle && "font-semibold")} dir="auto">—</span>;
         return isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
       }
       
@@ -1582,7 +1587,7 @@ export const formatFieldValue = (
             const isDateOnly = field?.component === 'date';
             
             return wrapWithForceIcon(
-              <span>
+              <span className="w-full block" dir="auto">
                 {isDateOnly
                   ? formatDate(dateValue, {
                       month: 'short',
@@ -1608,7 +1613,7 @@ export const formatFieldValue = (
         }
       }
       
-      return wrapWithForceIcon(<span>{stringValue}</span>, isForce, field, row);
+      return wrapWithForceIcon(<span className="w-full block" dir="auto">{stringValue}</span>, isForce, field, row);
   }
 };
 

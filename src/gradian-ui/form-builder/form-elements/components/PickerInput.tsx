@@ -711,6 +711,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       {fieldLabel && (
         <label
           htmlFor={fieldName}
+          dir="auto"
           className={getLabelClasses({ error: Boolean(error), required })}
         >
           {fieldLabel}

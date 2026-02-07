@@ -1572,8 +1572,18 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KGH1TMXDH89EPZRWA1MYR12Z",
       "createdAt": "2026-02-03T06:07:53.278Z",
-      "updatedAt": "2026-02-03T06:08:18.319Z",
+      "updatedAt": "2026-02-07T08:22:53.806Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "application-schemas": [],
+      "name": "Project Management",
+      "icon": "ActivitySquare",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KGVJXCKW8X0GHS7EPFVK9KTX",
+      "createdAt": "2026-02-07T08:18:53.193Z",
+      "updatedAt": "2026-02-07T08:21:16.672Z"
     }
   ],
   "production-actuals": [],
@@ -19552,6 +19562,13 @@
       "icon": "Download",
       "color": "blue",
       "sourceUrl": "field-options:integrations:integration-source-method"
+    },
+    {
+      "id": "approved",
+      "label": "تأیید جهت اجرا",
+      "icon": "CheckCircle",
+      "color": "success",
+      "sourceUrl": "field-options:project-proposal:project-proposal-approval-status"
     }
   ],
   "deviation-management": [
@@ -19817,6 +19834,30 @@
     }
   ],
   "lean-management": [],
+  "project-proposal": [
+    {
+      "competitiveAdvantage": 3,
+      "reworkReduction": 2,
+      "riskReduction": 5,
+      "decisionMakingImprovement": 2,
+      "revenueIncrease": 1,
+      "costReduction": 1,
+      "productivityIncrease": 3,
+      "approvalStatus": [
+        {
+          "id": "approved"
+        }
+      ],
+      "estimatedBudget": 50000000000,
+      "projectTitle": "راه اندازی دیتاسنتر موازی در دفتر تهران",
+      "projectReason": "جهت کاهش ریسک های احتمالی در زمان جنگ و تضمین تداوم کسب و کار (Business Continuity) از طریق ایجاد زیرساخت موازی در دفتر تهران.",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KGVEN60BD590CB72NRY8343H",
+      "createdAt": "2026-02-07T07:04:29.970Z",
+      "updatedAt": "2026-02-07T07:11:26.983Z"
+    }
+  ],
   "notes": [
     {
       "color": "cyan",

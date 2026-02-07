@@ -89,6 +89,7 @@ export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
+            dir="auto"
             className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}

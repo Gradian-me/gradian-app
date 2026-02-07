@@ -86,6 +86,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
+            dir="auto"
             className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}

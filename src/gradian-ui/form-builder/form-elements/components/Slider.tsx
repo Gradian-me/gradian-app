@@ -57,6 +57,7 @@ export const Slider = forwardRef<FormElementRef, SliderProps>(
           <div className="flex items-center justify-between mb-3">
             <label
               htmlFor={fieldName}
+              dir="auto"
               className={getLabelClasses({ error: Boolean(error) })}
             >
               {fieldLabel}

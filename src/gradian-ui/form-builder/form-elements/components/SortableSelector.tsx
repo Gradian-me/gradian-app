@@ -318,6 +318,7 @@ export const SortableSelector: React.FC<SortableSelectorProps> = ({
       {resolvedFieldLabel && (
         <label
           htmlFor={fieldName}
+          dir="auto"
           className={getLabelClasses({ required: config?.required })}
         >
           {resolvedFieldLabel}

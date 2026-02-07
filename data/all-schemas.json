@@ -8339,6 +8339,206 @@
     ]
   },
   {
+    "id": "project-proposal",
+    "description": "پیشنهاد پروژه - تعریف پروژه، پارامترهای ارزیابی و ارزیابی مدیریت عامل",
+    "singular_name": "پیشنهاد پروژه",
+    "plural_name": "پیشنهادات پروژه",
+    "fields": [
+      {
+        "id": "project-proposal-title",
+        "name": "projectTitle",
+        "label": "عنوان پروژه پیشنهادی",
+        "sectionId": "project-definition",
+        "component": "text",
+        "placeholder": "عنوان پروژه پیشنهادی را وارد کنید",
+        "role": "title",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 2,
+        "order": 1
+      },
+      {
+        "id": "project-proposal-reason",
+        "name": "projectReason",
+        "label": "علت پیشنهاد پروژه",
+        "sectionId": "project-definition",
+        "component": "textarea",
+        "placeholder": "علت پیشنهاد پروژه را شرح دهید",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 2,
+        "order": 2
+      },
+      {
+        "id": "project-proposal-estimated-budget",
+        "name": "estimatedBudget",
+        "label": "بودجه تخمینی (ریال)",
+        "sectionId": "project-definition",
+        "component": "number",
+        "placeholder": "مبلغ به ریال",
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "project-proposal-competitive-advantage",
+        "name": "competitiveAdvantage",
+        "label": "ایجاد مزیت رقابتی",
+        "sectionId": "evaluation-parameters",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "project-proposal-revenue-increase",
+        "name": "revenueIncrease",
+        "label": "افزایش درآمد",
+        "sectionId": "evaluation-parameters",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "project-proposal-rework-reduction",
+        "name": "reworkReduction",
+        "label": "کاهش دوباره کاری",
+        "sectionId": "evaluation-parameters",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "project-proposal-cost-reduction",
+        "name": "costReduction",
+        "label": "کاهش هزینه",
+        "sectionId": "evaluation-parameters",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "project-proposal-risk-reduction",
+        "name": "riskReduction",
+        "label": "کاهش ریسک",
+        "sectionId": "evaluation-parameters",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "project-proposal-productivity-increase",
+        "name": "productivityIncrease",
+        "label": "افزایش بهره وری",
+        "sectionId": "evaluation-parameters",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "project-proposal-decision-making-improvement",
+        "name": "decisionMakingImprovement",
+        "label": "بهبود تصمیم گیری",
+        "sectionId": "evaluation-parameters",
+        "component": "rating",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 7
+      },
+      {
+        "id": "project-proposal-approval-status",
+        "name": "approvalStatus",
+        "label": "وضعیت تأیید پروژه پیشنهادی",
+        "sectionId": "management-evaluation",
+        "component": "select",
+        "placeholder": "انتخاب وضعیت",
+        "role": "status",
+        "validation": {
+          "required": false
+        },
+        "options": [
+          {
+            "id": "rejected",
+            "label": "رد شده",
+            "icon": "XCircle",
+            "color": "destructive"
+          },
+          {
+            "id": "approved",
+            "label": "تأیید جهت اجرا",
+            "icon": "CheckCircle",
+            "color": "success"
+          }
+        ],
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "project-proposal-ceo-comments",
+        "name": "ceoComments",
+        "label": "توضیحات مدیر عامل",
+        "sectionId": "management-evaluation",
+        "component": "textarea",
+        "placeholder": "توضیحات مدیر عامل",
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 2
+      }
+    ],
+    "sections": [
+      {
+        "id": "project-definition",
+        "title": "تعریف پروژه",
+        "description": "عنوان، علت پیشنهاد و بودجه تخمینی",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "evaluation-parameters",
+        "title": "پارامترهای ارزیابی پروژه",
+        "description": "ارزیابی بر اساس معیارهای تعریف شده",
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "management-evaluation",
+        "title": "ارزیابی مدیریت عامل",
+        "description": "وضعیت تأیید و توضیحات مدیر عامل",
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "FileCheck",
+    "schemaType": "business"
+  },
+  {
     "id": "notes",
     "description": "Personal notes and checklists - sticky-note style workspace",
     "singular_name": "Note",

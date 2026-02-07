@@ -191,7 +191,7 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
           </div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label htmlFor="schema-plural-name" className="text-sm font-medium text-gray-700 after:content-['*'] after:ms-1 after:text-red-500">
+              <label dir="auto" htmlFor="schema-plural-name" className="text-sm font-medium text-gray-700 after:content-['*'] after:ms-1 after:text-red-500">
                 Plural Name
               </label>
               <Button

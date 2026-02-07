@@ -3,6 +3,7 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { CheckboxProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
+import { getLabelClasses } from '../utils/field-styles';
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";
 
@@ -80,12 +81,13 @@ export const Checkbox = forwardRef<FormElementRef, CheckboxProps>(
           {config.label && (
             <label
               htmlFor={config.name}
-              className={cn(
-                'ms-2 text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
-                error ? 'text-destructive' : 'text-foreground',
-                required && 'after:content-["*"] after:ms-1 after:text-destructive',
-                disabled && 'opacity-50'
-              )}
+              dir="auto"
+              className={getLabelClasses({
+                error: Boolean(error),
+                required,
+                disabled,
+                className: 'ms-2 mb-0! leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+              })}
             >
               {config.label}
             </label>

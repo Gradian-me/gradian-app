@@ -362,7 +362,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
   const renderFieldLabel = () =>
     fieldLabel ? (
-      <label htmlFor={fieldName} className={getLabelClasses({ error: Boolean(error), required: Boolean(required) })}>
+      <label htmlFor={fieldName} dir="auto" className={getLabelClasses({ error: Boolean(error), required: Boolean(required) })}>
         {fieldLabel}
       </label>
     ) : null;

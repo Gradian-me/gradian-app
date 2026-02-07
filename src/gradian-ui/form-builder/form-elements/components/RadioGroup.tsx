@@ -5,6 +5,7 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { RadioProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
+import { getLabelClasses } from '../utils/field-styles';
 import { extractFirstId, normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
@@ -226,11 +227,8 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
         {config.label && (
           <fieldset>
             <legend
-              className={cn(
-                'text-xs font-medium mb-2',
-                error ? 'text-red-700' : 'text-gray-700',
-                required && 'after:content-["*"] after:ms-1 after:text-red-500'
-              )}
+              dir="auto"
+              className={getLabelClasses({ error: Boolean(error), required, disabled })}
             >
               {config.label}
             </legend>
