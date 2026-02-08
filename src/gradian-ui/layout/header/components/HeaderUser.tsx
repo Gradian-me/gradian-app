@@ -110,19 +110,19 @@ export const HeaderUser: React.FC<HeaderUserProps> = ({
         <div className="py-1">
           <button
             onClick={() => handleAction('profile')}
-            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            className="block w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             Profile
           </button>
           <button
             onClick={() => handleAction('settings')}
-            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            className="block w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             Settings
           </button>
           <button
             onClick={() => handleAction('help')}
-            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            className="block w-full text-start px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             Help & Support
           </button>
@@ -131,7 +131,7 @@ export const HeaderUser: React.FC<HeaderUserProps> = ({
         <div className="py-1 border-t border-gray-200">
           <button
             onClick={() => handleAction('logout')}
-            className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+            className="block w-full text-start px-4 py-2 text-sm text-red-600 hover:bg-red-50"
           >
             Sign out
           </button>

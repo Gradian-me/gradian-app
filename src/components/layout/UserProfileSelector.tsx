@@ -170,12 +170,12 @@ export function UserProfileSelector({
           </Avatar>
           <div
             className={cn(
-              'flex flex-col text-left leading-tight',
+              'flex flex-col text-start leading-tight',
               fullWidth ? 'flex-1 overflow-hidden' : 'max-w-[140px] overflow-hidden'
             )}
           >
             <span className="text-gray-900 dark:text-gray-100 text-sm font-semibold truncate" suppressHydrationWarning>
-              Loading...
+              {getT(TRANSLATION_KEYS.PAGINATION_LOADING, language, defaultLang)}
             </span>
           </div>
           <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 text-gray-500" />
@@ -269,7 +269,7 @@ export function UserProfileSelector({
             </Avatar>
             <div
               className={cn(
-                'flex flex-col text-left leading-tight',
+                'flex flex-col text-start leading-tight',
                 fullWidth ? 'flex-1 overflow-hidden' : 'max-w-[140px] overflow-hidden'
               )}
             >
@@ -344,10 +344,8 @@ export function UserProfileSelector({
                       </div>
                     )}
                     <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                      <p className="text-[11px] font-medium text-gray-600 dark:text-gray-300 mb-1.5">
-                        {getT(TRANSLATION_KEYS.LABEL_LANGUAGE, language, defaultLang)}
-                      </p>
                       <LanguageSelector
+                        config={{ name: 'language', label: '' }}
                         value={language || undefined}
                         onChange={setLanguage}
                         className="w-full"

@@ -200,7 +200,7 @@ export function ResponseCardViewer({
               'border border-violet-200/50 dark:border-violet-800/50',
               'shadow-sm hover:shadow-md',
               'transition-all duration-200',
-              'text-left p-5',
+              'text-start p-5',
               'hover:scale-[1.02] hover:border-violet-300 dark:hover:border-violet-700',
               'focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2'
             )}

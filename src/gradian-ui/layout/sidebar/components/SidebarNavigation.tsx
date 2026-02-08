@@ -15,7 +15,8 @@ import { SIDEBAR_HIGHLIGHT_CLASS } from '../utils';
 import { SidebarNavigationDynamic } from './SidebarNavigationDynamic';
 import { Menu } from 'lucide-react';
 import { useLanguageStore } from '@/stores/language.store';
-import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { isRTL, getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   items,
@@ -31,7 +32,9 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   const currentPath = activePath || pathname;
   const shouldShowTooltip = isCollapsed && !isMobile;
   const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
   const tooltipSide = isRTL(language) ? 'left' : 'right';
+  const homeLabel = getT(TRANSLATION_KEYS.SIDEBAR_HOME, language, defaultLang);
   
   const filteredItems = React.useMemo(() => {
     return filterNavigationItems(items, searchQuery || '');
@@ -84,14 +87,14 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                       <HomeIcon className="h-5 w-5 shrink-0" />
                       {(!isCollapsed || isMobile) && (
                         <span className="text-xs font-medium overflow-hidden whitespace-nowrap">
-                          {FALLBACK_HOME_MENU_ITEM.name}
+                          {homeLabel}
                         </span>
                       )}
                     </div>
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent side={tooltipSide} className="bg-gray-900 text-white border-gray-700">
-                  <p>{FALLBACK_HOME_MENU_ITEM.name}</p>
+                  <p>{homeLabel}</p>
                 </TooltipContent>
               </Tooltip>
             ) : (
@@ -108,7 +111,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                   <HomeIcon className="h-5 w-5 shrink-0" />
                   {(!isCollapsed || isMobile) && (
                     <span className="text-xs font-medium overflow-hidden whitespace-nowrap">
-                      {FALLBACK_HOME_MENU_ITEM.name}
+                      {homeLabel}
                     </span>
                   )}
                 </div>

@@ -117,7 +117,7 @@ export const HeaderMobileMenu: React.FC<HeaderMobileMenuProps> = ({
                       onClick={() => !item.disabled && handleItemClick(item)}
                       disabled={item.disabled}
                       className={cn(
-                        'block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors',
+                        'block w-full text-start px-3 py-2 rounded-md text-base font-medium transition-colors',
                         'text-gray-700 hover:text-gray-900 hover:bg-gray-100',
                         item.disabled && 'opacity-50 cursor-not-allowed'
                       )}
@@ -185,19 +185,19 @@ export const HeaderMobileMenu: React.FC<HeaderMobileMenuProps> = ({
               <div className="space-y-1">
                 <button
                   onClick={() => handleUserAction('profile')}
-                  className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                  className="block w-full text-start px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
                 >
                   Profile
                 </button>
                 <button
                   onClick={() => handleUserAction('settings')}
-                  className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                  className="block w-full text-start px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
                 >
                   Settings
                 </button>
                 <button
                   onClick={() => handleUserAction('logout')}
-                  className="block w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+                  className="block w-full text-start px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
                 >
                   Sign out
                 </button>

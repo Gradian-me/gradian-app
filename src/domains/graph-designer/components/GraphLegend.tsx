@@ -132,7 +132,7 @@ export function GraphLegend({
                             key={schema.id}
                             onClick={() => onToggleSchemaVisibility?.(schema.id)}
                             className={cn(
-                              "flex items-center gap-2 text-sm w-full text-left p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
+                              "flex items-center gap-2 text-sm w-full text-start p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
                               isHidden && "opacity-50"
                             )}
                           >
@@ -191,7 +191,7 @@ export function GraphLegend({
                             key={type.id}
                             onClick={() => onToggleNodeTypeVisibility?.(type.id)}
                             className={cn(
-                              "flex items-center gap-2 text-sm w-full text-left p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
+                              "flex items-center gap-2 text-sm w-full text-start p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
                               isHidden && "opacity-50"
                             )}
                           >
@@ -236,7 +236,7 @@ export function GraphLegend({
                         key={type.id}
                         onClick={() => onToggleRelationTypeVisibility?.(type.id)}
                         className={cn(
-                          "flex items-center gap-2 text-sm w-full text-left p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
+                          "flex items-center gap-2 text-sm w-full text-start p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
                           isHidden && "opacity-50"
                         )}
                       >

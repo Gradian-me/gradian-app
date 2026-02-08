@@ -2193,10 +2193,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2026-02-03T08:49:24.901Z",
+      "updatedAt": "2026-02-08T08:00:00.275Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2026-02-03T08:49:24.901Z",
+      "lastSynced": "2026-02-08T08:00:00.275Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2209,7 +2209,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 53 schemas: 53 succeeded, 0 failed (3 created, 50 updated)"
+      "lastSyncMessage": "Processed 53 schemas: 53 succeeded, 0 failed (1 created, 52 updated)"
     },
     {
       "color": "blue",
@@ -2237,8 +2237,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2026-01-06T13:59:35.844Z",
-      "lastSynced": "2026-01-06T13:59:35.844Z",
+      "updatedAt": "2026-02-08T08:00:08.169Z",
+      "lastSynced": "2026-02-08T08:00:08.169Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2251,7 +2251,7 @@
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "lastSyncMessage": "Generated relations for 50 out of 50 schemas",
+      "lastSyncMessage": "Generated relations for 54 out of 54 schemas",
       "sourceRoute": []
     },
     {
@@ -2300,9 +2300,9 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "graph_data_sync",
       "createdAt": "2025-11-22T14:38:40.167Z",
-      "updatedAt": "2026-01-06T14:01:12.756Z",
+      "updatedAt": "2026-02-08T08:01:35.455Z",
       "targetDataPath": "data",
-      "lastSynced": "2026-01-06T14:01:12.756Z",
+      "lastSynced": "2026-02-08T08:01:35.455Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2313,7 +2313,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 1363, nodes updated: 9, edges created: 183, nodes failed: 0, edges failed: 0.",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 27, nodes updated: 1365, edges created: 205, nodes failed: 0, edges failed: 0.",
       "isTenantBased": false
     },
     {
@@ -2488,8 +2488,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-02-08T05:58:28.515Z",
-      "lastSynced": "2026-02-08T05:58:28.515Z",
+      "updatedAt": "2026-02-08T08:02:03.190Z",
+      "lastSynced": "2026-02-08T08:02:03.190Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2529,7 +2529,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-02-08T05:58:33.147Z",
+      "updatedAt": "2026-02-08T08:02:10.182Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2539,8 +2539,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-02-08T05:58:33.147Z",
-      "lastSyncMessage": "Generated relations for 46 out of 46 schemas",
+      "lastSynced": "2026-02-08T08:02:10.182Z",
+      "lastSyncMessage": "Generated relations for 45 out of 45 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },

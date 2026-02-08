@@ -17,7 +17,8 @@ import { useTenantStore } from '@/stores/tenant.store';
 import { filterFormSchemas, SIDEBAR_HIGHLIGHT_CLASS } from '../utils';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { useLanguageStore } from '@/stores/language.store';
-import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { isRTL, getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getSchemaTranslatedPluralName, getSchemaTranslatedSingularName } from '@/gradian-ui/schema-manager/utils/schema-utils';
 
 interface SidebarNavigationDynamicProps {
@@ -39,6 +40,8 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
 }) => {
   const pathname = usePathname();
   const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
+  const applicationsLabel = getT(TRANSLATION_KEYS.SIDEBAR_APPLICATIONS, language, defaultLang);
   const rtl = isRTL(language);
   const tooltipSide = rtl ? 'left' : 'right';
   const tenantId = useTenantStore((state) => state.getTenantId());
@@ -362,7 +365,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                     {accordionTrigger}
                   </TooltipTrigger>
                   <TooltipContent side={tooltipSide} className="bg-gray-900 text-white border-gray-700">
-                    <p>Applications</p>
+                    <p>{applicationsLabel}</p>
                   </TooltipContent>
                 </Tooltip>
               ) : (
@@ -661,7 +664,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
             )}>
               <LayoutGrid className="h-5 w-5 shrink-0" />
               {(!isCollapsed || isMobile) && (
-                <span className="text-xs font-medium">Applications</span>
+                <span className="text-xs font-medium">{applicationsLabel}</span>
               )}
             </div>
           </div>

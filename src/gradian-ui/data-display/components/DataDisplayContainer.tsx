@@ -184,13 +184,13 @@ export const DataDisplayContainer: React.FC<DataDisplayContainerProps> = ({
               {columns.map((column: string) => (
                 <th
                   key={column}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
                   {column.replace(/([A-Z])/g, ' $1').trim()}
                 </th>
               ))}
               {actions.length > 0 && (
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               )}

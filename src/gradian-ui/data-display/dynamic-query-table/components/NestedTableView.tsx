@@ -352,7 +352,7 @@ export function NestedTableView({
             {/* Schema header row for flattened columns */}
             {flattenedColumns.length > 0 && (
               <tr className="bg-violet-200 dark:bg-violet-950/90 border-b border-gray-200 dark:border-gray-700">
-                <th className="w-10 px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300"></th>
+                <th className="w-10 px-4 py-3 text-start text-xs font-semibold text-gray-700 dark:text-gray-300"></th>
                 {/* Main schema header with action column if needed */}
                 {(() => {
                   const hasMainSchemaActions = dynamicQueryId && dynamicQueryActions && 
@@ -362,7 +362,7 @@ export function NestedTableView({
                     <th 
                       colSpan={mainSchemaColSpan} 
                       className={cn(
-                        'px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
+                        'px-4 py-3 text-start text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
                         getSchemaHeaderBorderColor(-1, false)
                       )}
                     >
@@ -380,7 +380,7 @@ export function NestedTableView({
                       key={group.schema.id}
                       colSpan={groupColSpan}
                       className={cn(
-                        'px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
+                        'px-4 py-3 text-start text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
                         getSchemaHeaderBorderColor(groupIndex, isLast)
                       )}
                     >
@@ -392,7 +392,7 @@ export function NestedTableView({
             )}
             {/* Column header row */}
             <tr>
-              <th className="w-10 px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200"></th>
+              <th className="w-10 px-4 py-3 text-start text-xs font-semibold text-gray-900 dark:text-gray-200"></th>
               {columns.map((column, colIndex) => {
                 const isLastColumn = colIndex === columns.length - 1;
                 const columnGroup = columnToGroupInfo.get(column.id);
@@ -409,7 +409,7 @@ export function NestedTableView({
                     )}
                     <th
                       className={cn(
-                        'px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider',
+                        'px-4 py-3 text-start text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider',
                         isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo)
                       )}
                     >

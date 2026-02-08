@@ -192,12 +192,12 @@ export const DynamicFilterPane = ({
             />
           </div>
           {customActions && (
-            <div className="flex items-center border-l border-gray-300 dark:border-gray-500 ps-2">
+            <div className="flex items-center border-s border-gray-300 dark:border-gray-500 ps-2">
               {customActions}
             </div>
           )}
           {showIds !== undefined && onShowIdsChange && (
-            <div className="flex items-center gap-2 border-l border-gray-300 dark:border-gray-500 ps-2">
+            <div className="flex items-center gap-2 border-s border-gray-300 dark:border-gray-500 ps-2">
               <Label htmlFor="show-ids-switch-filter" className="text-xs cursor-pointer whitespace-nowrap">
                 Show IDs
               </Label>

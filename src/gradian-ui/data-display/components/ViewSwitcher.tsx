@@ -102,7 +102,7 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
         </Button>
       )}
       {showExpandCollapse && onExpandAll && onCollapseAll && (
-        <div className="border-l border-gray-300 dark:border-gray-500 ms-1 ps-1">
+        <div className="border-s border-gray-300 dark:border-gray-500 ms-1 ps-1">
           <HierarchyExpandCollapseControls
             onExpandAll={onExpandAll}
             onCollapseAll={onCollapseAll}

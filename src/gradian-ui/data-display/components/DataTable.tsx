@@ -55,7 +55,7 @@ export const DataTable: React.FC<DataTableProps> = ({
               <th
                 key={column.key}
                 className={cn(
-                  'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+                  'px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase tracking-wider',
                   column.sortable && 'cursor-pointer hover:bg-gray-100',
                   column.align === 'center' && 'text-center',
                   column.align === 'right' && 'text-right'

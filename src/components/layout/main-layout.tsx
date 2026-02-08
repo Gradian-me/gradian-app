@@ -536,7 +536,10 @@ function MainLayoutContent({
   );
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-950 relative">
+    <div
+      className="flex h-screen bg-gray-50 dark:bg-gray-950 relative"
+      dir={rtl ? 'rtl' : 'ltr'}
+    >
       {/* Desktop Sidebar - Fixed Position (left in LTR, right in RTL) */}
       {/* Keep sidebar mounted but hidden when maximized to preserve state */}
       <div 
@@ -602,7 +605,8 @@ function MainLayoutContent({
       </AnimatePresence>
       
       {/* Main Content - Margin opposite to sidebar (left in LTR, right in RTL) */}
-      <motion.div 
+      <motion.div
+        key={rtl ? 'main-rtl' : 'main-ltr'}
         className="flex-1 flex flex-col min-h-0"
         initial={
           isMaximized

@@ -390,7 +390,7 @@ export default function AnalyticsPage() {
           transition={{ duration: 0.3 }}
           className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between md:items-center"
         >
-          <div className="text-center sm:text-left space-y-1">
+          <div className="text-center sm:text-start space-y-1">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Analytics & Reporting</h2>
             <p className="text-gray-600 dark:text-gray-400">Comprehensive insights into your business performance</p>
           </div>

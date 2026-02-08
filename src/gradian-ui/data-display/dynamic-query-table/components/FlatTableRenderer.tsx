@@ -324,7 +324,7 @@ export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, o
                     key={group.schema.id}
                     colSpan={groupColSpan}
                     className={cn(
-                      'px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
+                      'px-4 py-3 text-start text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
                       getSchemaHeaderBorderColor(groupIndex, isLast)
                     )}
                   >
@@ -351,7 +351,7 @@ export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, o
                     )}
                     <th
                       className={cn(
-                        'px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider',
+                        'px-4 py-3 text-start text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider',
                         isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo)
                       )}
                       style={{

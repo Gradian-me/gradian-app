@@ -24,10 +24,10 @@ export function NestedTableSkeleton({
           <thead className="bg-gray-100 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700">
             <tr>
               {/* Expand/collapse column */}
-              <th className="w-10 px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200"></th>
+              <th className="w-10 px-4 py-3 text-start text-xs font-semibold text-gray-900 dark:text-gray-200"></th>
               {/* ID column header (if showIds) */}
               {showIds && (
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">
+                <th className="px-4 py-3 text-start text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">
                   <Skeleton className="h-3 w-8" />
                 </th>
               )}
@@ -36,7 +36,7 @@ export function NestedTableSkeleton({
                 <th
                   key={`column-header-${colIndex}`}
                   className={cn(
-                    'px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700',
+                    'px-4 py-3 text-start text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700',
                     colIndex === columnCount - 1 && 'last:border-r-0'
                   )}
                 >

@@ -91,7 +91,7 @@
     
     for (let i = 0; i <= columnCount; i++) {
       const th = document.createElement('th');
-      th.className = 'px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider';
+      th.className = 'px-4 py-3 text-start text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider';
       const skeleton = document.createElement('div');
       skeleton.className = 'h-4 bg-gray-200 dark:bg-gray-600 rounded animate-pulse ' + skeletonWidths[i % skeletonWidths.length];
       th.appendChild(skeleton);
@@ -277,7 +277,7 @@
 
     columnConfig.forEach(function(col) {
       const th = document.createElement('th');
-      const alignClass = col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left';
+      const alignClass = col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-start';
       th.className = 'px-4 py-3 ' + alignClass + ' text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider';
       if (col.width) {
         th.style.width = typeof col.width === 'number' ? col.width + 'px' : col.width;
@@ -354,7 +354,7 @@
 
       columnConfig.forEach(function(col) {
         const td = document.createElement('td');
-        const alignClass = col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-left';
+        const alignClass = col.align === 'center' ? 'text-center' : col.align === 'right' ? 'text-right' : 'text-start';
         let cellClassName = 'px-4 py-3 text-sm text-gray-900 dark:text-gray-200 ' + alignClass;
         
         // Apply custom cell className if provided

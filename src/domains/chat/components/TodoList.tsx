@@ -706,10 +706,10 @@ export const TodoList: React.FC<TodoListProps> = ({
                   {/* Execution Plan Status Icon */}
                   {getExecutionPlanStatusIcon()}
                   <div>
-                    <div className="text-xs font-semibold text-gray-900 dark:text-gray-100 text-left">
+                    <div className="text-xs font-semibold text-gray-900 dark:text-gray-100 text-start">
                       Execution Plan
                     </div>
-                    <p className="text-[10px] text-gray-600 dark:text-gray-400 mt-0 text-left">
+                    <p className="text-[10px] text-gray-600 dark:text-gray-400 mt-0 text-start">
                       {localTodos.length} step{localTodos.length !== 1 ? 's' : ''} to execute
                     </p>
                   </div>

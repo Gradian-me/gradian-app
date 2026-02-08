@@ -310,7 +310,7 @@ export function CompanySelector({
           className={cn(
             "text-sm font-medium",
             isDarkVariant ? "text-gray-300" : "text-gray-700",
-            fullWidth ? "flex-1 text-left truncate" : ""
+            fullWidth ? "flex-1 text-start truncate" : ""
           )}
         >
           {getCompanyDisplayName(selectedCompany) || 'Loading...'}
@@ -345,7 +345,7 @@ export function CompanySelector({
           className={cn(
             "text-sm font-medium",
             isDarkVariant ? "text-gray-300" : "text-gray-700",
-            fullWidth ? "flex-1 text-left truncate" : ""
+            fullWidth ? "flex-1 text-start truncate" : ""
           )}
         >
           No companies

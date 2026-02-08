@@ -412,7 +412,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
           className={cn(
             "text-sm font-medium",
             isDarkVariant ? "text-gray-300" : "text-gray-700",
-            fullWidth ? "flex-1 text-left truncate" : ""
+            fullWidth ? "flex-1 text-start truncate" : ""
           )}
         >
           {getTenantName(selectedTenant) || 'Loading...'}
@@ -447,7 +447,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
           className={cn(
             "text-sm font-medium",
             isDarkVariant ? "text-gray-300" : "text-gray-700",
-            fullWidth ? "flex-1 text-left truncate" : ""
+            fullWidth ? "flex-1 text-start truncate" : ""
           )}
         >
           No tenants

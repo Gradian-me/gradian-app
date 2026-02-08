@@ -109,7 +109,7 @@ export function TableHeader({ children, className }: TableCellProps) {
   return (
     <th 
       className={cn(
-      "px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700 last:border-r-0",
+      "px-4 py-3 text-start text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700 last:border-r-0",
       className
     )}>
       {children ?? null}

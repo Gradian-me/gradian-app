@@ -166,7 +166,7 @@ export const formatFieldValue = (
           <button
             type="button"
             dir="auto"
-            className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium font-mono text-left max-w-full"
+            className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium font-mono text-start max-w-full"
             onClick={(e) => {
               e.stopPropagation();
             }}

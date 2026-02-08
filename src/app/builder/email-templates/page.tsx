@@ -550,7 +550,7 @@ export default function EmailTemplateBuilderPage() {
                     >
                       <button
                         onClick={() => setSelectedTemplateId(template.id)}
-                        className="w-full text-left"
+                        className="w-full text-start"
                       >
                         <div className="flex items-center justify-between gap-2 pe-6">
                           <p className="font-medium">{template.name}</p>

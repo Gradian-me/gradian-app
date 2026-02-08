@@ -52,7 +52,7 @@ export function FlatTableSkeleton({
                     key={`schema-header-${schemaIndex}`}
                     colSpan={colSpan}
                     className={cn(
-                      'px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
+                      'px-4 py-3 text-start text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
                       isLast ? 'border-r-0' : 'border-r-2 border-violet-300 dark:border-violet-600'
                     )}
                   >
@@ -72,7 +72,7 @@ export function FlatTableSkeleton({
                   <th
                     key={`column-header-${colIndex}`}
                     className={cn(
-                      'px-4 py-3 text-left text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider',
+                      'px-4 py-3 text-start text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider',
                       isLastColumn ? 'border-r-0' : isLastInSchema 
                         ? 'border-r-2 border-violet-300 dark:border-violet-600' 
                         : 'border-r border-gray-200 dark:border-gray-700'
