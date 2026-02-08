@@ -6565,5 +6565,57 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50002000000000000001",
+    "timestamp": "2026-02-08T00:00:00.000Z",
+    "version": "1.50.002",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "Expanded AI prompts in ai-prompts.json to include multiple project proposals with detailed evaluation parameters in Persian.",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "data"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "Updated timestamps in all-data.json for synchronization records.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved email template handling in page.tsx to support dynamic language translations.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "builder",
+          "i18n"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Streamlined language handling in various components to enhance internationalization support.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "i18n",
+          "form-builder",
+          "layout"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "This update enhances user experience and accessibility across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "i18n"
+        ]
+      }
+    ]
   }
 ]

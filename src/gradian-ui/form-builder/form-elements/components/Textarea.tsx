@@ -97,7 +97,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       resize === 'horizontal' && 'resize-x',
       resize === 'vertical' && 'resize-y',
       resize === 'both' && 'resize',
-      (aiAgentId || enableVoiceInput) && 'pr-12',
+      (aiAgentId || enableVoiceInput) && 'pe-12',
       className
     );
 
@@ -128,10 +128,10 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           required={required ?? config.validation?.required ?? false}
           disabled={disabled}
           className={textareaClasses}
-          style={(aiAgentId || enableVoiceInput) ? { paddingRight: '3rem' } : undefined}
+          style={(aiAgentId || enableVoiceInput) ? { paddingInlineEnd: '3rem' } : undefined}
           {...props}
         />
-          <div className="absolute right-3 top-2 flex items-center gap-1">
+          <div className="absolute end-3 top-2 flex items-center gap-1">
             {canCopy && value && (
               <CopyContent content={value} />
             )}
@@ -143,7 +143,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
             )}
           </div>
           {enableVoiceInput && (
-            <div className="absolute right-3 bottom-4 flex items-center gap-1">
+            <div className="absolute end-3 bottom-4 flex items-center gap-1">
               <TextareaVoiceInputButton
                 onClick={handleVoiceInputClick}
                 disabled={disabled}

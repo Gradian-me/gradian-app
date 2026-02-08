@@ -12,6 +12,9 @@ import { Badge as FormBadge } from '@/gradian-ui/form-builder/form-elements/comp
 import { useUserStore } from '@/stores/user.store';
 import { useLanguageStore } from '@/stores/language.store';
 import { useTheme } from 'next-themes';
+import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { ProfileSelectorConfig } from '@/gradian-ui/layout/profile-selector/types';
 import { UserProfile } from '@/gradian-ui/shared/types';
 import { AuthEventType, dispatchAuthEvent } from '@/gradian-ui/shared/utils/auth-events';
@@ -37,6 +40,8 @@ export function UserProfileSelector({
   const [triggerWidth, setTriggerWidth] = useState<number | undefined>(undefined);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const language = useLanguageStore((state) => state.language || 'en');
+  const setLanguage = useLanguageStore((state) => state.setLanguage);
+  const defaultLang = getDefaultLanguage();
   const { resolvedTheme } = useTheme();
 
   // Access user store normally - but ensure we always render placeholder until mounted
@@ -338,6 +343,16 @@ export function UserProfileSelector({
                         ))}
                       </div>
                     )}
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                      <p className="text-[11px] font-medium text-gray-600 dark:text-gray-300 mb-1.5">
+                        {getT(TRANSLATION_KEYS.LABEL_LANGUAGE, language, defaultLang)}
+                      </p>
+                      <LanguageSelector
+                        value={language || undefined}
+                        onChange={setLanguage}
+                        className="w-full"
+                      />
+                    </div>
                   </div>
 
                   <DropdownMenuPrimitive.Separator className={separatorClasses} />

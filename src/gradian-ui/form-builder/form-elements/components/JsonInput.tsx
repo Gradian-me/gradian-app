@@ -9,6 +9,9 @@ import { CopyContent } from './CopyContent';
 import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { isPrototypePollutionKey, safeObjectKeys } from '@/gradian-ui/shared/utils/security-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface JsonInputProps extends Omit<TextareaProps, 'value' | 'onChange'> {
   value?: any; // Can be object, array, or string (will be parsed)
@@ -156,11 +159,14 @@ export const JsonInput = forwardRef<FormElementRef, JsonInputProps>(
     },
     ref
   ) => {
+    const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [jsonString, setJsonString] = useState<string>('');
     const [parseError, setParseError] = useState<string | null>(null);
     const [isFocused, setIsFocused] = useState(false);
     const [validationError, setValidationError] = useState<string | null>(null);
+    const t = (key: string) => getT(key, language, defaultLang);
 
     // Convert value (object/array/string) to formatted JSON string for display
     useEffect(() => {
@@ -212,22 +218,22 @@ export const JsonInput = forwardRef<FormElementRef, JsonInputProps>(
       if (config.validation) {
         // Check required first
         if (config.validation.required) {
-          const isEmpty = value === undefined || 
-                        value === null || 
+          const isEmpty = value === undefined ||
+                        value === null ||
                         value === '' ||
                         (Array.isArray(value) && value.length === 0) ||
                         (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0);
           if (isEmpty) {
-            setValidationError('This field is required');
+            setValidationError(t(TRANSLATION_KEYS.MESSAGE_FIELD_REQUIRED));
             return;
           }
         }
 
         // Apply other validation rules if value exists
         if (value !== undefined && value !== null && value !== '') {
-          const result = validateField(value, config.validation);
+          const result = validateField(value, config.validation, { t });
           if (!result.isValid) {
-            setValidationError(result.error || 'Invalid value');
+            setValidationError(result.error || t(TRANSLATION_KEYS.MESSAGE_INVALID_VALUE));
           } else {
             setValidationError(null);
           }
@@ -237,7 +243,7 @@ export const JsonInput = forwardRef<FormElementRef, JsonInputProps>(
       } else {
         setValidationError(null);
       }
-    }, [value, parseError, config.validation, touched]);
+    }, [value, parseError, config.validation, touched, language, defaultLang]);
 
     useImperativeHandle(ref, () => ({
       focus: () => textareaRef.current?.focus(),
@@ -266,7 +272,7 @@ export const JsonInput = forwardRef<FormElementRef, JsonInputProps>(
         }
 
         // Apply other validation rules
-        const result = validateField(value, config.validation);
+        const result = validateField(value, config.validation, { t });
         return result.isValid;
       },
       reset: () => {
@@ -320,9 +326,9 @@ export const JsonInput = forwardRef<FormElementRef, JsonInputProps>(
         if (parseError) {
           setValidationError(parseError);
         } else {
-          const result = validateField(value, config.validation);
+          const result = validateField(value, config.validation, { t });
           if (!result.isValid) {
-            setValidationError(result.error || 'Invalid value');
+            setValidationError(result.error || t(TRANSLATION_KEYS.MESSAGE_INVALID_VALUE));
           }
         }
       }
@@ -382,12 +388,12 @@ export const JsonInput = forwardRef<FormElementRef, JsonInputProps>(
                   {isValidJson ? (
                     <>
                       <CheckCircle className="h-3.5 w-3.5 shrink-0" />
-                      <span>Valid</span>
+                      <span>{t(TRANSLATION_KEYS.LABEL_JSON_VALID)}</span>
                     </>
                   ) : (
                     <>
                       <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                      <span>Invalid</span>
+                      <span>{t(TRANSLATION_KEYS.LABEL_JSON_INVALID)}</span>
                     </>
                   )}
                 </div>
@@ -407,7 +413,7 @@ export const JsonInput = forwardRef<FormElementRef, JsonInputProps>(
             onChange={handleChange}
             onBlur={handleBlur}
             onFocus={handleFocus}
-            placeholder={config.placeholder || 'Enter JSON (object or array)...'}
+            placeholder={config.placeholder || t(TRANSLATION_KEYS.PLACEHOLDER_JSON_INPUT)}
             rows={rows}
             cols={cols}
             maxLength={MAX_JSON_STRING_LENGTH}

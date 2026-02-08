@@ -1795,12 +1795,12 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         variant="destructive"
         buttons={[
           {
-            label: 'Cancel',
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
             variant: 'outline',
             action: () => setDeleteConfirmDialog({ open: false, entity: null }),
           },
           {
-            label: 'Delete',
+            label: getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang),
             variant: 'destructive',
             icon: 'Trash2',
             action: confirmDelete,

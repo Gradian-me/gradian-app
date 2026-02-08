@@ -1,6 +1,9 @@
 'use client';
 
 import { ConfirmationMessage } from '@/gradian-ui/form-builder';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 interface DeleteConfirmDialogProps {
   open: boolean;
@@ -10,6 +13,8 @@ interface DeleteConfirmDialogProps {
 }
 
 export function DeleteConfirmDialog({ open, onOpenChange, type, onConfirm }: DeleteConfirmDialogProps) {
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
   return (
     <ConfirmationMessage
       isOpen={open}
@@ -19,12 +24,12 @@ export function DeleteConfirmDialog({ open, onOpenChange, type, onConfirm }: Del
       variant="destructive"
       buttons={[
         {
-          label: 'Cancel',
+          label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
           variant: 'outline',
           action: () => onOpenChange(false),
         },
         {
-          label: 'Delete',
+          label: getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang),
           variant: 'destructive',
           icon: 'Trash2',
           action: onConfirm,

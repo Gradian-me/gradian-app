@@ -2488,8 +2488,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-02-03T12:40:48.790Z",
-      "lastSynced": "2026-02-03T12:40:48.790Z",
+      "updatedAt": "2026-02-08T05:58:28.515Z",
+      "lastSynced": "2026-02-08T05:58:28.515Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2529,7 +2529,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-02-03T12:41:04.422Z",
+      "updatedAt": "2026-02-08T05:58:33.147Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2539,7 +2539,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-02-03T12:41:04.422Z",
+      "lastSynced": "2026-02-08T05:58:33.147Z",
       "lastSyncMessage": "Generated relations for 46 out of 46 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"

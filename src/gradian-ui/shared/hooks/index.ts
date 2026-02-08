@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ulid } from 'ulid';
 import type { ComponentHookData, ComponentConfig } from '../types';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '../constants/translations';
 
 /**
  * Hook for managing async component data with loading and error states
@@ -47,6 +50,8 @@ export const useFormState = <T extends Record<string, any>>(
   initialValues: T,
   validationRules?: Partial<Record<keyof T, any>>
 ) => {
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
   const [values, setValues] = useState<T>(initialValues);
   const [errors, setErrors] = useState<Partial<Record<keyof T, string>>>({});
   const [touched, setTouched] = useState<Partial<Record<keyof T, boolean>>>({});
@@ -102,24 +107,27 @@ export const useFormState = <T extends Record<string, any>>(
     const value = values[field];
 
     if (rule.required && (!value || value.toString().trim() === '')) {
-      setErrors(prev => ({ ...prev, [field]: 'This field is required' }));
+      setErrors(prev => ({ ...prev, [field]: getT(TRANSLATION_KEYS.MESSAGE_FIELD_REQUIRED, language, defaultLang) }));
       return false;
     }
 
     if (value && rule.minLength && value.toString().length < rule.minLength) {
-      setErrors(prev => ({ ...prev, [field]: `Minimum length is ${rule.minLength}` }));
+      const msg = getT(TRANSLATION_KEYS.MESSAGE_MIN_LENGTH, language, defaultLang).replace('{min}', String(rule.minLength));
+      setErrors(prev => ({ ...prev, [field]: msg }));
       return false;
     }
 
     if (value && rule.maxLength && value.toString().length > rule.maxLength) {
-      setErrors(prev => ({ ...prev, [field]: `Maximum length is ${rule.maxLength}` }));
+      const msg = getT(TRANSLATION_KEYS.MESSAGE_MAX_LENGTH, language, defaultLang).replace('{max}', String(rule.maxLength));
+      setErrors(prev => ({ ...prev, [field]: msg }));
       return false;
     }
 
     if (value && rule.min !== undefined) {
       const numValue = Number(value);
       if (isNaN(numValue) || numValue < rule.min) {
-        setErrors(prev => ({ ...prev, [field]: `Minimum value is ${rule.min}` }));
+        const msg = getT(TRANSLATION_KEYS.MESSAGE_MIN_VALUE, language, defaultLang).replace('{min}', String(rule.min));
+        setErrors(prev => ({ ...prev, [field]: msg }));
         return false;
       }
     }
@@ -127,7 +135,8 @@ export const useFormState = <T extends Record<string, any>>(
     if (value && rule.max !== undefined) {
       const numValue = Number(value);
       if (isNaN(numValue) || numValue > rule.max) {
-        setErrors(prev => ({ ...prev, [field]: `Maximum value is ${rule.max}` }));
+        const msg = getT(TRANSLATION_KEYS.MESSAGE_MAX_VALUE, language, defaultLang).replace('{max}', String(rule.max));
+        setErrors(prev => ({ ...prev, [field]: msg }));
         return false;
       }
     }
@@ -136,7 +145,7 @@ export const useFormState = <T extends Record<string, any>>(
       const pattern = toRegExp(rule.pattern);
 
       if (pattern && typeof pattern.test === 'function' && !pattern.test(value.toString())) {
-        setErrors(prev => ({ ...prev, [field]: 'Invalid format' }));
+        setErrors(prev => ({ ...prev, [field]: getT(TRANSLATION_KEYS.MESSAGE_INVALID_FORMAT, language, defaultLang) }));
         return false;
       }
     }
@@ -146,21 +155,21 @@ export const useFormState = <T extends Record<string, any>>(
       if (typeof result === 'object' && result !== null) {
         const { isValid, error } = result as { isValid: boolean; error?: string };
         if (!isValid) {
-          setErrors(prev => ({ ...prev, [field]: error || 'Invalid value' }));
+          setErrors(prev => ({ ...prev, [field]: error || getT(TRANSLATION_KEYS.MESSAGE_INVALID_VALUE, language, defaultLang) }));
           return false;
         }
       } else if (typeof result === 'string') {
         setErrors(prev => ({ ...prev, [field]: result }));
         return false;
       } else if (!result) {
-        setErrors(prev => ({ ...prev, [field]: 'Invalid value' }));
+        setErrors(prev => ({ ...prev, [field]: getT(TRANSLATION_KEYS.MESSAGE_INVALID_VALUE, language, defaultLang) }));
         return false;
       }
     }
 
     setErrors(prev => ({ ...prev, [field]: undefined }));
     return true;
-  }, [values, validationRules]);
+  }, [values, validationRules, language, defaultLang]);
 
   const validateForm = useCallback(() => {
     if (!validationRules) return true;

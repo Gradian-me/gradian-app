@@ -12,6 +12,9 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { CardSectionEditor } from './CardSectionEditor';
 import { AddButtonFull } from '@/gradian-ui/form-builder/form-elements/components/AddButtonFull';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 import { ensureKebabCase } from '@/gradian-ui/shared/utils/text-utils';
 
 interface CardMetadataTabProps {
@@ -26,6 +29,8 @@ export function CardMetadataTab({ schema, onUpdate }: CardMetadataTabProps) {
   const [editingSectionDraft, setEditingSectionDraft] = useState<CardSection | null>(null);
   const [editingCustomId, setEditingCustomId] = useState(false);
   const cardMetadata = schema.cardMetadata || [];
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
 
   const allFields = schema.fields || [];
   const availableFields = allFields.filter(f => !f.inactive);
@@ -301,12 +306,12 @@ export function CardMetadataTab({ schema, onUpdate }: CardMetadataTabProps) {
         variant="destructive"
         buttons={[
           {
-            label: 'Cancel',
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
             variant: 'outline',
             action: () => setDeleteConfirmSectionId(null),
           },
           {
-            label: 'Delete',
+            label: getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang),
             variant: 'destructive',
             icon: 'Trash2',
             action: () => {

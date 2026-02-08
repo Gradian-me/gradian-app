@@ -25,6 +25,8 @@ import { Badge } from '@/gradian-ui/form-builder/form-elements/components/Badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useUserStore } from '@/stores/user.store';
 import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { formatRelativeTime, formatTime } from '@/gradian-ui/shared/utils/date-utils';
 import { processTextWithStyledHashtagsAndMentions } from '@/gradian-ui/shared/utils/text-utils';
 import { MessageMetadataDialog } from './MessageMetadataDialog';
@@ -136,6 +138,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   const isAssistant = message.role === 'assistant';
   const user = useUserStore((state) => state.user);
   const language = useLanguageStore((state) => state.language || 'en');
+  const defaultLang = getDefaultLanguage();
+  const aiGeneratedContentLabel = getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang);
   const [isMetadataDialogOpen, setIsMetadataDialogOpen] = useState(false);
 
   // Get user display name and initials for avatar
@@ -953,7 +957,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                     <CodeViewer
                       code={typeof jsonData === 'string' ? jsonData : JSON.stringify(jsonData, null, 2)}
                       programmingLanguage="json"
-                      title={message.metadata?.todoTitle || 'AI Generated Content'}
+                      title={message.metadata?.todoTitle || aiGeneratedContentLabel}
                       initialLineNumbers={10}
                     />
                   );
@@ -1011,7 +1015,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   <CodeViewer
                     code={typeof parsedContent === 'string' ? parsedContent : JSON.stringify(parsedContent, null, 2)}
                     programmingLanguage="text"
-                    title={message.metadata?.todoTitle || 'AI Generated Content'}
+                    title={message.metadata?.todoTitle || aiGeneratedContentLabel}
                     initialLineNumbers={10}
                   />
                 );

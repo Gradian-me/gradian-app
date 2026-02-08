@@ -27,8 +27,11 @@ import { TextSwitcher } from '@/components/ui/text-switcher';
 import { cleanMarkdownResponse } from '@/domains/ai-builder/utils/ai-security-utils';
 import { Badge } from '@/components/ui/badge';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
+import { useLanguageStore } from '@/stores/language.store';
 import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
 import {
   Dialog,
@@ -75,6 +78,8 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   const [showMaximizeDialog, setShowMaximizeDialog] = useState(false);
   const autoExecuteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isCurrentlyLoadingRef = useRef(false);
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
 
   const {
     aiResponse,
@@ -82,6 +87,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     error,
     generateResponse,
     loadPreloadRoutes,
+    clearResponse,
   } = useAiBuilder();
 
   // Utility function to parse JSON and extract array data for tables
@@ -602,8 +608,9 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     setShowRefreshConfirmation(false);
     setHasExecuted(false);
     isCurrentlyLoadingRef.current = false;
+    clearResponse();
     executeAgent();
-  }, [executeAgent]);
+  }, [clearResponse, executeAgent]);
 
   // Define variables needed for renderContent (before early returns to maintain hook order)
   // These are safe to compute even if agent is null
@@ -658,7 +665,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               className="rounded-xl overflow-hidden"
             />
             {agent?.loadingTextSwitches && agent.loadingTextSwitches.length > 0 && (
-              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4">
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4" dir="ltr">
                 <div className="max-w-[85%] text-center">
                   <TextSwitcher
                     texts={agent.loadingTextSwitches}
@@ -710,7 +717,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               <CodeViewer
                 code={aiResponse}
                 programmingLanguage="json"
-                title="AI Generated Content"
+                title={getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang)}
                 initialLineNumbers={10}
               />
             )
@@ -734,7 +741,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               <CodeViewer
                 code={aiResponse}
                 programmingLanguage="json"
-                title="AI Generated Content"
+                title={getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang)}
                 initialLineNumbers={10}
               />
             )
@@ -771,7 +778,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               <CodeViewer
                 code={aiResponse}
                 programmingLanguage="json"
-                title="AI Generated Content"
+                title={getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang)}
                 initialLineNumbers={10}
               />
             )
@@ -795,7 +802,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
             <CodeViewer
               code={aiResponse}
               programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
-              title="AI Generated Content"
+              title={getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang)}
               initialLineNumbers={10}
             />
           )}
@@ -957,7 +964,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
                 enableVoiceControl={false}
                 className="rounded-xl overflow-hidden"
               />
-              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4">
+              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4" dir="ltr">
                 <div className="max-w-[85%] text-center">
                   <TextSwitcher
                     texts={['Loading agent...', 'Preparing AI...']}
@@ -1067,16 +1074,16 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
       <ConfirmationMessage
         isOpen={showRefreshConfirmation}
         onOpenChange={setShowRefreshConfirmation}
-        title={[{ en: 'Refresh AI Analysis' }, { fa: 'بروزرسانی تحلیل هوش مصنوعی' }, { ar: 'تحديث تحليل الذكاء الاصطناعي' }, { es: 'Actualizar análisis IA' }, { fr: 'Actualiser l\'analyse IA' }, { de: 'KI-Analyse aktualisieren' }, { it: 'Aggiorna analisi IA' }, { ru: 'Обновить анализ ИИ' }]}
-        message={[{ en: 'Are you sure you want to refresh this analysis? This will regenerate the AI response and may take some time.' }, { fa: 'آیا مطمئن هستید که می‌خواهید این تحلیل را بروزرسانی کنید؟ پاسخ هوش مصنوعی دوباره تولید شده و ممکن است زمان ببرد.' }, { ar: 'هل أنت متأكد أنك تريد تحديث هذا التحليل؟ سيتم إعادة إنشاء استجابة الذكاء الاصطناعي وقد يستغرق ذلك بعض الوقت.' }, { es: '¿Está seguro de que desea actualizar este análisis? Se regenerará la respuesta de IA y puede tardar un poco.' }, { fr: 'Voulez-vous vraiment actualiser cette analyse ? La réponse IA sera régénérée et cela peut prendre du temps.' }, { de: 'Möchten Sie diese Analyse wirklich aktualisieren? Die KI-Antwort wird neu generiert und kann einige Zeit dauern.' }, { it: 'Sei sicuro di voler aggiornare questa analisi? La risposta IA verrà rigenerata e potrebbe richiedere tempo.' }, { ru: 'Вы уверены, что хотите обновить этот анализ? Ответ ИИ будет сгенерирован заново и это может занять время.' }]}
+        title={[{ en: 'Previous result will be lost' }, { fa: 'نتیجه قبلی از بین می‌رود' }, { ar: 'ستفقد النتيجة السابقة' }, { es: 'Se perderá el resultado anterior' }, { fr: 'Le résultat précédent sera perdu' }, { de: 'Das vorherige Ergebnis geht verloren' }, { it: 'Il risultato precedente andrà perso' }, { ru: 'Предыдущий результат будет потерян' }]}
+        message={[{ en: 'Running again will clear the current response and generate a new one. Do you want to continue?' }, { fa: 'اجرای دوباره پاسخ فعلی را پاک کرده و پاسخ جدید تولید می‌کند. ادامه می‌دهید؟' }, { ar: 'التشغيل مرة أخرى سيمسح الاستجابة الحالية وينشئ واحدة جديدة. هل تريد المتابعة؟' }, { es: 'Ejecutar de nuevo borrará la respuesta actual y generará una nueva. ¿Desea continuar?' }, { fr: 'Relancer effacera la réponse actuelle et en générera une nouvelle. Voulez-vous continuer ?' }, { de: 'Bei erneuter Ausführung wird die aktuelle Antwort gelöscht und eine neue erstellt. Möchten Sie fortfahren?' }, { it: 'Eseguire di nuovo cancellerà la risposta attuale e ne genererà una nuova. Vuoi continuare?' }, { ru: 'Повторный запуск удалит текущий ответ и создаст новый. Продолжить?' }]}
         buttons={[
           {
-            label: 'Cancel',
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
             variant: 'outline',
             action: () => setShowRefreshConfirmation(false),
           },
           {
-            label: 'Refresh',
+            label: getT(TRANSLATION_KEYS.BUTTON_REFRESH, language, defaultLang),
             variant: 'default',
             action: handleRefreshConfirm,
             icon: 'RefreshCw',

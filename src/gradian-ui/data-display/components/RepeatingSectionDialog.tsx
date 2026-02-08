@@ -18,6 +18,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Plus, List } from 'lucide-react';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
@@ -95,6 +98,9 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
     relationId: null,
     targetId: null,
   });
+
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
 
   // Get parent entity title using getValueByRole
   const parentTitle = useMemo(() => {
@@ -603,12 +609,12 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
         variant={repeatingConfig?.deleteType === 'relationOnly' ? 'default' : 'destructive'}
         buttons={[
           {
-            label: 'Cancel',
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
             variant: 'outline',
             action: () => setDeleteConfirmDialog({ open: false, relationId: null, targetId: null }),
           },
           {
-            label: repeatingConfig?.deleteType === 'relationOnly' ? 'Remove' : 'Delete',
+            label: repeatingConfig?.deleteType === 'relationOnly' ? getT(TRANSLATION_KEYS.BUTTON_REMOVE, language, defaultLang) : getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang),
             variant: repeatingConfig?.deleteType === 'relationOnly' ? 'default' : 'destructive',
             icon: 'Trash2',
             action: () => {

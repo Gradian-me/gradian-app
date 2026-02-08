@@ -17,6 +17,9 @@ import { buildFormFillerPreloadRoutes } from '../utils/form-filler-routes';
 import { validateAndTransformFormData } from '../utils/form-filler-validator';
 import { populateFormFields } from '../utils/form-filler-populator';
 import { useAiResponseStore } from '@/stores/ai-response.store';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface AiFormFillerDialogProps {
   isOpen: boolean;
@@ -51,6 +54,9 @@ export function AiFormFillerDialog({
   const [pendingData, setPendingData] = useState<Record<string, any> | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('en');
+
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
 
   // Get latest response from store
   const latestResponse = useAiResponseStore((state) => {
@@ -242,13 +248,17 @@ export function AiFormFillerDialog({
     return null;
   }
 
+  const titleFillForm = getT(TRANSLATION_KEYS.TITLE_FILL_FORM_WITH_AI, language, defaultLang);
+  const descriptionFillForm = getT(TRANSLATION_KEYS.DESCRIPTION_FILL_FORM_WITH_AI, language, defaultLang);
+  const buttonFillForm = getT(TRANSLATION_KEYS.BUTTON_FILL_FORM, language, defaultLang);
+
   return (
     <>
       <Modal
         isOpen={isOpen && !showConfirmation}
         onClose={onClose}
-        title="Fill Form with AI"
-        description="Describe what you want in the form, and AI will generate and populate the data for you."
+        title={titleFillForm}
+        description={descriptionFillForm}
         size="xl"
         showCloseButton={true}
         footerLeftActions={
@@ -263,7 +273,7 @@ export function AiFormFillerDialog({
                 onClick={handleFillForm}
                 className="ml-auto"
               >
-                Fill Form
+                {buttonFillForm}
               </Button>
             </div>
           ) : undefined
@@ -301,12 +311,12 @@ export function AiFormFillerDialog({
         variant="warning"
         buttons={[
           {
-            label: 'Cancel',
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
             variant: 'outline',
             action: handleCancelReplace,
           },
           {
-            label: 'Replace All',
+            label: getT(TRANSLATION_KEYS.BUTTON_REPLACE_ALL, language, defaultLang),
             variant: 'destructive',
             action: handleConfirmReplace,
             icon: 'AlertTriangle',

@@ -209,7 +209,7 @@ export function PromptPreviewSheet({
                                 enableVoiceControl={false}
                                 className="rounded-xl overflow-hidden"
                               />
-                              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4">
+                              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4" dir="ltr">
                                 <div className="max-w-[85%]">
                                   <TextSwitcher
                                     texts={['Summarizing prompt...', 'Preparing summary...', 'Analyzing content...']}

@@ -1,4 +1,22 @@
 import type { ComponentConfig, ValidationRule, ChartDataPoint } from '../types';
+import { TRANSLATION_KEYS } from '../constants/translations';
+import { getGlobalTranslator } from './global-translator';
+
+export interface ValidateFieldOptions {
+  /** When provided, error messages are translated using t(translationKey) */
+  t?: (key: string) => string;
+}
+
+/**
+ * Replaces {key} placeholders in a message string.
+ */
+function replaceParams(msg: string, params: Record<string, number | string>): string {
+  let out = msg;
+  for (const [key, val] of Object.entries(params)) {
+    out = out.replace(new RegExp(`\\{${key}\\}`, 'g'), String(val));
+  }
+  return out;
+}
 
 /**
  * Generates a unique ID for components
@@ -17,43 +35,57 @@ export const cn = (...classes: (string | undefined | null | false | 0)[]): strin
 };
 
 /**
- * Validates form field value based on validation rules
+ * Validates form field value based on validation rules.
+ * Pass options.t (e.g. (key) => getT(key, language, defaultLang)) to get translated error messages.
  */
 export const validateField = (
   value: any,
-  rules: ValidationRule
+  rules: ValidationRule,
+  options?: ValidateFieldOptions
 ): { isValid: boolean; error?: string } => {
+  const t = options?.t ?? getGlobalTranslator();
+  const err = (key: string, params?: Record<string, number | string>) => {
+    if (t) {
+      const msg = t(key);
+      return params ? replaceParams(msg, params) : msg;
+    }
+    return undefined;
+  };
+
   if (rules.required) {
-    // Check for empty values (including empty arrays)
-    const isEmpty = value === undefined || 
-                    value === null || 
-                    value === '' || 
+    const isEmpty = value === undefined ||
+                    value === null ||
+                    value === '' ||
                     (Array.isArray(value) && value.length === 0) ||
                     (!Array.isArray(value) && value.toString().trim() === '');
     if (isEmpty) {
-      return { isValid: false, error: 'This field is required' };
+      return { isValid: false, error: t ? (err(TRANSLATION_KEYS.MESSAGE_FIELD_REQUIRED) ?? 'This field is required') : 'This field is required' };
     }
   }
 
   if (value && rules.minLength && value.toString().length < rules.minLength) {
-    return { isValid: false, error: `Minimum length is ${rules.minLength}` };
+    const msg = t ? (err(TRANSLATION_KEYS.MESSAGE_MIN_LENGTH, { min: rules.minLength }) ?? `Minimum length is ${rules.minLength}`) : `Minimum length is ${rules.minLength}`;
+    return { isValid: false, error: msg };
   }
 
   if (value && rules.maxLength && value.toString().length > rules.maxLength) {
-    return { isValid: false, error: `Maximum length is ${rules.maxLength}` };
+    const msg = t ? (err(TRANSLATION_KEYS.MESSAGE_MAX_LENGTH, { max: rules.maxLength }) ?? `Maximum length is ${rules.maxLength}`) : `Maximum length is ${rules.maxLength}`;
+    return { isValid: false, error: msg };
   }
 
   if (value && rules.min !== undefined) {
     const numValue = Number(value);
     if (isNaN(numValue) || numValue < rules.min) {
-      return { isValid: false, error: `Minimum value is ${rules.min}` };
+      const msg = t ? (err(TRANSLATION_KEYS.MESSAGE_MIN_VALUE, { min: rules.min }) ?? `Minimum value is ${rules.min}`) : `Minimum value is ${rules.min}`;
+      return { isValid: false, error: msg };
     }
   }
 
   if (value && rules.max !== undefined) {
     const numValue = Number(value);
     if (isNaN(numValue) || numValue > rules.max) {
-      return { isValid: false, error: `Maximum value is ${rules.max}` };
+      const msg = t ? (err(TRANSLATION_KEYS.MESSAGE_MAX_VALUE, { max: rules.max }) ?? `Maximum value is ${rules.max}`) : `Maximum value is ${rules.max}`;
+      return { isValid: false, error: msg };
     }
   }
 
@@ -61,24 +93,18 @@ export const validateField = (
     const pattern = toRegExp(rules.pattern);
 
     if (pattern && typeof pattern.test === 'function') {
-      // Handle arrays (list-input fields): validate each item's label
       if (Array.isArray(value)) {
         for (const item of value) {
-          // Extract label from item (could be object with label property or just a string)
           const itemLabel = typeof item === 'string' ? item : (item?.label || item?.value || String(item));
-          
-          // Trim the label before validation to handle whitespace
           const trimmedLabel = itemLabel ? String(itemLabel).trim() : '';
-          
           if (trimmedLabel && !pattern.test(trimmedLabel)) {
-            return { isValid: false, error: 'Invalid format' };
+            return { isValid: false, error: t ? (err(TRANSLATION_KEYS.MESSAGE_INVALID_FORMAT) ?? 'Invalid format') : 'Invalid format' };
           }
         }
       } else {
-        // Standard validation for non-array fields - trim string values
         const testValue = typeof value === 'string' ? value.trim() : value.toString();
         if (!pattern.test(testValue)) {
-          return { isValid: false, error: 'Invalid format' };
+          return { isValid: false, error: t ? (err(TRANSLATION_KEYS.MESSAGE_INVALID_FORMAT) ?? 'Invalid format') : 'Invalid format' };
         }
       }
     }
@@ -93,7 +119,7 @@ export const validateField = (
       return { isValid: false, error: result };
     }
     if (!result) {
-      return { isValid: false, error: 'Invalid value' };
+      return { isValid: false, error: t ? (err(TRANSLATION_KEYS.MESSAGE_INVALID_VALUE) ?? 'Invalid value') : 'Invalid value' };
     }
   }
 

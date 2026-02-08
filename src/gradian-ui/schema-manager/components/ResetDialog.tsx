@@ -1,6 +1,9 @@
 'use client';
 
 import { ConfirmationMessage } from '@/gradian-ui/form-builder';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 interface ResetDialogProps {
   open: boolean;
@@ -9,6 +12,8 @@ interface ResetDialogProps {
 }
 
 export function ResetDialog({ open, onOpenChange, onConfirm }: ResetDialogProps) {
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
   return (
     <ConfirmationMessage
       isOpen={open}
@@ -18,12 +23,12 @@ export function ResetDialog({ open, onOpenChange, onConfirm }: ResetDialogProps)
       variant="warning"
       buttons={[
         {
-          label: 'Cancel',
+          label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
           variant: 'outline',
           action: () => onOpenChange(false),
         },
         {
-          label: 'Reset Changes',
+          label: getT(TRANSLATION_KEYS.BUTTON_RESET_CHANGES, language, defaultLang),
           variant: 'destructive',
           action: onConfirm,
         },

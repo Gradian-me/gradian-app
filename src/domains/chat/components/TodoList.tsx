@@ -11,6 +11,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 import { CardWrapper, CardHeader, CardTitle, CardContent } from '@/gradian-ui/data-display/card/components/CardWrapper';
 import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card';
 import { TodoResponseDialog } from './TodoResponseDialog';
@@ -95,6 +98,8 @@ export const TodoList: React.FC<TodoListProps> = ({
   onExpandedChange,
   className,
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
   const [localTodos, setLocalTodos] = useState<Todo[]>(todos);
   const [executingTodoId, setExecutingTodoId] = useState<string | null>(null);
   const [selectedTodoForDialog, setSelectedTodoForDialog] = useState<Todo | null>(null);
@@ -917,7 +922,7 @@ export const TodoList: React.FC<TodoListProps> = ({
         size="md"
         buttons={[
           {
-            label: 'Cancel',
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
             variant: 'outline',
             action: () => {
               setIsDeleteDialogOpen(false);
@@ -925,7 +930,7 @@ export const TodoList: React.FC<TodoListProps> = ({
             },
           },
           {
-            label: 'Delete',
+            label: getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang),
             variant: 'destructive',
             icon: 'Trash2',
             action: handleConfirmDelete,

@@ -7,6 +7,9 @@ import { Plus, Trash2 } from 'lucide-react';
 import { TextInput, Textarea, Select, ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements';
 import { AiAgent } from '../../../types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 interface PreloadRoutesTabProps {
   agent: AiAgent;
@@ -17,6 +20,8 @@ interface PreloadRoutesTabProps {
 export function PreloadRoutesTab({ agent, onUpdate, readonly = false }: PreloadRoutesTabProps) {
   const preloadRoutes = agent.preloadRoutes || [];
   const [deleteConfirmIndex, setDeleteConfirmIndex] = useState<number | null>(null);
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
 
   const addRoute = () => {
     const newRoute: any = {
@@ -161,12 +166,12 @@ export function PreloadRoutesTab({ agent, onUpdate, readonly = false }: PreloadR
           variant="warning"
           buttons={[
             {
-              label: 'Cancel',
+              label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
               variant: 'outline',
               action: () => setDeleteConfirmIndex(null),
             },
             {
-              label: 'Delete',
+              label: getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang),
               variant: 'destructive',
               action: () => deleteConfirmIndex !== null && deleteRoute(deleteConfirmIndex),
             },

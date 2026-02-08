@@ -7,6 +7,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { ModalProps } from '../types';
 import { cn } from '../../shared/utils';
 import { Button } from '@/components/ui/button';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const Modal: React.FC<ModalProps> = ({
   isOpen,
@@ -25,6 +28,10 @@ export const Modal: React.FC<ModalProps> = ({
   headerActions,
   ...props
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const closeButtonLabel = getT(TRANSLATION_KEYS.BUTTON_CLOSE, language, defaultLang);
+
   const sizeClasses = {
     sm: 'max-w-md',
     md: 'md:max-w-4xl',
@@ -97,7 +104,7 @@ export const Modal: React.FC<ModalProps> = ({
               </div>
             )}
             <Button variant="outline" onClick={onClose}>
-              Close
+              {closeButtonLabel}
             </Button>
           </div>
         )}

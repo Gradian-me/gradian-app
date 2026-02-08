@@ -11,6 +11,9 @@ import { useSchemas as useSchemaSummaries } from '@/gradian-ui/schema-manager/ho
 import { useTenantStore } from '@/stores/tenant.store';
 import { FormModal } from '@/gradian-ui/form-builder';
 import { ConfirmationMessage, PopupPicker } from '@/gradian-ui/form-builder/form-elements';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 import { getValueByRole } from '@/gradian-ui/data-display/utils';
 import { getPrimaryDisplayString, hasDisplayValue } from '@/gradian-ui/data-display/utils/value-display';
 import { useGraphStore } from '../hooks/useGraphStore';
@@ -189,6 +192,8 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
   const [edgeModeEnabled, setEdgeModeEnabled] = useState(false);
   const [sidebarVisible, setSidebarVisible] = useState(!viewMode); // Hide sidebar in view mode
   const [showResetConfirmation, setShowResetConfirmation] = useState(false);
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
 
   const canvasHandleRef = useRef<GraphCanvasHandle | null>(null);
   const formJustSavedRef = useRef(false);
@@ -589,12 +594,12 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
         variant="destructive"
         buttons={[
           {
-            label: 'Cancel',
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
             variant: 'outline',
             action: closeDeleteConfirmation,
           },
           {
-            label: 'Delete',
+            label: getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang),
             variant: 'destructive',
             icon: 'Trash2',
             action: confirmDelete,
@@ -613,12 +618,12 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
         variant="warning"
         buttons={[
           {
-            label: 'Cancel',
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
             variant: 'outline',
             action: () => setShowResetConfirmation(false),
           },
           {
-            label: 'Reset Graph',
+            label: getT(TRANSLATION_KEYS.BUTTON_RESET_GRAPH, language, defaultLang),
             variant: 'destructive',
             icon: 'RotateCcw',
             action: confirmReset,
@@ -720,7 +725,7 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
           subtitle={deleteConfirmation.type === 'node' ? [{ en: 'This will permanently remove the node and all its connected edges from the graph.' }, { fa: 'گره و تمام یال‌های متصل به آن به طور دائمی از گراف حذف می‌شوند.' }, { ar: 'سيتم إزالة العقدة وجميع الحواف المتصلة بها بشكل دائم من الرسم البياني.' }, { es: 'Esto eliminará permanentemente el nodo y todas sus aristas conectadas del grafo.' }, { fr: 'Le nœud et toutes ses arêtes connectées seront définitivement supprimés du graphe.' }, { de: 'Der Knoten und alle verbundenen Kanten werden dauerhaft aus dem Graphen entfernt.' }, { it: 'Il nodo e tutti i bordi collegati verranno rimossi permanentemente dal grafico.' }, { ru: 'Узел и все связанные рёбра будут окончательно удалены из графа.' }] : [{ en: 'This will permanently remove the edge from the graph.' }, { fa: 'یال به طور دائمی از گراف حذف می‌شود.' }, { ar: 'سيتم إزالة الحافة بشكل دائم من الرسم البياني.' }, { es: 'Esto eliminará permanentemente la arista del grafo.' }, { fr: 'L\'arête sera définitivement supprimée du graphe.' }, { de: 'Die Kante wird dauerhaft aus dem Graphen entfernt.' }, { it: 'Il bordo verrà rimosso permanentemente dal grafico.' }, { ru: 'Ребро будет окончательно удалено из графа.' }]}
           message={deleteConfirmation.type === 'node' && deleteConfirmation.item ? `Are you sure you want to delete the node "${(deleteConfirmation.item as GraphNodeData).title || deleteConfirmation.item.id}"?` : deleteConfirmation.type === 'edge' ? [{ en: 'Are you sure you want to delete this edge?' }, { fa: 'آیا مطمئن هستید که می‌خواهید این یال را حذف کنید؟' }, { ar: 'هل أنت متأكد أنك تريد حذف هذه الحافة؟' }, { es: '¿Está seguro de que desea eliminar esta arista?' }, { fr: 'Voulez-vous vraiment supprimer cette arête ?' }, { de: 'Möchten Sie diese Kante wirklich löschen?' }, { it: 'Sei sicuro di voler eliminare questo bordo?' }, { ru: 'Вы уверены, что хотите удалить это ребро?' }] : ''}
           variant="destructive"
-          buttons={[{ label: 'Cancel', variant: 'outline', action: closeDeleteConfirmation }, { label: 'Delete', variant: 'destructive', icon: 'Trash2', action: confirmDelete }]}
+          buttons={[{ label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang), variant: 'outline', action: closeDeleteConfirmation }, { label: getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang), variant: 'destructive', icon: 'Trash2', action: confirmDelete }]}
         />
       )}
       {!viewMode && (
@@ -731,7 +736,7 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
           subtitle={[{ en: 'This will permanently clear all nodes and edges from the current graph.' }, { fa: 'همه گره‌ها و یال‌ها به طور دائمی از گراف فعلی پاک می‌شوند.' }, { ar: 'سيؤدي هذا إلى مسح جميع العقد والحواف بشكل دائم من الرسم البياني الحالي.' }, { es: 'Esto borrará permanentemente todos los nodos y aristas del grafo actual.' }, { fr: 'Cela effacera définitivement tous les nœuds et arêtes du graphe actuel.' }, { de: 'Alle Knoten und Kanten werden dauerhaft aus dem aktuellen Graphen gelöscht.' }, { it: 'Tutti i nodi e i bordi verranno rimossi permanentemente dal grafico corrente.' }, { ru: 'Все узлы и рёбра будут окончательно удалены из текущего графа.' }]}
           message={[{ en: `Are you sure you want to reset the graph? This action cannot be undone. You will lose all ${nodes.length} node(s) and ${edges.length} edge(s).` }, { fa: `آیا مطمئن هستید که می‌خواهید گراف را بازنشانی کنید؟ این عمل قابل بازگشت نیست. ${nodes.length} گره و ${edges.length} یال از دست خواهند رفت.` }, { ar: `هل أنت متأكد أنك تريد إعادة تعيين الرسم البياني؟ لا يمكن التراجع عن هذا الإجراء. ستفقد ${nodes.length} عقدة و${edges.length} حافة.` }, { es: `¿Está seguro de que desea restablecer el grafo? Esta acción no se puede deshacer. Perderá ${nodes.length} nodo(s) y ${edges.length} arista(s).` }, { fr: `Voulez-vous vraiment réinitialiser le graphe ? Cette action est irréversible. Vous perdrez ${nodes.length} nœud(s) et ${edges.length} arête(s).` }, { de: `Möchten Sie den Graphen wirklich zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden. Sie verlieren ${nodes.length} Knoten und ${edges.length} Kanten.` }, { it: `Sei sicuro di voler reimpostare il grafico? Questa azione non può essere annullata. Perderai ${nodes.length} nodo/i e ${edges.length} bordo/i.` }, { ru: `Вы уверены, что хотите сбросить граф? Это действие нельзя отменить. Вы потеряете ${nodes.length} узл(ов) и ${edges.length} рёбер.` }]}
           variant="warning"
-          buttons={[{ label: 'Cancel', variant: 'outline', action: () => setShowResetConfirmation(false) }, { label: 'Reset Graph', variant: 'destructive', icon: 'RotateCcw', action: confirmReset }]}
+          buttons={[{ label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang), variant: 'outline', action: () => setShowResetConfirmation(false) }, { label: getT(TRANSLATION_KEYS.BUTTON_RESET_GRAPH, language, defaultLang), variant: 'destructive', icon: 'RotateCcw', action: confirmReset }]}
         />
       )}
       {!viewMode && pickerState.schema && (

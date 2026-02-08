@@ -41,7 +41,8 @@ export interface AnnotationItem {
 export type ListInputItem = AnnotationItem & { completed?: boolean };
 
 export interface ListInputProps {
-  value: ListInputItem[];
+  /** List of items. Also accepts string[] (e.g. from API/form filler) which is normalized to ListInputItem[]. */
+  value: ListInputItem[] | string[];
   onChange: (items: ListInputItem[]) => void;
   placeholder?: string;
   addButtonText?: string;
@@ -523,23 +524,41 @@ export const ListInput: React.FC<ListInputProps> = ({
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const inputRefs = React.useRef<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map());
   const [itemRefsMap, setItemRefsMap] = useState<Map<string, React.RefObject<HTMLInputElement | null>>>(new Map());
-  const valueRef = React.useRef<ListInputItem[]>(value);
+
+  // Normalize value: accept string[] from API/form filler and convert to ListInputItem[]
+  const normalizedValue = React.useMemo((): ListInputItem[] => {
+    if (!Array.isArray(value)) return [];
+    return value.map((item, index) => {
+      if (item && typeof item === 'object' && 'id' in item && 'label' in item) {
+        return item as ListInputItem;
+      }
+      const label = typeof item === 'string' ? item : String(item ?? '');
+      const safeSlug = label.slice(0, 30).replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-]/g, '') || `i${index}`;
+      return {
+        id: `item-${index}-${safeSlug}`,
+        label,
+        ...(showCheckbox ? { completed: false } : {}),
+      };
+    });
+  }, [value, showCheckbox]);
+
+  const valueRef = React.useRef<ListInputItem[]>(normalizedValue);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   // When commitOnBlur: use local state and only call onChange when focus leaves the list
-  const [localValue, setLocalValue] = useState<ListInputItem[]>(value);
-  const displayValue = commitOnBlur ? localValue : value;
-  const lastSyncedJsonRef = React.useRef<string>(JSON.stringify(value));
+  const [localValue, setLocalValue] = useState<ListInputItem[]>(normalizedValue);
+  const displayValue = commitOnBlur ? localValue : normalizedValue;
+  const lastSyncedJsonRef = React.useRef<string>(JSON.stringify(normalizedValue));
 
   // Sync from prop only when value content actually changed (e.g. form reset), so we don't overwrite local edits on parent re-renders
   React.useEffect(() => {
     if (!commitOnBlur) return;
-    const nextJson = JSON.stringify(value);
+    const nextJson = JSON.stringify(normalizedValue);
     if (nextJson !== lastSyncedJsonRef.current) {
       lastSyncedJsonRef.current = nextJson;
-      setLocalValue(value);
+      setLocalValue(normalizedValue);
     }
-  }, [commitOnBlur, value]);
+  }, [commitOnBlur, normalizedValue]);
 
   // Keep ref in sync with display value for commitOnBlur (so focusout has latest)
   React.useEffect(() => {
@@ -755,8 +774,8 @@ export const ListInput: React.FC<ListInputProps> = ({
       const updatedItems = current.map((item) =>
         item.id === id ? { ...item, label: validItems[0] } : item
       );
-      const newItems = validItems.slice(1).map((label) => ({
-        id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      const newItems = validItems.slice(1).map((label, index) => ({
+        id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}-${index}`,
         label: label.trim(),
         ...(showCheckbox ? { completed: false } : {}),
       }));

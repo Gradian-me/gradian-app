@@ -1831,12 +1831,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             variant={section.repeatingConfig?.deleteType === 'relationOnly' ? 'default' : 'destructive'}
             buttons={[
               {
-                label: 'Cancel',
+                label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
                 variant: 'outline',
                 action: () => setDeleteConfirmDialog({ open: false, relationId: null }),
               },
               {
-                label: section.repeatingConfig?.deleteType === 'relationOnly' ? 'Remove' : 'Delete',
+                label: section.repeatingConfig?.deleteType === 'relationOnly' ? getT(TRANSLATION_KEYS.BUTTON_REMOVE, language, defaultLang) : getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang),
                 variant: section.repeatingConfig?.deleteType === 'relationOnly' ? 'default' : 'destructive',
                 icon: 'Trash2',
                 action: () => {
@@ -1879,12 +1879,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             variant="destructive"
             buttons={[
               {
-                label: 'Cancel',
+                label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
                 variant: 'outline',
                 action: () => setNaConfirmDialog({ open: false, willEnable: false }),
               },
               {
-                label: 'Mark as N.A',
+                label: getT(TRANSLATION_KEYS.BUTTON_MARK_NA, language, defaultLang),
                 variant: 'destructive',
                 action: () => handleNAConfirm(true),
               },
@@ -2130,12 +2130,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         variant="destructive"
         buttons={[
           {
-            label: 'Cancel',
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
             variant: 'outline',
             action: () => setNaConfirmDialog({ open: false, willEnable: false }),
           },
           {
-            label: 'Mark as N.A',
+            label: getT(TRANSLATION_KEYS.BUTTON_MARK_NA, language, defaultLang),
             variant: 'destructive',
             action: () => handleNAConfirm(true),
           },
@@ -2262,12 +2262,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         variant="destructive"
         buttons={[
           {
-            label: 'Cancel',
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
             variant: 'outline',
             action: () => setNaConfirmDialog({ open: false, willEnable: false }),
           },
           {
-            label: 'Mark as N.A',
+            label: getT(TRANSLATION_KEYS.BUTTON_MARK_NA, language, defaultLang),
             variant: 'destructive',
             action: () => handleNAConfirm(true),
           },

@@ -7,7 +7,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CompanySelector } from './CompanySelector';
 import { TenantSelector } from './TenantSelector';
-import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useCompanyStore } from '@/stores/company.store';
 import { useLanguageStore } from '@/stores/language.store';
@@ -21,7 +20,6 @@ export function OrganizationSettings() {
   const { selectedTenant } = useTenantStore();
   const { selectedCompany } = useCompanyStore();
   const language = useLanguageStore((s) => s.language);
-  const setLanguage = useLanguageStore((s) => s.setLanguage);
   const { resolvedTheme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
   const defaultLang = getDefaultLanguage();
@@ -144,14 +142,6 @@ export function OrganizationSettings() {
                   {labelCompany}
                 </p>
                 <CompanySelector fullWidth showLogo="sidebar-avatar" />
-              </div>
-
-              <div className="space-y-1 pt-2 border-t border-gray-200 dark:border-gray-700">
-                <LanguageSelector
-                  value={language}
-                  onChange={setLanguage}
-                  className="w-full"
-                />
               </div>
             </PopoverContent>
           </Popover>

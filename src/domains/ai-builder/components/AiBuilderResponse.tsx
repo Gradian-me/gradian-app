@@ -33,6 +33,9 @@ import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 import { detectMessageRenderType } from '@/domains/chat/utils/message-render-utils';
 import type { ChatMessage } from '@/domains/chat/types';
 import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 interface AiBuilderResponseProps {
   response: string;
@@ -247,7 +250,10 @@ export function AiBuilderResponse({
   const prevIsLoadingRef = useRef<boolean>(isLoading);
   const lastResponseRef = useRef<string>('');
   const showModelBadge = LOG_CONFIG[LogType.AI_MODEL_LOG] === true;
-  
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
+  const aiGeneratedContentLabel = getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang);
+
   // Get agent format
   const agentFormat = useMemo(() => {
     if (!agent?.requiredOutputFormat) return 'string';
@@ -1819,7 +1825,7 @@ export function AiBuilderResponse({
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-violet-600 dark:text-violet-400 me-1" />
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                AI Generated Content
+                {aiGeneratedContentLabel}
               </h3>
               {showModelBadge && agent?.model && (
                 <Badge
@@ -1842,7 +1848,7 @@ export function AiBuilderResponse({
                 enablePrint={true}
                 printConfig={{
                   includeHeader: true,
-                  documentTitle: agent?.label || 'AI Generated Content',
+                  documentTitle: agent?.label || aiGeneratedContentLabel,
                   documentNumber: agent?.id ? `AI-${agent.id}` : undefined,
                 }}
               />
@@ -1879,7 +1885,7 @@ export function AiBuilderResponse({
                 enablePrint={true}
                 printConfig={{
                   includeHeader: true,
-                  documentTitle: agent?.label || 'AI Generated Content',
+                  documentTitle: agent?.label || aiGeneratedContentLabel,
                   documentNumber: agent?.id ? `AI-${agent.id}` : undefined,
                 }}
               />
@@ -1892,8 +1898,8 @@ export function AiBuilderResponse({
           programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
           title={
             showModelBadge && agent?.model
-              ? `AI Generated Content · ${agent.model}`
-              : 'AI Generated Content'
+              ? `${aiGeneratedContentLabel} · ${agent.model}`
+              : aiGeneratedContentLabel
           }
           initialLineNumbers={10}
         />

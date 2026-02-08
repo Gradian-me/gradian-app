@@ -10,6 +10,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 import {
   Card,
   CardContent,
@@ -57,6 +60,8 @@ export default function EmailTemplateBuilderPage() {
   const savingTemplateRef = useRef<string | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [templateToDelete, setTemplateToDelete] = useState<{ id: string; name: string } | null>(null);
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
   const [htmlLanguage, setHtmlLanguage] = useState<string>('html');
   const [testEmailTo, setTestEmailTo] = useState<string[]>([]);
   const [testEmailCc, setTestEmailCc] = useState<string[]>([]);
@@ -858,7 +863,7 @@ export default function EmailTemplateBuilderPage() {
         variant="destructive"
         buttons={[
           {
-            label: 'Cancel',
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
             variant: 'outline',
             action: () => {
               setDeleteConfirmOpen(false);
@@ -866,7 +871,7 @@ export default function EmailTemplateBuilderPage() {
             },
           },
           {
-            label: 'Delete',
+            label: getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang),
             variant: 'destructive',
             icon: 'Trash2',
             action: handleDeleteConfirm,
