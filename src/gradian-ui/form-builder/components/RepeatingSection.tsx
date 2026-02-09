@@ -9,6 +9,7 @@ import { cn } from '../../shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getSectionTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
 
 export const RepeatingSection: React.FC<RepeatingSectionProps> = ({
   section,
@@ -55,8 +56,8 @@ export const RepeatingSection: React.FC<RepeatingSectionProps> = ({
             </span>
           )}
         </div>
-        {section.description && (
-          <p className="text-xs text-gray-600 mt-1">{section.description}</p>
+        {(section.description || section.descriptionTranslations?.length) && (
+          <p className="text-xs text-gray-600 mt-1">{getSectionTranslatedDescription(section, language, section.description ?? '')}</p>
         )}
       </div>
 

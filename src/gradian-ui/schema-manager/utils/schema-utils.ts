@@ -1,12 +1,14 @@
 import { FormSchema as SharedFormSchema } from '../types/form-schema';
 import { FormSchema as FormBuilderFormSchema } from '../types/form-schema';
 
-/** Schema with optional translation arrays for names */
+/** Schema with optional translation arrays for names and description */
 type SchemaWithNameTranslations = {
   singular_name?: string;
   plural_name?: string;
   singular_name_translations?: Array<Record<string, string>>;
   plural_name_translations?: Array<Record<string, string>>;
+  description?: string;
+  description_translations?: Array<Record<string, string>>;
 };
 
 /**
@@ -51,6 +53,20 @@ export function getSchemaTranslatedPluralName(
   if (!schema) return fallback;
   const base = schema.plural_name || fallback;
   return resolveFromNameTranslations(schema.plural_name_translations, lang, base);
+}
+
+/**
+ * Get the schema description in the given language.
+ * Uses description_translations when present and lang is set; otherwise returns schema.description or fallback.
+ */
+export function getSchemaTranslatedDescription(
+  schema: SchemaWithNameTranslations | null | undefined,
+  lang: string | undefined,
+  fallback = ''
+): string {
+  if (!schema) return fallback;
+  const base = schema.description ?? fallback;
+  return resolveFromNameTranslations(schema.description_translations, lang, base);
 }
 
 /** Section with optional title/description translation arrays */

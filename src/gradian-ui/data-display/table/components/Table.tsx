@@ -71,11 +71,12 @@ export function Table<T = any>({
     return null;
   }
 
+  const tableDir = dir ?? 'auto';
   return (
-    <div className={containerClasses} style={{ width: '-webkit-fill-available' }}>
+    <div className={containerClasses} style={{ width: '-webkit-fill-available' }} dir={dir}>
       {config.bordered ? (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-x-auto overflow-y-hidden w-full">
-          <table className={tableClasses} style={tableStyle} dir="auto">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-x-auto overflow-y-hidden w-full" dir={dir}>
+          <table className={tableClasses} style={tableStyle} dir={tableDir}>
             <TableHeader
               columns={config.columns}
               sortBy={state.sortBy}
@@ -104,7 +105,7 @@ export function Table<T = any>({
           </table>
         </div>
       ) : (
-        <table className={tableClasses} style={tableStyle} dir={dir ?? 'auto'}>
+        <table className={tableClasses} style={tableStyle} dir={tableDir}>
           <TableHeader
             columns={config.columns}
             sortBy={state.sortBy}

@@ -4,6 +4,9 @@ import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronsUp } from 'lucide-react';
 import { FormSection, FormField } from '../types/form-schema';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { AddButtonFull, Switch } from '@/gradian-ui/form-builder/form-elements';
 import { SortableSection } from './SortableSection';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -59,6 +62,13 @@ export function SectionsTab({
   currentSchemaId,
   config
 }: SectionsTabProps) {
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const labelShowInactive = getT(TRANSLATION_KEYS.SCHEMA_LABEL_SHOW_INACTIVE_SECTIONS, language, defaultLang);
+  const titleSectionsAndFields = getT(TRANSLATION_KEYS.SCHEMA_TITLE_SECTIONS_AND_FIELDS, language, defaultLang);
+  const labelCollapseAll = getT(TRANSLATION_KEYS.SCHEMA_LABEL_COLLAPSE_ALL, language, defaultLang);
+  const labelAddSection = getT(TRANSLATION_KEYS.SCHEMA_LABEL_ADD_SECTION, language, defaultLang);
+  const msgCompleteSectionBeforeAdd = getT(TRANSLATION_KEYS.SCHEMA_MSG_COMPLETE_SECTION_BEFORE_ADD, language, defaultLang);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -128,15 +138,15 @@ export function SectionsTab({
               </div>
             )}
             <div className="flex items-center gap-2">
-              <CardTitle className="text-base">Sections & Fields</CardTitle>
+              <CardTitle className="text-base">{titleSectionsAndFields}</CardTitle>
               <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-100">
                 {sectionsCount}
               </span>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onCollapseAll} className="text-gray-600 dark:text-gray-300">
+          <Button variant="ghost" size="sm" onClick={onCollapseAll} className="text-xs text-gray-600 dark:text-gray-300">
             <ChevronsUp className="h-4 w-4 me-1" />
-            Collapse all
+            {labelCollapseAll}
           </Button>
         </div>
       </CardHeader>
@@ -211,17 +221,17 @@ export function SectionsTab({
                 })}
               </AnimatePresence>
               <AddButtonFull
-                label="Add Section"
+                label={labelAddSection}
                 onClick={onAddSection}
                 iconSize="w-4 h-4"
-                textSize="text-xs sm:text-sm"
+                textSize="text-xs"
                 className="px-3 py-2 rounded-xl"
                 disabled={hasIncompleteSections}
               />
               {hasIncompleteSections && (
                 <div className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-start gap-2">
                   <span className="text-amber-600">⚠</span>
-                  <span>Please complete the configuration for the new section before adding another section.</span>
+                  <span>{msgCompleteSectionBeforeAdd}</span>
                 </div>
               )}
             </div>

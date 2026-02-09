@@ -203,7 +203,6 @@ export function TableBody<T = any>({
                 <td
                   key={column.id}
                   className={cn(tdClasses(column, rowIndex, isSelected, row), cellClassName)}
-                  dir="auto"
                   style={{
                     // Only set width if explicitly provided, otherwise let content determine width
                     width: column.width ? (typeof column.width === 'number' ? `${column.width}px` : column.width) : undefined,
@@ -226,7 +225,6 @@ export function TableBody<T = any>({
                 >
                   <div 
                     className={shouldAllowWrapping ? "min-w-0 w-full" : ""} // Allow shrinking and full width if wrapping is allowed
-                    dir="auto"
                     style={{
                       // Limit to 3 lines max for wrapped text columns with ellipsis
                       // For badge columns, we rely on BadgeViewer's flex-wrap to handle wrapping
@@ -238,8 +236,8 @@ export function TableBody<T = any>({
                 >
                   {column.render ? (
                     shouldTruncate ? (
-                      <div className="space-y-1">
-                        <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                      <div className="space-y-1" dir="auto">
+                        <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap" dir="auto">
                           {truncatedText}
                         </div>
                         <button
@@ -254,7 +252,7 @@ export function TableBody<T = any>({
                       applyHighlight(column.render(value, row, rowIndex))
                     )
                   ) : (
-                    <span className="block">
+                    <span className="block" dir="auto">
                       {(() => {
                         let textValue: string;
                         let isStructured = false;
@@ -294,8 +292,8 @@ export function TableBody<T = any>({
                         
                         if (shouldTruncateJson) {
                           return (
-                            <div className="space-y-1">
-                              <div className="text-sm text-gray-700 dark:text-gray-300 font-mono whitespace-pre-wrap wrap-break-word">
+                            <div className="space-y-1" dir="auto">
+                              <div className="text-sm text-gray-700 dark:text-gray-300 font-mono whitespace-pre-wrap wrap-break-word" dir="auto">
                                 {applyHighlight(truncatedJson!)}
                               </div>
                               <button

@@ -20,10 +20,13 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { useSchemas } from '@/gradian-ui/schema-manager/hooks/use-schemas';
 import { FormSchema } from '@/gradian-ui/schema-manager/types';
+import { getSchemaTranslatedPluralName, getSchemaTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import { UserWelcome } from '@/gradian-ui/layout/components/UserWelcome';
 import { useUserStore } from '@/stores/user.store';
 import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { cn } from '@/gradian-ui/shared/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTenantStore } from '@/stores/tenant.store';
@@ -48,6 +51,8 @@ const AppListItem: React.FC<AppListItemProps> = ({
   onOpen,
   query,
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
   const animationDelay = Math.min(
     index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
     UI_PARAMS.CARD_INDEX_DELAY.MAX,
@@ -90,16 +95,16 @@ const AppListItem: React.FC<AppListItemProps> = ({
                   )}
                   <CardTitle className="truncate text-base font-semibold text-gray-900 dark:text-gray-100">
                     {renderHighlightedText(
-                      schema.plural_name || schema.singular_name || schema.id,
+                      getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? schema.singular_name ?? schema.id ?? ''),
                       query,
                       'bg-violet-100/70 text-violet-900 rounded px-0.5 dark:bg-violet-500/30 dark:text-violet-50'
                     )}
                   </CardTitle>
                 </div>
-                {schema.description && (
+                {(schema.description || schema.description_translations?.length) && (
                   <p className="line-clamp-2 text-xs text-gray-500 dark:text-gray-400">
                     {renderHighlightedText(
-                      schema.description,
+                      getSchemaTranslatedDescription(schema, language, schema.description ?? ''),
                       query,
                       'bg-amber-100/70 text-amber-900 rounded px-0.5 dark:bg-amber-500/30 dark:text-amber-50'
                     )}
@@ -114,14 +119,14 @@ const AppListItem: React.FC<AppListItemProps> = ({
                 variant="outline"
                 className="border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-200"
               >
-                App
+                {getT(TRANSLATION_KEYS.BADGE_APP, language, defaultLang)}
               </Badge>
               {isSystemSchema && (
                 <Badge
                   variant="outline"
                   className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200"
                 >
-                  System
+                  {getT(TRANSLATION_KEYS.BADGE_SYSTEM, language, defaultLang)}
                 </Badge>
               )}
             </div>
@@ -184,7 +189,7 @@ const AppListItem: React.FC<AppListItemProps> = ({
           <div className="mb-1 flex items-center gap-2">
             <h3 className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
               {renderHighlightedText(
-                schema.plural_name || schema.singular_name || schema.id,
+                getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? schema.singular_name ?? schema.id ?? ''),
                 query,
                 'bg-violet-100/70 text-violet-900 rounded px-0.5 dark:bg-violet-500/30 dark:text-violet-50'
               )}
@@ -194,14 +199,14 @@ const AppListItem: React.FC<AppListItemProps> = ({
                 variant="outline"
                 className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200"
               >
-                System
+                {getT(TRANSLATION_KEYS.BADGE_SYSTEM, language, defaultLang)}
               </Badge>
             )}
           </div>
-          {schema.description && (
+          {(schema.description || schema.description_translations?.length) && (
             <p className="line-clamp-1 text-xs text-gray-500 dark:text-gray-400">
               {renderHighlightedText(
-                schema.description,
+                getSchemaTranslatedDescription(schema, language, schema.description ?? ''),
                 query,
                 'bg-amber-100/70 text-amber-900 rounded px-0.5 dark:bg-amber-500/30 dark:text-amber-50'
               )}
@@ -305,7 +310,8 @@ const AppListSkeleton: React.FC<{ index: number }> = ({ index }) => {
 export function AppListWrapper() {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
-  const language = useLanguageStore((state) => state.language || 'en');
+  const language = useLanguageStore((state) => state.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
   const tenantId = useTenantStore((state) => state.getTenantId());
   const selectedTenant = useTenantStore((state) => state.selectedTenant);
   // Check if tenant name is "local" - if so, show all apps
@@ -334,7 +340,7 @@ export function AppListWrapper() {
 
   // Get user display info for UserWelcome
   const userFirstName = user ? resolveLocalizedField(user.name, language, 'en') : '';
-  const userDisplayName = userFirstName || user?.email || 'there';
+  const userDisplayName = userFirstName || user?.email || getT(TRANSLATION_KEYS.WELCOME_NAME_FALLBACK, language, defaultLang);
   const userInitials = (() => {
     const source = userDisplayName?.trim() || 'GR';
     return source
@@ -405,12 +411,12 @@ export function AppListWrapper() {
 
   return (
     <MainLayout
-      title="Apps"
+      title={getT(TRANSLATION_KEYS.TITLE_APPS, language, defaultLang)}
       icon="Grid2X2"
       subtitle={
         <span className="flex items-center gap-1">
           <span className="font-medium text-gray-800 dark:text-gray-100">
-            Launch your data-driven experiences
+            {getT(TRANSLATION_KEYS.SUBTITLE_APPS_LAUNCH, language, defaultLang)}
           </span>
         </span>
       }
@@ -421,21 +427,36 @@ export function AppListWrapper() {
           userName={userDisplayName}
           avatar={user?.avatar}
           initials={userInitials}
-          welcomeSubtitle="Browse and launch your business applications."
-          welcomeBadges={[
-            {
-              label: `📱 ${apps.length} App${apps.length === 1 ? '' : 's'} Available for you`,
-              color: 'violet',
-            },
-            {
-              label: '🚀 Launch in One Click',
-              color: 'emerald',
-            },
-            {
-              label: '⚡ Real-time Analytics',
-              color: 'indigo',
-            },
-          ]}
+          welcomeTitle={getT(TRANSLATION_KEYS.WELCOME_BACK_TITLE, language, defaultLang).replace('{name}', userDisplayName)}
+          welcomeSubtitle={getT(TRANSLATION_KEYS.SUBTITLE_APPS_BROWSE, language, defaultLang)}
+          welcomeBadges={
+            isMounted
+              ? [
+                  {
+                    label: `📱 ${getT(TRANSLATION_KEYS.APPS_AVAILABLE_BADGE, language, defaultLang).replace('{count}', String(apps.length))}`,
+                    color: 'violet',
+                  },
+                  {
+                    label: `🚀 ${getT(TRANSLATION_KEYS.BADGE_LAUNCH_ONE_CLICK, language, defaultLang)}`,
+                    color: 'emerald',
+                  },
+                  {
+                    label: `⚡ ${getT(TRANSLATION_KEYS.BADGE_REALTIME_ANALYTICS, language, defaultLang)}`,
+                    color: 'indigo',
+                  },
+                ]
+              : [
+                  { label: `📱 ${getT(TRANSLATION_KEYS.TITLE_APPS, language, defaultLang)}`, color: 'violet' },
+                  {
+                    label: `🚀 ${getT(TRANSLATION_KEYS.BADGE_LAUNCH_ONE_CLICK, language, defaultLang)}`,
+                    color: 'emerald',
+                  },
+                  {
+                    label: `⚡ ${getT(TRANSLATION_KEYS.BADGE_REALTIME_ANALYTICS, language, defaultLang)}`,
+                    color: 'indigo',
+                  },
+                ]
+          }
           welcomeGradient="violet"
           welcomeShowPattern={true}
         />
@@ -452,10 +473,10 @@ export function AppListWrapper() {
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                {apps.length} app{apps.length === 1 ? '' : 's'} available
+                {getT(TRANSLATION_KEYS.APPS_COUNT_AVAILABLE, language, defaultLang).replace('{count}', String(apps.length))}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Type to search, then open an app in a single click.
+                {getT(TRANSLATION_KEYS.APPS_SEARCH_HINT, language, defaultLang)}
               </p>
             </div>
           </div>
@@ -598,12 +619,12 @@ export function AppListWrapper() {
                 <AppWindow className="h-6 w-6" />
               </div>
               <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-gray-100">
-                No apps found
+                {getT(TRANSLATION_KEYS.EMPTY_NO_APPS_FOUND, language, defaultLang)}
               </h3>
               <p className="max-w-md text-sm text-gray-500 dark:text-gray-400">
                 {searchQuery
-                  ? 'Try adjusting your search terms or clearing the search box to see all available apps.'
-                  : 'Schemas that are marked to show in navigation will appear here as apps you can open.'}
+                  ? getT(TRANSLATION_KEYS.EMPTY_APPS_TRY_ADJUSTING, language, defaultLang)
+                  : getT(TRANSLATION_KEYS.EMPTY_APPS_SCHEMAS_MARKED, language, defaultLang)}
               </p>
             </motion.div>
           )}

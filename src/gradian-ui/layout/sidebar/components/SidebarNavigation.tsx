@@ -35,6 +35,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   const defaultLang = getDefaultLanguage();
   const tooltipSide = isRTL(language) ? 'left' : 'right';
   const homeLabel = getT(TRANSLATION_KEYS.SIDEBAR_HOME, language, defaultLang);
+  const menuLabel = getT(TRANSLATION_KEYS.SIDEBAR_MENU, language, defaultLang);
   
   const filteredItems = React.useMemo(() => {
     return filterNavigationItems(items, searchQuery || '');
@@ -77,7 +78,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                   <Link href="/" prefetch={false} className="block">
                     <div
                       className={cn(
-                        "flex items-center py-2 rounded-lg transition-colors duration-150",
+                        "flex items-center py-2 min-h-8 rounded-lg transition-colors duration-150",
                         isCollapsed && !isMobile ? "justify-center px-0" : "gap-3 px-3",
                         homeActive
                           ? "bg-gray-800 text-white"
@@ -86,7 +87,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                     >
                       <HomeIcon className="h-5 w-5 shrink-0" />
                       {(!isCollapsed || isMobile) && (
-                        <span className="text-xs font-medium overflow-hidden whitespace-nowrap">
+                        <span className="text-xs font-medium overflow-hidden whitespace-nowrap leading-relaxed">
                           {homeLabel}
                         </span>
                       )}
@@ -94,14 +95,14 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent side={tooltipSide} className="bg-gray-900 text-white border-gray-700">
-                  <p>{homeLabel}</p>
+                  <p className="leading-relaxed">{homeLabel}</p>
                 </TooltipContent>
               </Tooltip>
             ) : (
               <Link href="/" prefetch={false} className="block">
                 <div
                   className={cn(
-                    "flex items-center py-2 rounded-lg transition-colors duration-150",
+                    "flex items-center py-2 min-h-8 rounded-lg transition-colors duration-150",
                     isCollapsed && !isMobile ? "justify-center px-0" : "gap-3 px-3",
                     homeActive
                       ? "bg-gray-800 text-white"
@@ -110,7 +111,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                 >
                   <HomeIcon className="h-5 w-5 shrink-0" />
                   {(!isCollapsed || isMobile) && (
-                    <span className="text-xs font-medium overflow-hidden whitespace-nowrap">
+                    <span className="text-xs font-medium overflow-hidden whitespace-nowrap leading-relaxed">
                       {homeLabel}
                     </span>
                   )}
@@ -125,14 +126,14 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
               <AccordionItem value="menu-items" className="border-none">
                 <AccordionTrigger
                   className={cn(
-                    "px-3 py-2 hover:no-underline rounded-lg transition-colors",
+                    "px-3 py-2 min-h-9 hover:no-underline rounded-lg transition-colors",
                     "text-gray-300 hover:text-white hover:bg-gray-800/50",
                     "data-[state=open]:text-white data-[state=open]:bg-gray-800/70",
                     "border-s-2 border-s-transparent data-[state=open]:border-s-violet-500"
                   )}
                 >
                   <div className={cn(
-                    "flex items-center flex-1",
+                    "flex items-center flex-1 min-h-[1.5em]",
                     isCollapsed && !isMobile ? "justify-center" : "gap-2"
                   )}>
                     <Menu className="h-4 w-4 shrink-0" />
@@ -146,9 +147,9 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                             duration: 0.15,
                             ease: 'easeOut'
                           }}
-                          className="text-[11px] font-semibold uppercase tracking-wider truncate"
+                          className="text-[11px] font-semibold uppercase tracking-wider truncate leading-relaxed"
                         >
-                          Menu
+                          {menuLabel}
                         </motion.span>
                       )}
                     </AnimatePresence>
@@ -180,7 +181,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                                   ease: "easeIn",
                                 }}
                             className={cn(
-                              "flex items-center py-2 rounded-lg transition-colors duration-150",
+                              "flex items-center py-2 min-h-8 rounded-lg transition-colors duration-150",
                               isCollapsed && !isMobile ? "justify-center px-0" : "gap-3 px-3",
                               isActive
                                 ? "bg-gray-800 text-white"
@@ -198,7 +199,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                                     duration: 0.15,
                                     ease: 'easeOut'
                                   }}
-                                  className="text-xs font-medium overflow-hidden whitespace-nowrap"
+                                  className="text-xs font-medium overflow-hidden whitespace-nowrap leading-relaxed"
                                 >
                                   {searchQuery?.trim()
                                     ? renderHighlightedText(item.name ?? '', searchQuery.trim(), SIDEBAR_HIGHLIGHT_CLASS)
@@ -222,7 +223,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                               {content}
                             </TooltipTrigger>
                             <TooltipContent side={tooltipSide} className="bg-gray-900 text-white border-gray-700">
-                              <p>{item.name}</p>
+                              <p className="leading-relaxed">{item.name}</p>
                             </TooltipContent>
                           </Tooltip>
                         );

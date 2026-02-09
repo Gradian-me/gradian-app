@@ -8,6 +8,7 @@ import {
   getT,
   resolveSchemaFieldLabel,
   resolveSchemaFieldPlaceholder,
+  resolveDisplayLabel,
 } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -162,7 +163,16 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
 
   switch (elementType) {
     case 'text':
-      return <TextInput config={config} {...commonProps} canCopy={canCopy} />;
+      return (
+        <TextInput
+          config={config}
+          {...commonProps}
+          canCopy={canCopy}
+          allowTranslation={(config as any)?.allowTranslation}
+          language={language}
+          defaultLanguage={defaultLang}
+        />
+      );
     
     case 'email':
       return <EmailInput config={config} {...commonProps} canCopy={canCopy} />;
@@ -313,11 +323,14 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
             : 5;
 
       return (
-        <Textarea 
-          config={config} 
-          {...commonProps} 
-          canCopy={canCopy} 
-          enableVoiceInput={enableVoiceInput} 
+        <Textarea
+          config={config}
+          {...commonProps}
+          canCopy={canCopy}
+          allowTranslation={(config as any)?.allowTranslation}
+          language={language}
+          defaultLanguage={defaultLang}
+          enableVoiceInput={enableVoiceInput}
           loadingTextSwitches={loadingTextSwitches}
           rows={resolvedRows}
         />
@@ -531,7 +544,11 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           onClick={(config as any).onClick || restProps.onChange}
           className={restProps.className}
         >
-          {(config as any).label || restProps.value || 'Button'}
+          {resolveDisplayLabel(
+            (config as any).label ?? restProps.value ?? 'Button',
+            language,
+            defaultLang
+          )}
         </Button>
       );
     
@@ -601,7 +618,11 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           size={(config as any).size || 'md'}
           className={restProps.className}
         >
-          {restProps.value || (config as any).label || 'Badge'}
+          {resolveDisplayLabel(
+            restProps.value ?? (config as any).label ?? 'Badge',
+            language,
+            defaultLang
+          )}
         </Badge>
       );
     
@@ -614,7 +635,11 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           showIcon={(config as any).showIcon !== false}
           size={(config as any).size || 'md'}
           className={restProps.className}
-          fieldLabel={(config as any).label || (config as any).name || ''}
+          fieldLabel={resolveDisplayLabel(
+            (config as any).label ?? (config as any).name ?? '',
+            language,
+            defaultLang
+          )}
         />
       );
     
@@ -627,7 +652,11 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           onChange={(items) => restProps.onChange?.(listInputItemsToChecklist(items))}
           placeholder={(config as any).placeholder || addItemFallback}
           addButtonText={(config as any).addButtonText || addItemFallback}
-          label={(config as any).label}
+          label={resolveDisplayLabel(
+            (config as any).label,
+            language,
+            defaultLang
+          )}
           disabled={restProps.disabled}
           error={restProps.error}
           required={restProps.required}
@@ -648,9 +677,16 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           value={restProps.value || []}
           onChange={(items) => restProps.onChange?.(items)}
           placeholder={(config as any).placeholder || 'Enter annotation...'}
-          addButtonText={(config as any).addButtonText || getT(TRANSLATION_KEYS.BUTTON_ADD, language, defaultLang)}
+          addButtonText={
+            (config as any).addButtonText ||
+            getT(TRANSLATION_KEYS.BUTTON_ADD, language, defaultLang)
+          }
           className={restProps.className}
-          label={(config as any).label}
+          label={resolveDisplayLabel(
+            (config as any).label,
+            language,
+            defaultLang
+          )}
           required={restProps.required}
           error={restProps.error}
           disabled={restProps.disabled}

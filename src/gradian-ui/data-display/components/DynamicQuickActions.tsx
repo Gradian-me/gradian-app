@@ -27,6 +27,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useLanguageStore } from '@/stores/language.store';
+import { resolveDisplayLabel, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 
 export interface DynamicQuickActionsProps {
   actions: QuickAction[];
@@ -57,6 +59,8 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
 }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
   
   // Debug: Log when component receives onActionClick
   React.useEffect(() => {
@@ -362,6 +366,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
             <div className="space-y-2">
               {buttonActions.map((action) => {
                 const isLoading = loadingActionId === action.id;
+                const label = resolveDisplayLabel(action.label, language, defaultLang);
                 return (
                   <Button
                     key={action.id}
@@ -374,7 +379,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
                     {action.icon && (
                       <IconRenderer iconName={action.icon} className="h-4 w-4 me-2" />
                     )}
-                    {isLoading ? 'Loading...' : action.label}
+                    {isLoading ? 'Loading...' : label}
                   </Button>
                 );
               })}
@@ -386,6 +391,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
             <div className="space-y-2">
               {buttonActions.map((action) => {
                 const isLoading = loadingActionId === action.id;
+                const label = resolveDisplayLabel(action.label, language, defaultLang);
                 return (
                   <Button
                     key={action.id}
@@ -398,7 +404,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
                     {action.icon && (
                       <IconRenderer iconName={action.icon} className="h-4 w-4 me-2" />
                     )}
-                    {isLoading ? 'Loading...' : action.label}
+                    {isLoading ? 'Loading...' : label}
                   </Button>
                 );
               })}
@@ -412,7 +418,11 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
         <FormModal
           schemaId={targetSchemaId}
           mode="create"
-          title={formAction?.label}
+          title={
+            formAction
+              ? resolveDisplayLabel(formAction.label, language, defaultLang)
+              : undefined
+          }
           getInitialSchema={(requestedId) => schemaCacheState?.[requestedId] ?? null}
           customSubmitRoute={formAction?.submitRoute}
           customSubmitMethod={formAction?.submitMethod}

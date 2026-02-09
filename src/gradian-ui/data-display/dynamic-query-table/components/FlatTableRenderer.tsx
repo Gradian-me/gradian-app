@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { useLanguageStore } from '@/stores/language.store';
+import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { TableColumn } from '../../table/types';
 import { formatFieldValue } from '../../table/utils/field-formatters';
 import { resolveColumnWidth } from '../../table/utils/column-config';
@@ -95,6 +97,8 @@ function createSyntheticField(fieldName: string, value: any, schema: Schema): Sc
 }
 
 export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, onFlattenChange, showIds = false, onShowIdsChange, highlightQuery, dynamicQueryActions, dynamicQueryId, onEditEntity }: FlatTableRendererProps) {
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const isRtl = isRTL(language);
   const schemaList = schemas || [];
 
   // Parse data and group columns by schema and determine order
@@ -308,9 +312,9 @@ export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, o
 
   // Render custom table with schema header row
   return (
-    <div className="w-full">
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-x-auto overflow-y-hidden w-full">
-        <table className="border-collapse" style={{ tableLayout: 'auto', width: '-webkit-fill-available' }}>
+    <div className="w-full" dir={isRtl ? 'rtl' : undefined}>
+      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-x-auto overflow-y-hidden w-full" dir={isRtl ? 'rtl' : undefined}>
+        <table className="border-collapse" style={{ tableLayout: 'auto', width: '-webkit-fill-available' }} dir={isRtl ? 'rtl' : undefined}>
           {/* Schema header row */}
           <thead>
             <tr className="bg-violet-200 dark:bg-violet-950/90 border-b border-gray-200 dark:border-gray-700">
@@ -327,6 +331,7 @@ export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, o
                       'px-4 py-3 text-start text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
                       getSchemaHeaderBorderColor(groupIndex, isLast)
                     )}
+                    dir="auto"
                   >
                     {group.schema.label || group.schema.id}
                   </th>
@@ -362,6 +367,7 @@ export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, o
                         boxSizing: 'border-box',
                         whiteSpace: column.maxWidth ? 'normal' : 'nowrap',
                       }}
+                      dir="auto"
                     >
                       {column.label}
                     </th>
@@ -437,8 +443,10 @@ export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, o
                             'p-3 text-xs text-gray-900 dark:text-gray-200',
                             isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo),
                             column.align === 'center' && 'text-center',
-                            column.align === 'right' && 'text-right'
+                            (column.align === 'left' || !column.align) && 'text-start',
+                            column.align === 'right' && 'text-end'
                           )}
+                          dir="auto"
                           style={{
                             // Apply width constraints for badge columns
                             minWidth: column.minWidth ? `${column.minWidth}px` : undefined,
@@ -453,8 +461,8 @@ export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, o
                             overflowY: shouldAllowWrapping ? 'visible' : 'hidden',
                           }}
                         >
-                          <div className={shouldAllowWrapping ? "min-w-0 w-full" : ""}>
-                            {column.render ? column.render(value, row, rowIndex) : <span>{String(value ?? '—')}</span>}
+                          <div className={shouldAllowWrapping ? "min-w-0 w-full" : ""} dir="auto">
+                            {column.render ? column.render(value, row, rowIndex) : <span dir="auto">{String(value ?? '—')}</span>}
                           </div>
                         </td>
                       </React.Fragment>

@@ -321,10 +321,11 @@ export function CreateSchemaDialog({ open, onOpenChange, onSubmit }: CreateSchem
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isSubmitting}
+            className="text-xs"
           >
             Cancel
           </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
+          <Button onClick={handleSubmit} disabled={isSubmitting} className="text-xs">
             <Plus className="h-4 w-4 me-2" />
             {isSubmitting ? 'Creating...' : 'Create Schema'}
           </Button>

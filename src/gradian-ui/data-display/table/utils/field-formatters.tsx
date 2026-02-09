@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link as LinkIcon, Check, X, CheckSquare, Square } from 'lucide-react';
+import React, { useState } from 'react';
+import { Link as LinkIcon, Check, X, CheckSquare, Square, Languages } from 'lucide-react';
 import { formatCurrency, formatDate, formatNumber } from '@/gradian-ui/shared/utils';
 import { BadgeViewer } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
 import type { BadgeItem } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
@@ -7,6 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { IconRenderer, isValidLucideIcon } from '@/gradian-ui/shared/utils/icon-renderer';
 import { getBadgeConfig, getValidBadgeVariant } from '../../utils';
 import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
+import {
+  isTranslationArray,
+  resolveFromTranslationsArray,
+  getDefaultLanguage,
+  resolveSchemaFieldLabel,
+} from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 import {
   getDisplayStrings,
   getJoinedDisplayString,
@@ -27,22 +34,90 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
+import { TranslationDialog } from '@/gradian-ui/form-builder/form-elements/components/TranslationDialog';
+import { getDefaultLanguage as getDefLang } from '@/gradian-ui/shared/utils/translation-utils';
 
-export const getFieldValue = (field: any, row: any): any => {
-  if (!field || !row) return null;
+/** Schema field shape for resolving label by language. */
+type FieldForLabel = { label?: string; translations?: Array<Record<string, string>> };
 
+/** Renders resolved translation text + a button to open TranslationDialog in view mode. */
+function TranslationViewCell({
+  displayText,
+  rawValue,
+  fieldLabel,
+  field,
+  isTextarea,
+}: {
+  displayText: string;
+  rawValue: Array<Record<string, string>>;
+  fieldLabel?: string;
+  /** When provided, dialog title is resolved from field.translations/label by current language. */
+  field?: FieldForLabel | null;
+  isTextarea?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const defaultLang = getDefLang();
+  const language = useLanguageStore((s) => s.language);
+  const resolvedTitle =
+    field ? resolveSchemaFieldLabel(field, language, defaultLang) : fieldLabel;
+  const title = resolvedTitle || fieldLabel || '';
+  return (
+    <span className="inline-flex items-center gap-1.5 min-w-0">
+      <span className="min-w-0 truncate" dir="auto" title={displayText}>
+        {displayText}
+      </span>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setOpen(true);
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        className="shrink-0 p-1 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-100/70 dark:hover:bg-gray-700/50 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-0"
+        title="View translations"
+        aria-label="View translations"
+      >
+        <Languages className="h-4 w-4" />
+      </button>
+      <TranslationDialog
+        open={open}
+        onOpenChange={setOpen}
+        value={rawValue}
+        isTextarea={isTextarea}
+        title={title}
+        defaultLanguage={defaultLang}
+        viewMode
+      />
+    </span>
+  );
+}
+
+/** Get raw value from row without resolving translation arrays (for detecting + showing translation button). */
+function getRawFieldValue(field: any, row: any): any {
+  if (!field || !row) return undefined;
   if (field.source) {
-    // SECURITY: Use safe path access from security utility to prevent prototype pollution
     const { safeGetByPath } = require('@/gradian-ui/shared/utils/security-utils');
-    const value = safeGetByPath(row, field.source);
-    return value ?? null;
+    return safeGetByPath(row, field.source) ?? undefined;
   }
-
   if (field.compute && typeof field.compute === 'function') {
     return field.compute(row);
   }
-
   return row[field.name];
+}
+
+export const getFieldValue = (field: any, row: any): any => {
+  if (!field || !row) return null;
+  const raw = getRawFieldValue(field, row);
+  if (raw != null && isTranslationArray(raw)) {
+    const lang = useLanguageStore.getState?.()?.language || getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
+    return resolveFromTranslationsArray(raw, lang, defaultLang);
+  }
+  return raw ?? null;
 };
 
 export const formatRelationType = (value: string | null | undefined): string | null => {
@@ -81,9 +156,8 @@ const wrapWithForceIcon = (content: React.ReactNode, isForce: boolean, field?: a
   const isInactive = isRecordInactive(row);
   const isTitle = field?.role === 'title';
   
-  // Apply bold styling to title fields; dir="auto" for correct text direction (RTL/LTR); w-full for full cell width
   let wrappedContent = isTitle ? (
-    <span className="font-semibold w-full block" dir="auto">{content}</span>
+    <span className="font-semibold w-full block">{content}</span>
   ) : content;
   
   // Apply strike-through to title if inactive
@@ -112,6 +186,25 @@ export const formatFieldValue = (
   showForceIcon: boolean = true,
   highlightQuery?: string
 ): React.ReactNode => {
+  // Use raw value from row when available so we can detect translation arrays even when accessor returns resolved string
+  const rawValueFromRow = row ? getRawFieldValue(field, row) : value;
+  const isTranslatable =
+    rawValueFromRow != null &&
+    isTranslationArray(rawValueFromRow) &&
+    Array.isArray(rawValueFromRow) &&
+    rawValueFromRow.length > 1;
+
+  const lang = useLanguageStore.getState?.()?.language || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+
+  // Resolve translation-array values to display string (selected language, default language, or first non-empty)
+  let resolvedValue = value;
+  if (isTranslatable) {
+    resolvedValue = resolveFromTranslationsArray(rawValueFromRow, lang, defaultLang);
+  } else if (value != null && isTranslationArray(value)) {
+    resolvedValue = resolveFromTranslationsArray(value, lang, defaultLang);
+  }
+
   // Check if row has isForce flag - only show for title role fields
   const isForce = showForceIcon && row?.isForce === true && field?.role === 'title';
   const isInactive = isRecordInactive(row);
@@ -207,7 +300,7 @@ export const formatFieldValue = (
     );
   }
   
-  if (value === null || value === undefined || value === '') {
+  if (resolvedValue === null || resolvedValue === undefined || resolvedValue === '') {
     // Still show ForceIcon even if value is empty (only for title role)
     if (isForce && isTitle) {
       const emptyContent = <span className={cn("text-gray-400 w-full block", isTitle && "font-semibold")} dir="auto">—</span>;
@@ -223,9 +316,26 @@ export const formatFieldValue = (
     return isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
   }
 
+  // Translation-array field: show resolved text + button to open dialog in view mode (use raw from row so table/card both get button)
+  if (isTranslatable && rawValueFromRow) {
+    return wrapWithForceIcon(
+      <TranslationViewCell
+        displayText={resolvedValue as string}
+        rawValue={rawValueFromRow}
+        fieldLabel={field?.label}
+        field={field}
+        isTextarea={field?.component === 'textarea'}
+      />,
+      isForce,
+      field,
+      row
+    );
+  }
+
   // If value is an array of IDs (strings) and field has options, resolve labels from options first
   // This applies to checkbox-list, picker fields, select fields, and any field that stores IDs but needs to display labels
-  let resolvedValue = value;
+  // Keep already-resolved translation-array string; do not overwrite with raw value
+  resolvedValue = value;
   const isCheckboxList = field?.component === 'checkbox-list' || field?.component === 'checkboxlist' || field?.component === 'checkbox_list';
   const isSelect = field?.component === 'select';
   const isRadio = field?.component === 'radio' || field?.component === 'radio-group' || field?.component === 'radiogroup';
@@ -1466,9 +1576,9 @@ export const formatFieldValue = (
             row
           );
         }
-        return wrapWithForceIcon(<span dir="auto">{String(value)}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span dir="auto">{String(resolvedValue)}</span>, isForce, field, row);
       } catch {
-        return wrapWithForceIcon(<span dir="auto">{String(value)}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span dir="auto">{String(resolvedValue)}</span>, isForce, field, row);
       }
     case 'datetime':
     case 'datetime-local':
@@ -1491,12 +1601,12 @@ export const formatFieldValue = (
             row
           );
         }
-        return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(value)}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(resolvedValue)}</span>, isForce, field, row);
       } catch {
-        return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(value)}</span>, isForce, field, row);
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(resolvedValue)}</span>, isForce, field, row);
       }
     case 'url': {
-      const stringValue = String(value);
+      const stringValue = String(resolvedValue);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
       if (!isUrl) {
         return wrapWithForceIcon(<span>{stringValue}</span>, isForce, field, row);
@@ -1525,13 +1635,13 @@ export const formatFieldValue = (
       if (displayStrings.length > 0) {
         return wrapWithForceIcon(<span className="w-full block" dir="auto">{displayStrings.join(', ')}</span>, isForce, field, row);
       }
-      if (Array.isArray(value)) {
+      if (Array.isArray(value) && !isTranslationArray(value)) {
         return wrapWithForceIcon(<span className="w-full block" dir="auto">{value.join(', ')}</span>, isForce, field, row);
       }
-      return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(value)}</span>, isForce, field, row);
+      return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(resolvedValue)}</span>, isForce, field, row);
     default:
       if (hasStructuredOptions) {
-        const joined = getJoinedDisplayString(value);
+        const joined = getJoinedDisplayString(resolvedValue);
         if (joined) {
           return wrapWithForceIcon(<span className="w-full block" dir="auto">{joined}</span>, isForce, field, row);
         }
@@ -1554,7 +1664,7 @@ export const formatFieldValue = (
       }
       
       // Check if it's a URL even if not explicitly typed as url
-      const stringValue = String(value);
+      const stringValue = String(resolvedValue);
       const isUrl = stringValue.startsWith('http://') || stringValue.startsWith('https://') || stringValue.startsWith('//');
       if (isUrl && field?.component === 'url') {
         const linkLabel = field?.componentTypeConfig?.label || 'URL';

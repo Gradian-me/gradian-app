@@ -4,6 +4,9 @@ import { FormSection, FormField } from '../types/form-schema';
 import { AddButtonFull } from '@/gradian-ui/form-builder/form-elements';
 import { SortableField } from './SortableField';
 import { FieldEditorContent } from './FieldEditorContent';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import {
   DndContext,
   closestCenter,
@@ -38,6 +41,10 @@ export function SectionFields({
   onFieldDelete,
   onFieldDragEnd
 }: SectionFieldsProps) {
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const labelFields = getT(TRANSLATION_KEYS.SECTION_LABEL_FIELDS, language, defaultLang);
+  const labelAddField = getT(TRANSLATION_KEYS.SCHEMA_LABEL_ADD_FIELD, language, defaultLang);
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -48,7 +55,7 @@ export function SectionFields({
   return (
     <div className="space-y-3 pt-2">
       <div className="flex items-start gap-2">
-        <h4 className="text-xs font-semibold text-gray-600">Fields</h4>
+        <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-300">{labelFields}</h4>
         <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700">
           {fields.length}
         </span>
@@ -81,10 +88,10 @@ export function SectionFields({
       )}
 
       <AddButtonFull
-        label="Add Field"
+        label={labelAddField}
         onClick={onAddField}
         iconSize="w-4 h-4"
-        textSize="text-xs sm:text-sm"
+        textSize="text-xs"
         className="px-3 py-2 rounded-xl"
       />
     </div>

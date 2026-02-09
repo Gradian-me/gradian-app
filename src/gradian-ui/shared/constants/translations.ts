@@ -16,7 +16,12 @@ export const TRANSLATION_KEYS = {
   ACTION_GO_TO_APPS: 'ACTION_GO_TO_APPS',
   ACTION_TOGGLE_THEME: 'ACTION_TOGGLE_THEME',
   ACTION_SHOW_QR_CODE: 'ACTION_SHOW_QR_CODE',
+  TITLE_QR_CODE: 'TITLE_QR_CODE',
+  ACTION_OPEN_URL: 'ACTION_OPEN_URL',
+  ACTION_DOWNLOAD: 'ACTION_DOWNLOAD',
   ACTION_SHARE: 'ACTION_SHARE',
+  TITLE_SHARE_QR_CODE: 'TITLE_SHARE_QR_CODE',
+  TEXT_CHECK_OUT_THIS_QR_CODE: 'TEXT_CHECK_OUT_THIS_QR_CODE',
   ACTION_MAXIMIZE_VIEW: 'ACTION_MAXIMIZE_VIEW',
   ACTION_MINIMIZE_VIEW: 'ACTION_MINIMIZE_VIEW',
   TITLE_SHARE_THIS_PAGE: 'TITLE_SHARE_THIS_PAGE',
@@ -46,18 +51,24 @@ export const TRANSLATION_KEYS = {
   ARIA_REFRESH_ITEMS: 'ARIA_REFRESH_ITEMS',
   PLACEHOLDER_SELECT_LANGUAGE: 'PLACEHOLDER_SELECT_LANGUAGE',
   PLACEHOLDER_SEARCH: 'PLACEHOLDER_SEARCH',
+  PLACEHOLDER_SEARCH_OPTIONS: 'PLACEHOLDER_SEARCH_OPTIONS',
   PLACEHOLDER_SEARCH_APPLICATIONS: 'PLACEHOLDER_SEARCH_APPLICATIONS',
   PLACEHOLDER_SEARCH_RESULTS: 'PLACEHOLDER_SEARCH_RESULTS',
   LABEL_LANGUAGE: 'LABEL_LANGUAGE',
+  LABEL_VALUE: 'LABEL_VALUE',
   LABEL_ORGANIZATION: 'LABEL_ORGANIZATION',
   LABEL_SELECT_ORGANIZATION: 'LABEL_SELECT_ORGANIZATION',
   LABEL_TENANT: 'LABEL_TENANT',
   LABEL_COMPANY: 'LABEL_COMPANY',
   LABEL_NONE: 'LABEL_NONE',
+  LABEL_CUSTOMIZE: 'LABEL_CUSTOMIZE',
+  LABEL_USE_GENERATED: 'LABEL_USE_GENERATED',
+  MSG_AUTO_GENERATED_CLICK_CUSTOMIZE: 'MSG_AUTO_GENERATED_CLICK_CUSTOMIZE',
   LABEL_NONE_USE_DOMAIN: 'LABEL_NONE_USE_DOMAIN',
   LABEL_ALL_COMPANIES: 'LABEL_ALL_COMPANIES',
   SIDEBAR_HOME: 'SIDEBAR_HOME',
   SIDEBAR_APPLICATIONS: 'SIDEBAR_APPLICATIONS',
+  SIDEBAR_MENU: 'SIDEBAR_MENU',
   TOOLTIP_EDIT_SCHEMA: 'TOOLTIP_EDIT_SCHEMA',
   LABEL_DEMO_MODE: 'LABEL_DEMO_MODE',
   LABEL_LIVE_MODE: 'LABEL_LIVE_MODE',
@@ -129,6 +140,26 @@ export const TRANSLATION_KEYS = {
   EMPTY_SELECT_USER_TO_VIEW_TASKS_DESCRIPTION: 'EMPTY_SELECT_USER_TO_VIEW_TASKS_DESCRIPTION',
   EMPTY_NO_X_FOUND: 'EMPTY_NO_X_FOUND',
   EMPTY_TRY_ADJUSTING_SEARCH: 'EMPTY_TRY_ADJUSTING_SEARCH',
+  // Apps page (/apps)
+  TITLE_APPS: 'TITLE_APPS',
+  WELCOME_BACK_TITLE: 'WELCOME_BACK_TITLE',
+  WELCOME_NAME_FALLBACK: 'WELCOME_NAME_FALLBACK',
+  SUBTITLE_APPS_LAUNCH: 'SUBTITLE_APPS_LAUNCH',
+  SUBTITLE_APPS_BROWSE: 'SUBTITLE_APPS_BROWSE',
+  APPS_AVAILABLE_BADGE: 'APPS_AVAILABLE_BADGE',
+  BADGE_LAUNCH_ONE_CLICK: 'BADGE_LAUNCH_ONE_CLICK',
+  BADGE_REALTIME_ANALYTICS: 'BADGE_REALTIME_ANALYTICS',
+  APPS_COUNT_AVAILABLE: 'APPS_COUNT_AVAILABLE',
+  APPS_SEARCH_HINT: 'APPS_SEARCH_HINT',
+  PLACEHOLDER_SEARCH_APPS: 'PLACEHOLDER_SEARCH_APPS',
+  ARIA_LIST_VIEW: 'ARIA_LIST_VIEW',
+  ARIA_GRID_VIEW: 'ARIA_GRID_VIEW',
+  TITLE_REFRESH_APPS: 'TITLE_REFRESH_APPS',
+  EMPTY_NO_APPS_FOUND: 'EMPTY_NO_APPS_FOUND',
+  EMPTY_APPS_TRY_ADJUSTING: 'EMPTY_APPS_TRY_ADJUSTING',
+  EMPTY_APPS_SCHEMAS_MARKED: 'EMPTY_APPS_SCHEMAS_MARKED',
+  BADGE_APP: 'BADGE_APP',
+  BADGE_SYSTEM: 'BADGE_SYSTEM',
   EMPTY_GET_STARTED_ADD_FIRST: 'EMPTY_GET_STARTED_ADD_FIRST',
   EMPTY_CLICK_BUTTON_TO_ADD_ONE: 'EMPTY_CLICK_BUTTON_TO_ADD_ONE',
   EMPTY_NO_ITEMS_ADDED_YET: 'EMPTY_NO_ITEMS_ADDED_YET',
@@ -152,6 +183,7 @@ export const TRANSLATION_KEYS = {
   ARIA_MAXIMIZE_FORM: 'ARIA_MAXIMIZE_FORM',
   ARIA_RESTORE_FORM: 'ARIA_RESTORE_FORM',
   TITLE_UNSAVED_CHANGES: 'TITLE_UNSAVED_CHANGES',
+  TITLE_TRANSLATIONS: 'TITLE_TRANSLATIONS',
   MESSAGE_UNSAVED_CHANGES_LEAVE: 'MESSAGE_UNSAVED_CHANGES_LEAVE',
   BUTTON_STAY: 'BUTTON_STAY',
   BUTTON_DISCARD: 'BUTTON_DISCARD',
@@ -295,6 +327,262 @@ export const TRANSLATION_KEYS = {
   LABEL_INFO: 'LABEL_INFO',
   LABEL_WARNING: 'LABEL_WARNING',
   LABEL_IMPORTANT: 'LABEL_IMPORTANT',
+  // Schema Builder
+  SCHEMA_TITLE_INFO: 'SCHEMA_TITLE_INFO',
+  SCHEMA_LABEL_ID: 'SCHEMA_LABEL_ID',
+  SCHEMA_LABEL_TYPE: 'SCHEMA_LABEL_TYPE',
+  SCHEMA_TYPE_SYSTEM: 'SCHEMA_TYPE_SYSTEM',
+  SCHEMA_TYPE_BUSINESS: 'SCHEMA_TYPE_BUSINESS',
+  SCHEMA_TYPE_ACTION_FORM: 'SCHEMA_TYPE_ACTION_FORM',
+  SCHEMA_LABEL_SINGULAR_NAME: 'SCHEMA_LABEL_SINGULAR_NAME',
+  SCHEMA_LABEL_PLURAL_NAME: 'SCHEMA_LABEL_PLURAL_NAME',
+  SCHEMA_LABEL_ICON: 'SCHEMA_LABEL_ICON',
+  SCHEMA_LABEL_SHOW_IN_NAVIGATION: 'SCHEMA_LABEL_SHOW_IN_NAVIGATION',
+  SCHEMA_LABEL_IS_NOT_COMPANY_BASED: 'SCHEMA_LABEL_IS_NOT_COMPANY_BASED',
+  SCHEMA_LABEL_ALLOW_DATA_INACTIVE: 'SCHEMA_LABEL_ALLOW_DATA_INACTIVE',
+  SCHEMA_LABEL_ALLOW_DATA_FORCE: 'SCHEMA_LABEL_ALLOW_DATA_FORCE',
+  SCHEMA_LABEL_ALLOW_DATA_HARD_DELETE: 'SCHEMA_LABEL_ALLOW_DATA_HARD_DELETE',
+  SCHEMA_LABEL_ALLOW_ASSIGNED_TO: 'SCHEMA_LABEL_ALLOW_ASSIGNED_TO',
+  SCHEMA_LABEL_ALLOW_DUE_DATE: 'SCHEMA_LABEL_ALLOW_DUE_DATE',
+  SCHEMA_LABEL_ALLOW_DATA_BOOKMARK: 'SCHEMA_LABEL_ALLOW_DATA_BOOKMARK',
+  SCHEMA_LABEL_ALLOW_HIERARCHICAL_PARENT: 'SCHEMA_LABEL_ALLOW_HIERARCHICAL_PARENT',
+  SCHEMA_HEADING_DATA_MANAGEMENT: 'SCHEMA_HEADING_DATA_MANAGEMENT',
+  SCHEMA_HEADING_TENANT_SCOPE: 'SCHEMA_HEADING_TENANT_SCOPE',
+  SCHEMA_LABEL_APPLY_TO_ALL_TENANTS: 'SCHEMA_LABEL_APPLY_TO_ALL_TENANTS',
+  SCHEMA_DESC_APPLY_TO_ALL_TENANTS: 'SCHEMA_DESC_APPLY_TO_ALL_TENANTS',
+  SCHEMA_LABEL_SYNC_STRATEGY: 'SCHEMA_LABEL_SYNC_STRATEGY',
+  SCHEMA_DESC_SYNC_STRATEGY: 'SCHEMA_DESC_SYNC_STRATEGY',
+  SCHEMA_OPTION_SYNC_SCHEMA_ONLY: 'SCHEMA_OPTION_SYNC_SCHEMA_ONLY',
+  SCHEMA_OPTION_SYNC_SCHEMA_AND_DATA: 'SCHEMA_OPTION_SYNC_SCHEMA_AND_DATA',
+  SCHEMA_TAB_GENERAL: 'SCHEMA_TAB_GENERAL',
+  SCHEMA_TAB_SECTIONS: 'SCHEMA_TAB_SECTIONS',
+  SCHEMA_TITLE_SECTIONS_AND_FIELDS: 'SCHEMA_TITLE_SECTIONS_AND_FIELDS',
+  SCHEMA_BUTTON_SAVE_SCHEMA: 'SCHEMA_BUTTON_SAVE_SCHEMA',
+  SCHEMA_BUTTON_BACK_TO_SCHEMAS: 'SCHEMA_BUTTON_BACK_TO_SCHEMAS',
+  SCHEMA_MSG_COMPLETE_SECTION_BEFORE_ADD: 'SCHEMA_MSG_COMPLETE_SECTION_BEFORE_ADD',
+  SCHEMA_MSG_NO_CARD_SECTIONS: 'SCHEMA_MSG_NO_CARD_SECTIONS',
+  SCHEMA_LABEL_ADD_CARD_SECTION: 'SCHEMA_LABEL_ADD_CARD_SECTION',
+  SCHEMA_LABEL_UNTITLED_SECTION: 'SCHEMA_LABEL_UNTITLED_SECTION',
+  SCHEMA_LABEL_SECTION_COUNT: 'SCHEMA_LABEL_SECTION_COUNT',
+  SCHEMA_LABEL_SECTIONS_COUNT: 'SCHEMA_LABEL_SECTIONS_COUNT',
+  SCHEMA_LABEL_FIELD_COUNT: 'SCHEMA_LABEL_FIELD_COUNT',
+  SCHEMA_LABEL_FIELDS_COUNT: 'SCHEMA_LABEL_FIELDS_COUNT',
+  SCHEMA_TITLE_DETAIL_PAGE_SECTIONS: 'SCHEMA_TITLE_DETAIL_PAGE_SECTIONS',
+  SCHEMA_TITLE_QUICK_ACTIONS: 'SCHEMA_TITLE_QUICK_ACTIONS',
+  SCHEMA_TITLE_TABLE_RENDERERS: 'SCHEMA_TITLE_TABLE_RENDERERS',
+  SCHEMA_TITLE_COMPONENT_RENDERERS: 'SCHEMA_TITLE_COMPONENT_RENDERERS',
+  SCHEMA_TITLE_LAYOUT: 'SCHEMA_TITLE_LAYOUT',
+  SCHEMA_TITLE_HEADER: 'SCHEMA_TITLE_HEADER',
+  DETAIL_MSG_NO_SECTIONS: 'DETAIL_MSG_NO_SECTIONS',
+  DETAIL_MSG_NO_QUICK_ACTIONS: 'DETAIL_MSG_NO_QUICK_ACTIONS',
+  DETAIL_MSG_NO_TABLE_RENDERERS: 'DETAIL_MSG_NO_TABLE_RENDERERS',
+  DETAIL_MSG_NO_COMPONENT_RENDERERS: 'DETAIL_MSG_NO_COMPONENT_RENDERERS',
+  DETAIL_BUTTON_ADD_SECTION: 'DETAIL_BUTTON_ADD_SECTION',
+  DETAIL_BUTTON_ADD_ACTION: 'DETAIL_BUTTON_ADD_ACTION',
+  DETAIL_BUTTON_ADD_TABLE: 'DETAIL_BUTTON_ADD_TABLE',
+  DETAIL_BUTTON_ADD_COMPONENT: 'DETAIL_BUTTON_ADD_COMPONENT',
+  DETAIL_LABEL_UNTITLED_ACTION: 'DETAIL_LABEL_UNTITLED_ACTION',
+  DETAIL_LABEL_UNTITLED_TABLE: 'DETAIL_LABEL_UNTITLED_TABLE',
+  DETAIL_LABEL_UNTITLED_COMPONENT: 'DETAIL_LABEL_UNTITLED_COMPONENT',
+  DETAIL_LABEL_ACTION_SINGULAR: 'DETAIL_LABEL_ACTION_SINGULAR',
+  DETAIL_LABEL_ACTIONS_PLURAL: 'DETAIL_LABEL_ACTIONS_PLURAL',
+  DETAIL_LABEL_TABLE_SINGULAR: 'DETAIL_LABEL_TABLE_SINGULAR',
+  DETAIL_LABEL_TABLES_PLURAL: 'DETAIL_LABEL_TABLES_PLURAL',
+  DETAIL_LABEL_COMPONENT_SINGULAR: 'DETAIL_LABEL_COMPONENT_SINGULAR',
+  DETAIL_LABEL_COMPONENTS_PLURAL: 'DETAIL_LABEL_COMPONENTS_PLURAL',
+  DETAIL_LABEL_COLUMN_SINGULAR: 'DETAIL_LABEL_COLUMN_SINGULAR',
+  DETAIL_LABEL_COLUMNS_PLURAL: 'DETAIL_LABEL_COLUMNS_PLURAL',
+  DETAIL_LABEL_SELECTED_FIELDS: 'DETAIL_LABEL_SELECTED_FIELDS',
+  DETAIL_LABEL_AVAILABLE_FIELDS: 'DETAIL_LABEL_AVAILABLE_FIELDS',
+  DETAIL_MSG_NO_FIELDS_SELECTED: 'DETAIL_MSG_NO_FIELDS_SELECTED',
+  DETAIL_MSG_NO_FIELDS_AVAILABLE: 'DETAIL_MSG_NO_FIELDS_AVAILABLE',
+  DETAIL_LABEL_SHOW_BACK_BUTTON: 'DETAIL_LABEL_SHOW_BACK_BUTTON',
+  DETAIL_LABEL_SHOW_ACTIONS: 'DETAIL_LABEL_SHOW_ACTIONS',
+  DETAIL_LABEL_MAIN_COLUMNS: 'DETAIL_LABEL_MAIN_COLUMNS',
+  DETAIL_LABEL_SIDEBAR_COLUMNS: 'DETAIL_LABEL_SIDEBAR_COLUMNS',
+  DETAIL_LABEL_COLUMN_AREA: 'DETAIL_LABEL_COLUMN_AREA',
+  DETAIL_OPTION_MAIN: 'DETAIL_OPTION_MAIN',
+  DETAIL_OPTION_SIDEBAR: 'DETAIL_OPTION_SIDEBAR',
+  DETAIL_LABEL_SELECTED_COLUMNS: 'DETAIL_LABEL_SELECTED_COLUMNS',
+  DETAIL_MSG_NO_COLUMNS_SELECTED: 'DETAIL_MSG_NO_COLUMNS_SELECTED',
+  DETAIL_LABEL_TITLE: 'DETAIL_LABEL_TITLE',
+  DETAIL_LABEL_COLUMN_SPAN: 'DETAIL_LABEL_COLUMN_SPAN',
+  DETAIL_LABEL_BADGE_VARIANT: 'DETAIL_LABEL_BADGE_VARIANT',
+  DETAIL_LABEL_ENFORCE_BADGE_VARIANT: 'DETAIL_LABEL_ENFORCE_BADGE_VARIANT',
+  DETAIL_LABEL_BADGE_CLICKABLE: 'DETAIL_LABEL_BADGE_CLICKABLE',
+  DETAIL_LABEL_LAYOUT_COLUMNS: 'DETAIL_LABEL_LAYOUT_COLUMNS',
+  DETAIL_LABEL_LAYOUT_GAP: 'DETAIL_LABEL_LAYOUT_GAP',
+  DETAIL_LABEL_ACTION_ID: 'DETAIL_LABEL_ACTION_ID',
+  DETAIL_LABEL_ACTION_TYPE: 'DETAIL_LABEL_ACTION_TYPE',
+  DETAIL_LABEL_VARIANT: 'DETAIL_LABEL_VARIANT',
+  DETAIL_LABEL_TARGET_SCHEMA: 'DETAIL_LABEL_TARGET_SCHEMA',
+  DETAIL_PLACEHOLDER_SCHEMA_ID: 'DETAIL_PLACEHOLDER_SCHEMA_ID',
+  DETAIL_LABEL_TARGET_URL: 'DETAIL_LABEL_TARGET_URL',
+  DETAIL_LABEL_RENDERER_ID: 'DETAIL_LABEL_RENDERER_ID',
+  DETAIL_LABEL_RELATION_TYPE_ID: 'DETAIL_LABEL_RELATION_TYPE_ID',
+  DETAIL_PLACEHOLDER_SECTION_ID_FROM_TARGET: 'DETAIL_PLACEHOLDER_SECTION_ID_FROM_TARGET',
+  DETAIL_LABEL_SORTING_ENABLED: 'DETAIL_LABEL_SORTING_ENABLED',
+  DETAIL_LABEL_PAGINATION_ENABLED: 'DETAIL_LABEL_PAGINATION_ENABLED',
+  DETAIL_LABEL_PAGE_SIZE: 'DETAIL_LABEL_PAGE_SIZE',
+  DETAIL_LABEL_COMPONENT_TYPE: 'DETAIL_LABEL_COMPONENT_TYPE',
+  DETAIL_LABEL_COMPONENT_NAME: 'DETAIL_LABEL_COMPONENT_NAME',
+  DETAIL_LABEL_DATA_PATH: 'DETAIL_LABEL_DATA_PATH',
+  DETAIL_LABEL_GAP: 'DETAIL_LABEL_GAP',
+  DETAIL_LABEL_ACTIONS: 'DETAIL_LABEL_ACTIONS',
+  DETAIL_MSG_NO_SECTIONS_AVAILABLE: 'DETAIL_MSG_NO_SECTIONS_AVAILABLE',
+  DETAIL_LABEL_AI_AGENT: 'DETAIL_LABEL_AI_AGENT',
+  DETAIL_PLACEHOLDER_SELECT_AI_AGENT: 'DETAIL_PLACEHOLDER_SELECT_AI_AGENT',
+  DETAIL_LABEL_SELECTED_SECTIONS: 'DETAIL_LABEL_SELECTED_SECTIONS',
+  DETAIL_LABEL_RUN_TYPE: 'DETAIL_LABEL_RUN_TYPE',
+  DETAIL_LABEL_DISPLAY_TYPE: 'DETAIL_LABEL_DISPLAY_TYPE',
+  DETAIL_LABEL_DEFAULT_LANGUAGE: 'DETAIL_LABEL_DEFAULT_LANGUAGE',
+  DETAIL_OPTION_MANUAL: 'DETAIL_OPTION_MANUAL',
+  DETAIL_OPTION_AUTOMATIC: 'DETAIL_OPTION_AUTOMATIC',
+  DETAIL_OPTION_SHOW_FORM: 'DETAIL_OPTION_SHOW_FORM',
+  DETAIL_OPTION_HIDE_FORM: 'DETAIL_OPTION_HIDE_FORM',
+  DETAIL_PLACEHOLDER_SELECT_DEFAULT_LANGUAGE: 'DETAIL_PLACEHOLDER_SELECT_DEFAULT_LANGUAGE',
+  DETAIL_MSG_DEFAULT_LANGUAGE_DESCRIPTION: 'DETAIL_MSG_DEFAULT_LANGUAGE_DESCRIPTION',
+  DETAIL_MSG_LEAVE_EMPTY_SHOW_ALL_FIELDS: 'DETAIL_MSG_LEAVE_EMPTY_SHOW_ALL_FIELDS',
+  DETAIL_PLACEHOLDER_CUSTOM_COMPONENT_NAME: 'DETAIL_PLACEHOLDER_CUSTOM_COMPONENT_NAME',
+  SCHEMA_TAB_CARD_METADATA: 'SCHEMA_TAB_CARD_METADATA',
+  SCHEMA_TAB_DETAIL_PAGE: 'SCHEMA_TAB_DETAIL_PAGE',
+  SCHEMA_LOADING: 'SCHEMA_LOADING',
+  SCHEMA_NOT_FOUND: 'SCHEMA_NOT_FOUND',
+  SCHEMA_EDIT_TITLE: 'SCHEMA_EDIT_TITLE',
+  SCHEMA_SAVED_SUCCESS: 'SCHEMA_SAVED_SUCCESS',
+  SCHEMA_SAVE_ERROR: 'SCHEMA_SAVE_ERROR',
+  SECTION_EDIT_TITLE: 'SECTION_EDIT_TITLE',
+  SECTION_DESCRIPTION_DIALOG: 'SECTION_DESCRIPTION_DIALOG',
+  SECTION_LABEL_TITLE: 'SECTION_LABEL_TITLE',
+  SECTION_PLACEHOLDER_TITLE: 'SECTION_PLACEHOLDER_TITLE',
+  SECTION_LABEL_ID: 'SECTION_LABEL_ID',
+  SECTION_PLACEHOLDER_ID: 'SECTION_PLACEHOLDER_ID',
+  SECTION_HELPER_ID: 'SECTION_HELPER_ID',
+  SECTION_LABEL_DESCRIPTION: 'SECTION_LABEL_DESCRIPTION',
+  SECTION_PLACEHOLDER_DESCRIPTION: 'SECTION_PLACEHOLDER_DESCRIPTION',
+  SECTION_LABEL_INITIAL_STATE: 'SECTION_LABEL_INITIAL_STATE',
+  SECTION_OPTION_EXPANDED: 'SECTION_OPTION_EXPANDED',
+  SECTION_OPTION_COLLAPSED: 'SECTION_OPTION_COLLAPSED',
+  SECTION_LABEL_COLUMNS: 'SECTION_LABEL_COLUMNS',
+  SECTION_LABEL_REPEATING: 'SECTION_LABEL_REPEATING',
+  SECTION_BADGE_REPEATING: 'SECTION_BADGE_REPEATING',
+  SECTION_TITLE_DRAG_TO_REORDER: 'SECTION_TITLE_DRAG_TO_REORDER',
+  SECTION_LABEL_FIELD_RELATION_TYPE: 'SECTION_LABEL_FIELD_RELATION_TYPE',
+  SECTION_OPTION_CONNECT_TO_SCHEMA: 'SECTION_OPTION_CONNECT_TO_SCHEMA',
+  SECTION_OPTION_ADD_FIELDS: 'SECTION_OPTION_ADD_FIELDS',
+  SECTION_DESC_CONNECT_TO_SCHEMA: 'SECTION_DESC_CONNECT_TO_SCHEMA',
+  SECTION_DESC_ADD_FIELDS: 'SECTION_DESC_ADD_FIELDS',
+  SECTION_LABEL_SHOW_NOT_APPLICABLE: 'SECTION_LABEL_SHOW_NOT_APPLICABLE',
+  SECTION_LABEL_CONFIGURATION: 'SECTION_LABEL_CONFIGURATION',
+  SECTION_LABEL_TARGET_SCHEMA: 'SECTION_LABEL_TARGET_SCHEMA',
+  SECTION_PLACEHOLDER_SELECT_TARGET_SCHEMA: 'SECTION_PLACEHOLDER_SELECT_TARGET_SCHEMA',
+  SECTION_MSG_TARGET_SCHEMA_REQUIRED: 'SECTION_MSG_TARGET_SCHEMA_REQUIRED',
+  SECTION_LABEL_RELATION_TYPE: 'SECTION_LABEL_RELATION_TYPE',
+  SECTION_PLACEHOLDER_SELECT_RELATION_TYPE: 'SECTION_PLACEHOLDER_SELECT_RELATION_TYPE',
+  SECTION_MSG_RELATION_TYPE_REQUIRED: 'SECTION_MSG_RELATION_TYPE_REQUIRED',
+  SECTION_MSG_REQUIRED_BOTH: 'SECTION_MSG_REQUIRED_BOTH',
+  SECTION_LABEL_MIN_ITEMS: 'SECTION_LABEL_MIN_ITEMS',
+  SECTION_LABEL_MAX_ITEMS: 'SECTION_LABEL_MAX_ITEMS',
+  SECTION_TITLE_SELECT_TARGET_SCHEMA: 'SECTION_TITLE_SELECT_TARGET_SCHEMA',
+  SECTION_DESC_SELECT_TARGET_SCHEMA: 'SECTION_DESC_SELECT_TARGET_SCHEMA',
+  SECTION_TITLE_SELECT_RELATION_TYPE: 'SECTION_TITLE_SELECT_RELATION_TYPE',
+  SECTION_DESC_SELECT_RELATION_TYPE: 'SECTION_DESC_SELECT_RELATION_TYPE',
+  SECTION_ERROR_TITLE_INVALID: 'SECTION_ERROR_TITLE_INVALID',
+  SECTION_LABEL_NEW_SECTION: 'SECTION_LABEL_NEW_SECTION',
+  FIELD_UNNAMED: 'FIELD_UNNAMED',
+  FIELD_EDIT_TITLE: 'FIELD_EDIT_TITLE',
+  FIELD_DESCRIPTION_DIALOG: 'FIELD_DESCRIPTION_DIALOG',
+  FIELD_LABEL_LABEL: 'FIELD_LABEL_LABEL',
+  FIELD_PLACEHOLDER_LABEL: 'FIELD_PLACEHOLDER_LABEL',
+  FIELD_LABEL_NAME: 'FIELD_LABEL_NAME',
+  FIELD_LABEL_COMPONENT: 'FIELD_LABEL_COMPONENT',
+  FIELD_LABEL_SECTION: 'FIELD_LABEL_SECTION',
+  FIELD_LABEL_PLACEHOLDER: 'FIELD_LABEL_PLACEHOLDER',
+  FIELD_LABEL_ROLE: 'FIELD_LABEL_ROLE',
+  FIELD_LABEL_ROLE_COLOR: 'FIELD_LABEL_ROLE_COLOR',
+  FIELD_TOOLTIP_EDIT: 'FIELD_TOOLTIP_EDIT',
+  FIELD_TOOLTIP_DELETE: 'FIELD_TOOLTIP_DELETE',
+  FIELD_LABEL_SAVE_CHANGES: 'FIELD_LABEL_SAVE_CHANGES',
+  FIELD_LABEL_NEW_FIELD: 'FIELD_LABEL_NEW_FIELD',
+  FIELD_LABEL_ADD_TO_REFERENCE_METADATA: 'FIELD_LABEL_ADD_TO_REFERENCE_METADATA',
+  FIELD_MSG_VALID_LABEL_REQUIRED: 'FIELD_MSG_VALID_LABEL_REQUIRED',
+  FIELD_PLACEHOLDER_AUTO_NAME: 'FIELD_PLACEHOLDER_AUTO_NAME',
+  FIELD_HELPER_AUTO_NAME: 'FIELD_HELPER_AUTO_NAME',
+  FIELD_LABEL_ORDER: 'FIELD_LABEL_ORDER',
+  FIELD_PLACEHOLDER_ORDER: 'FIELD_PLACEHOLDER_ORDER',
+  FIELD_LABEL_DESCRIPTION: 'FIELD_LABEL_DESCRIPTION',
+  FIELD_PLACEHOLDER_DESCRIPTION: 'FIELD_PLACEHOLDER_DESCRIPTION',
+  FIELD_PLACEHOLDER_ENTER_PLACEHOLDER: 'FIELD_PLACEHOLDER_ENTER_PLACEHOLDER',
+  FIELD_LABEL_VALIDATION_RULES: 'FIELD_LABEL_VALIDATION_RULES',
+  FIELD_LABEL_MIN_LENGTH: 'FIELD_LABEL_MIN_LENGTH',
+  FIELD_PLACEHOLDER_MIN_LENGTH: 'FIELD_PLACEHOLDER_MIN_LENGTH',
+  FIELD_LABEL_MAX_LENGTH: 'FIELD_LABEL_MAX_LENGTH',
+  FIELD_PLACEHOLDER_MAX_LENGTH: 'FIELD_PLACEHOLDER_MAX_LENGTH',
+  FIELD_LABEL_MIN_VALUE: 'FIELD_LABEL_MIN_VALUE',
+  FIELD_PLACEHOLDER_MIN_VALUE: 'FIELD_PLACEHOLDER_MIN_VALUE',
+  FIELD_LABEL_MAX_VALUE: 'FIELD_LABEL_MAX_VALUE',
+  FIELD_PLACEHOLDER_MAX_VALUE: 'FIELD_PLACEHOLDER_MAX_VALUE',
+  FIELD_LABEL_PATTERN: 'FIELD_LABEL_PATTERN',
+  FIELD_PLACEHOLDER_PATTERN: 'FIELD_PLACEHOLDER_PATTERN',
+  FIELD_HELPER_PATTERN: 'FIELD_HELPER_PATTERN',
+  FIELD_LABEL_REQUIRED: 'FIELD_LABEL_REQUIRED',
+  FIELD_LABEL_DISABLED: 'FIELD_LABEL_DISABLED',
+  FIELD_LABEL_READONLY: 'FIELD_LABEL_READONLY',
+  FIELD_LABEL_CAN_COPY: 'FIELD_LABEL_CAN_COPY',
+  FIELD_LABEL_IS_SENSITIVE: 'FIELD_LABEL_IS_SENSITIVE',
+  FIELD_OPTION_DEFAULT: 'FIELD_OPTION_DEFAULT',
+  FIELD_OPTION_SECONDARY: 'FIELD_OPTION_SECONDARY',
+  FIELD_OPTION_OUTLINE: 'FIELD_OPTION_OUTLINE',
+  FIELD_OPTION_DESTRUCTIVE: 'FIELD_OPTION_DESTRUCTIVE',
+  FIELD_OPTION_GRADIENT: 'FIELD_OPTION_GRADIENT',
+  FIELD_OPTION_SUCCESS: 'FIELD_OPTION_SUCCESS',
+  FIELD_OPTION_WARNING: 'FIELD_OPTION_WARNING',
+  FIELD_OPTION_INFO: 'FIELD_OPTION_INFO',
+  FIELD_OPTION_MUTED: 'FIELD_OPTION_MUTED',
+  FIELD_MSG_LOADING_COMPONENTS: 'FIELD_MSG_LOADING_COMPONENTS',
+  FIELD_MSG_ERROR_LOADING_COMPONENTS: 'FIELD_MSG_ERROR_LOADING_COMPONENTS',
+  FIELD_TITLE_SELECT_TARGET_SCHEMA: 'FIELD_TITLE_SELECT_TARGET_SCHEMA',
+  FIELD_DESC_SELECT_TARGET_SCHEMA: 'FIELD_DESC_SELECT_TARGET_SCHEMA',
+  FIELD_LABEL_INCOMPLETE: 'FIELD_LABEL_INCOMPLETE',
+  SCHEMA_LABEL_CAN_SELECT_MULTI_COMPANIES: 'SCHEMA_LABEL_CAN_SELECT_MULTI_COMPANIES',
+  SCHEMA_DESC_CAN_SELECT_MULTI_COMPANIES: 'SCHEMA_DESC_CAN_SELECT_MULTI_COMPANIES',
+  SCHEMA_LABEL_ALLOW_DATA_RELATED_TENANTS: 'SCHEMA_LABEL_ALLOW_DATA_RELATED_TENANTS',
+  SCHEMA_DESC_ALLOW_DATA_RELATED_TENANTS: 'SCHEMA_DESC_ALLOW_DATA_RELATED_TENANTS',
+  SCHEMA_LABEL_STATUS_GROUP: 'SCHEMA_LABEL_STATUS_GROUP',
+  SCHEMA_DESC_STATUS_GROUP: 'SCHEMA_DESC_STATUS_GROUP',
+  SCHEMA_LABEL_ENTITY_TYPE_GROUP: 'SCHEMA_LABEL_ENTITY_TYPE_GROUP',
+  SCHEMA_DESC_ENTITY_TYPE_GROUP: 'SCHEMA_DESC_ENTITY_TYPE_GROUP',
+  SCHEMA_LABEL_RELATED_TENANTS: 'SCHEMA_LABEL_RELATED_TENANTS',
+  SCHEMA_DESC_RELATED_TENANTS: 'SCHEMA_DESC_RELATED_TENANTS',
+  SCHEMA_LABEL_SHOW_INACTIVE_SECTIONS: 'SCHEMA_LABEL_SHOW_INACTIVE_SECTIONS',
+  SCHEMA_LABEL_ADD_SECTION: 'SCHEMA_LABEL_ADD_SECTION',
+  SCHEMA_LABEL_ADD_FIELD: 'SCHEMA_LABEL_ADD_FIELD',
+  SCHEMA_LABEL_COLLAPSE_ALL: 'SCHEMA_LABEL_COLLAPSE_ALL',
+  SCHEMA_SUBTITLE_BUILDER: 'SCHEMA_SUBTITLE_BUILDER',
+  SECTION_LABEL_FIELDS: 'SECTION_LABEL_FIELDS',
+  SECTION_MSG_NO_FIELDS_YET: 'SECTION_MSG_NO_FIELDS_YET',
+  SECTION_DESC_ADD_ONLY: 'SECTION_DESC_ADD_ONLY',
+  SECTION_DESC_CAN_SELECT: 'SECTION_DESC_CAN_SELECT',
+  SECTION_DESC_MUST_SELECT: 'SECTION_DESC_MUST_SELECT',
+  SECTION_LABEL_UNIQUE_SELECTION: 'SECTION_LABEL_UNIQUE_SELECTION',
+  SECTION_DESC_UNIQUE_SELECTION: 'SECTION_DESC_UNIQUE_SELECTION',
+  SECTION_MSG_RELATION_BASED: 'SECTION_MSG_RELATION_BASED',
+  SECTION_MSG_FIELDS_MANAGED_IN_TARGET: 'SECTION_MSG_FIELDS_MANAGED_IN_TARGET',
+  SECTION_MSG_SAVE_BEFORE_ADD_FIELDS: 'SECTION_MSG_SAVE_BEFORE_ADD_FIELDS',
+  SECTION_LABEL_DELETE_TYPE: 'SECTION_LABEL_DELETE_TYPE',
+  SECTION_OPTION_DELETE_RELATION_ONLY: 'SECTION_OPTION_DELETE_RELATION_ONLY',
+  SECTION_OPTION_DELETE_ITEM_AND_RELATION: 'SECTION_OPTION_DELETE_ITEM_AND_RELATION',
+  SECTION_DESC_DELETE_RELATION_ONLY: 'SECTION_DESC_DELETE_RELATION_ONLY',
+  SECTION_DESC_DELETE_ITEM_AND_RELATION: 'SECTION_DESC_DELETE_ITEM_AND_RELATION',
+  SECTION_LABEL_ADD_TYPE: 'SECTION_LABEL_ADD_TYPE',
+  SECTION_OPTION_ADD_ONLY: 'SECTION_OPTION_ADD_ONLY',
+  SECTION_OPTION_CAN_SELECT_FROM_DATA: 'SECTION_OPTION_CAN_SELECT_FROM_DATA',
+  SECTION_OPTION_MUST_SELECT_FROM_DATA: 'SECTION_OPTION_MUST_SELECT_FROM_DATA',
+  SCHEMA_MSG_NO_FIELDS_YET: 'SCHEMA_MSG_NO_FIELDS_YET',
+  SCHEMA_MSG_NOT_FOUND: 'SCHEMA_MSG_NOT_FOUND',
+  SCHEMA_MSG_TRY_DIFFERENT: 'SCHEMA_MSG_TRY_DIFFERENT',
+  CARD_LABEL_NEW_SECTION: 'CARD_LABEL_NEW_SECTION',
+  CARD_MSG_ID_AUTO_CUSTOMIZE: 'CARD_MSG_ID_AUTO_CUSTOMIZE',
 } as const;
 
 export type TranslationKey = (typeof TRANSLATION_KEYS)[keyof typeof TRANSLATION_KEYS];
@@ -691,6 +979,71 @@ export const TRANSLATIONS: TranslationEntry[] = [
     ],
   },
   {
+    key: TRANSLATION_KEYS.TITLE_QR_CODE,
+    translations: [
+      { en: 'QR Code' },
+      { fa: 'کد QR' },
+      { ar: 'رمز QR' },
+      { es: 'Código QR' },
+      { fr: 'Code QR' },
+      { de: 'QR-Code' },
+      { it: 'Codice QR' },
+      { ru: 'QR-код' },
+    ],
+  },
+  {
+    key: TRANSLATION_KEYS.ACTION_OPEN_URL,
+    translations: [
+      { en: 'Open URL' },
+      { fa: 'باز کردن پیوند' },
+      { ar: 'فتح الرابط' },
+      { es: 'Abrir URL' },
+      { fr: 'Ouvrir l\'URL' },
+      { de: 'URL öffnen' },
+      { it: 'Apri URL' },
+      { ru: 'Открыть URL' },
+    ],
+  },
+  {
+    key: TRANSLATION_KEYS.ACTION_DOWNLOAD,
+    translations: [
+      { en: 'Download' },
+      { fa: 'دانلود' },
+      { ar: 'تحميل' },
+      { es: 'Descargar' },
+      { fr: 'Télécharger' },
+      { de: 'Herunterladen' },
+      { it: 'Scarica' },
+      { ru: 'Скачать' },
+    ],
+  },
+  {
+    key: TRANSLATION_KEYS.TITLE_SHARE_QR_CODE,
+    translations: [
+      { en: 'Share QR Code' },
+      { fa: 'اشتراک‌گذاری کد QR' },
+      { ar: 'مشاركة رمز QR' },
+      { es: 'Compartir código QR' },
+      { fr: 'Partager le code QR' },
+      { de: 'QR-Code teilen' },
+      { it: 'Condividi codice QR' },
+      { ru: 'Поделиться QR-кодом' },
+    ],
+  },
+  {
+    key: TRANSLATION_KEYS.TEXT_CHECK_OUT_THIS_QR_CODE,
+    translations: [
+      { en: 'Check out this QR code' },
+      { fa: 'این کد QR را ببینید' },
+      { ar: 'اطلع على رمز QR هذا' },
+      { es: 'Mira este código QR' },
+      { fr: 'Découvrez ce code QR' },
+      { de: 'QR-Code ansehen' },
+      { it: 'Dai un\'occhiata a questo codice QR' },
+      { ru: 'Посмотрите этот QR-код' },
+    ],
+  },
+  {
     key: TRANSLATION_KEYS.TITLE_SHARE_THIS_PAGE,
     translations: [
       { en: 'Share this page' },
@@ -782,6 +1135,10 @@ export const TRANSLATIONS: TranslationEntry[] = [
     ],
   },
   {
+    key: TRANSLATION_KEYS.PLACEHOLDER_SEARCH_OPTIONS,
+    translations: [{ en: 'Search options...' }, { fa: 'جستجوی گزینه‌ها...' }, { ar: 'البحث في الخيارات...' }, { es: 'Buscar opciones...' }, { fr: 'Rechercher des options...' }, { de: 'Optionen suchen...' }, { it: 'Cerca opzioni...' }, { ru: 'Поиск вариантов...' }],
+  },
+  {
     key: TRANSLATION_KEYS.PLACEHOLDER_SEARCH_APPLICATIONS,
     translations: [
       { en: 'Search applications...' },
@@ -821,6 +1178,19 @@ export const TRANSLATIONS: TranslationEntry[] = [
     ],
   },
   {
+    key: TRANSLATION_KEYS.LABEL_VALUE,
+    translations: [
+      { en: 'Value' },
+      { fa: 'مقدار' },
+      { ar: 'القيمة' },
+      { es: 'Valor' },
+      { fr: 'Valeur' },
+      { de: 'Wert' },
+      { it: 'Valore' },
+      { ru: 'Значение' },
+    ],
+  },
+  {
     key: TRANSLATION_KEYS.SIDEBAR_HOME,
     translations: [
       { en: 'Home' },
@@ -837,13 +1207,26 @@ export const TRANSLATIONS: TranslationEntry[] = [
     key: TRANSLATION_KEYS.SIDEBAR_APPLICATIONS,
     translations: [
       { en: 'Applications' },
-      { fa: 'برنامه‌ها' },
+      { fa: 'اپلیکیشن‌ها' },
       { ar: 'التطبيقات' },
       { es: 'Aplicaciones' },
       { fr: 'Applications' },
       { de: 'Anwendungen' },
       { it: 'Applicazioni' },
       { ru: 'Приложения' },
+    ],
+  },
+  {
+    key: TRANSLATION_KEYS.SIDEBAR_MENU,
+    translations: [
+      { en: 'Menu' },
+      { fa: 'منو' },
+      { ar: 'القائمة' },
+      { es: 'Menú' },
+      { fr: 'Menu' },
+      { de: 'Menü' },
+      { it: 'Menu' },
+      { ru: 'Меню' },
     ],
   },
   {
@@ -910,6 +1293,18 @@ export const TRANSLATIONS: TranslationEntry[] = [
       { it: 'Nessuno' },
       { ru: 'Нет' },
     ],
+  },
+  {
+    key: TRANSLATION_KEYS.LABEL_CUSTOMIZE,
+    translations: [{ en: 'Customize' }, { fa: 'سفارشی' }, { ar: 'تخصيص' }, { es: 'Personalizar' }, { fr: 'Personnaliser' }, { de: 'Anpassen' }, { it: 'Personalizza' }, { ru: 'Настроить' }],
+  },
+  {
+    key: TRANSLATION_KEYS.LABEL_USE_GENERATED,
+    translations: [{ en: 'Use generated' }, { fa: 'استفاده از تولیدشده' }, { ar: 'استخدام المُنشأ' }, { es: 'Usar generado' }, { fr: 'Utiliser généré' }, { de: 'Generiert verwenden' }, { it: 'Usa generato' }, { ru: 'Использовать сгенерированное' }],
+  },
+  {
+    key: TRANSLATION_KEYS.MSG_AUTO_GENERATED_CLICK_CUSTOMIZE,
+    translations: [{ en: 'Automatically generated. Click "Customize" to override.' }, { fa: 'تولید خودکار. برای تغییر «سفارشی» بزنید.' }, { ar: 'يُنشأ تلقائياً. انقر على «تخصيص» للتجاوز.' }, { es: 'Generado automáticamente. Haz clic en «Personalizar» para cambiarlo.' }, { fr: 'Généré automatiquement. Cliquez sur « Personnaliser » pour modifier.' }, { de: 'Automatisch generiert. Klicken Sie auf „Anpassen“, um zu überschreiben.' }, { it: 'Generato automaticamente. Clicca su «Personalizza» per sovrascrivere.' }, { ru: 'Создаётся автоматически. Нажмите «Настроить», чтобы изменить.' }],
   },
   {
     key: TRANSLATION_KEYS.LABEL_NONE_USE_DOMAIN,
@@ -1448,6 +1843,25 @@ export const TRANSLATIONS: TranslationEntry[] = [
   { key: TRANSLATION_KEYS.EMPTY_SELECT_USER_TO_VIEW_TASKS_DESCRIPTION, translations: [{ en: 'Use the assignment switcher above to choose whose assigned or initiated tasks you want to see.' }, { fa: 'از سوئیچ انتساب بالا استفاده کنید تا وظایف تخصیص‌یافته یا آغازشده توسط هر کاربر را ببینید.' }, { ar: 'استخدم مبدل التعيين أعلاه لاختيار مهام من تريد رؤيتها (المُعيَّنة أو المُبدَأة).' }, { es: 'Use el selector de asignación de arriba para elegir las tareas asignadas o iniciadas que desea ver.' }, { fr: 'Utilisez le sélecteur d\'affectation ci-dessus pour choisir les tâches assignées ou initiées à afficher.' }, { de: 'Verwenden Sie den Zuweisungs-Umschalter oben, um auszuwählen, wessen zugewiesene oder initiierte Aufgaben Sie sehen möchten.' }, { it: 'Usa il selettore di assegnazione sopra per scegliere quali attività assegnate o avviate vuoi vedere.' }, { ru: 'Используйте переключатель назначения выше, чтобы выбрать, чьи назначенные или инициированные задачи вы хотите видеть.' }] },
   { key: TRANSLATION_KEYS.EMPTY_NO_X_FOUND, translations: [{ en: 'No {name} found' }, { fa: 'هیچ {name} یافت نشد' }, { ar: 'لم يتم العثور على {name}' }, { es: 'No se encontró {name}' }, { fr: 'Aucun {name} trouvé' }, { de: 'Keine {name} gefunden' }, { it: 'Nessun {name} trovato' }, { ru: 'Ничего не найдено: {name}' }] },
   { key: TRANSLATION_KEYS.EMPTY_TRY_ADJUSTING_SEARCH, translations: [{ en: 'Try adjusting your search criteria.' }, { fa: 'معیارهای جستجو را تنظیم کنید.' }, { ar: 'حاول تعديل معايير البحث.' }, { es: 'Intente ajustar los criterios de búsqueda.' }, { fr: 'Essayez d\'ajuster vos critères de recherche.' }, { de: 'Versuchen Sie, Ihre Suchkriterien anzupassen.' }, { it: 'Prova a modificare i criteri di ricerca.' }, { ru: 'Попробуйте изменить критерии поиска.' }] },
+  { key: TRANSLATION_KEYS.TITLE_APPS, translations: [{ en: 'Apps' }, { fa: 'برنامه‌ها' }, { ar: 'التطبيقات' }, { es: 'Aplicaciones' }, { fr: 'Applications' }, { de: 'Apps' }, { it: 'App' }, { ru: 'Приложения' }] },
+  { key: TRANSLATION_KEYS.WELCOME_BACK_TITLE, translations: [{ en: 'Welcome back, {name}! 👋' }, { fa: 'خوش آمدید، {name}! 👋' }, { ar: 'مرحباً بعودتك، {name}! 👋' }, { es: '¡Bienvenido de nuevo, {name}! 👋' }, { fr: 'Bon retour, {name} ! 👋' }, { de: 'Willkommen zurück, {name}! 👋' }, { it: 'Bentornato, {name}! 👋' }, { ru: 'С возвращением, {name}! 👋' }] },
+  { key: TRANSLATION_KEYS.WELCOME_NAME_FALLBACK, translations: [{ en: 'there' }, { fa: 'میهمان' }, { ar: 'زائر' }, { es: 'invitado' }, { fr: 'invité' }, { de: 'Gast' }, { it: 'ospite' }, { ru: 'гость' }] },
+  { key: TRANSLATION_KEYS.SUBTITLE_APPS_LAUNCH, translations: [{ en: 'Launch your data-driven experiences' }, { fa: 'تجربه‌های داده‌محور خود را اجرا کنید' }, { ar: 'شغّل تجاربك المدفوعة بالبيانات' }, { es: 'Lanza tus experiencias basadas en datos' }, { fr: 'Lancez vos expériences pilotées par les données' }, { de: 'Starten Sie Ihre datengetriebenen Anwendungen' }, { it: 'Avvia le tue esperienze basate sui dati' }, { ru: 'Запускайте приложения на основе данных' }] },
+  { key: TRANSLATION_KEYS.SUBTITLE_APPS_BROWSE, translations: [{ en: 'Browse and launch your business applications.' }, { fa: 'برنامه‌های کسب‌وکار خود را مرور و اجرا کنید.' }, { ar: 'تصفح وتشغيل تطبيقات عملك.' }, { es: 'Explora y lanza tus aplicaciones de negocio.' }, { fr: 'Parcourez et lancez vos applications métier.' }, { de: 'Durchsuchen und starten Sie Ihre Geschäftsanwendungen.' }, { it: 'Sfoglia e avvia le tue applicazioni aziendali.' }, { ru: 'Просматривайте и запускайте бизнес-приложения.' }] },
+  { key: TRANSLATION_KEYS.APPS_AVAILABLE_BADGE, translations: [{ en: '{count} App(s) Available for you' }, { fa: '{count} برنامه برای شما' }, { ar: '{count} تطبيق متاح لك' }, { es: '{count} aplicación(es) disponible(s) para ti' }, { fr: '{count} application(s) disponible(s) pour vous' }, { de: '{count} App(s) für Sie verfügbar' }, { it: '{count} app disponibili per te' }, { ru: '{count} приложений доступно для вас' }] },
+  { key: TRANSLATION_KEYS.BADGE_LAUNCH_ONE_CLICK, translations: [{ en: 'Launch in One Click' }, { fa: 'اجرا با یک کلیک' }, { ar: 'تشغيل بنقرة واحدة' }, { es: 'Lanzar con un clic' }, { fr: 'Lancer en un clic' }, { de: 'Mit einem Klick starten' }, { it: 'Avvia con un clic' }, { ru: 'Запуск в один клик' }] },
+  { key: TRANSLATION_KEYS.BADGE_REALTIME_ANALYTICS, translations: [{ en: 'Real-time Analytics' }, { fa: 'تحلیل لحظه‌ای' }, { ar: 'تحليلات في الوقت الفعلي' }, { es: 'Análisis en tiempo real' }, { fr: 'Analytique en temps réel' }, { de: 'Echtzeit-Analysen' }, { it: 'Analisi in tempo reale' }, { ru: 'Аналитика в реальном времени' }] },
+  { key: TRANSLATION_KEYS.APPS_COUNT_AVAILABLE, translations: [{ en: '{count} app(s) available' }, { fa: '{count} برنامه موجود' }, { ar: '{count} تطبيق متاح' }, { es: '{count} aplicación(es) disponible(s)' }, { fr: '{count} application(s) disponible(s)' }, { de: '{count} App(s) verfügbar' }, { it: '{count} app disponibili' }, { ru: '{count} приложений доступно' }] },
+  { key: TRANSLATION_KEYS.APPS_SEARCH_HINT, translations: [{ en: 'Type to search, then open an app in a single click.' }, { fa: 'جستجو کنید و با یک کلیک برنامه را باز کنید.' }, { ar: 'اكتب للبحث ثم افتح التطبيق بنقرة واحدة.' }, { es: 'Escribe para buscar y abre una app con un clic.' }, { fr: 'Tapez pour rechercher, puis ouvrez une app en un clic.' }, { de: 'Tippen Sie zum Suchen und öffnen Sie eine App mit einem Klick.' }, { it: 'Digita per cercare e apri un\'app con un clic.' }, { ru: 'Введите поиск и откройте приложение одним кликом.' }] },
+  { key: TRANSLATION_KEYS.PLACEHOLDER_SEARCH_APPS, translations: [{ en: 'Search Apps' }, { fa: 'جستجوی برنامه‌ها' }, { ar: 'البحث في التطبيقات' }, { es: 'Buscar aplicaciones' }, { fr: 'Rechercher des applications' }, { de: 'Apps suchen' }, { it: 'Cerca app' }, { ru: 'Поиск приложений' }] },
+  { key: TRANSLATION_KEYS.ARIA_LIST_VIEW, translations: [{ en: 'List view' }, { fa: 'نمایش لیست' }, { ar: 'عرض القائمة' }, { es: 'Vista de lista' }, { fr: 'Vue liste' }, { de: 'Listenansicht' }, { it: 'Vista elenco' }, { ru: 'Вид списком' }] },
+  { key: TRANSLATION_KEYS.ARIA_GRID_VIEW, translations: [{ en: 'Grid view' }, { fa: 'نمایش شبکه‌ای' }, { ar: 'عرض الشبكة' }, { es: 'Vista de cuadrícula' }, { fr: 'Vue grille' }, { de: 'Rasteransicht' }, { it: 'Vista griglia' }, { ru: 'Вид сеткой' }] },
+  { key: TRANSLATION_KEYS.TITLE_REFRESH_APPS, translations: [{ en: 'Refresh apps' }, { fa: 'بروزرسانی برنامه‌ها' }, { ar: 'تحديث التطبيقات' }, { es: 'Actualizar aplicaciones' }, { fr: 'Actualiser les applications' }, { de: 'Apps aktualisieren' }, { it: 'Aggiorna app' }, { ru: 'Обновить приложения' }] },
+  { key: TRANSLATION_KEYS.EMPTY_NO_APPS_FOUND, translations: [{ en: 'No apps found' }, { fa: 'برنامه‌ای یافت نشد' }, { ar: 'لم يتم العثور على تطبيقات' }, { es: 'No se encontraron aplicaciones' }, { fr: 'Aucune application trouvée' }, { de: 'Keine Apps gefunden' }, { it: 'Nessuna app trovata' }, { ru: 'Приложения не найдены' }] },
+  { key: TRANSLATION_KEYS.EMPTY_APPS_TRY_ADJUSTING, translations: [{ en: 'Try adjusting your search terms or clearing the search box to see all available apps.' }, { fa: 'عبارت جستجو را تغییر دهید یا جستجو را پاک کنید تا همه برنامه‌ها را ببینید.' }, { ar: 'حاول تعديل مصطلحات البحث أو مسح مربع البحث لرؤية جميع التطبيقات المتاحة.' }, { es: 'Intente ajustar los términos de búsqueda o borrar el cuadro de búsqueda para ver todas las aplicaciones disponibles.' }, { fr: 'Essayez d\'ajuster les termes de recherche ou d\'effacer la recherche pour voir toutes les applications disponibles.' }, { de: 'Passen Sie die Suchbegriffe an oder leeren Sie das Suchfeld, um alle verfügbaren Apps zu sehen.' }, { it: 'Prova a modificare i termini di ricerca o a cancellare la ricerca per vedere tutte le app disponibili.' }, { ru: 'Измените поисковый запрос или очистите поле поиска, чтобы увидеть все приложения.' }] },
+  { key: TRANSLATION_KEYS.EMPTY_APPS_SCHEMAS_MARKED, translations: [{ en: 'Schemas that are marked to show in navigation will appear here as apps you can open.' }, { fa: 'طرح‌هایی که برای نمایش در ناوبری علامت‌گذاری شده‌اند اینجا به صورت برنامه نمایش داده می‌شوند.' }, { ar: 'ستظهر هنا المخططات المعلمة للعرض في التنقل كتطبيقات يمكنك فتحها.' }, { es: 'Los esquemas marcados para mostrarse en la navegación aparecerán aquí como aplicaciones que puede abrir.' }, { fr: 'Les schémas configurés pour la navigation apparaîtront ici comme applications à ouvrir.' }, { de: 'Schemata, die in der Navigation angezeigt werden, erscheinen hier als Apps, die Sie öffnen können.' }, { it: 'Gli schemi impostati per la navigazione appariranno qui come app da aprire.' }, { ru: 'Схемы, отмеченные для отображения в навигации, появятся здесь как приложения для открытия.' }] },
+  { key: TRANSLATION_KEYS.BADGE_APP, translations: [{ en: 'App' }, { fa: 'برنامه' }, { ar: 'تطبيق' }, { es: 'Aplicación' }, { fr: 'Application' }, { de: 'App' }, { it: 'App' }, { ru: 'Приложение' }] },
+  { key: TRANSLATION_KEYS.BADGE_SYSTEM, translations: [{ en: 'System' }, { fa: 'سیستم' }, { ar: 'النظام' }, { es: 'Sistema' }, { fr: 'Système' }, { de: 'System' }, { it: 'Sistema' }, { ru: 'Система' }] },
   { key: TRANSLATION_KEYS.EMPTY_GET_STARTED_ADD_FIRST, translations: [{ en: 'Get started by adding your first {name}.' }, { fa: 'با افزودن اولین {name} خود شروع کنید.' }, { ar: 'ابدأ بإضافة أول {name}.' }, { es: 'Comience agregando su primer {name}.' }, { fr: 'Commencez par ajouter votre premier {name}.' }, { de: 'Beginnen Sie, indem Sie Ihren ersten {name} hinzufügen.' }, { it: 'Inizia aggiungendo il tuo primo {name}.' }, { ru: 'Добавьте свой первый {name}, чтобы начать.' }] },
   { key: TRANSLATION_KEYS.EMPTY_CLICK_BUTTON_TO_ADD_ONE, translations: [{ en: 'Click the button below to add one.' }, { fa: 'برای افزودن روی دکمه زیر کلیک کنید.' }, { ar: 'انقر على الزر أدناه للإضافة.' }, { es: 'Haga clic en el botón de abajo para agregar uno.' }, { fr: 'Cliquez sur le bouton ci-dessous pour en ajouter un.' }, { de: 'Klicken Sie auf die Schaltfläche unten, um einen hinzuzufügen.' }, { it: 'Clicca sul pulsante sotto per aggiungerne uno.' }, { ru: 'Нажмите кнопку ниже, чтобы добавить.' }] },
   { key: TRANSLATION_KEYS.EMPTY_NO_ITEMS_ADDED_YET, translations: [{ en: 'No items added yet' }, { fa: 'هنوز موردی اضافه نشده' }, { ar: 'لم تتم إضافة عناصر بعد' }, { es: 'Aún no se han agregado elementos' }, { fr: 'Aucun élément ajouté pour le moment' }, { de: 'Noch keine Einträge hinzugefügt' }, { it: 'Nessun elemento aggiunto ancora' }, { ru: 'Элементы пока не добавлены' }] },
@@ -1469,6 +1883,7 @@ export const TRANSLATIONS: TranslationEntry[] = [
   { key: TRANSLATION_KEYS.ARIA_MAXIMIZE_FORM, translations: [{ en: 'Maximize form' }, { fa: 'بزرگنمایی فرم' }, { ar: 'تكبير النموذج' }, { es: 'Maximizar formulario' }, { fr: 'Agrandir le formulaire' }, { de: 'Formular maximieren' }, { it: 'Ingrandisci modulo' }, { ru: 'Развернуть форму' }] },
   { key: TRANSLATION_KEYS.ARIA_RESTORE_FORM, translations: [{ en: 'Restore form size' }, { fa: 'بازگرداندن اندازه فرم' }, { ar: 'استعادة حجم النموذج' }, { es: 'Restaurar tamaño del formulario' }, { fr: 'Restaurer la taille du formulaire' }, { de: 'Formulargröße wiederherstellen' }, { it: 'Ripristina dimensione modulo' }, { ru: 'Восстановить размер формы' }] },
   { key: TRANSLATION_KEYS.TITLE_UNSAVED_CHANGES, translations: [{ en: 'Unsaved changes' }, { fa: 'تغییرات ذخیره‌نشده' }, { ar: 'تغييرات غير محفوظة' }, { es: 'Cambios sin guardar' }, { fr: 'Modifications non enregistrées' }, { de: 'Ungespeicherte Änderungen' }, { it: 'Modifiche non salvate' }, { ru: 'Несохранённые изменения' }] },
+  { key: TRANSLATION_KEYS.TITLE_TRANSLATIONS, translations: [{ en: 'Translations' }, { fa: 'ترجمه‌ها' }, { ar: 'الترجمات' }, { es: 'Traducciones' }, { fr: 'Traductions' }, { de: 'Übersetzungen' }, { it: 'Traduzioni' }, { ru: 'Переводы' }] },
   { key: TRANSLATION_KEYS.MESSAGE_UNSAVED_CHANGES_LEAVE, translations: [{ en: 'You have unsaved changes. Are you sure you want to leave? Your changes will be lost.' }, { fa: 'تغییرات ذخیره‌نشده دارید. آیا مطمئن هستید که می‌خواهید خارج شوید؟ تغییرات شما از دست خواهند رفت.' }, { ar: 'لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد المغادرة؟ سيتم فقدان تغييراتك.' }, { es: 'Tiene cambios sin guardar. ¿Está seguro de que desea salir? Se perderán sus cambios.' }, { fr: 'Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ? Vos modifications seront perdues.' }, { de: 'Sie haben ungespeicherte Änderungen. Möchten Sie wirklich gehen? Ihre Änderungen gehen verloren.' }, { it: 'Hai modifiche non salvate. Sei sicuro di voler uscire? Le tue modifiche andranno perse.' }, { ru: 'У вас есть несохранённые изменения. Вы уверены, что хотите выйти? Ваши изменения будут потеряны.' }] },
   { key: TRANSLATION_KEYS.BUTTON_STAY, translations: [{ en: 'Stay' }, { fa: 'بمان' }, { ar: 'ابقَ' }, { es: 'Permanecer' }, { fr: 'Rester' }, { de: 'Bleiben' }, { it: 'Resta' }, { ru: 'Остаться' }] },
   { key: TRANSLATION_KEYS.BUTTON_DISCARD, translations: [{ en: 'Discard' }, { fa: 'رد کردن' }, { ar: 'تجاهل' }, { es: 'Descartar' }, { fr: 'Abandonner' }, { de: 'Verwerfen' }, { it: 'Scarta' }, { ru: 'Отменить' }] },
@@ -1577,4 +1992,260 @@ export const TRANSLATIONS: TranslationEntry[] = [
   { key: TRANSLATION_KEYS.LABEL_INFO, translations: [{ en: 'Info' }, { fa: 'اطلاعات' }, { ar: 'معلومات' }, { es: 'Información' }, { fr: 'Info' }, { de: 'Info' }, { it: 'Info' }, { ru: 'Информация' }] },
   { key: TRANSLATION_KEYS.LABEL_WARNING, translations: [{ en: 'Warning' }, { fa: 'هشدار' }, { ar: 'تحذير' }, { es: 'Advertencia' }, { fr: 'Avertissement' }, { de: 'Warnung' }, { it: 'Avviso' }, { ru: 'Предупреждение' }] },
   { key: TRANSLATION_KEYS.LABEL_IMPORTANT, translations: [{ en: 'Important' }, { fa: 'مهم' }, { ar: 'مهم' }, { es: 'Importante' }, { fr: 'Important' }, { de: 'Wichtig' }, { it: 'Importante' }, { ru: 'Важно' }] },
+  // Schema Builder
+  { key: TRANSLATION_KEYS.SCHEMA_TITLE_INFO, translations: [{ en: 'Schema Information' }, { fa: 'اطلاعات طرح' }, { ar: 'معلومات المخطط' }, { es: 'Información del esquema' }, { fr: 'Informations du schéma' }, { de: 'Schema-Informationen' }, { it: 'Informazioni schema' }, { ru: 'Информация о схеме' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ID, translations: [{ en: 'Schema ID' }, { fa: 'شناسه طرح' }, { ar: 'معرف المخطط' }, { es: 'ID del esquema' }, { fr: 'ID du schéma' }, { de: 'Schema-ID' }, { it: 'ID schema' }, { ru: 'ID схемы' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_TYPE, translations: [{ en: 'Schema Type' }, { fa: 'نوع طرح' }, { ar: 'نوع المخطط' }, { es: 'Tipo de esquema' }, { fr: 'Type de schéma' }, { de: 'Schema-Typ' }, { it: 'Tipo schema' }, { ru: 'Тип схемы' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TYPE_SYSTEM, translations: [{ en: 'System' }, { fa: 'سیستمی' }, { ar: 'النظام' }, { es: 'Sistema' }, { fr: 'Système' }, { de: 'System' }, { it: 'Sistema' }, { ru: 'Система' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TYPE_BUSINESS, translations: [{ en: 'Business' }, { fa: 'کسب‌وکار' }, { ar: 'الأعمال' }, { es: 'Negocio' }, { fr: 'Métier' }, { de: 'Geschäft' }, { it: 'Business' }, { ru: 'Бизнес' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TYPE_ACTION_FORM, translations: [{ en: 'Action Form' }, { fa: 'فرم عملیات' }, { ar: 'نموذج الإجراء' }, { es: 'Formulario de acción' }, { fr: 'Formulaire d\'action' }, { de: 'Aktionsformular' }, { it: 'Modulo azione' }, { ru: 'Форма действия' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_SINGULAR_NAME, translations: [{ en: 'Singular Name' }, { fa: 'نام مفرد' }, { ar: 'الاسم المفرد' }, { es: 'Nombre singular' }, { fr: 'Nom singulier' }, { de: 'Singularname' }, { it: 'Nome singolare' }, { ru: 'Единственное число' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_PLURAL_NAME, translations: [{ en: 'Plural Name' }, { fa: 'نام جمع' }, { ar: 'الاسم الجمع' }, { es: 'Nombre plural' }, { fr: 'Nom pluriel' }, { de: 'Pluralname' }, { it: 'Nome plurale' }, { ru: 'Множественное число' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ICON, translations: [{ en: 'Icon' }, { fa: 'آیکون' }, { ar: 'أيقونة' }, { es: 'Icono' }, { fr: 'Icône' }, { de: 'Symbol' }, { it: 'Icona' }, { ru: 'Иконка' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_SHOW_IN_NAVIGATION, translations: [{ en: 'Show in Navigation' }, { fa: 'نمایش در ناوبری' }, { ar: 'إظهار في التنقل' }, { es: 'Mostrar en navegación' }, { fr: 'Afficher dans la navigation' }, { de: 'In Navigation anzeigen' }, { it: 'Mostra in navigazione' }, { ru: 'Показывать в навигации' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_IS_NOT_COMPANY_BASED, translations: [{ en: 'Is Not Company Based' }, { fa: 'وابسته به شرکت نیست' }, { ar: 'غير قائم على الشركة' }, { es: 'No basado en empresa' }, { fr: 'Non basé sur l\'entreprise' }, { de: 'Nicht unternehmensbasiert' }, { it: 'Non basato su azienda' }, { ru: 'Не на основе компании' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ALLOW_DATA_INACTIVE, translations: [{ en: 'Allow Data Inactive' }, { fa: 'امکان غیرفعال برای داده' }, { ar: 'السماح ببيانات غير نشطة' }, { es: 'Permitir datos inactivos' }, { fr: 'Autoriser données inactives' }, { de: 'Inaktive Daten erlauben' }, { it: 'Consenti dati inattivi' }, { ru: 'Разрешить неактивные данные' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ALLOW_DATA_FORCE, translations: [{ en: 'Allow Data Force' }, { fa: 'امکان فورس برای داده' }, { ar: 'السماح بفرض البيانات' }, { es: 'Permitir forzar datos' }, { fr: 'Autoriser forcer les données' }, { de: 'Daten-Erzwingen erlauben' }, { it: 'Consenti forzatura dati' }, { ru: 'Разрешить принудительное применение' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ALLOW_DATA_HARD_DELETE, translations: [{ en: 'Allow Data Hard Delete' }, { fa: 'امکان حذف قطعی داده' }, { ar: 'السماح بحذف البيانات نهائياً' }, { es: 'Permitir borrado permanente' }, { fr: 'Autoriser suppression définitive' }, { de: 'Endgültiges Löschen erlauben' }, { it: 'Consenti eliminazione definitiva' }, { ru: 'Разрешить полное удаление' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ALLOW_ASSIGNED_TO, translations: [{ en: 'Allow Assigned To' }, { fa: 'امکان «واگذار شده به»' }, { ar: 'السماح بـ «معين إلى»' }, { es: 'Permitir Asignado a' }, { fr: 'Autoriser Assigné à' }, { de: 'Zugewiesen an erlauben' }, { it: 'Consenti Assegnato a' }, { ru: 'Разрешить «Назначено»' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ALLOW_DUE_DATE, translations: [{ en: 'Allow Due Date' }, { fa: 'امکان مهلت' }, { ar: 'السماح بتاريخ الاستحقاق' }, { es: 'Permitir fecha de vencimiento' }, { fr: 'Autoriser date d\'échéance' }, { de: 'Fälligkeitsdatum erlauben' }, { it: 'Consenti scadenza' }, { ru: 'Разрешить срок' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ALLOW_DATA_BOOKMARK, translations: [{ en: 'Allow Data Bookmark' }, { fa: 'امکان نشانک برای داده' }, { ar: 'السماح بإشارة مرجعية للبيانات' }, { es: 'Permitir marcador en datos' }, { fr: 'Autoriser favori sur les données' }, { de: 'Lesezeichen für Daten erlauben' }, { it: 'Consenti segnalibro dati' }, { ru: 'Разрешить закладку для данных' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ALLOW_HIERARCHICAL_PARENT, translations: [{ en: 'Allow Hierarchical Parent' }, { fa: 'امکان والد سلسله‌مراتبی' }, { ar: 'السماح بالأصل الهرمي' }, { es: 'Permitir padre jerárquico' }, { fr: 'Autoriser parent hiérarchique' }, { de: 'Hierarchisches übergeordnetes Element erlauben' }, { it: 'Consenti genitore gerarchico' }, { ru: 'Разрешить иерархического родителя' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_HEADING_DATA_MANAGEMENT, translations: [{ en: 'Data Management Options' }, { fa: 'گزینه‌های مدیریت داده' }, { ar: 'خيارات إدارة البيانات' }, { es: 'Opciones de gestión de datos' }, { fr: 'Options de gestion des données' }, { de: 'Datenverwaltungsoptionen' }, { it: 'Opzioni gestione dati' }, { ru: 'Параметры управления данными' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_HEADING_TENANT_SCOPE, translations: [{ en: 'Tenant Scope' }, { fa: 'محدوده مستاجر' }, { ar: 'نطاق المستأجر' }, { es: 'Ámbito del inquilino' }, { fr: 'Portée du locataire' }, { de: 'Mandantenbereich' }, { it: 'Ambito tenant' }, { ru: 'Область арендатора' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_APPLY_TO_ALL_TENANTS, translations: [{ en: 'Apply to All Tenants' }, { fa: 'اعمال برای همه مستاجران' }, { ar: 'تطبيق على جميع المستأجرين' }, { es: 'Aplicar a todos los inquilinos' }, { fr: 'Appliquer à tous les locataires' }, { de: 'Auf alle Mandanten anwenden' }, { it: 'Applica a tutti i tenant' }, { ru: 'Применить ко всем арендаторам' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_DESC_APPLY_TO_ALL_TENANTS, translations: [{ en: 'When enabled, schema applies to every tenant and no tenant selection is required.' }, { fa: 'با فعال‌سازی، طرح برای همه مستاجران اعمال می‌شود.' }, { ar: 'عند التمكين، ينطبق المخطط على كل المستأجرين.' }, { es: 'Cuando está activado, el esquema se aplica a todos los inquilinos.' }, { fr: 'Quand activé, le schéma s\'applique à tous les locataires.' }, { de: 'Wenn aktiviert, gilt das Schema für alle Mandanten.' }, { it: 'Se attivo, lo schema si applica a tutti i tenant.' }, { ru: 'Включено: схема применяется ко всем арендаторам.' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_SYNC_STRATEGY, translations: [{ en: 'Sync Strategy' }, { fa: 'استراتژی همگام‌سازی' }, { ar: 'استراتيجية المزامنة' }, { es: 'Estrategia de sincronización' }, { fr: 'Stratégie de synchronisation' }, { de: 'Synchronisierungsstrategie' }, { it: 'Strategia di sincronizzazione' }, { ru: 'Стратегия синхронизации' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_DESC_SYNC_STRATEGY, translations: [{ en: 'Choose how to sync the schema to databases' }, { fa: 'نحوه همگام‌سازی طرح با پایگاه داده را انتخاب کنید' }, { ar: 'اختر كيفية مزامنة المخطط مع قواعد البيانات' }, { es: 'Elija cómo sincronizar el esquema con las bases de datos' }, { fr: 'Choisissez comment synchroniser le schéma avec les bases de données' }, { de: 'Wählen Sie, wie das Schema mit Datenbanken synchronisiert wird' }, { it: 'Scegli come sincronizzare lo schema con i database' }, { ru: 'Выберите способ синхронизации схемы с БД' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_OPTION_SYNC_SCHEMA_ONLY, translations: [{ en: 'Sync Schema Only' }, { fa: 'فقط همگام‌سازی طرح' }, { ar: 'مزامنة المخطط فقط' }, { es: 'Solo sincronizar esquema' }, { fr: 'Synchroniser le schéma uniquement' }, { de: 'Nur Schema synchronisieren' }, { it: 'Sincronizza solo schema' }, { ru: 'Только схема' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_OPTION_SYNC_SCHEMA_AND_DATA, translations: [{ en: 'Sync Schema and Data' }, { fa: 'همگام‌سازی طرح و داده' }, { ar: 'مزامنة المخطط والبيانات' }, { es: 'Sincronizar esquema y datos' }, { fr: 'Synchroniser schéma et données' }, { de: 'Schema und Daten synchronisieren' }, { it: 'Sincronizza schema e dati' }, { ru: 'Схема и данные' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TAB_GENERAL, translations: [{ en: 'General' }, { fa: 'عمومی' }, { ar: 'عام' }, { es: 'General' }, { fr: 'Général' }, { de: 'Allgemein' }, { it: 'Generale' }, { ru: 'Общие' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TAB_SECTIONS, translations: [{ en: 'Sections' }, { fa: 'بخش‌ها' }, { ar: 'الأقسام' }, { es: 'Secciones' }, { fr: 'Sections' }, { de: 'Abschnitte' }, { it: 'Sezioni' }, { ru: 'Разделы' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TITLE_SECTIONS_AND_FIELDS, translations: [{ en: 'Sections & Fields' }, { fa: 'بخش‌ها و فیلدها' }, { ar: 'الأقسام والحقول' }, { es: 'Secciones y campos' }, { fr: 'Sections et champs' }, { de: 'Abschnitte & Felder' }, { it: 'Sezioni e campi' }, { ru: 'Разделы и поля' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_BUTTON_SAVE_SCHEMA, translations: [{ en: 'Save Schema' }, { fa: 'ذخیره طرح' }, { ar: 'حفظ المخطط' }, { es: 'Guardar esquema' }, { fr: 'Enregistrer le schéma' }, { de: 'Schema speichern' }, { it: 'Salva schema' }, { ru: 'Сохранить схему' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_BUTTON_BACK_TO_SCHEMAS, translations: [{ en: 'Back to Schemas' }, { fa: 'بازگشت به طرح‌ها' }, { ar: 'العودة إلى المخططات' }, { es: 'Volver a esquemas' }, { fr: 'Retour aux schémas' }, { de: 'Zurück zu Schemas' }, { it: 'Torna agli schemi' }, { ru: 'Назад к схемам' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_MSG_COMPLETE_SECTION_BEFORE_ADD, translations: [{ en: 'Please complete the configuration for the new section before adding another section.' }, { fa: 'پیکربندی بخش جدید را قبل از افزودن بخش دیگر تکمیل کنید.' }, { ar: 'يرجى إكمال تكوين القسم الجديد قبل إضافة قسم آخر.' }, { es: 'Complete la configuración de la nueva sección antes de añadir otra.' }, { fr: 'Veuillez compléter la configuration de la nouvelle section avant d\'en ajouter une autre.' }, { de: 'Bitte schließen Sie die Konfiguration des neuen Abschnitts ab, bevor Sie einen weiteren hinzufügen.' }, { it: 'Completa la configurazione della nuova sezione prima di aggiungerne un\'altra.' }, { ru: 'Завершите настройку нового раздела перед добавлением следующего.' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_MSG_NO_CARD_SECTIONS, translations: [{ en: 'No card sections defined. Add a section to configure how cards are displayed in list views.' }, { fa: 'بخش کارتی تعریف نشده است. یک بخش برای پیکربندی نمایش کارت‌ها اضافه کنید.' }, { ar: 'لم يتم تعريف أقسام البطاقات. أضف قسماً لتكوين عرض البطاقات.' }, { es: 'No hay secciones de tarjeta. Añade una sección para configurar la visualización.' }, { fr: 'Aucune section de carte. Ajoutez une section pour configurer l\'affichage.' }, { de: 'Keine Kartenabschnitte definiert. Fügen Sie einen Abschnitt hinzu.' }, { it: 'Nessuna sezione scheda. Aggiungi una sezione per configurare la visualizzazione.' }, { ru: 'Нет разделов карточек. Добавьте раздел для настройки отображения.' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ADD_CARD_SECTION, translations: [{ en: 'Add Card Section' }, { fa: 'افزودن بخش کارت' }, { ar: 'إضافة قسم بطاقة' }, { es: 'Añadir sección de tarjeta' }, { fr: 'Ajouter une section de carte' }, { de: 'Kartenabschnitt hinzufügen' }, { it: 'Aggiungi sezione scheda' }, { ru: 'Добавить раздел карточки' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_UNTITLED_SECTION, translations: [{ en: 'Untitled Section' }, { fa: 'بخش بدون عنوان' }, { ar: 'قسم بدون عنوان' }, { es: 'Sección sin título' }, { fr: 'Section sans titre' }, { de: 'Abschnitt ohne Titel' }, { it: 'Sezione senza titolo' }, { ru: 'Раздел без названия' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_SECTION_COUNT, translations: [{ en: 'section' }, { fa: 'بخش' }, { ar: 'قسم' }, { es: 'sección' }, { fr: 'section' }, { de: 'Abschnitt' }, { it: 'sezione' }, { ru: 'раздел' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_FIELD_COUNT, translations: [{ en: 'field' }, { fa: 'فیلد' }, { ar: 'حقل' }, { es: 'campo' }, { fr: 'champ' }, { de: 'Feld' }, { it: 'campo' }, { ru: 'поле' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_SECTIONS_COUNT, translations: [{ en: 'sections' }, { fa: 'بخش‌ها' }, { ar: 'أقسام' }, { es: 'secciones' }, { fr: 'sections' }, { de: 'Abschnitte' }, { it: 'sezioni' }, { ru: 'разделы' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_FIELDS_COUNT, translations: [{ en: 'fields' }, { fa: 'فیلدها' }, { ar: 'حقول' }, { es: 'campos' }, { fr: 'champs' }, { de: 'Felder' }, { it: 'campi' }, { ru: 'поля' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TITLE_DETAIL_PAGE_SECTIONS, translations: [{ en: 'Detail Page Sections' }, { fa: 'بخش‌های صفحه جزئیات' }, { ar: 'أقسام صفحة التفاصيل' }, { es: 'Secciones de página de detalle' }, { fr: 'Sections de la page de détail' }, { de: 'Detailseiten-Abschnitte' }, { it: 'Sezioni pagina dettaglio' }, { ru: 'Разделы страницы деталей' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TITLE_QUICK_ACTIONS, translations: [{ en: 'Quick Actions' }, { fa: 'اقدامات سریع' }, { ar: 'إجراءات سريعة' }, { es: 'Acciones rápidas' }, { fr: 'Actions rapides' }, { de: 'Schnellaktionen' }, { it: 'Azioni rapide' }, { ru: 'Быстрые действия' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TITLE_TABLE_RENDERERS, translations: [{ en: 'Table Renderers' }, { fa: 'رندرهای جدول' }, { ar: 'عرض الجدول' }, { es: 'Representación de tablas' }, { fr: 'Rendu des tableaux' }, { de: 'Tabellen-Renderer' }, { it: 'Renderer tabelle' }, { ru: 'Отрисовка таблиц' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TITLE_COMPONENT_RENDERERS, translations: [{ en: 'Component Renderers' }, { fa: 'رندرهای کامپوننت' }, { ar: 'عرض المكوّنات' }, { es: 'Representación de componentes' }, { fr: 'Rendu des composants' }, { de: 'Komponenten-Renderer' }, { it: 'Renderer componenti' }, { ru: 'Отрисовка компонентов' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TITLE_LAYOUT, translations: [{ en: 'Layout' }, { fa: 'چیدمان' }, { ar: 'التخطيط' }, { es: 'Diseño' }, { fr: 'Disposition' }, { de: 'Layout' }, { it: 'Layout' }, { ru: 'Макет' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TITLE_HEADER, translations: [{ en: 'Header' }, { fa: 'سربرگ' }, { ar: 'الرأس' }, { es: 'Encabezado' }, { fr: 'En-tête' }, { de: 'Kopfzeile' }, { it: 'Intestazione' }, { ru: 'Заголовок' }] },
+  { key: TRANSLATION_KEYS.DETAIL_MSG_NO_SECTIONS, translations: [{ en: 'No sections defined. Add sections to configure the detail page layout.' }, { fa: 'بخشی تعریف نشده است. بخش‌ها را برای پیکربندی چیدمان صفحه جزئیات اضافه کنید.' }, { ar: 'لم يتم تعريف أقسام. أضف أقساماً لتكوين تخطيط الصفحة.' }, { es: 'No hay secciones. Añade secciones para configurar el diseño.' }, { fr: 'Aucune section. Ajoutez des sections pour configurer la mise en page.' }, { de: 'Keine Abschnitte definiert. Abschnitte hinzufügen.' }, { it: 'Nessuna sezione. Aggiungi sezioni per configurare il layout.' }, { ru: 'Разделы не заданы. Добавьте разделы для настройки макета.' }] },
+  { key: TRANSLATION_KEYS.DETAIL_MSG_NO_QUICK_ACTIONS, translations: [{ en: 'No quick actions defined.' }, { fa: 'اقدام سریعی تعریف نشده است.' }, { ar: 'لم يتم تعريف إجراءات سريعة.' }, { es: 'No hay acciones rápidas definidas.' }, { fr: 'Aucune action rapide définie.' }, { de: 'Keine Schnellaktionen definiert.' }, { it: 'Nessuna azione rapida definita.' }, { ru: 'Быстрые действия не заданы.' }] },
+  { key: TRANSLATION_KEYS.DETAIL_MSG_NO_TABLE_RENDERERS, translations: [{ en: 'No table renderers defined.' }, { fa: 'رندر جدولی تعریف نشده است.' }, { ar: 'لم يتم تعريف عرض الجدول.' }, { es: 'No hay representación de tablas definida.' }, { fr: 'Aucun rendu de tableau défini.' }, { de: 'Keine Tabellen-Renderer definiert.' }, { it: 'Nessun renderer tabella definito.' }, { ru: 'Отрисовка таблиц не задана.' }] },
+  { key: TRANSLATION_KEYS.DETAIL_MSG_NO_COMPONENT_RENDERERS, translations: [{ en: 'No component renderers defined.' }, { fa: 'رندر کامپوننت تعریف نشده است.' }, { ar: 'لم يتم تعريف عرض المكوّنات.' }, { es: 'No hay representación de componentes definida.' }, { fr: 'Aucun rendu de composant défini.' }, { de: 'Keine Komponenten-Renderer definiert.' }, { it: 'Nessun renderer componenti definito.' }, { ru: 'Отрисовка компонентов не задана.' }] },
+  { key: TRANSLATION_KEYS.DETAIL_BUTTON_ADD_SECTION, translations: [{ en: 'Add Section' }, { fa: 'افزودن بخش' }, { ar: 'إضافة قسم' }, { es: 'Añadir sección' }, { fr: 'Ajouter une section' }, { de: 'Abschnitt hinzufügen' }, { it: 'Aggiungi sezione' }, { ru: 'Добавить раздел' }] },
+  { key: TRANSLATION_KEYS.DETAIL_BUTTON_ADD_ACTION, translations: [{ en: 'Add Action' }, { fa: 'افزودن اقدام' }, { ar: 'إضافة إجراء' }, { es: 'Añadir acción' }, { fr: 'Ajouter une action' }, { de: 'Aktion hinzufügen' }, { it: 'Aggiungi azione' }, { ru: 'Добавить действие' }] },
+  { key: TRANSLATION_KEYS.DETAIL_BUTTON_ADD_TABLE, translations: [{ en: 'Add Table' }, { fa: 'افزودن جدول' }, { ar: 'إضافة جدول' }, { es: 'Añadir tabla' }, { fr: 'Ajouter un tableau' }, { de: 'Tabelle hinzufügen' }, { it: 'Aggiungi tabella' }, { ru: 'Добавить таблицу' }] },
+  { key: TRANSLATION_KEYS.DETAIL_BUTTON_ADD_COMPONENT, translations: [{ en: 'Add Component' }, { fa: 'افزودن کامپوننت' }, { ar: 'إضافة مكوّن' }, { es: 'Añadir componente' }, { fr: 'Ajouter un composant' }, { de: 'Komponente hinzufügen' }, { it: 'Aggiungi componente' }, { ru: 'Добавить компонент' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_UNTITLED_ACTION, translations: [{ en: 'Untitled Action' }, { fa: 'اقدام بدون عنوان' }, { ar: 'إجراء بدون عنوان' }, { es: 'Acción sin título' }, { fr: 'Action sans titre' }, { de: 'Aktion ohne Titel' }, { it: 'Azione senza titolo' }, { ru: 'Действие без названия' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_UNTITLED_TABLE, translations: [{ en: 'Untitled Table' }, { fa: 'جدول بدون عنوان' }, { ar: 'جدول بدون عنوان' }, { es: 'Tabla sin título' }, { fr: 'Tableau sans titre' }, { de: 'Tabelle ohne Titel' }, { it: 'Tabella senza titolo' }, { ru: 'Таблица без названия' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_UNTITLED_COMPONENT, translations: [{ en: 'Untitled Component' }, { fa: 'کامپوننت بدون عنوان' }, { ar: 'مكوّن بدون عنوان' }, { es: 'Componente sin título' }, { fr: 'Composant sans titre' }, { de: 'Komponente ohne Titel' }, { it: 'Componente senza titolo' }, { ru: 'Компонент без названия' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_ACTION_SINGULAR, translations: [{ en: 'action' }, { fa: 'اقدام' }, { ar: 'إجراء' }, { es: 'acción' }, { fr: 'action' }, { de: 'Aktion' }, { it: 'azione' }, { ru: 'действие' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_ACTIONS_PLURAL, translations: [{ en: 'actions' }, { fa: 'اقدامات' }, { ar: 'إجراءات' }, { es: 'acciones' }, { fr: 'actions' }, { de: 'Aktionen' }, { it: 'azioni' }, { ru: 'действия' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_TABLE_SINGULAR, translations: [{ en: 'table' }, { fa: 'جدول' }, { ar: 'جدول' }, { es: 'tabla' }, { fr: 'tableau' }, { de: 'Tabelle' }, { it: 'tabella' }, { ru: 'таблица' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_TABLES_PLURAL, translations: [{ en: 'tables' }, { fa: 'جدول‌ها' }, { ar: 'جداول' }, { es: 'tablas' }, { fr: 'tableaux' }, { de: 'Tabellen' }, { it: 'tabelle' }, { ru: 'таблицы' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_COMPONENT_SINGULAR, translations: [{ en: 'component' }, { fa: 'کامپوننت' }, { ar: 'مكوّن' }, { es: 'componente' }, { fr: 'composant' }, { de: 'Komponente' }, { it: 'componente' }, { ru: 'компонент' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_COMPONENTS_PLURAL, translations: [{ en: 'components' }, { fa: 'کامپوننت‌ها' }, { ar: 'مكوّنات' }, { es: 'componentes' }, { fr: 'composants' }, { de: 'Komponenten' }, { it: 'componenti' }, { ru: 'компоненты' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_COLUMN_SINGULAR, translations: [{ en: 'column' }, { fa: 'ستون' }, { ar: 'عمود' }, { es: 'columna' }, { fr: 'colonne' }, { de: 'Spalte' }, { it: 'colonna' }, { ru: 'столбец' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_COLUMNS_PLURAL, translations: [{ en: 'columns' }, { fa: 'ستون‌ها' }, { ar: 'أعمدة' }, { es: 'columnas' }, { fr: 'colonnes' }, { de: 'Spalten' }, { it: 'colonne' }, { ru: 'столбцы' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_SELECTED_FIELDS, translations: [{ en: 'Selected Fields' }, { fa: 'فیلدهای انتخاب‌شده' }, { ar: 'الحقول المحددة' }, { es: 'Campos seleccionados' }, { fr: 'Champs sélectionnés' }, { de: 'Ausgewählte Felder' }, { it: 'Campi selezionati' }, { ru: 'Выбранные поля' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_AVAILABLE_FIELDS, translations: [{ en: 'Available Fields' }, { fa: 'فیلدهای موجود' }, { ar: 'الحقول المتاحة' }, { es: 'Campos disponibles' }, { fr: 'Champs disponibles' }, { de: 'Verfügbare Felder' }, { it: 'Campi disponibili' }, { ru: 'Доступные поля' }] },
+  { key: TRANSLATION_KEYS.DETAIL_MSG_NO_FIELDS_SELECTED, translations: [{ en: 'No fields selected. Select fields below to add them.' }, { fa: 'فیلدی انتخاب نشده است. فیلدها را از پایین انتخاب کنید.' }, { ar: 'لم يتم تحديد حقول. حدد الحقول أدناه.' }, { es: 'No hay campos seleccionados. Seleccione campos abajo.' }, { fr: 'Aucun champ sélectionné. Sélectionnez des champs ci-dessous.' }, { de: 'Keine Felder ausgewählt. Wählen Sie Felder unten.' }, { it: 'Nessun campo selezionato. Seleziona i campi sotto.' }, { ru: 'Поля не выбраны. Выберите поля ниже.' }] },
+  { key: TRANSLATION_KEYS.DETAIL_MSG_NO_FIELDS_AVAILABLE, translations: [{ en: 'No fields available.' }, { fa: 'فیلدی موجود نیست.' }, { ar: 'لا توجد حقول متاحة.' }, { es: 'No hay campos disponibles.' }, { fr: 'Aucun champ disponible.' }, { de: 'Keine Felder verfügbar.' }, { it: 'Nessun campo disponibile.' }, { ru: 'Нет доступных полей.' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_SHOW_BACK_BUTTON, translations: [{ en: 'Show Back Button' }, { fa: 'نمایش دکمه بازگشت' }, { ar: 'إظهار زر الرجوع' }, { es: 'Mostrar botón Atrás' }, { fr: 'Afficher le bouton Retour' }, { de: 'Zurück-Button anzeigen' }, { it: 'Mostra pulsante Indietro' }, { ru: 'Показывать кнопку «Назад»' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_SHOW_ACTIONS, translations: [{ en: 'Show Actions' }, { fa: 'نمایش اقدامات' }, { ar: 'إظهار الإجراءات' }, { es: 'Mostrar acciones' }, { fr: 'Afficher les actions' }, { de: 'Aktionen anzeigen' }, { it: 'Mostra azioni' }, { ru: 'Показывать действия' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_MAIN_COLUMNS, translations: [{ en: 'Main Columns' }, { fa: 'ستون‌های اصلی' }, { ar: 'الأعمدة الرئيسية' }, { es: 'Columnas principales' }, { fr: 'Colonnes principales' }, { de: 'Hauptspalten' }, { it: 'Colonne principali' }, { ru: 'Основные столбцы' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_SIDEBAR_COLUMNS, translations: [{ en: 'Sidebar Columns' }, { fa: 'ستون‌های نوار کناری' }, { ar: 'أعمدة الشريط الجانبي' }, { es: 'Columnas de barra lateral' }, { fr: 'Colonnes de la barre latérale' }, { de: 'Seitenleisten-Spalten' }, { it: 'Colonne barra laterale' }, { ru: 'Столбцы боковой панели' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_COLUMN_AREA, translations: [{ en: 'Column Area' }, { fa: 'ناحیه ستون' }, { ar: 'منطقة العمود' }, { es: 'Área de columna' }, { fr: 'Zone de colonne' }, { de: 'Spaltenbereich' }, { it: 'Area colonna' }, { ru: 'Область столбца' }] },
+  { key: TRANSLATION_KEYS.DETAIL_OPTION_MAIN, translations: [{ en: 'Main' }, { fa: 'اصلی' }, { ar: 'الرئيسي' }, { es: 'Principal' }, { fr: 'Principal' }, { de: 'Haupt' }, { it: 'Principale' }, { ru: 'Основная' }] },
+  { key: TRANSLATION_KEYS.DETAIL_OPTION_SIDEBAR, translations: [{ en: 'Sidebar' }, { fa: 'نوار کناری' }, { ar: 'الشريط الجانبي' }, { es: 'Barra lateral' }, { fr: 'Barre latérale' }, { de: 'Seitenleiste' }, { it: 'Barra laterale' }, { ru: 'Боковая панель' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_SELECTED_COLUMNS, translations: [{ en: 'Selected Columns' }, { fa: 'ستون‌های انتخاب‌شده' }, { ar: 'الأعمدة المحددة' }, { es: 'Columnas seleccionadas' }, { fr: 'Colonnes sélectionnées' }, { de: 'Ausgewählte Spalten' }, { it: 'Colonne selezionate' }, { ru: 'Выбранные столбцы' }] },
+  { key: TRANSLATION_KEYS.DETAIL_MSG_NO_COLUMNS_SELECTED, translations: [{ en: 'No columns selected. Select columns below to add them. Leave empty to show all fields.' }, { fa: 'ستونی انتخاب نشده است. خالی بگذارید تا همه فیلدها نمایش داده شوند.' }, { ar: 'لم يتم تحديد أعمدة. اتركه فارغاً لعرض كل الحقول.' }, { es: 'No hay columnas seleccionadas. Deje vacío para mostrar todos los campos.' }, { fr: 'Aucune colonne. Laissez vide pour afficher tous les champs.' }, { de: 'Keine Spalten ausgewählt. Leer lassen für alle Felder.' }, { it: 'Nessuna colonna. Lasciare vuoto per tutti i campi.' }, { ru: 'Столбцы не выбраны. Оставьте пустым для всех полей.' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_TITLE, translations: [{ en: 'Title' }, { fa: 'عنوان' }, { ar: 'العنوان' }, { es: 'Título' }, { fr: 'Titre' }, { de: 'Titel' }, { it: 'Titolo' }, { ru: 'Название' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_COLUMN_SPAN, translations: [{ en: 'Column Span' }, { fa: 'پهنای ستون' }, { ar: 'امتداد العمود' }, { es: 'Columnas de ancho' }, { fr: 'Largeur de colonne' }, { de: 'Spaltenbreite' }, { it: 'Larghezza colonna' }, { ru: 'Ширина столбца' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_BADGE_VARIANT, translations: [{ en: 'Badge Variant' }, { fa: 'نوع نشان' }, { ar: 'نوع الشارة' }, { es: 'Variante de insignia' }, { fr: 'Variante de badge' }, { de: 'Badge-Variante' }, { it: 'Variante badge' }, { ru: 'Вариант значка' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_ENFORCE_BADGE_VARIANT, translations: [{ en: 'Enforce Badge Variant' }, { fa: 'اعمال نوع نشان' }, { ar: 'فرض نوع الشارة' }, { es: 'Forzar variante de insignia' }, { fr: 'Forcer la variante de badge' }, { de: 'Badge-Variante erzwingen' }, { it: 'Forza variante badge' }, { ru: 'Применить вариант значка' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_BADGE_CLICKABLE, translations: [{ en: 'Badge Clickable' }, { fa: 'نشان قابل کلیک' }, { ar: 'الشارة قابلة للنقر' }, { es: 'Insignia clicable' }, { fr: 'Badge cliquable' }, { de: 'Badge klickbar' }, { it: 'Badge cliccabile' }, { ru: 'Значок кликабельный' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_LAYOUT_COLUMNS, translations: [{ en: 'Layout Columns' }, { fa: 'ستون‌های چیدمان' }, { ar: 'أعمدة التخطيط' }, { es: 'Columnas de diseño' }, { fr: 'Colonnes de disposition' }, { de: 'Layout-Spalten' }, { it: 'Colonne layout' }, { ru: 'Столбцы макета' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_LAYOUT_GAP, translations: [{ en: 'Layout Gap' }, { fa: 'فاصله چیدمان' }, { ar: 'فجوة التخطيط' }, { es: 'Espacio de diseño' }, { fr: 'Espacement de disposition' }, { de: 'Layout-Abstand' }, { it: 'Spaziatura layout' }, { ru: 'Интервал макета' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_ACTION_ID, translations: [{ en: 'Action ID' }, { fa: 'شناسه اقدام' }, { ar: 'معرف الإجراء' }, { es: 'ID de acción' }, { fr: 'ID d\'action' }, { de: 'Aktions-ID' }, { it: 'ID azione' }, { ru: 'ID действия' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_ACTION_TYPE, translations: [{ en: 'Action Type' }, { fa: 'نوع اقدام' }, { ar: 'نوع الإجراء' }, { es: 'Tipo de acción' }, { fr: 'Type d\'action' }, { de: 'Aktionstyp' }, { it: 'Tipo azione' }, { ru: 'Тип действия' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_VARIANT, translations: [{ en: 'Variant' }, { fa: 'نوع' }, { ar: 'المتغير' }, { es: 'Variante' }, { fr: 'Variante' }, { de: 'Variante' }, { it: 'Variante' }, { ru: 'Вариант' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_TARGET_SCHEMA, translations: [{ en: 'Target Schema' }, { fa: 'طرح هدف' }, { ar: 'المخطط المستهدف' }, { es: 'Esquema de destino' }, { fr: 'Schéma cible' }, { de: 'Ziel-Schema' }, { it: 'Schema di destinazione' }, { ru: 'Целевая схема' }] },
+  { key: TRANSLATION_KEYS.DETAIL_PLACEHOLDER_SCHEMA_ID, translations: [{ en: 'Schema ID' }, { fa: 'شناسه طرح' }, { ar: 'معرف المخطط' }, { es: 'ID del esquema' }, { fr: 'ID du schéma' }, { de: 'Schema-ID' }, { it: 'ID schema' }, { ru: 'ID схемы' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_TARGET_URL, translations: [{ en: 'Target URL' }, { fa: 'نشانی هدف' }, { ar: 'رابط الهدف' }, { es: 'URL de destino' }, { fr: 'URL cible' }, { de: 'Ziel-URL' }, { it: 'URL di destinazione' }, { ru: 'Целевой URL' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_RENDERER_ID, translations: [{ en: 'Renderer ID' }, { fa: 'شناسه رندر' }, { ar: 'معرف العرض' }, { es: 'ID del representador' }, { fr: 'ID du rendu' }, { de: 'Renderer-ID' }, { it: 'ID renderer' }, { ru: 'ID отрисовки' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_RELATION_TYPE_ID, translations: [{ en: 'Relation Type ID' }, { fa: 'شناسه نوع ارتباط' }, { ar: 'معرف نوع العلاقة' }, { es: 'ID de tipo de relación' }, { fr: 'ID du type de relation' }, { de: 'Relationstyp-ID' }, { it: 'ID tipo relazione' }, { ru: 'ID типа связи' }] },
+  { key: TRANSLATION_KEYS.DETAIL_PLACEHOLDER_SECTION_ID_FROM_TARGET, translations: [{ en: 'Section ID from target schema' }, { fa: 'شناسه بخش از طرح هدف' }, { ar: 'معرف القسم من المخطط المستهدف' }, { es: 'ID de sección del esquema de destino' }, { fr: 'ID de section du schéma cible' }, { de: 'Abschnitts-ID aus Ziel-Schema' }, { it: 'ID sezione dallo schema di destinazione' }, { ru: 'ID раздела из целевой схемы' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_SORTING_ENABLED, translations: [{ en: 'Sorting Enabled' }, { fa: 'مرتب‌سازی فعال' }, { ar: 'الفرز مفعّل' }, { es: 'Ordenación activada' }, { fr: 'Tri activé' }, { de: 'Sortierung aktiviert' }, { it: 'Ordinamento attivo' }, { ru: 'Сортировка включена' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_PAGINATION_ENABLED, translations: [{ en: 'Pagination Enabled' }, { fa: 'صفحه‌بندی فعال' }, { ar: 'ترقيم الصفحات مفعّل' }, { es: 'Paginación activada' }, { fr: 'Pagination activée' }, { de: 'Paginierung aktiviert' }, { it: 'Paginazione attiva' }, { ru: 'Пагинация включена' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_PAGE_SIZE, translations: [{ en: 'Page Size' }, { fa: 'اندازه صفحه' }, { ar: 'حجم الصفحة' }, { es: 'Tamaño de página' }, { fr: 'Taille de page' }, { de: 'Seitengröße' }, { it: 'Dimensione pagina' }, { ru: 'Размер страницы' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_COMPONENT_TYPE, translations: [{ en: 'Component Type' }, { fa: 'نوع کامپوننت' }, { ar: 'نوع المكوّن' }, { es: 'Tipo de componente' }, { fr: 'Type de composant' }, { de: 'Komponententyp' }, { it: 'Tipo componente' }, { ru: 'Тип компонента' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_COMPONENT_NAME, translations: [{ en: 'Component Name' }, { fa: 'نام کامپوننت' }, { ar: 'اسم المكوّن' }, { es: 'Nombre del componente' }, { fr: 'Nom du composant' }, { de: 'Komponentenname' }, { it: 'Nome componente' }, { ru: 'Имя компонента' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_DATA_PATH, translations: [{ en: 'Data Path' }, { fa: 'مسیر داده' }, { ar: 'مسار البيانات' }, { es: 'Ruta de datos' }, { fr: 'Chemin des données' }, { de: 'Datenpfad' }, { it: 'Percorso dati' }, { ru: 'Путь к данным' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_GAP, translations: [{ en: 'Gap' }, { fa: 'فاصله' }, { ar: 'الفجوة' }, { es: 'Espacio' }, { fr: 'Espacement' }, { de: 'Abstand' }, { it: 'Spaziatura' }, { ru: 'Интервал' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_ACTIONS, translations: [{ en: 'Actions' }, { fa: 'اقدامات' }, { ar: 'الإجراءات' }, { es: 'Acciones' }, { fr: 'Actions' }, { de: 'Aktionen' }, { it: 'Azioni' }, { ru: 'Действия' }] },
+  { key: TRANSLATION_KEYS.DETAIL_MSG_NO_SECTIONS_AVAILABLE, translations: [{ en: 'No sections available' }, { fa: 'بخشی موجود نیست' }, { ar: 'لا توجد أقسام متاحة' }, { es: 'No hay secciones disponibles' }, { fr: 'Aucune section disponible' }, { de: 'Keine Abschnitte verfügbar' }, { it: 'Nessuna sezione disponibile' }, { ru: 'Нет доступных разделов' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_AI_AGENT, translations: [{ en: 'AI Agent' }, { fa: 'عامل هوش مصنوعی' }, { ar: 'وكيل الذكاء الاصطناعي' }, { es: 'Agente de IA' }, { fr: 'Agent IA' }, { de: 'KI-Agent' }, { it: 'Agente AI' }, { ru: 'ИИ-агент' }] },
+  { key: TRANSLATION_KEYS.DETAIL_PLACEHOLDER_SELECT_AI_AGENT, translations: [{ en: 'Select an AI agent' }, { fa: 'انتخاب عامل هوش مصنوعی' }, { ar: 'اختر وكيل ذكاء اصطناعي' }, { es: 'Seleccionar agente de IA' }, { fr: 'Sélectionner un agent IA' }, { de: 'KI-Agent auswählen' }, { it: 'Seleziona agente AI' }, { ru: 'Выберите ИИ-агента' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_SELECTED_SECTIONS, translations: [{ en: 'Selected Sections' }, { fa: 'بخش‌های انتخاب‌شده' }, { ar: 'الأقسام المحددة' }, { es: 'Secciones seleccionadas' }, { fr: 'Sections sélectionnées' }, { de: 'Ausgewählte Abschnitte' }, { it: 'Sezioni selezionate' }, { ru: 'Выбранные разделы' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_RUN_TYPE, translations: [{ en: 'Run Type' }, { fa: 'نوع اجرا' }, { ar: 'نوع التشغيل' }, { es: 'Tipo de ejecución' }, { fr: 'Type d\'exécution' }, { de: 'Ausführungstyp' }, { it: 'Tipo esecuzione' }, { ru: 'Тип запуска' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_DISPLAY_TYPE, translations: [{ en: 'Display Type' }, { fa: 'نوع نمایش' }, { ar: 'نوع العرض' }, { es: 'Tipo de visualización' }, { fr: 'Type d\'affichage' }, { de: 'Anzeigetyp' }, { it: 'Tipo visualizzazione' }, { ru: 'Тип отображения' }] },
+  { key: TRANSLATION_KEYS.DETAIL_LABEL_DEFAULT_LANGUAGE, translations: [{ en: 'Default Language' }, { fa: 'زبان پیش‌فرض' }, { ar: 'اللغة الافتراضية' }, { es: 'Idioma predeterminado' }, { fr: 'Langue par défaut' }, { de: 'Standardsprache' }, { it: 'Lingua predefinita' }, { ru: 'Язык по умолчанию' }] },
+  { key: TRANSLATION_KEYS.DETAIL_OPTION_MANUAL, translations: [{ en: 'Manual' }, { fa: 'دستی' }, { ar: 'يدوي' }, { es: 'Manual' }, { fr: 'Manuel' }, { de: 'Manuell' }, { it: 'Manuale' }, { ru: 'Вручную' }] },
+  { key: TRANSLATION_KEYS.DETAIL_OPTION_AUTOMATIC, translations: [{ en: 'Automatic' }, { fa: 'خودکار' }, { ar: 'تلقائي' }, { es: 'Automático' }, { fr: 'Automatique' }, { de: 'Automatisch' }, { it: 'Automatico' }, { ru: 'Автоматически' }] },
+  { key: TRANSLATION_KEYS.DETAIL_OPTION_SHOW_FORM, translations: [{ en: 'Show Form' }, { fa: 'نمایش فرم' }, { ar: 'إظهار النموذج' }, { es: 'Mostrar formulario' }, { fr: 'Afficher le formulaire' }, { de: 'Formular anzeigen' }, { it: 'Mostra modulo' }, { ru: 'Показать форму' }] },
+  { key: TRANSLATION_KEYS.DETAIL_OPTION_HIDE_FORM, translations: [{ en: 'Hide Form' }, { fa: 'مخفی کردن فرم' }, { ar: 'إخفاء النموذج' }, { es: 'Ocultar formulario' }, { fr: 'Masquer le formulaire' }, { de: 'Formular ausblenden' }, { it: 'Nascondi modulo' }, { ru: 'Скрыть форму' }] },
+  { key: TRANSLATION_KEYS.DETAIL_PLACEHOLDER_SELECT_DEFAULT_LANGUAGE, translations: [{ en: 'Select default language...' }, { fa: 'انتخاب زبان پیش‌فرض...' }, { ar: 'اختر اللغة الافتراضية...' }, { es: 'Seleccionar idioma predeterminado...' }, { fr: 'Sélectionner la langue par défaut...' }, { de: 'Standardsprache auswählen...' }, { it: 'Seleziona lingua predefinita...' }, { ru: 'Выберите язык по умолчанию...' }] },
+  { key: TRANSLATION_KEYS.DETAIL_MSG_DEFAULT_LANGUAGE_DESCRIPTION, translations: [{ en: "Default language for AI agent output. If not set, uses 'fa' for most agents or 'en' for image-generation agents." }, { fa: "زبان پیش‌فرض خروجی عامل هوش مصنوعی. در صورت عدم تنظیم، برای اکثر عوامل 'fa' و برای عوامل تولید تصویر 'en' استفاده می‌شود." }, { ar: "اللغة الافتراضية لمخرجات وكيل الذكاء الاصطناعي. إن لم تُحدد، تُستخدم 'fa' لمعظم الوكلاء أو 'en' لوكلاء توليد الصور." }, { es: "Idioma predeterminado para la salida del agente de IA. Si no se establece, se usa 'fa' para la mayoría de agentes o 'en' para agentes de generación de imágenes." }, { fr: "Langue par défaut pour la sortie de l'agent IA. Si non défini, utilise 'fa' pour la plupart des agents ou 'en' pour les agents de génération d'images." }, { de: "Standardsprache für die KI-Agent-Ausgabe. Wenn nicht gesetzt, wird 'fa' für die meisten Agenten oder 'en' für Bildgenerierungs-Agenten verwendet." }, { it: "Lingua predefinita per l'output dell'agente AI. Se non impostata, usa 'fa' per la maggior parte degli agenti o 'en' per agenti di generazione immagini." }, { ru: "Язык по умолчанию для вывода ИИ-агента. Если не задан, используется 'fa' для большинства агентов или 'en' для агентов генерации изображений." }] },
+  { key: TRANSLATION_KEYS.DETAIL_MSG_LEAVE_EMPTY_SHOW_ALL_FIELDS, translations: [{ en: 'Leave empty to show all fields from section' }, { fa: 'برای نمایش همه فیلدهای بخش خالی بگذارید' }, { ar: 'اتركه فارغاً لعرض جميع الحقول من القسم' }, { es: 'Dejar vacío para mostrar todos los campos de la sección' }, { fr: 'Laisser vide pour afficher tous les champs de la section' }, { de: 'Leer lassen, um alle Felder des Abschnitts anzuzeigen' }, { it: 'Lascia vuoto per mostrare tutti i campi della sezione' }, { ru: 'Оставьте пустым, чтобы показать все поля раздела' }] },
+  { key: TRANSLATION_KEYS.DETAIL_PLACEHOLDER_CUSTOM_COMPONENT_NAME, translations: [{ en: 'Custom component name' }, { fa: 'نام کامپوننت سفارشی' }, { ar: 'اسم المكوّن المخصص' }, { es: 'Nombre del componente personalizado' }, { fr: 'Nom du composant personnalisé' }, { de: 'Benutzerdefinierter Komponentenname' }, { it: 'Nome componente personalizzato' }, { ru: 'Имя пользовательского компонента' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TAB_CARD_METADATA, translations: [{ en: 'Card Metadata' }, { fa: 'متادیتای کارت' }, { ar: 'بيانات بطاقة التعريف' }, { es: 'Metadatos de tarjeta' }, { fr: 'Métadonnées de carte' }, { de: 'Karten-Metadaten' }, { it: 'Metadati scheda' }, { ru: 'Метаданные карточки' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_TAB_DETAIL_PAGE, translations: [{ en: 'Detail Page' }, { fa: 'صفحه جزئیات' }, { ar: 'صفحة التفاصيل' }, { es: 'Página de detalle' }, { fr: 'Page de détail' }, { de: 'Detailseite' }, { it: 'Pagina dettaglio' }, { ru: 'Страница деталей' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LOADING, translations: [{ en: 'Loading Schema...' }, { fa: 'در حال بارگذاری طرح...' }, { ar: 'جاري تحميل المخطط...' }, { es: 'Cargando esquema...' }, { fr: 'Chargement du schéma...' }, { de: 'Schema wird geladen...' }, { it: 'Caricamento schema...' }, { ru: 'Загрузка схемы...' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_NOT_FOUND, translations: [{ en: 'Schema Not Found' }, { fa: 'طرح یافت نشد' }, { ar: 'المخطط غير موجود' }, { es: 'Esquema no encontrado' }, { fr: 'Schéma introuvable' }, { de: 'Schema nicht gefunden' }, { it: 'Schema non trovato' }, { ru: 'Схема не найдена' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_EDIT_TITLE, translations: [{ en: 'Edit {name}' }, { fa: 'ویرایش {name}' }, { ar: 'تعديل {name}' }, { es: 'Editar {name}' }, { fr: 'Modifier {name}' }, { de: '{name} bearbeiten' }, { it: 'Modifica {name}' }, { ru: 'Редактировать {name}' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_SAVED_SUCCESS, translations: [{ en: 'Schema saved successfully' }, { fa: 'طرح با موفقیت ذخیره شد' }, { ar: 'تم حفظ المخطط بنجاح' }, { es: 'Esquema guardado correctamente' }, { fr: 'Schéma enregistré avec succès' }, { de: 'Schema erfolgreich gespeichert' }, { it: 'Schema salvato con successo' }, { ru: 'Схема успешно сохранена' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_SAVE_ERROR, translations: [{ en: 'Error saving schema' }, { fa: 'خطا در ذخیره طرح' }, { ar: 'خطأ في حفظ المخطط' }, { es: 'Error al guardar el esquema' }, { fr: 'Erreur lors de l\'enregistrement du schéma' }, { de: 'Fehler beim Speichern des Schemas' }, { it: 'Errore nel salvataggio dello schema' }, { ru: 'Ошибка сохранения схемы' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_SUBTITLE_BUILDER, translations: [{ en: 'Schema Builder' }, { fa: 'سازنده طرح' }, { ar: 'منشئ المخطط' }, { es: 'Constructor de esquemas' }, { fr: 'Générateur de schémas' }, { de: 'Schema-Builder' }, { it: 'Costruttore schema' }, { ru: 'Конструктор схем' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_FIELDS, translations: [{ en: 'Fields' }, { fa: 'فیلدها' }, { ar: 'الحقول' }, { es: 'Campos' }, { fr: 'Champs' }, { de: 'Felder' }, { it: 'Campi' }, { ru: 'Поля' }] },
+  { key: TRANSLATION_KEYS.SECTION_MSG_NO_FIELDS_YET, translations: [{ en: 'No fields yet. Click "Add Field" to get started.' }, { fa: 'هنوز فیلدی نیست. برای شروع «افزودن فیلد» را بزنید.' }, { ar: 'لا توجد حقول بعد. انقر على "إضافة حقل" للبدء.' }, { es: 'Aún no hay campos. Haz clic en "Añadir campo" para empezar.' }, { fr: 'Aucun champ pour l\'instant. Cliquez sur « Ajouter un champ » pour commencer.' }, { de: 'Noch keine Felder. Klicken Sie auf „Feld hinzufügen“, um zu starten.' }, { it: 'Nessun campo ancora. Clicca su "Aggiungi campo" per iniziare.' }, { ru: 'Полей пока нет. Нажмите «Добавить поле», чтобы начать.' }] },
+  { key: TRANSLATION_KEYS.SECTION_DESC_ADD_ONLY, translations: [{ en: 'Users can only create new items. No selection from existing data.' }, { fa: 'کاربران فقط می‌توانند آیتم جدید بسازند. انتخاب از داده موجود نیست.' }, { ar: 'يمكن للمستخدمين إنشاء عناصر جديدة فقط. لا يوجد اختيار من البيانات الموجودة.' }, { es: 'Los usuarios solo pueden crear nuevos elementos. No se puede seleccionar de datos existentes.' }, { fr: 'Les utilisateurs ne peuvent que créer de nouveaux éléments. Aucune sélection parmi les données existantes.' }, { de: 'Benutzer können nur neue Einträge erstellen. Keine Auswahl aus vorhandenen Daten.' }, { it: 'Gli utenti possono solo creare nuovi elementi. Nessuna selezione dai dati esistenti.' }, { ru: 'Пользователи могут только создавать новые элементы. Выбор из существующих данных недоступен.' }] },
+  { key: TRANSLATION_KEYS.SECTION_DESC_CAN_SELECT, translations: [{ en: 'Users can create new items or select from existing data. Both "Add" and "Select" buttons will be shown.' }, { fa: 'کاربران می‌توانند آیتم جدید بسازند یا از داده موجود انتخاب کنند. دکمه‌های «افزودن» و «انتخاب» نمایش داده می‌شوند.' }, { ar: 'يمكن للمستخدمين إنشاء عناصر جديدة أو الاختيار من البيانات الموجودة. سيظهر كلا الزرين «إضافة» و«اختيار».' }, { es: 'Los usuarios pueden crear nuevos elementos o seleccionar de datos existentes. Se mostrarán los botones «Añadir» y «Seleccionar».' }, { fr: 'Les utilisateurs peuvent créer de nouveaux éléments ou choisir parmi les données existantes. Les boutons « Ajouter » et « Sélectionner » seront affichés.' }, { de: 'Benutzer können neue Einträge erstellen oder aus vorhandenen Daten wählen. Beide Schaltflächen „Hinzufügen“ und „Auswählen“ werden angezeigt.' }, { it: 'Gli utenti possono creare nuovi elementi o selezionare dai dati esistenti. Verranno mostrati i pulsanti «Aggiungi» e «Seleziona».' }, { ru: 'Пользователи могут создавать новые элементы или выбирать из существующих данных. Будут показаны кнопки «Добавить» и «Выбрать».' }] },
+  { key: TRANSLATION_KEYS.SECTION_DESC_MUST_SELECT, translations: [{ en: 'Users can only select from existing data. Only "Select" button will be shown.' }, { fa: 'کاربران فقط می‌توانند از داده موجود انتخاب کنند. فقط دکمه «انتخاب» نمایش داده می‌شود.' }, { ar: 'يمكن للمستخدمين الاختيار من البيانات الموجودة فقط. سيظهر زر «اختيار» فقط.' }, { es: 'Los usuarios solo pueden seleccionar de datos existentes. Solo se mostrará el botón «Seleccionar».' }, { fr: 'Les utilisateurs ne peuvent que choisir parmi les données existantes. Seul le bouton « Sélectionner » sera affiché.' }, { de: 'Benutzer können nur aus vorhandenen Daten wählen. Es wird nur die Schaltfläche „Auswählen“ angezeigt.' }, { it: 'Gli utenti possono solo selezionare dai dati esistenti. Verrà mostrato solo il pulsante «Seleziona».' }, { ru: 'Пользователи могут только выбирать из существующих данных. Будет показана только кнопка «Выбрать».' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_UNIQUE_SELECTION, translations: [{ en: 'Unique Selection' }, { fa: 'انتخاب یکتا' }, { ar: 'اختيار فريد' }, { es: 'Selección única' }, { fr: 'Sélection unique' }, { de: 'Eindeutige Auswahl' }, { it: 'Selezione univoca' }, { ru: 'Уникальный выбор' }] },
+  { key: TRANSLATION_KEYS.SECTION_DESC_UNIQUE_SELECTION, translations: [{ en: 'If enabled, each item can only be selected once. Already selected items will be excluded from the picker.' }, { fa: 'در صورت فعال بودن، هر آیتم فقط یک بار قابل انتخاب است. آیتم‌های انتخاب‌شده از انتخابگر حذف می‌شوند.' }, { ar: 'إذا تم التفعيل، يمكن اختيار كل عنصر مرة واحدة فقط. سيتم استبعاد العناصر المحددة من المنتقي.' }, { es: 'Si está activado, cada elemento solo puede seleccionarse una vez. Los elementos ya seleccionados se excluirán del selector.' }, { fr: 'Si activé, chaque élément ne peut être sélectionné qu\'une fois. Les éléments déjà sélectionnés seront exclus du sélecteur.' }, { de: 'Wenn aktiviert, kann jedes Element nur einmal ausgewählt werden. Bereits ausgewählte Elemente werden aus dem Auswahlfeld ausgeschlossen.' }, { it: 'Se attivato, ogni elemento può essere selezionato una sola volta. Gli elementi già selezionati saranno esclusi dal selettore.' }, { ru: 'Если включено, каждый элемент можно выбрать только один раз. Уже выбранные элементы будут исключены из списка.' }] },
+  { key: TRANSLATION_KEYS.SECTION_MSG_RELATION_BASED, translations: [{ en: 'Relation-based section:' }, { fa: 'بخش مبتنی بر ارتباط:' }, { ar: 'قسم قائم على العلاقة:' }, { es: 'Sección basada en relación:' }, { fr: 'Section basée sur la relation :' }, { de: 'Beziehungsbasierter Abschnitt:' }, { it: 'Sezione basata su relazione:' }, { ru: 'Раздел на основе связи:' }] },
+  { key: TRANSLATION_KEYS.SECTION_MSG_FIELDS_MANAGED_IN_TARGET, translations: [{ en: 'Fields are managed in the target schema' }, { fa: 'فیلدها در طرح هدف مدیریت می‌شوند' }, { ar: 'تتم إدارة الحقول في المخطط المستهدف' }, { es: 'Los campos se gestionan en el esquema de destino' }, { fr: 'Les champs sont gérés dans le schéma cible' }, { de: 'Felder werden im Ziel-Schema verwaltet' }, { it: 'I campi sono gestiti nello schema di destinazione' }, { ru: 'Поля управляются в целевой схеме' }] },
+  { key: TRANSLATION_KEYS.SECTION_MSG_SAVE_BEFORE_ADD_FIELDS, translations: [{ en: 'Please save your changes before adding fields.' }, { fa: 'لطفاً قبل از افزودن فیلد تغییرات را ذخیره کنید.' }, { ar: 'يرجى حفظ التغييرات قبل إضافة الحقول.' }, { es: 'Guarde los cambios antes de añadir campos.' }, { fr: 'Veuillez enregistrer vos modifications avant d\'ajouter des champs.' }, { de: 'Bitte speichern Sie Ihre Änderungen, bevor Sie Felder hinzufügen.' }, { it: 'Salva le modifiche prima di aggiungere campi.' }, { ru: 'Сохраните изменения перед добавлением полей.' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_DELETE_TYPE, translations: [{ en: 'Delete Type' }, { fa: 'نوع حذف' }, { ar: 'نوع الحذف' }, { es: 'Tipo de eliminación' }, { fr: 'Type de suppression' }, { de: 'Löschtyp' }, { it: 'Tipo di eliminazione' }, { ru: 'Тип удаления' }] },
+  { key: TRANSLATION_KEYS.SECTION_OPTION_DELETE_RELATION_ONLY, translations: [{ en: 'Delete relation only (keep item)' }, { fa: 'فقط حذف ارتباط (آیتم بماند)' }, { ar: 'حذف العلاقة فقط (الإبقاء على العنصر)' }, { es: 'Solo eliminar relación (mantener elemento)' }, { fr: 'Supprimer uniquement la relation (conserver l\'élément)' }, { de: 'Nur Beziehung löschen (Element behalten)' }, { it: 'Elimina solo relazione (mantieni elemento)' }, { ru: 'Удалить только связь (элемент сохранить)' }] },
+  { key: TRANSLATION_KEYS.SECTION_OPTION_DELETE_ITEM_AND_RELATION, translations: [{ en: 'Delete item and relation' }, { fa: 'حذف آیتم و ارتباط' }, { ar: 'حذف العنصر والعلاقة' }, { es: 'Eliminar elemento y relación' }, { fr: 'Supprimer l\'élément et la relation' }, { de: 'Element und Beziehung löschen' }, { it: 'Elimina elemento e relazione' }, { ru: 'Удалить элемент и связь' }] },
+  { key: TRANSLATION_KEYS.SECTION_DESC_DELETE_RELATION_ONLY, translations: [{ en: 'Only the relation will be deleted. The item will remain in the target schema.' }, { fa: 'فقط ارتباط حذف می‌شود. آیتم در طرح هدف می‌ماند.' }, { ar: 'سيتم حذف العلاقة فقط. سيبقى العنصر في المخطط المستهدف.' }, { es: 'Solo se eliminará la relación. El elemento permanecerá en el esquema de destino.' }, { fr: 'Seule la relation sera supprimée. L\'élément restera dans le schéma cible.' }, { de: 'Nur die Beziehung wird gelöscht. Das Element bleibt im Ziel-Schema.' }, { it: 'Verrà eliminata solo la relazione. L\'elemento resterà nello schema di destinazione.' }, { ru: 'Будет удалена только связь. Элемент останется в целевой схеме.' }] },
+  { key: TRANSLATION_KEYS.SECTION_DESC_DELETE_ITEM_AND_RELATION, translations: [{ en: 'Both the relation and the item will be permanently deleted.' }, { fa: 'هم ارتباط و هم آیتم برای همیشه حذف می‌شوند.' }, { ar: 'سيتم حذف العلاقة والعنصر نهائياً.' }, { es: 'Tanto la relación como el elemento se eliminarán permanentemente.' }, { fr: 'La relation et l\'élément seront définitivement supprimés.' }, { de: 'Sowohl die Beziehung als auch das Element werden dauerhaft gelöscht.' }, { it: 'Sia la relazione che l\'elemento verranno eliminati definitivamente.' }, { ru: 'И связь, и элемент будут удалены безвозвратно.' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_ADD_TYPE, translations: [{ en: 'Add Type' }, { fa: 'نوع افزودن' }, { ar: 'نوع الإضافة' }, { es: 'Tipo de adición' }, { fr: 'Type d\'ajout' }, { de: 'Hinzufügen-Typ' }, { it: 'Tipo di aggiunta' }, { ru: 'Тип добавления' }] },
+  { key: TRANSLATION_KEYS.SECTION_OPTION_ADD_ONLY, translations: [{ en: 'Add only (create new items)' }, { fa: 'فقط افزودن (ایجاد آیتم جدید)' }, { ar: 'إضافة فقط (إنشاء عناصر جديدة)' }, { es: 'Solo añadir (crear nuevos elementos)' }, { fr: 'Ajout uniquement (créer de nouveaux éléments)' }, { de: 'Nur hinzufügen (neue Einträge erstellen)' }, { it: 'Solo aggiungi (crea nuovi elementi)' }, { ru: 'Только добавление (создание новых элементов)' }] },
+  { key: TRANSLATION_KEYS.SECTION_OPTION_CAN_SELECT_FROM_DATA, translations: [{ en: 'Can select from existing data' }, { fa: 'امکان انتخاب از داده موجود' }, { ar: 'يمكن الاختيار من البيانات الموجودة' }, { es: 'Se puede seleccionar de datos existentes' }, { fr: 'Peut sélectionner parmi les données existantes' }, { de: 'Kann aus vorhandenen Daten wählen' }, { it: 'Può selezionare dai dati esistenti' }, { ru: 'Можно выбрать из существующих данных' }] },
+  { key: TRANSLATION_KEYS.SECTION_OPTION_MUST_SELECT_FROM_DATA, translations: [{ en: 'Must select from existing data' }, { fa: 'الزاماً انتخاب از داده موجود' }, { ar: 'يجب الاختيار من البيانات الموجودة' }, { es: 'Debe seleccionar de datos existentes' }, { fr: 'Doit sélectionner parmi les données existantes' }, { de: 'Muss aus vorhandenen Daten wählen' }, { it: 'Deve selezionare dai dati esistenti' }, { ru: 'Необходимо выбрать из существующих данных' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_MSG_NO_FIELDS_YET, translations: [{ en: 'No fields yet' }, { fa: 'هنوز فیلدی نیست' }, { ar: 'لا توجد حقول بعد' }, { es: 'Aún no hay campos' }, { fr: 'Aucun champ pour l\'instant' }, { de: 'Noch keine Felder' }, { it: 'Nessun campo ancora' }, { ru: 'Полей пока нет' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_MSG_NOT_FOUND, translations: [{ en: 'Schema not found' }, { fa: 'طرح یافت نشد' }, { ar: 'المخطط غير موجود' }, { es: 'Esquema no encontrado' }, { fr: 'Schéma introuvable' }, { de: 'Schema nicht gefunden' }, { it: 'Schema non trovato' }, { ru: 'Схема не найдена' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_MSG_TRY_DIFFERENT, translations: [{ en: 'Please try loading a different schema.' }, { fa: 'لطفاً طرح دیگری بارگذاری کنید.' }, { ar: 'يرجى محاولة تحميل مخطط آخر.' }, { es: 'Intente cargar un esquema diferente.' }, { fr: 'Veuillez essayer de charger un autre schéma.' }, { de: 'Bitte versuchen Sie, ein anderes Schema zu laden.' }, { it: 'Prova a caricare uno schema diverso.' }, { ru: 'Попробуйте загрузить другую схему.' }] },
+  { key: TRANSLATION_KEYS.CARD_LABEL_NEW_SECTION, translations: [{ en: 'New Card Section' }, { fa: 'بخش کارت جدید' }, { ar: 'قسم بطاقة جديد' }, { es: 'Nueva sección de tarjeta' }, { fr: 'Nouvelle section de carte' }, { de: 'Neuer Kartenabschnitt' }, { it: 'Nuova sezione scheda' }, { ru: 'Новый раздел карточки' }] },
+  { key: TRANSLATION_KEYS.CARD_MSG_ID_AUTO_CUSTOMIZE, translations: [{ en: 'Card Section ID auto-generates from the title. Click "Customize" to override.' }, { fa: 'شناسه بخش کارت از عنوان به‌طور خودکار تولید می‌شود. برای تغییر «سفارشی» بزنید.' }, { ar: 'يُنشأ معرف قسم البطاقة تلقائياً من العنوان. انقر على «تخصيص» للتجاوز.' }, { es: 'El ID de sección de tarjeta se genera desde el título. Haz clic en «Personalizar» para cambiarlo.' }, { fr: 'L\'ID de section de carte est généré à partir du titre. Cliquez sur « Personnaliser » pour modifier.' }, { de: 'Kartenabschnitts-ID wird automatisch aus dem Titel generiert. Klicken Sie auf „Anpassen“, um zu überschreiben.' }, { it: 'L\'ID sezione scheda si genera dal titolo. Clicca su «Personalizza» per sovrascrivere.' }, { ru: 'ID раздела карточки создаётся из названия. Нажмите «Настроить», чтобы изменить.' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_CAN_SELECT_MULTI_COMPANIES, translations: [{ en: 'Can Select Multi Companies' }, { fa: 'امکان انتخاب چند شرکت' }, { ar: 'يمكن تحديد شركات متعددة' }, { es: 'Permitir varias empresas' }, { fr: 'Permettre plusieurs entreprises' }, { de: 'Mehrere Unternehmen wählbar' }, { it: 'Consenti più aziende' }, { ru: 'Несколько компаний' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_DESC_CAN_SELECT_MULTI_COMPANIES, translations: [{ en: 'Allow linking records of this schema to multiple companies in System Section' }, { fa: 'امکان ارتباط رکوردها با چند شرکت در بخش سیستم' }, { ar: 'السماح بربط السجلات بعدة شركات في قسم النظام' }, { es: 'Permitir vincular registros a varias empresas en la sección Sistema' }, { fr: 'Permettre de lier les enregistrements à plusieurs entreprises' }, { de: 'Datensätze mehreren Unternehmen zuordnen erlauben' }, { it: 'Consenti collegamento record a più aziende' }, { ru: 'Разрешить привязку записей к нескольким компаниям' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ALLOW_DATA_RELATED_TENANTS, translations: [{ en: 'Allow Data Related Tenants' }, { fa: 'امکان مستاجران مرتبط با داده' }, { ar: 'السماح بالمستأجرين المرتبطين بالبيانات' }, { es: 'Permitir inquilinos relacionados con datos' }, { fr: 'Permettre les locataires liés aux données' }, { de: 'Mandanten für Daten zulassen' }, { it: 'Consenti tenant correlati ai dati' }, { ru: 'Разрешить связанных арендаторов' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_DESC_ALLOW_DATA_RELATED_TENANTS, translations: [{ en: 'Allow linking records of this schema to multiple tenants in System Section' }, { fa: 'امکان ارتباط رکوردها با چند مستاجر در بخش سیستم' }, { ar: 'السماح بربط السجلات بعدة مستأجرين في قسم النظام' }, { es: 'Permitir vincular registros a varios inquilinos' }, { fr: 'Permettre de lier les enregistrements à plusieurs locataires' }, { de: 'Datensätze mehreren Mandanten zuordnen erlauben' }, { it: 'Consenti collegamento record a più tenant' }, { ru: 'Разрешить привязку записей к нескольким арендаторам' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_STATUS_GROUP, translations: [{ en: 'Status Group' }, { fa: 'گروه وضعیت' }, { ar: 'مجموعة الحالة' }, { es: 'Grupo de estado' }, { fr: 'Groupe de statut' }, { de: 'Statusgruppe' }, { it: 'Gruppo stato' }, { ru: 'Группа статусов' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_DESC_STATUS_GROUP, translations: [{ en: 'Select a status group to enable selection on this schema.' }, { fa: 'یک گروه وضعیت برای فعال‌سازی انتخاب در این طرح انتخاب کنید.' }, { ar: 'اختر مجموعة حالة لتمكين التحديد في هذا المخطط.' }, { es: 'Seleccione un grupo de estado para habilitar la selección.' }, { fr: 'Sélectionnez un groupe de statut pour activer la sélection.' }, { de: 'Wählen Sie eine Statusgruppe zur Aktivierung der Auswahl.' }, { it: 'Seleziona un gruppo stato per abilitare la selezione.' }, { ru: 'Выберите группу статусов для включения выбора.' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ENTITY_TYPE_GROUP, translations: [{ en: 'Entity Type Group' }, { fa: 'گروه نوع موجودیت' }, { ar: 'مجموعة نوع الكيان' }, { es: 'Grupo de tipo de entidad' }, { fr: 'Groupe de type d\'entité' }, { de: 'Entitätstyp-Gruppe' }, { it: 'Gruppo tipo entità' }, { ru: 'Группа типов сущностей' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_DESC_ENTITY_TYPE_GROUP, translations: [{ en: 'Select an entity type group to enable selection on this schema.' }, { fa: 'یک گروه نوع موجودیت برای فعال‌سازی انتخاب در این طرح انتخاب کنید.' }, { ar: 'اختر مجموعة نوع كيان لتمكين التحديد.' }, { es: 'Seleccione un grupo de tipo de entidad para habilitar la selección.' }, { fr: 'Sélectionnez un groupe de type d\'entité pour activer la sélection.' }, { de: 'Wählen Sie eine Entitätstyp-Gruppe zur Aktivierung der Auswahl.' }, { it: 'Seleziona un gruppo tipo entità per abilitare la selezione.' }, { ru: 'Выберите группу типов сущностей для включения выбора.' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_RELATED_TENANTS, translations: [{ en: 'Related Tenants' }, { fa: 'مستاجران مرتبط' }, { ar: 'المستأجرون المرتبطون' }, { es: 'Inquilinos relacionados' }, { fr: 'Locataires liés' }, { de: 'Zugehörige Mandanten' }, { it: 'Tenant correlati' }, { ru: 'Связанные арендаторы' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_DESC_RELATED_TENANTS, translations: [{ en: 'Select tenants using the popup picker' }, { fa: 'مستاجران را با انتخابگر بازشو انتخاب کنید' }, { ar: 'حدد المستأجرين باستخدام نافذة الاختيار' }, { es: 'Seleccione inquilinos con el selector emergente' }, { fr: 'Sélectionnez les locataires avec le sélecteur' }, { de: 'Mandanten über das Popup auswählen' }, { it: 'Seleziona i tenant con il selettore popup' }, { ru: 'Выберите арендаторов в окне выбора' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_SHOW_INACTIVE_SECTIONS, translations: [{ en: 'Show inactive sections' }, { fa: 'نمایش بخش‌های غیرفعال' }, { ar: 'إظهار الأقسام غير النشطة' }, { es: 'Mostrar secciones inactivas' }, { fr: 'Afficher les sections inactives' }, { de: 'Inaktive Abschnitte anzeigen' }, { it: 'Mostra sezioni inattive' }, { ru: 'Показывать неактивные разделы' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ADD_SECTION, translations: [{ en: 'Add Section' }, { fa: 'افزودن بخش' }, { ar: 'إضافة قسم' }, { es: 'Añadir sección' }, { fr: 'Ajouter une section' }, { de: 'Abschnitt hinzufügen' }, { it: 'Aggiungi sezione' }, { ru: 'Добавить раздел' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_ADD_FIELD, translations: [{ en: 'Add Field' }, { fa: 'افزودن فیلد' }, { ar: 'إضافة حقل' }, { es: 'Añadir campo' }, { fr: 'Ajouter un champ' }, { de: 'Feld hinzufügen' }, { it: 'Aggiungi campo' }, { ru: 'Добавить поле' }] },
+  { key: TRANSLATION_KEYS.SCHEMA_LABEL_COLLAPSE_ALL, translations: [{ en: 'Collapse All' }, { fa: 'جمع کردن همه' }, { ar: 'طي الكل' }, { es: 'Contraer todo' }, { fr: 'Tout réduire' }, { de: 'Alle einklappen' }, { it: 'Comprimi tutto' }, { ru: 'Свернуть все' }] },
+  { key: TRANSLATION_KEYS.SECTION_EDIT_TITLE, translations: [{ en: 'Edit Section' }, { fa: 'ویرایش بخش' }, { ar: 'تعديل القسم' }, { es: 'Editar sección' }, { fr: 'Modifier la section' }, { de: 'Abschnitt bearbeiten' }, { it: 'Modifica sezione' }, { ru: 'Редактировать раздел' }] },
+  { key: TRANSLATION_KEYS.SECTION_DESCRIPTION_DIALOG, translations: [{ en: 'Configure section properties and fields' }, { fa: 'تنظیم ویژگی‌ها و فیلدهای بخش' }, { ar: 'تكوين خصائص وحقول القسم' }, { es: 'Configurar propiedades y campos de la sección' }, { fr: 'Configurer les propriétés et champs de la section' }, { de: 'Abschnittseigenschaften und Felder konfigurieren' }, { it: 'Configura proprietà e campi della sezione' }, { ru: 'Настроить свойства и поля раздела' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_TITLE, translations: [{ en: 'Section Title' }, { fa: 'عنوان بخش' }, { ar: 'عنوان القسم' }, { es: 'Título de sección' }, { fr: 'Titre de la section' }, { de: 'Abschnittstitel' }, { it: 'Titolo sezione' }, { ru: 'Название раздела' }] },
+  { key: TRANSLATION_KEYS.SECTION_PLACEHOLDER_TITLE, translations: [{ en: 'Section title...' }, { fa: 'عنوان بخش...' }, { ar: 'عنوان القسم...' }, { es: 'Título de sección...' }, { fr: 'Titre de la section...' }, { de: 'Abschnittstitel...' }, { it: 'Titolo sezione...' }, { ru: 'Название раздела...' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_ID, translations: [{ en: 'Section ID' }, { fa: 'شناسه بخش' }, { ar: 'معرف القسم' }, { es: 'ID de sección' }, { fr: 'ID de la section' }, { de: 'Abschnitts-ID' }, { it: 'ID sezione' }, { ru: 'ID раздела' }] },
+  { key: TRANSLATION_KEYS.SECTION_PLACEHOLDER_ID, translations: [{ en: 'Generated from the section title' }, { fa: 'تولید از عنوان بخش' }, { ar: 'يُنشأ من عنوان القسم' }, { es: 'Generado desde el título de la sección' }, { fr: 'Généré à partir du titre de la section' }, { de: 'Aus dem Abschnittstitel generiert' }, { it: 'Generato dal titolo della sezione' }, { ru: 'Генерируется из названия раздела' }] },
+  { key: TRANSLATION_KEYS.SECTION_HELPER_ID, translations: [{ en: 'Section IDs auto-generate from the title. Customize if you need a specific identifier.' }, { fa: 'شناسه بخش از عنوان به‌طور خودکار تولید می‌شود.' }, { ar: 'تُنشأ معرفات الأقسام تلقائياً من العنوان.' }, { es: 'Los ID de sección se generan automáticamente desde el título.' }, { fr: 'Les ID de section sont générés automatiquement à partir du titre.' }, { de: 'Abschnitts-IDs werden automatisch aus dem Titel generiert.' }, { it: 'Gli ID sezione si generano automaticamente dal titolo.' }, { ru: 'ID раздела генерируются из названия.' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_DESCRIPTION, translations: [{ en: 'Description' }, { fa: 'توضیحات' }, { ar: 'الوصف' }, { es: 'Descripción' }, { fr: 'Description' }, { de: 'Beschreibung' }, { it: 'Descrizione' }, { ru: 'Описание' }] },
+  { key: TRANSLATION_KEYS.SECTION_PLACEHOLDER_DESCRIPTION, translations: [{ en: 'Section description (optional)...' }, { fa: 'توضیحات بخش (اختیاری)...' }, { ar: 'وصف القسم (اختياري)...' }, { es: 'Descripción de la sección (opcional)...' }, { fr: 'Description de la section (optionnel)...' }, { de: 'Abschnittsbeschreibung (optional)...' }, { it: 'Descrizione sezione (opzionale)...' }, { ru: 'Описание раздела (необязательно)...' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_INITIAL_STATE, translations: [{ en: 'Initial State' }, { fa: 'وضعیت اولیه' }, { ar: 'الحالة الأولية' }, { es: 'Estado inicial' }, { fr: 'État initial' }, { de: 'Anfangszustand' }, { it: 'Stato iniziale' }, { ru: 'Начальное состояние' }] },
+  { key: TRANSLATION_KEYS.SECTION_OPTION_EXPANDED, translations: [{ en: 'Expanded' }, { fa: 'باز' }, { ar: 'موسع' }, { es: 'Expandido' }, { fr: 'Développé' }, { de: 'Erweitert' }, { it: 'Espanso' }, { ru: 'Развёрнут' }] },
+  { key: TRANSLATION_KEYS.SECTION_OPTION_COLLAPSED, translations: [{ en: 'Collapsed' }, { fa: 'جمع' }, { ar: 'مطوي' }, { es: 'Contraído' }, { fr: 'Réduit' }, { de: 'Eingeklappt' }, { it: 'Compresso' }, { ru: 'Свёрнут' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_COLUMNS, translations: [{ en: 'Columns' }, { fa: 'ستون‌ها' }, { ar: 'الأعمدة' }, { es: 'Columnas' }, { fr: 'Colonnes' }, { de: 'Spalten' }, { it: 'Colonne' }, { ru: 'Столбцы' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_REPEATING, translations: [{ en: 'Repeating Section' }, { fa: 'بخش تکراری' }, { ar: 'قسم متكرر' }, { es: 'Sección repetible' }, { fr: 'Section répétable' }, { de: 'Wiederholender Abschnitt' }, { it: 'Sezione ripetibile' }, { ru: 'Повторяющийся раздел' }] },
+  { key: TRANSLATION_KEYS.SECTION_BADGE_REPEATING, translations: [{ en: 'Repeating' }, { fa: 'تکراری' }, { ar: 'متكرر' }, { es: 'Repetible' }, { fr: 'Répétable' }, { de: 'Wiederholend' }, { it: 'Ripetibile' }, { ru: 'Повтор' }] },
+  { key: TRANSLATION_KEYS.SECTION_TITLE_DRAG_TO_REORDER, translations: [{ en: 'Drag to reorder section' }, { fa: 'برای تغییر ترتیب بکشید' }, { ar: 'اسحب لإعادة ترتيب القسم' }, { es: 'Arrastrar para reordenar sección' }, { fr: 'Glisser pour réordonner la section' }, { de: 'Ziehen zum Neuanordnen' }, { it: 'Trascina per riordinare la sezione' }, { ru: 'Перетащите для изменения порядка' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_FIELD_RELATION_TYPE, translations: [{ en: 'Field Relation Type' }, { fa: 'نوع ارتباط فیلد' }, { ar: 'نوع علاقة الحقل' }, { es: 'Tipo de relación de campo' }, { fr: 'Type de relation de champ' }, { de: 'Feldrelationstyp' }, { it: 'Tipo relazione campo' }, { ru: 'Тип связи поля' }] },
+  { key: TRANSLATION_KEYS.SECTION_OPTION_CONNECT_TO_SCHEMA, translations: [{ en: 'Connect To Schema' }, { fa: 'اتصال به طرح' }, { ar: 'الاتصال بالمخطط' }, { es: 'Conectar al esquema' }, { fr: 'Connecter au schéma' }, { de: 'Mit Schema verbinden' }, { it: 'Connetti allo schema' }, { ru: 'Подключить к схеме' }] },
+  { key: TRANSLATION_KEYS.SECTION_OPTION_ADD_FIELDS, translations: [{ en: 'Add Fields' }, { fa: 'افزودن فیلدها' }, { ar: 'إضافة حقول' }, { es: 'Añadir campos' }, { fr: 'Ajouter des champs' }, { de: 'Felder hinzufügen' }, { it: 'Aggiungi campi' }, { ru: 'Добавить поля' }] },
+  { key: TRANSLATION_KEYS.SECTION_DESC_CONNECT_TO_SCHEMA, translations: [{ en: 'Fields will be managed in the connected schema. Configure target schema and relation type below.' }, { fa: 'فیلدها در طرح متصل مدیریت می‌شوند.' }, { ar: 'ستُدار الحقول في المخطط المتصل.' }, { es: 'Los campos se gestionarán en el esquema conectado.' }, { fr: 'Les champs seront gérés dans le schéma connecté.' }, { de: 'Felder werden im verbundenen Schema verwaltet.' }, { it: 'I campi saranno gestiti nello schema collegato.' }, { ru: 'Поля управляются в подключённой схеме.' }] },
+  { key: TRANSLATION_KEYS.SECTION_DESC_ADD_FIELDS, translations: [{ en: 'Fields will be added directly to this section.' }, { fa: 'فیلدها مستقیماً به این بخش اضافه می‌شوند.' }, { ar: 'ستُضاف الحقول مباشرة إلى هذا القسم.' }, { es: 'Los campos se añadirán directamente a esta sección.' }, { fr: 'Les champs seront ajoutés directement à cette section.' }, { de: 'Felder werden direkt zu diesem Abschnitt hinzugefügt.' }, { it: 'I campi verranno aggiunti direttamente a questa sezione.' }, { ru: 'Поля добавляются напрямую в этот раздел.' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_SHOW_NOT_APPLICABLE, translations: [{ en: 'Show Not Applicable Switch' }, { fa: 'نمایش کلید عدم اعمال' }, { ar: 'إظهار مفتاح غير قابل للتطبيق' }, { es: 'Mostrar interruptor No aplicable' }, { fr: 'Afficher le commutateur Non applicable' }, { de: 'Schalter „Nicht zutreffend“ anzeigen' }, { it: 'Mostra interruttore Non applicabile' }, { ru: 'Показывать переключатель «Не применимо»' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_CONFIGURATION, translations: [{ en: 'Configuration' }, { fa: 'پیکربندی' }, { ar: 'التكوين' }, { es: 'Configuración' }, { fr: 'Configuration' }, { de: 'Konfiguration' }, { it: 'Configurazione' }, { ru: 'Конфигурация' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_TARGET_SCHEMA, translations: [{ en: 'Target Schema' }, { fa: 'طرح هدف' }, { ar: 'المخطط المستهدف' }, { es: 'Esquema de destino' }, { fr: 'Schéma cible' }, { de: 'Ziel-Schema' }, { it: 'Schema di destinazione' }, { ru: 'Целевая схема' }] },
+  { key: TRANSLATION_KEYS.SECTION_PLACEHOLDER_SELECT_TARGET_SCHEMA, translations: [{ en: 'Select target schema...' }, { fa: 'انتخاب طرح هدف...' }, { ar: 'اختر المخطط المستهدف...' }, { es: 'Seleccionar esquema de destino...' }, { fr: 'Sélectionner le schéma cible...' }, { de: 'Ziel-Schema auswählen...' }, { it: 'Seleziona schema di destinazione...' }, { ru: 'Выберите целевую схему...' }] },
+  { key: TRANSLATION_KEYS.SECTION_MSG_TARGET_SCHEMA_REQUIRED, translations: [{ en: 'Target schema is required when using "Connect To Schema"' }, { fa: 'طرح هدف در حالت «اتصال به طرح» الزامی است' }, { ar: 'المخطط المستهدف مطلوب عند استخدام «الاتصال بالمخطط»' }, { es: 'El esquema de destino es obligatorio al usar "Conectar al esquema"' }, { fr: 'Le schéma cible est requis avec « Connecter au schéma »' }, { de: 'Ziel-Schema ist bei „Mit Schema verbinden“ erforderlich' }, { it: 'Lo schema di destinazione è obbligatorio con "Connetti allo schema"' }, { ru: 'Целевая схема обязательна при «Подключить к схеме»' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_RELATION_TYPE, translations: [{ en: 'Relation Type' }, { fa: 'نوع ارتباط' }, { ar: 'نوع العلاقة' }, { es: 'Tipo de relación' }, { fr: 'Type de relation' }, { de: 'Relationstyp' }, { it: 'Tipo di relazione' }, { ru: 'Тип связи' }] },
+  { key: TRANSLATION_KEYS.SECTION_PLACEHOLDER_SELECT_RELATION_TYPE, translations: [{ en: 'Select relation type...' }, { fa: 'انتخاب نوع ارتباط...' }, { ar: 'اختر نوع العلاقة...' }, { es: 'Seleccionar tipo de relación...' }, { fr: 'Sélectionner le type de relation...' }, { de: 'Relationstyp auswählen...' }, { it: 'Seleziona tipo di relazione...' }, { ru: 'Выберите тип связи...' }] },
+  { key: TRANSLATION_KEYS.SECTION_MSG_RELATION_TYPE_REQUIRED, translations: [{ en: 'Relation type is required when using "Connect To Schema"' }, { fa: 'نوع ارتباط در حالت «اتصال به طرح» الزامی است' }, { ar: 'نوع العلاقة مطلوب عند استخدام «الاتصال بالمخطط»' }, { es: 'El tipo de relación es obligatorio al usar "Conectar al esquema"' }, { fr: 'Le type de relation est requis avec « Connecter au schéma »' }, { de: 'Relationstyp ist bei „Mit Schema verbinden“ erforderlich' }, { it: 'Il tipo di relazione è obbligatorio con "Connetti allo schema"' }, { ru: 'Тип связи обязателен при «Подключить к схеме»' }] },
+  { key: TRANSLATION_KEYS.SECTION_MSG_REQUIRED_BOTH, translations: [{ en: 'Required: Please select both Target Schema and Relation Type to save this section.' }, { fa: 'الزامی: طرح هدف و نوع ارتباط را انتخاب کنید.' }, { ar: 'مطلوب: يرجى تحديد المخطط المستهدف ونوع العلاقة.' }, { es: 'Requerido: seleccione Esquema de destino y Tipo de relación.' }, { fr: 'Requis : veuillez sélectionner le schéma cible et le type de relation.' }, { de: 'Erforderlich: Bitte wählen Sie Ziel-Schema und Relationstyp.' }, { it: 'Obbligatorio: seleziona Schema di destinazione e Tipo di relazione.' }, { ru: 'Обязательно: выберите целевую схему и тип связи.' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_MIN_ITEMS, translations: [{ en: 'Min Items' }, { fa: 'حداقل آیتم' }, { ar: 'الحد الأدنى للعناصر' }, { es: 'Mín. elementos' }, { fr: 'Éléments min.' }, { de: 'Min. Elemente' }, { it: 'Elementi min' }, { ru: 'Мин. элементов' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_MAX_ITEMS, translations: [{ en: 'Max Items' }, { fa: 'حداکثر آیتم' }, { ar: 'الحد الأقصى للعناصر' }, { es: 'Máx. elementos' }, { fr: 'Éléments max.' }, { de: 'Max. Elemente' }, { it: 'Elementi max' }, { ru: 'Макс. элементов' }] },
+  { key: TRANSLATION_KEYS.SECTION_TITLE_SELECT_TARGET_SCHEMA, translations: [{ en: 'Select Target Schema' }, { fa: 'انتخاب طرح هدف' }, { ar: 'اختر المخطط المستهدف' }, { es: 'Seleccionar esquema de destino' }, { fr: 'Sélectionner le schéma cible' }, { de: 'Ziel-Schema auswählen' }, { it: 'Seleziona schema di destinazione' }, { ru: 'Выберите целевую схему' }] },
+  { key: TRANSLATION_KEYS.SECTION_DESC_SELECT_TARGET_SCHEMA, translations: [{ en: 'Choose a schema to link to this repeating section' }, { fa: 'طرحی برای اتصال به این بخش تکراری انتخاب کنید' }, { ar: 'اختر مخططاً للربط بهذا القسم المتكرر' }, { es: 'Elija un esquema para vincular a esta sección repetible' }, { fr: 'Choisissez un schéma à lier à cette section répétable' }, { de: 'Schema zum Verknüpfen mit diesem wiederholenden Abschnitt wählen' }, { it: 'Scegli uno schema da collegare a questa sezione ripetibile' }, { ru: 'Выберите схему для связи с этим повторяющимся разделом' }] },
+  { key: TRANSLATION_KEYS.SECTION_TITLE_SELECT_RELATION_TYPE, translations: [{ en: 'Select Relation Type' }, { fa: 'انتخاب نوع ارتباط' }, { ar: 'اختر نوع العلاقة' }, { es: 'Seleccionar tipo de relación' }, { fr: 'Sélectionner le type de relation' }, { de: 'Relationstyp auswählen' }, { it: 'Seleziona tipo di relazione' }, { ru: 'Выберите тип связи' }] },
+  { key: TRANSLATION_KEYS.SECTION_DESC_SELECT_RELATION_TYPE, translations: [{ en: 'Choose a relation type for this repeating section' }, { fa: 'نوع ارتباط برای این بخش تکراری انتخاب کنید' }, { ar: 'اختر نوع علاقة لهذا القسم المتكرر' }, { es: 'Elija un tipo de relación para esta sección repetible' }, { fr: 'Choisissez un type de relation pour cette section répétable' }, { de: 'Relationstyp für diesen wiederholenden Abschnitt wählen' }, { it: 'Scegli un tipo di relazione per questa sezione ripetibile' }, { ru: 'Выберите тип связи для этого повторяющегося раздела' }] },
+  { key: TRANSLATION_KEYS.SECTION_ERROR_TITLE_INVALID, translations: [{ en: 'Please enter a valid section title (cannot be empty or "New Section").' }, { fa: 'عنوان بخش معتبر وارد کنید (خالی یا «بخش جدید» نباشد).' }, { ar: 'يرجى إدخال عنوان قسم صالح (لا يمكن أن يكون فارغاً أو «قسم جديد»).' }, { es: 'Introduzca un título de sección válido (no vacío ni «Nueva sección»).' }, { fr: 'Veuillez entrer un titre de section valide.' }, { de: 'Bitte geben Sie einen gültigen Abschnittstitel ein.' }, { it: 'Inserisci un titolo di sezione valido.' }, { ru: 'Введите допустимое название раздела.' }] },
+  { key: TRANSLATION_KEYS.SECTION_LABEL_NEW_SECTION, translations: [{ en: 'New Section' }, { fa: 'بخش جدید' }, { ar: 'قسم جديد' }, { es: 'Nueva sección' }, { fr: 'Nouvelle section' }, { de: 'Neuer Abschnitt' }, { it: 'Nuova sezione' }, { ru: 'Новый раздел' }] },
+  { key: TRANSLATION_KEYS.FIELD_UNNAMED, translations: [{ en: 'Unnamed Field' }, { fa: 'فیلد بدون نام' }, { ar: 'حقل بدون اسم' }, { es: 'Campo sin nombre' }, { fr: 'Champ sans nom' }, { de: 'Unbenanntes Feld' }, { it: 'Campo senza nome' }, { ru: 'Поле без имени' }] },
+  { key: TRANSLATION_KEYS.FIELD_EDIT_TITLE, translations: [{ en: 'Edit Field' }, { fa: 'ویرایش فیلد' }, { ar: 'تعديل الحقل' }, { es: 'Editar campo' }, { fr: 'Modifier le champ' }, { de: 'Feld bearbeiten' }, { it: 'Modifica campo' }, { ru: 'Редактировать поле' }] },
+  { key: TRANSLATION_KEYS.FIELD_DESCRIPTION_DIALOG, translations: [{ en: 'Configure field properties and behavior' }, { fa: 'تنظیم ویژگی‌ها و رفتار فیلد' }, { ar: 'تكوين خصائص وسلوك الحقل' }, { es: 'Configurar propiedades y comportamiento del campo' }, { fr: 'Configurer les propriétés et le comportement du champ' }, { de: 'Feldeigenschaften und Verhalten konfigurieren' }, { it: 'Configura proprietà e comportamento del campo' }, { ru: 'Настроить свойства и поведение поля' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_LABEL, translations: [{ en: 'Field Label' }, { fa: 'برچسب فیلد' }, { ar: 'تسمية الحقل' }, { es: 'Etiqueta del campo' }, { fr: 'Libellé du champ' }, { de: 'Feldbezeichnung' }, { it: 'Etichetta campo' }, { ru: 'Подпись поля' }] },
+  { key: TRANSLATION_KEYS.FIELD_PLACEHOLDER_LABEL, translations: [{ en: 'Enter field label...' }, { fa: 'برچسب فیلد را وارد کنید...' }, { ar: 'أدخل تسمية الحقل...' }, { es: 'Introduzca la etiqueta del campo...' }, { fr: 'Entrez le libellé du champ...' }, { de: 'Feldbezeichnung eingeben...' }, { it: 'Inserisci etichetta campo...' }, { ru: 'Введите подпись поля...' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_NAME, translations: [{ en: 'Field Name' }, { fa: 'نام فیلد' }, { ar: 'اسم الحقل' }, { es: 'Nombre del campo' }, { fr: 'Nom du champ' }, { de: 'Feldname' }, { it: 'Nome campo' }, { ru: 'Имя поля' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_COMPONENT, translations: [{ en: 'Component' }, { fa: 'کامپوننت' }, { ar: 'المكوّن' }, { es: 'Componente' }, { fr: 'Composant' }, { de: 'Komponente' }, { it: 'Componente' }, { ru: 'Компонент' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_SECTION, translations: [{ en: 'Section' }, { fa: 'بخش' }, { ar: 'القسم' }, { es: 'Sección' }, { fr: 'Section' }, { de: 'Abschnitt' }, { it: 'Sezione' }, { ru: 'Раздел' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_PLACEHOLDER, translations: [{ en: 'Placeholder' }, { fa: 'متن راهنما' }, { ar: 'النص البديل' }, { es: 'Marcador de posición' }, { fr: 'Texte d\'indication' }, { de: 'Platzhalter' }, { it: 'Segnaposto' }, { ru: 'Заполнитель' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_ROLE, translations: [{ en: 'Role' }, { fa: 'نقش' }, { ar: 'الدور' }, { es: 'Rol' }, { fr: 'Rôle' }, { de: 'Rolle' }, { it: 'Ruolo' }, { ru: 'Роль' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_ROLE_COLOR, translations: [{ en: 'Role Color' }, { fa: 'رنگ نقش' }, { ar: 'لون الدور' }, { es: 'Color del rol' }, { fr: 'Couleur du rôle' }, { de: 'Rollenfarbe' }, { it: 'Colore ruolo' }, { ru: 'Цвет роли' }] },
+  { key: TRANSLATION_KEYS.FIELD_TOOLTIP_EDIT, translations: [{ en: 'Edit Field' }, { fa: 'ویرایش فیلد' }, { ar: 'تعديل الحقل' }, { es: 'Editar campo' }, { fr: 'Modifier le champ' }, { de: 'Feld bearbeiten' }, { it: 'Modifica campo' }, { ru: 'Редактировать поле' }] },
+  { key: TRANSLATION_KEYS.FIELD_TOOLTIP_DELETE, translations: [{ en: 'Delete Field' }, { fa: 'حذف فیلد' }, { ar: 'حذف الحقل' }, { es: 'Eliminar campo' }, { fr: 'Supprimer le champ' }, { de: 'Feld löschen' }, { it: 'Elimina campo' }, { ru: 'Удалить поле' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_SAVE_CHANGES, translations: [{ en: 'Save Changes' }, { fa: 'ذخیره تغییرات' }, { ar: 'حفظ التغييرات' }, { es: 'Guardar cambios' }, { fr: 'Enregistrer les modifications' }, { de: 'Änderungen speichern' }, { it: 'Salva modifiche' }, { ru: 'Сохранить изменения' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_NEW_FIELD, translations: [{ en: 'New Field' }, { fa: 'فیلد جدید' }, { ar: 'حقل جديد' }, { es: 'Nuevo campo' }, { fr: 'Nouveau champ' }, { de: 'Neues Feld' }, { it: 'Nuovo campo' }, { ru: 'Новое поле' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_ADD_TO_REFERENCE_METADATA, translations: [{ en: 'Add To Reference Metadata' }, { fa: 'افزودن به متادیتای مرجع' }, { ar: 'إضافة إلى بيانات المرجع' }, { es: 'Añadir a metadatos de referencia' }, { fr: 'Ajouter aux métadonnées de référence' }, { de: 'Zu Referenz-Metadaten hinzufügen' }, { it: 'Aggiungi ai metadati di riferimento' }, { ru: 'Добавить в метаданные ссылки' }] },
+  { key: TRANSLATION_KEYS.FIELD_MSG_VALID_LABEL_REQUIRED, translations: [{ en: 'Please enter a valid field label (cannot be empty or "New Field").' }, { fa: 'یک برچسب فیلد معتبر وارد کنید (خالی یا «فیلد جدید» مجاز نیست).' }, { ar: 'يرجى إدخال تسمية حقل صالحة (لا يمكن أن تكون فارغة أو «حقل جديد»).' }, { es: 'Introduzca una etiqueta de campo válida (no puede estar vacía ni ser «Nuevo campo»).' }, { fr: 'Veuillez entrer un libellé de champ valide (vide ou « Nouveau champ » non autorisé).' }, { de: 'Bitte geben Sie eine gültige Feldbezeichnung ein (leer oder „Neues Feld“ nicht erlaubt).' }, { it: 'Inserisci un\'etichetta di campo valida (non può essere vuota o «Nuovo campo»).' }, { ru: 'Введите допустимую подпись поля (не пусто и не «Новое поле»).' }] },
+  { key: TRANSLATION_KEYS.FIELD_PLACEHOLDER_AUTO_NAME, translations: [{ en: 'Auto-generated from label' }, { fa: 'تولید خودکار از برچسب' }, { ar: 'يُنشأ تلقائياً من التسمية' }, { es: 'Generado automáticamente desde la etiqueta' }, { fr: 'Généré automatiquement à partir du libellé' }, { de: 'Automatisch aus Bezeichnung generiert' }, { it: 'Generato automaticamente dall\'etichetta' }, { ru: 'Автоматически из подписи' }] },
+  { key: TRANSLATION_KEYS.FIELD_HELPER_AUTO_NAME, translations: [{ en: 'Field name auto-generates from the label. Click "Customize" to override.' }, { fa: 'نام فیلد از برچسب به‌طور خودکار تولید می‌شود. برای تغییر «سفارشی» بزنید.' }, { ar: 'يُنشأ اسم الحقل تلقائياً من التسمية. انقر على «تخصيص» للتجاوز.' }, { es: 'El nombre del campo se genera automáticamente desde la etiqueta. Haz clic en «Personalizar» para cambiarlo.' }, { fr: 'Le nom du champ est généré automatiquement à partir du libellé. Cliquez sur « Personnaliser » pour le modifier.' }, { de: 'Feldname wird automatisch aus der Bezeichnung generiert. Klicken Sie auf „Anpassen“, um zu überschreiben.' }, { it: 'Il nome del campo si genera automaticamente dall\'etichetta. Clicca su «Personalizza» per sovrascrivere.' }, { ru: 'Имя поля создаётся автоматически из подписи. Нажмите «Настроить», чтобы изменить.' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_ORDER, translations: [{ en: 'Order' }, { fa: 'ترتیب' }, { ar: 'الترتيب' }, { es: 'Orden' }, { fr: 'Ordre' }, { de: 'Reihenfolge' }, { it: 'Ordine' }, { ru: 'Порядок' }] },
+  { key: TRANSLATION_KEYS.FIELD_PLACEHOLDER_ORDER, translations: [{ en: 'Field display order' }, { fa: 'ترتیب نمایش فیلد' }, { ar: 'ترتيب عرض الحقل' }, { es: 'Orden de visualización del campo' }, { fr: 'Ordre d\'affichage du champ' }, { de: 'Anzeigereihenfolge des Feldes' }, { it: 'Ordine di visualizzazione del campo' }, { ru: 'Порядок отображения поля' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_DESCRIPTION, translations: [{ en: 'Description' }, { fa: 'توضیحات' }, { ar: 'الوصف' }, { es: 'Descripción' }, { fr: 'Description' }, { de: 'Beschreibung' }, { it: 'Descrizione' }, { ru: 'Описание' }] },
+  { key: TRANSLATION_KEYS.FIELD_PLACEHOLDER_DESCRIPTION, translations: [{ en: 'Enter field description...' }, { fa: 'توضیحات فیلد را وارد کنید...' }, { ar: 'أدخل وصف الحقل...' }, { es: 'Introduzca la descripción del campo...' }, { fr: 'Entrez la description du champ...' }, { de: 'Feldbeschreibung eingeben...' }, { it: 'Inserisci descrizione campo...' }, { ru: 'Введите описание поля...' }] },
+  { key: TRANSLATION_KEYS.FIELD_PLACEHOLDER_ENTER_PLACEHOLDER, translations: [{ en: 'Enter placeholder text...' }, { fa: 'متن راهنما را وارد کنید...' }, { ar: 'أدخل النص البديل...' }, { es: 'Introduzca el texto de marcador de posición...' }, { fr: 'Entrez le texte d\'indication...' }, { de: 'Platzhaltertext eingeben...' }, { it: 'Inserisci testo segnaposto...' }, { ru: 'Введите текст заполнителя...' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_VALIDATION_RULES, translations: [{ en: 'Validation Rules' }, { fa: 'قوانین اعتبارسنجی' }, { ar: 'قواعد التحقق' }, { es: 'Reglas de validación' }, { fr: 'Règles de validation' }, { de: 'Validierungsregeln' }, { it: 'Regole di validazione' }, { ru: 'Правила проверки' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_MIN_LENGTH, translations: [{ en: 'Min Length' }, { fa: 'حداقل طول' }, { ar: 'الحد الأدنى للطول' }, { es: 'Longitud mínima' }, { fr: 'Longueur min.' }, { de: 'Mindestlänge' }, { it: 'Lunghezza min.' }, { ru: 'Мин. длина' }] },
+  { key: TRANSLATION_KEYS.FIELD_PLACEHOLDER_MIN_LENGTH, translations: [{ en: 'Minimum length' }, { fa: 'حداقل طول' }, { ar: 'الحد الأدنى للطول' }, { es: 'Longitud mínima' }, { fr: 'Longueur minimale' }, { de: 'Mindestlänge' }, { it: 'Lunghezza minima' }, { ru: 'Минимальная длина' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_MAX_LENGTH, translations: [{ en: 'Max Length' }, { fa: 'حداکثر طول' }, { ar: 'الحد الأقصى للطول' }, { es: 'Longitud máxima' }, { fr: 'Longueur max.' }, { de: 'Maximale Länge' }, { it: 'Lunghezza max.' }, { ru: 'Макс. длина' }] },
+  { key: TRANSLATION_KEYS.FIELD_PLACEHOLDER_MAX_LENGTH, translations: [{ en: 'Maximum length' }, { fa: 'حداکثر طول' }, { ar: 'الحد الأقصى للطول' }, { es: 'Longitud máxima' }, { fr: 'Longueur maximale' }, { de: 'Maximale Länge' }, { it: 'Lunghezza massima' }, { ru: 'Максимальная длина' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_MIN_VALUE, translations: [{ en: 'Min Value' }, { fa: 'حداقل مقدار' }, { ar: 'الحد الأدنى للقيمة' }, { es: 'Valor mínimo' }, { fr: 'Valeur min.' }, { de: 'Mindestwert' }, { it: 'Valore min.' }, { ru: 'Мин. значение' }] },
+  { key: TRANSLATION_KEYS.FIELD_PLACEHOLDER_MIN_VALUE, translations: [{ en: 'Minimum value' }, { fa: 'حداقل مقدار' }, { ar: 'الحد الأدنى للقيمة' }, { es: 'Valor mínimo' }, { fr: 'Valeur minimale' }, { de: 'Mindestwert' }, { it: 'Valore minimo' }, { ru: 'Минимальное значение' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_MAX_VALUE, translations: [{ en: 'Max Value' }, { fa: 'حداکثر مقدار' }, { ar: 'الحد الأقصى للقيمة' }, { es: 'Valor máximo' }, { fr: 'Valeur max.' }, { de: 'Maximalwert' }, { it: 'Valore max.' }, { ru: 'Макс. значение' }] },
+  { key: TRANSLATION_KEYS.FIELD_PLACEHOLDER_MAX_VALUE, translations: [{ en: 'Maximum value' }, { fa: 'حداکثر مقدار' }, { ar: 'الحد الأقصى للقيمة' }, { es: 'Valor máximo' }, { fr: 'Valeur maximale' }, { de: 'Maximalwert' }, { it: 'Valore massimo' }, { ru: 'Максимальное значение' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_PATTERN, translations: [{ en: 'Pattern (Regex)' }, { fa: 'الگو (Regex)' }, { ar: 'النمط (Regex)' }, { es: 'Patrón (Regex)' }, { fr: 'Modèle (Regex)' }, { de: 'Muster (Regex)' }, { it: 'Pattern (Regex)' }, { ru: 'Шаблон (Regex)' }] },
+  { key: TRANSLATION_KEYS.FIELD_PLACEHOLDER_PATTERN, translations: [{ en: 'Enter regex pattern (e.g., ^[A-Za-z]+$)' }, { fa: 'الگوی regex وارد کنید (مثلاً ^[A-Za-z]+$)' }, { ar: 'أدخل نمط التعبير النمطي (مثلاً ^[A-Za-z]+$)' }, { es: 'Introduzca el patrón regex (ej., ^[A-Za-z]+$)' }, { fr: 'Entrez le motif regex (ex. ^[A-Za-z]+$)' }, { de: 'Regex-Muster eingeben (z. B. ^[A-Za-z]+$)' }, { it: 'Inserisci pattern regex (es. ^[A-Za-z]+$)' }, { ru: 'Введите regex (напр. ^[A-Za-z]+$)' }] },
+  { key: TRANSLATION_KEYS.FIELD_HELPER_PATTERN, translations: [{ en: 'Enter a regular expression pattern for validation' }, { fa: 'یک عبارت منظم برای اعتبارسنجی وارد کنید' }, { ar: 'أدخل تعبيراً منتظماً للتحقق' }, { es: 'Introduzca un patrón de expresión regular para validación' }, { fr: 'Entrez un motif d\'expression régulière pour la validation' }, { de: 'Geben Sie ein reguläres Ausdrucksmuster zur Validierung ein' }, { it: 'Inserisci un pattern di espressione regolare per la validazione' }, { ru: 'Введите шаблон регулярного выражения для проверки' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_REQUIRED, translations: [{ en: 'Required' }, { fa: 'الزامی' }, { ar: 'مطلوب' }, { es: 'Obligatorio' }, { fr: 'Requis' }, { de: 'Erforderlich' }, { it: 'Obbligatorio' }, { ru: 'Обязательно' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_DISABLED, translations: [{ en: 'Disabled' }, { fa: 'غیرقابل ویرایش' }, { ar: 'معطّل' }, { es: 'Deshabilitado' }, { fr: 'Désactivé' }, { de: 'Deaktiviert' }, { it: 'Disabilitato' }, { ru: 'Отключено' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_READONLY, translations: [{ en: 'Readonly' }, { fa: 'فقط خواندنی' }, { ar: 'للقراءة فقط' }, { es: 'Solo lectura' }, { fr: 'Lecture seule' }, { de: 'Nur Lesen' }, { it: 'Sola lettura' }, { ru: 'Только чтение' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_CAN_COPY, translations: [{ en: 'Can Copy' }, { fa: 'قابل کپی' }, { ar: 'قابل للنسخ' }, { es: 'Se puede copiar' }, { fr: 'Copiable' }, { de: 'Kopierbar' }, { it: 'Copiabile' }, { ru: 'Можно копировать' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_IS_SENSITIVE, translations: [{ en: 'Is Sensitive' }, { fa: 'حساس است' }, { ar: 'حساس' }, { es: 'Es sensible' }, { fr: 'Sensible' }, { de: 'Sensibel' }, { it: 'Sensibile' }, { ru: 'Конфиденциально' }] },
+  { key: TRANSLATION_KEYS.FIELD_MSG_LOADING_COMPONENTS, translations: [{ en: 'Loading components...' }, { fa: 'در حال بارگذاری کامپوننت‌ها...' }, { ar: 'جاري تحميل المكوّنات...' }, { es: 'Cargando componentes...' }, { fr: 'Chargement des composants...' }, { de: 'Komponenten werden geladen...' }, { it: 'Caricamento componenti...' }, { ru: 'Загрузка компонентов...' }] },
+  { key: TRANSLATION_KEYS.FIELD_MSG_ERROR_LOADING_COMPONENTS, translations: [{ en: 'Error loading components:' }, { fa: 'خطا در بارگذاری کامپوننت‌ها:' }, { ar: 'خطأ في تحميل المكوّنات:' }, { es: 'Error al cargar componentes:' }, { fr: 'Erreur lors du chargement des composants :' }, { de: 'Fehler beim Laden der Komponenten:' }, { it: 'Errore nel caricamento dei componenti:' }, { ru: 'Ошибка загрузки компонентов:' }] },
+  { key: TRANSLATION_KEYS.FIELD_TITLE_SELECT_TARGET_SCHEMA, translations: [{ en: 'Select Target Schema' }, { fa: 'انتخاب طرح هدف' }, { ar: 'اختر المخطط المستهدف' }, { es: 'Seleccionar esquema de destino' }, { fr: 'Sélectionner le schéma cible' }, { de: 'Ziel-Schema auswählen' }, { it: 'Seleziona schema di destinazione' }, { ru: 'Выбрать целевую схему' }] },
+  { key: TRANSLATION_KEYS.FIELD_DESC_SELECT_TARGET_SCHEMA, translations: [{ en: 'Choose a schema for the picker component' }, { fa: 'یک طرح برای کامپوننت انتخابگر انتخاب کنید' }, { ar: 'اختر مخططاً لمكوّن المنتقي' }, { es: 'Elija un esquema para el componente selector' }, { fr: 'Choisissez un schéma pour le composant sélecteur' }, { de: 'Wählen Sie ein Schema für die Auswahlkomponente' }, { it: 'Scegli uno schema per il componente selettore' }, { ru: 'Выберите схему для компонента выбора' }] },
+  { key: TRANSLATION_KEYS.FIELD_LABEL_INCOMPLETE, translations: [{ en: 'Incomplete' }, { fa: 'ناقص' }, { ar: 'غير مكتمل' }, { es: 'Incompleto' }, { fr: 'Incomplet' }, { de: 'Unvollständig' }, { it: 'Incompleto' }, { ru: 'Неполный' }] },
+  { key: TRANSLATION_KEYS.FIELD_OPTION_DEFAULT, translations: [{ en: 'Default' }, { fa: 'پیش‌فرض' }, { ar: 'افتراضي' }, { es: 'Predeterminado' }, { fr: 'Par défaut' }, { de: 'Standard' }, { it: 'Predefinito' }, { ru: 'По умолчанию' }] },
+  { key: TRANSLATION_KEYS.FIELD_OPTION_SECONDARY, translations: [{ en: 'Secondary' }, { fa: 'ثانویه' }, { ar: 'ثانوي' }, { es: 'Secundario' }, { fr: 'Secondaire' }, { de: 'Sekundär' }, { it: 'Secondario' }, { ru: 'Вторичный' }] },
+  { key: TRANSLATION_KEYS.FIELD_OPTION_OUTLINE, translations: [{ en: 'Outline' }, { fa: 'حاشیه' }, { ar: 'حدود' }, { es: 'Contorno' }, { fr: 'Contour' }, { de: 'Umriss' }, { it: 'Contorno' }, { ru: 'Контур' }] },
+  { key: TRANSLATION_KEYS.FIELD_OPTION_DESTRUCTIVE, translations: [{ en: 'Destructive' }, { fa: 'مخرب' }, { ar: 'مدمر' }, { es: 'Destructivo' }, { fr: 'Destructif' }, { de: 'Destruktiv' }, { it: 'Distruttivo' }, { ru: 'Удаление' }] },
+  { key: TRANSLATION_KEYS.FIELD_OPTION_GRADIENT, translations: [{ en: 'Gradient' }, { fa: 'گرادیان' }, { ar: 'تدرج' }, { es: 'Degradado' }, { fr: 'Dégradé' }, { de: 'Verlauf' }, { it: 'Gradiente' }, { ru: 'Градиент' }] },
+  { key: TRANSLATION_KEYS.FIELD_OPTION_SUCCESS, translations: [{ en: 'Success' }, { fa: 'موفق' }, { ar: 'نجاح' }, { es: 'Éxito' }, { fr: 'Succès' }, { de: 'Erfolg' }, { it: 'Successo' }, { ru: 'Успех' }] },
+  { key: TRANSLATION_KEYS.FIELD_OPTION_WARNING, translations: [{ en: 'Warning' }, { fa: 'هشدار' }, { ar: 'تحذير' }, { es: 'Advertencia' }, { fr: 'Avertissement' }, { de: 'Warnung' }, { it: 'Avviso' }, { ru: 'Предупреждение' }] },
+  { key: TRANSLATION_KEYS.FIELD_OPTION_INFO, translations: [{ en: 'Info' }, { fa: 'اطلاعات' }, { ar: 'معلومات' }, { es: 'Info' }, { fr: 'Info' }, { de: 'Info' }, { it: 'Info' }, { ru: 'Инфо' }] },
+  { key: TRANSLATION_KEYS.FIELD_OPTION_MUTED, translations: [{ en: 'Muted' }, { fa: 'کم‌رنگ' }, { ar: 'باهت' }, { es: 'Apagado' }, { fr: 'Atténué' }, { de: 'Gedämpft' }, { it: 'Smorzato' }, { ru: 'Приглушённый' }] },
 ];

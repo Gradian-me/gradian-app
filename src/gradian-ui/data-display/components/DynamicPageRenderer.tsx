@@ -59,7 +59,7 @@ import { EntityMetadata } from './CreateUpdateDetail';
 import { normalizeCreateUpdateDates } from './CreateUpdateDetail';
 import { formatCreatedLabel, formatRelativeTime, formatFullDate, isLocaleRTL } from '@/gradian-ui/shared/utils/date-utils';
 import { useLanguageStore } from '@/stores/language.store';
-import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '../utils';
@@ -1242,6 +1242,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                 return 'outline' as const;
               })();
 
+              const label = resolveDisplayLabel(action.label, language, defaultLang);
+
               return (
                 <Button
                   key={action.id}
@@ -1253,7 +1255,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   {action.icon && (
                     <IconRenderer iconName={action.icon} className="h-4 w-4 me-2" />
                   )}
-                  {action.label}
+                  {label}
                 </Button>
               );
             })}

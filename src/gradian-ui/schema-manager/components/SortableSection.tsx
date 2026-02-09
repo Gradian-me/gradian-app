@@ -15,6 +15,10 @@ import { config } from '@/lib/config';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { useQueryClient } from '@tanstack/react-query';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getSectionTranslatedTitle, getSectionTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
 
 export interface SortableSectionProps {
   section: FormSection;
@@ -103,6 +107,18 @@ export function SortableSection({
   }, [section.isRepeatingSection, section.repeatingConfig?.targetSchema, queryClient]);
 
   const isInactive = section.inactive;
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const labelEditSection = getT(TRANSLATION_KEYS.SECTION_EDIT_TITLE, language, defaultLang);
+  const labelUntitledSection = getT(TRANSLATION_KEYS.SCHEMA_LABEL_UNTITLED_SECTION, language, defaultLang);
+  const labelFieldSingular = getT(TRANSLATION_KEYS.SCHEMA_LABEL_FIELD_COUNT, language, defaultLang);
+  const labelFieldsPlural = getT(TRANSLATION_KEYS.SCHEMA_LABEL_FIELDS_COUNT, language, defaultLang);
+  const labelInactive = getT(TRANSLATION_KEYS.LABEL_INACTIVE, language, defaultLang);
+  const labelIncomplete = getT(TRANSLATION_KEYS.FIELD_LABEL_INCOMPLETE, language, defaultLang);
+  const badgeRepeating = getT(TRANSLATION_KEYS.SECTION_BADGE_REPEATING, language, defaultLang);
+  const titleDragToReorder = getT(TRANSLATION_KEYS.SECTION_TITLE_DRAG_TO_REORDER, language, defaultLang);
+  const sectionTitleResolved = getSectionTranslatedTitle(section, language, section.title || labelUntitledSection);
+  const sectionDescriptionResolved = getSectionTranslatedDescription(section, language, section.description ?? '');
 
   return (
     <>
@@ -129,7 +145,7 @@ export function SortableSection({
                       ? 'text-gray-300 dark:text-gray-600'
                       : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
                   }`}
-                  title="Drag to reorder section"
+                  title={titleDragToReorder}
                 >
                   <GripVertical className="h-4 w-4" />
                 </button>
@@ -144,7 +160,7 @@ export function SortableSection({
                           : 'text-gray-900 dark:text-gray-100'
                       }`}
                     >
-                      {section.title || 'Untitled Section'}
+                      {sectionTitleResolved}
                     </CardTitle>
                     {/* Don't show badge for repeating sections when field count is 0 */}
                     {!(section.isRepeatingSection && fields.length === 0) && (
@@ -152,22 +168,22 @@ export function SortableSection({
                         variant="secondary"
                         className="text-[10px] px-1.5 py-0 bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-100"
                       >
-                        {fields.length} {fields.length === 1 ? 'field' : 'fields'}
+                        {fields.length} {fields.length === 1 ? labelFieldSingular : labelFieldsPlural}
                       </Badge>
                     )}
                     {isInactive && (
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-200">
-                        Inactive
+                        {labelInactive}
                       </Badge>
                     )}
                     {isIncomplete && !isInactive && (
                       <Badge variant="warning" size="sm" className="text-[10px] px-1.5 py-0">
-                        Incomplete
+                        {labelIncomplete}
                       </Badge>
                     )}
                     {section.isRepeatingSection && (
                       <Badge variant="primary" size="sm" className="text-[10px] px-1.5 py-0">
-                        Repeating
+                        {badgeRepeating}
                       </Badge>
                     )}
                     {targetSchemaName && (
@@ -192,9 +208,9 @@ export function SortableSection({
                       </button>
                     )}
                   </div>
-                  {section.description && (
+                  {sectionDescriptionResolved && (
                     <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {section.description}
+                      {sectionDescriptionResolved}
                     </p>
                   )}
                 </div>
@@ -206,7 +222,7 @@ export function SortableSection({
                   onClick={() => setShowDialog(true)}
                 >
                   <Pencil className="h-3 w-3 me-2" />
-                  Edit Section
+                  {labelEditSection}
                 </Button>
                 <Button
                   variant="ghost"

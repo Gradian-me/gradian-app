@@ -45,7 +45,7 @@ import { Plus } from 'lucide-react';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { fetchOptionsFromSchemaOrUrl } from '../utils/fetch-options-utils';
 import { CompanySelector } from '@/components/layout/CompanySelector';
-import { getT, getDefaultLanguage, isRTL, resolveFromTranslationsArray } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, isRTL, resolveFromTranslationsArray, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { useLanguageStore } from '@/stores/language.store';
 import { getSchemaTranslatedSingularName, getSchemaTranslatedPluralName } from '@/gradian-ui/schema-manager/utils/schema-utils';
@@ -1046,26 +1046,31 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     // The API may not filter (e.g. /api/schemas); we filter items for display so we never show "all".
     // Fetch updates only `items` when searching; we derive filteredItems here to avoid knock.
     const query = trimmed.toLowerCase();
+    const filterLang = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
+    const filterDefaultLang = getDefaultLanguage();
     const filtered = items.filter((item) => {
       if (!effectiveSchema) {
         if (effectiveSourceColumnRoles) {
-          const title =
+          const rawTitle =
             getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) ||
             item.name ||
             item.title ||
             item.singular_name ||
             item.label ||
             '';
-          const subtitle =
+          const rawSubtitle =
             getValueByRoleFromSourceColumns(item, 'subtitle', effectiveSourceColumnRoles) ||
             item.email ||
             item.subtitle ||
             '';
-          const description =
+          const rawDescription =
             getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles) ||
             item.description ||
             '';
-          const icon = item.icon || '';
+          const title = resolveDisplayLabel(rawTitle, filterLang, filterDefaultLang);
+          const subtitle = resolveDisplayLabel(rawSubtitle, filterLang, filterDefaultLang);
+          const description = resolveDisplayLabel(rawDescription, filterLang, filterDefaultLang);
+          const icon = typeof item.icon === 'string' ? item.icon : '';
           return (
             title.toLowerCase().includes(query) ||
             subtitle.toLowerCase().includes(query) ||
@@ -1073,15 +1078,16 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
             icon.toLowerCase().includes(query)
           );
         }
-        const title = item.name || item.title || item.singular_name || item.label || '';
-        const subtitle = item.email || item.subtitle || '';
-        const icon = item.icon || '';
+        const title = resolveDisplayLabel(item.name || item.title || item.singular_name || item.label || '', filterLang, filterDefaultLang);
+        const subtitle = resolveDisplayLabel(item.email || item.subtitle || '', filterLang, filterDefaultLang);
+        const icon = typeof item.icon === 'string' ? item.icon : '';
         return title.toLowerCase().includes(query) || subtitle.toLowerCase().includes(query) || icon.toLowerCase().includes(query);
       }
 
-      const title = getValueByRole(effectiveSchema, item, 'title') || item.name || '';
-      const subtitle =
-        getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
+      const rawTitle = getValueByRole(effectiveSchema, item, 'title') || item.name || '';
+      const rawSubtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
+      const title = resolveDisplayLabel(rawTitle, filterLang, filterDefaultLang);
+      const subtitle = resolveDisplayLabel(rawSubtitle, filterLang, filterDefaultLang);
       return title.toLowerCase().includes(query) || subtitle.toLowerCase().includes(query);
     });
 
@@ -1374,19 +1380,22 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const highlightQuery = searchQuery.trim();
 
     if (!effectiveSchema) {
-      // Fallback rendering with sourceColumnRoles support
-      // Use role-based title from schema (concatenates all fields with role "title")
-      const displayName = effectiveSourceColumnRoles
-        ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) || 
+      // Fallback rendering with sourceColumnRoles support (resolve translation arrays for safe display)
+      const langFallback = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
+      const dLangFallback = getDefaultLanguage();
+      const rawDisplayName = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) ||
           item.label || item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
         : item.label || item.name || item.title || item.id || `Item ${index + 1}`;
+      const displayName = resolveDisplayLabel(rawDisplayName, langFallback, dLangFallback);
       const iconName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'icon', effectiveSourceColumnRoles) || item.icon
         : item.icon || item.name || item.title;
-      const description = effectiveSourceColumnRoles
+      const rawDescription = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles)
         : undefined;
-      
+      const description = rawDescription != null ? resolveDisplayLabel(rawDescription, langFallback, dLangFallback) : undefined;
+
       // Extract color for icon styling
       const itemColor = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'color', effectiveSourceColumnRoles) || item.color
@@ -1427,7 +1436,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               >
                 {renderHighlightedText(displayName, highlightQuery)}
               </div>
-              {description && (
+              {description && description.trim() && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                   {renderHighlightedText(description, highlightQuery)}
                 </p>
@@ -1439,11 +1448,16 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       );
     }
 
-    // Extract data using schema roles
-    const title = getValueByRole(effectiveSchema, item, 'title') || item.name || `Item ${index + 1}`;
-    const subtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
-    const avatarField = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
-    
+    // Extract data using schema roles (resolve translation arrays so .trim() and render are safe)
+    const lang = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
+    const dLang = getDefaultLanguage();
+    const rawTitle = getValueByRole(effectiveSchema, item, 'title') || item.name || `Item ${index + 1}`;
+    const rawSubtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
+    const rawAvatarField = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
+    const title = resolveDisplayLabel(rawTitle, lang, dLang);
+    const subtitle = resolveDisplayLabel(rawSubtitle, lang, dLang);
+    const avatarField = resolveDisplayLabel(rawAvatarField, lang, dLang);
+
     // Extract color for avatar/icon styling
     let itemColor: string | undefined;
     const statusValue = getSingleValueByRole(effectiveSchema, item, 'status') ?? item.status;
@@ -1614,7 +1628,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       <CodeBadge code={codeField} />
                     )}
                   </div>
-                  {subtitle && subtitle.trim() && (
+                  {subtitle.trim() && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                       {renderHighlightedText(subtitle, highlightQuery)}
                     </p>
@@ -1799,19 +1813,22 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const isExpanded = expandedIds.has(node.id);
 
     if (!effectiveSchema) {
-      // Fallback rendering with sourceColumnRoles support
-      // Use role-based title from schema (concatenates all fields with role "title")
-      const displayName = effectiveSourceColumnRoles
-        ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) || 
+      // Fallback rendering with sourceColumnRoles support (resolve translation arrays for safe display)
+      const langFallback = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
+      const dLangFallback = getDefaultLanguage();
+      const rawDisplayName = effectiveSourceColumnRoles
+        ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) ||
           item.label || item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
         : item.label || item.name || item.title || item.id || `Item ${index + 1}`;
+      const displayName = resolveDisplayLabel(rawDisplayName, langFallback, dLangFallback);
       const iconName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'icon', effectiveSourceColumnRoles) || item.icon
         : item.icon || item.name || item.title;
-      const description = effectiveSourceColumnRoles
+      const rawDescription = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'description', effectiveSourceColumnRoles)
         : undefined;
-      
+      const description = rawDescription != null ? resolveDisplayLabel(rawDescription, langFallback, dLangFallback) : undefined;
+
       // Extract color for icon styling
       const itemColor = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'color', effectiveSourceColumnRoles) || item.color
@@ -1886,10 +1903,15 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       );
     }
 
-    // Schema-aware rendering
-    const title = getValueByRole(effectiveSchema, item, 'title') || item.name || `Item ${index + 1}`;
-    const subtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
-    const avatarField = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
+    // Schema-aware rendering (resolve translation arrays for safe .trim() and render)
+    const langNode = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
+    const dLangNode = getDefaultLanguage();
+    const rawTitleNode = getValueByRole(effectiveSchema, item, 'title') || item.name || `Item ${index + 1}`;
+    const rawSubtitleNode = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
+    const rawAvatarNode = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
+    const title = resolveDisplayLabel(rawTitleNode, langNode, dLangNode);
+    const subtitle = resolveDisplayLabel(rawSubtitleNode, langNode, dLangNode);
+    const avatarField = resolveDisplayLabel(rawAvatarNode, langNode, dLangNode);
 
     // Extract color for avatar styling
     let itemColor: string | undefined;
@@ -2044,7 +2066,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       </h4>
                       {hasCodeField && codeField && <CodeBadge code={codeField} />}
                     </div>
-                    {subtitle && subtitle.trim() && (
+                    {subtitle.trim() && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                         {renderHighlightedText(subtitle, highlightQuery)}
                       </p>

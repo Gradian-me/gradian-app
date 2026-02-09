@@ -1,3 +1,17 @@
+import { resolveDisplayLabel, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+
+/** Current UI language when available (e.g. client); otherwise default. */
+function getLabelLanguage(): string {
+  try {
+    const lang = useLanguageStore.getState?.()?.getLanguage?.();
+    if (lang) return lang;
+  } catch {
+    // ignore
+  }
+  return getDefaultLanguage();
+}
+
 export interface OptionLike {
   id?: string | number;
   value?: string | number;
@@ -63,9 +77,14 @@ export const normalizeOptionEntry = (input: OptionValueInput): NormalizedOption 
       ? toStringSafe(input.value as string | number)
       : undefined;
 
-    const label = 'label' in input && input.label !== undefined && input.label !== null
-      ? String(input.label)
-      : undefined;
+    const rawLabel =
+      (input as any).label ?? (input as any).name ?? (input as any).title ?? undefined;
+    const lang = getLabelLanguage();
+    const defaultLang = getDefaultLanguage();
+    const label =
+      rawLabel !== undefined && rawLabel !== null
+        ? resolveDisplayLabel(rawLabel, lang, defaultLang)
+        : undefined;
 
     return {
       ...(input ?? {}),

@@ -278,10 +278,10 @@ export function SchemaBuilderDialog({
           </DialogHeader>
           <div className="px-6 py-4 space-y-6 overflow-y-auto flex-1">
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowResetDialog(true)}>
+              <Button variant="outline" onClick={() => setShowResetDialog(true)} className="text-xs">
                 Reset
               </Button>
-              <Button onClick={handleSave} disabled={saving}>
+              <Button onClick={handleSave} disabled={saving} className="text-xs">
                 {saving ? 'Saving...' : 'Save Changes'}
               </Button>
             </div>

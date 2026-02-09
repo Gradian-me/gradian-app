@@ -215,6 +215,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Persian/Arabic: ensure Estedad is used with proper shaping so پ (pe) and چ (che) dots render correctly */
+[dir="rtl"],
+[lang="fa"],
+[lang="ar"] {
+  font-family: 'Estedad', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "ccmp" 1, "rlig" 1, "locl" 1;
+  text-rendering: optimizeLegibility;
+}
+
 label {
   font-size: 0.8rem;
   margin-bottom: 0.6rem;

@@ -16,6 +16,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useAiAgents } from '@/domains/ai-builder';
 import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 interface DetailPageMetadataTabProps {
   schema: FormSchema;
@@ -23,6 +26,93 @@ interface DetailPageMetadataTabProps {
 }
 
 export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTabProps) {
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const titleDetailSections = getT(TRANSLATION_KEYS.SCHEMA_TITLE_DETAIL_PAGE_SECTIONS, language, defaultLang);
+  const titleQuickActions = getT(TRANSLATION_KEYS.SCHEMA_TITLE_QUICK_ACTIONS, language, defaultLang);
+  const titleTableRenderers = getT(TRANSLATION_KEYS.SCHEMA_TITLE_TABLE_RENDERERS, language, defaultLang);
+  const titleComponentRenderers = getT(TRANSLATION_KEYS.SCHEMA_TITLE_COMPONENT_RENDERERS, language, defaultLang);
+  const titleLayout = getT(TRANSLATION_KEYS.SCHEMA_TITLE_LAYOUT, language, defaultLang);
+  const titleHeader = getT(TRANSLATION_KEYS.SCHEMA_TITLE_HEADER, language, defaultLang);
+  const msgNoSections = getT(TRANSLATION_KEYS.DETAIL_MSG_NO_SECTIONS, language, defaultLang);
+  const msgNoQuickActions = getT(TRANSLATION_KEYS.DETAIL_MSG_NO_QUICK_ACTIONS, language, defaultLang);
+  const msgNoTableRenderers = getT(TRANSLATION_KEYS.DETAIL_MSG_NO_TABLE_RENDERERS, language, defaultLang);
+  const msgNoComponentRenderers = getT(TRANSLATION_KEYS.DETAIL_MSG_NO_COMPONENT_RENDERERS, language, defaultLang);
+  const buttonAddSection = getT(TRANSLATION_KEYS.DETAIL_BUTTON_ADD_SECTION, language, defaultLang);
+  const buttonAddAction = getT(TRANSLATION_KEYS.DETAIL_BUTTON_ADD_ACTION, language, defaultLang);
+  const buttonAddTable = getT(TRANSLATION_KEYS.DETAIL_BUTTON_ADD_TABLE, language, defaultLang);
+  const buttonAddComponent = getT(TRANSLATION_KEYS.DETAIL_BUTTON_ADD_COMPONENT, language, defaultLang);
+  const labelUntitledSection = getT(TRANSLATION_KEYS.SCHEMA_LABEL_UNTITLED_SECTION, language, defaultLang);
+  const labelUntitledAction = getT(TRANSLATION_KEYS.DETAIL_LABEL_UNTITLED_ACTION, language, defaultLang);
+  const labelUntitledTable = getT(TRANSLATION_KEYS.DETAIL_LABEL_UNTITLED_TABLE, language, defaultLang);
+  const labelUntitledComponent = getT(TRANSLATION_KEYS.DETAIL_LABEL_UNTITLED_COMPONENT, language, defaultLang);
+  const labelSectionSingular = getT(TRANSLATION_KEYS.SCHEMA_LABEL_SECTION_COUNT, language, defaultLang);
+  const labelSectionsPlural = getT(TRANSLATION_KEYS.SCHEMA_LABEL_SECTIONS_COUNT, language, defaultLang);
+  const labelFieldSingular = getT(TRANSLATION_KEYS.SCHEMA_LABEL_FIELD_COUNT, language, defaultLang);
+  const labelFieldsPlural = getT(TRANSLATION_KEYS.SCHEMA_LABEL_FIELDS_COUNT, language, defaultLang);
+  const labelActionSingular = getT(TRANSLATION_KEYS.DETAIL_LABEL_ACTION_SINGULAR, language, defaultLang);
+  const labelActionsPlural = getT(TRANSLATION_KEYS.DETAIL_LABEL_ACTIONS_PLURAL, language, defaultLang);
+  const labelTableSingular = getT(TRANSLATION_KEYS.DETAIL_LABEL_TABLE_SINGULAR, language, defaultLang);
+  const labelTablesPlural = getT(TRANSLATION_KEYS.DETAIL_LABEL_TABLES_PLURAL, language, defaultLang);
+  const labelComponentSingular = getT(TRANSLATION_KEYS.DETAIL_LABEL_COMPONENT_SINGULAR, language, defaultLang);
+  const labelComponentsPlural = getT(TRANSLATION_KEYS.DETAIL_LABEL_COMPONENTS_PLURAL, language, defaultLang);
+  const labelColumnSingular = getT(TRANSLATION_KEYS.DETAIL_LABEL_COLUMN_SINGULAR, language, defaultLang);
+  const labelColumnsPlural = getT(TRANSLATION_KEYS.DETAIL_LABEL_COLUMNS_PLURAL, language, defaultLang);
+  const labelSelectedFields = getT(TRANSLATION_KEYS.DETAIL_LABEL_SELECTED_FIELDS, language, defaultLang);
+  const labelAvailableFields = getT(TRANSLATION_KEYS.DETAIL_LABEL_AVAILABLE_FIELDS, language, defaultLang);
+  const msgNoFieldsSelected = getT(TRANSLATION_KEYS.DETAIL_MSG_NO_FIELDS_SELECTED, language, defaultLang);
+  const msgNoFieldsAvailable = getT(TRANSLATION_KEYS.DETAIL_MSG_NO_FIELDS_AVAILABLE, language, defaultLang);
+  const labelShowBackButton = getT(TRANSLATION_KEYS.DETAIL_LABEL_SHOW_BACK_BUTTON, language, defaultLang);
+  const labelShowActions = getT(TRANSLATION_KEYS.DETAIL_LABEL_SHOW_ACTIONS, language, defaultLang);
+  const labelMainColumns = getT(TRANSLATION_KEYS.DETAIL_LABEL_MAIN_COLUMNS, language, defaultLang);
+  const labelSidebarColumns = getT(TRANSLATION_KEYS.DETAIL_LABEL_SIDEBAR_COLUMNS, language, defaultLang);
+  const labelColumnArea = getT(TRANSLATION_KEYS.DETAIL_LABEL_COLUMN_AREA, language, defaultLang);
+  const optionMain = getT(TRANSLATION_KEYS.DETAIL_OPTION_MAIN, language, defaultLang);
+  const optionSidebar = getT(TRANSLATION_KEYS.DETAIL_OPTION_SIDEBAR, language, defaultLang);
+  const labelSelectedColumns = getT(TRANSLATION_KEYS.DETAIL_LABEL_SELECTED_COLUMNS, language, defaultLang);
+  const msgNoColumnsSelected = getT(TRANSLATION_KEYS.DETAIL_MSG_NO_COLUMNS_SELECTED, language, defaultLang);
+  const labelSectionId = getT(TRANSLATION_KEYS.SECTION_LABEL_ID, language, defaultLang);
+  const labelTitle = getT(TRANSLATION_KEYS.DETAIL_LABEL_TITLE, language, defaultLang);
+  const labelDescription = getT(TRANSLATION_KEYS.SECTION_LABEL_DESCRIPTION, language, defaultLang);
+  const labelColumnSpan = getT(TRANSLATION_KEYS.DETAIL_LABEL_COLUMN_SPAN, language, defaultLang);
+  const labelBadgeVariant = getT(TRANSLATION_KEYS.DETAIL_LABEL_BADGE_VARIANT, language, defaultLang);
+  const labelEnforceBadgeVariant = getT(TRANSLATION_KEYS.DETAIL_LABEL_ENFORCE_BADGE_VARIANT, language, defaultLang);
+  const labelBadgeClickable = getT(TRANSLATION_KEYS.DETAIL_LABEL_BADGE_CLICKABLE, language, defaultLang);
+  const labelLayoutColumns = getT(TRANSLATION_KEYS.DETAIL_LABEL_LAYOUT_COLUMNS, language, defaultLang);
+  const labelLayoutGap = getT(TRANSLATION_KEYS.DETAIL_LABEL_LAYOUT_GAP, language, defaultLang);
+  const labelActionId = getT(TRANSLATION_KEYS.DETAIL_LABEL_ACTION_ID, language, defaultLang);
+  const labelActionType = getT(TRANSLATION_KEYS.DETAIL_LABEL_ACTION_TYPE, language, defaultLang);
+  const labelVariant = getT(TRANSLATION_KEYS.DETAIL_LABEL_VARIANT, language, defaultLang);
+  const labelTargetSchema = getT(TRANSLATION_KEYS.DETAIL_LABEL_TARGET_SCHEMA, language, defaultLang);
+  const placeholderSchemaId = getT(TRANSLATION_KEYS.DETAIL_PLACEHOLDER_SCHEMA_ID, language, defaultLang);
+  const labelTargetUrl = getT(TRANSLATION_KEYS.DETAIL_LABEL_TARGET_URL, language, defaultLang);
+  const labelRendererId = getT(TRANSLATION_KEYS.DETAIL_LABEL_RENDERER_ID, language, defaultLang);
+  const labelRelationTypeId = getT(TRANSLATION_KEYS.DETAIL_LABEL_RELATION_TYPE_ID, language, defaultLang);
+  const placeholderSectionIdFromTarget = getT(TRANSLATION_KEYS.DETAIL_PLACEHOLDER_SECTION_ID_FROM_TARGET, language, defaultLang);
+  const labelSortingEnabled = getT(TRANSLATION_KEYS.DETAIL_LABEL_SORTING_ENABLED, language, defaultLang);
+  const labelPaginationEnabled = getT(TRANSLATION_KEYS.DETAIL_LABEL_PAGINATION_ENABLED, language, defaultLang);
+  const labelPageSize = getT(TRANSLATION_KEYS.DETAIL_LABEL_PAGE_SIZE, language, defaultLang);
+  const labelComponentType = getT(TRANSLATION_KEYS.DETAIL_LABEL_COMPONENT_TYPE, language, defaultLang);
+  const labelComponentName = getT(TRANSLATION_KEYS.DETAIL_LABEL_COMPONENT_NAME, language, defaultLang);
+  const labelDataPath = getT(TRANSLATION_KEYS.DETAIL_LABEL_DATA_PATH, language, defaultLang);
+  const labelGap = getT(TRANSLATION_KEYS.DETAIL_LABEL_GAP, language, defaultLang);
+  const labelActions = getT(TRANSLATION_KEYS.DETAIL_LABEL_ACTIONS, language, defaultLang);
+  const msgNoSectionsAvailable = getT(TRANSLATION_KEYS.DETAIL_MSG_NO_SECTIONS_AVAILABLE, language, defaultLang);
+  const labelAiAgent = getT(TRANSLATION_KEYS.DETAIL_LABEL_AI_AGENT, language, defaultLang);
+  const placeholderSelectAiAgent = getT(TRANSLATION_KEYS.DETAIL_PLACEHOLDER_SELECT_AI_AGENT, language, defaultLang);
+  const labelSelectedSections = getT(TRANSLATION_KEYS.DETAIL_LABEL_SELECTED_SECTIONS, language, defaultLang);
+  const labelRunType = getT(TRANSLATION_KEYS.DETAIL_LABEL_RUN_TYPE, language, defaultLang);
+  const labelDisplayType = getT(TRANSLATION_KEYS.DETAIL_LABEL_DISPLAY_TYPE, language, defaultLang);
+  const labelDefaultLanguage = getT(TRANSLATION_KEYS.DETAIL_LABEL_DEFAULT_LANGUAGE, language, defaultLang);
+  const optionManual = getT(TRANSLATION_KEYS.DETAIL_OPTION_MANUAL, language, defaultLang);
+  const optionAutomatic = getT(TRANSLATION_KEYS.DETAIL_OPTION_AUTOMATIC, language, defaultLang);
+  const optionShowForm = getT(TRANSLATION_KEYS.DETAIL_OPTION_SHOW_FORM, language, defaultLang);
+  const optionHideForm = getT(TRANSLATION_KEYS.DETAIL_OPTION_HIDE_FORM, language, defaultLang);
+  const labelFieldLabel = getT(TRANSLATION_KEYS.FIELD_LABEL_LABEL, language, defaultLang);
+  const placeholderSelectDefaultLanguage = getT(TRANSLATION_KEYS.DETAIL_PLACEHOLDER_SELECT_DEFAULT_LANGUAGE, language, defaultLang);
+  const msgDefaultLanguageDescription = getT(TRANSLATION_KEYS.DETAIL_MSG_DEFAULT_LANGUAGE_DESCRIPTION, language, defaultLang);
+  const msgLeaveEmptyShowAllFields = getT(TRANSLATION_KEYS.DETAIL_MSG_LEAVE_EMPTY_SHOW_ALL_FIELDS, language, defaultLang);
+  const placeholderCustomComponentName = getT(TRANSLATION_KEYS.DETAIL_PLACEHOLDER_CUSTOM_COMPONENT_NAME, language, defaultLang);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     sections: true,
     quickActions: false,
@@ -217,14 +307,14 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                   <ChevronDown className="h-4 w-4" />
                 )}
               </Button>
-              <CardTitle>Detail Page Sections</CardTitle>
+              <CardTitle>{titleDetailSections}</CardTitle>
               <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                {sections.length} {sections.length === 1 ? 'section' : 'sections'}
+                {sections.length} {sections.length === 1 ? labelSectionSingular : labelSectionsPlural}
               </Badge>
             </div>
-            <Button onClick={addSection} size="sm" variant="outline">
+            <Button onClick={addSection} size="sm" variant="outline" className="text-xs">
               <Plus className="h-4 w-4 me-2" />
-              Add Section
+              {buttonAddSection}
             </Button>
           </div>
         </CardHeader>
@@ -245,7 +335,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                     transition={{ duration: 0.2 }}
                     className="text-sm text-gray-500"
                   >
-                    No sections defined. Add sections to configure the detail page layout.
+                    {msgNoSections}
                   </motion.p>
                 ) : (
                   <AnimatePresence mode="popLayout">
@@ -283,7 +373,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                   className="text-base cursor-pointer hover:text-violet-600 transition-colors flex-1"
                                   onClick={() => toggleItem(`section-${section.id}`)}
                                 >
-                                  {section.title || 'Untitled Section'}
+                                  {section.title || labelUntitledSection}
                                 </CardTitle>
                                 <motion.div
                                   initial={{ scale: 0.8, opacity: 0 }}
@@ -291,7 +381,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                   transition={{ duration: 0.2, delay: 0.1 }}
                                 >
                                   <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                                    {section.fieldIds?.length || 0} {section.fieldIds?.length === 1 ? 'field' : 'fields'}
+                                    {section.fieldIds?.length || 0} {section.fieldIds?.length === 1 ? labelFieldSingular : labelFieldsPlural}
                                   </Badge>
                                 </motion.div>
                               </div>
@@ -321,7 +411,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                 <CardContent className="space-y-4 pt-2">
                       <div>
                         <TextInput
-                          config={{ name: 'section-id', label: 'Section ID' }}
+                          config={{ name: 'section-id', label: labelSectionId }}
                           value={section.id}
                           onChange={() => {}}
                           disabled
@@ -330,14 +420,14 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       </div>
                       <div>
                         <TextInput
-                          config={{ name: 'section-title', label: 'Title' }}
+                          config={{ name: 'section-title', label: labelTitle }}
                           value={section.title || ''}
                           onChange={(value) => updateSection(section.id, { title: value })}
                         />
                       </div>
                       <div>
                         <Textarea
-                          config={{ name: 'section-description', label: 'Description' }}
+                          config={{ name: 'section-description', label: labelDescription }}
                           value={section.description || ''}
                           onChange={(value) => updateSection(section.id, { description: value })}
                           rows={2}
@@ -346,7 +436,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Slider
-                            config={{ name: 'col-span', label: 'Column Span' }}
+                            config={{ name: 'col-span', label: labelColumnSpan }}
                             value={section.colSpan || 2}
                             onChange={(value: number) => updateSection(section.id, { colSpan: value })}
                             min={1}
@@ -355,7 +445,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                           />
                         </div>
                         <div>
-                          <Label className="text-sm font-medium text-gray-700 mb-2 block">Column Area</Label>
+                          <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelColumnArea}</Label>
                           <UiSelect
                             value={section.columnArea || 'main'}
                             onValueChange={(value: 'main' | 'sidebar') => updateSection(section.id, { columnArea: value })}
@@ -364,31 +454,31 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="main">Main</SelectItem>
-                              <SelectItem value="sidebar">Sidebar</SelectItem>
+                              <SelectItem value="main">{optionMain}</SelectItem>
+                              <SelectItem value="sidebar">{optionSidebar}</SelectItem>
                             </SelectContent>
                           </UiSelect>
                         </div>
                       </div>
                       <div>
                         {availableFields.length === 0 ? (
-                          <p className="text-sm text-gray-500">No fields available.</p>
+                          <p className="text-sm text-gray-500">{msgNoFieldsAvailable}</p>
                         ) : (
                           <SortableSelector
                             availableItems={getAvailableFieldsForSection(section)}
                             selectedItems={getSelectedFieldsForSection(section)}
                             onChange={(selectedItems) => handleSectionFieldSelectionChange(section.id, selectedItems)}
                             isSortable={true}
-                            selectedLabel="Selected Fields"
-                            availableLabel="Available Fields"
+                            selectedLabel={labelSelectedFields}
+                            availableLabel={labelAvailableFields}
                             maxHeight="max-h-60"
-                            emptySelectedMessage="No fields selected. Select fields below to add them."
-                            emptyAvailableMessage="No fields available."
+                            emptySelectedMessage={msgNoFieldsSelected}
+                            emptyAvailableMessage={msgNoFieldsAvailable}
                           />
                         )}
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-700 mb-2 block">Badge Variant</Label>
+                        <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelBadgeVariant}</Label>
                         <UiSelect
                           value={section.badgeVariant || 'default'}
                           onValueChange={(value: any) => updateSection(section.id, { badgeVariant: value })}
@@ -417,7 +507,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                             onCheckedChange={(checked) => updateSection(section.id, { enforceBadgeVariant: checked })}
                           />
                           <Label htmlFor={`enforce-badge-${section.id}`} className="cursor-pointer text-sm">
-                            Enforce Badge Variant
+                            {labelEnforceBadgeVariant}
                           </Label>
                         </div>
                         <div className="flex items-center gap-2">
@@ -427,7 +517,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                             onCheckedChange={(checked) => updateSection(section.id, { badgeClickable: checked })}
                           />
                           <Label htmlFor={`badge-clickable-${section.id}`} className="cursor-pointer text-sm">
-                            Badge Clickable
+                            {labelBadgeClickable}
                           </Label>
                         </div>
                       </div>
@@ -435,7 +525,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                         <div className="grid grid-cols-2 gap-4 pt-2 border-t">
                           <div>
                             <Slider
-                              config={{ name: 'layout-columns', label: 'Layout Columns' }}
+                              config={{ name: 'layout-columns', label: labelLayoutColumns }}
                               value={section.layout.columns || 2}
                               onChange={(value: number) => updateSection(section.id, {
                                 layout: { ...section.layout, columns: value }
@@ -447,7 +537,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                           </div>
                           <div>
                             <NumberInput
-                              config={{ name: 'layout-gap', label: 'Layout Gap' }}
+                              config={{ name: 'layout-gap', label: labelLayoutGap }}
                               value={section.layout.gap || 0}
                               onChange={(value) => updateSection(section.id, {
                                 layout: { ...section.layout, gap: Number(value) || 0 }
@@ -489,14 +579,14 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                   <ChevronDown className="h-4 w-4" />
                 )}
               </Button>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle>{titleQuickActions}</CardTitle>
               <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                {quickActions.length} {quickActions.length === 1 ? 'action' : 'actions'}
+                {quickActions.length} {quickActions.length === 1 ? labelActionSingular : labelActionsPlural}
               </Badge>
             </div>
-            <Button onClick={addQuickAction} size="sm" variant="outline">
+            <Button onClick={addQuickAction} size="sm" variant="outline" className="text-xs">
               <Plus className="h-4 w-4 me-2" />
-              Add Action
+              {buttonAddAction}
             </Button>
           </div>
         </CardHeader>
@@ -517,7 +607,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                     transition={{ duration: 0.2 }}
                     className="text-sm text-gray-500"
                   >
-                    No quick actions defined.
+                    {msgNoQuickActions}
                   </motion.p>
                 ) : (
                   <AnimatePresence mode="popLayout">
@@ -555,7 +645,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                   className="text-base cursor-pointer hover:text-violet-600 transition-colors flex-1"
                                   onClick={() => toggleItem(`action-${action.id}`)}
                                 >
-                                  {action.label || 'Untitled Action'}
+                                  {action.label || labelUntitledAction}
                                 </CardTitle>
                                 <motion.div
                                   initial={{ scale: 0.8, opacity: 0 }}
@@ -593,7 +683,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                 <CardContent className="space-y-4 pt-2">
                       <div>
                         <TextInput
-                          config={{ name: 'action-id', label: 'Action ID' }}
+                          config={{ name: 'action-id', label: labelActionId }}
                           value={action.id}
                           onChange={() => {}}
                           disabled
@@ -602,14 +692,14 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       </div>
                       <div>
                         <TextInput
-                          config={{ name: 'action-label', label: 'Label' }}
+                          config={{ name: 'action-label', label: labelFieldLabel }}
                           value={action.label || ''}
                           onChange={(value) => updateQuickAction(action.id, { label: value })}
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label className="text-sm font-medium text-gray-700 mb-2 block">Action Type</Label>
+                          <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelActionType}</Label>
                           <UiSelect
                             value={action.action}
                             onValueChange={(value: any) =>
@@ -630,7 +720,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                           </UiSelect>
                         </div>
                         <div>
-                          <Label className="text-sm font-medium text-gray-700 mb-2 block">Variant</Label>
+                          <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelVariant}</Label>
                           <UiSelect
                             value={action.variant || 'default'}
                             onValueChange={(value: any) => updateQuickAction(action.id, { variant: value })}
@@ -660,10 +750,10 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       {(action.action === 'openFormDialog' || action.action === 'openActionForm') && (
                         <div>
                           <TextInput
-                            config={{ name: 'target-schema', label: 'Target Schema' }}
+                            config={{ name: 'target-schema', label: labelTargetSchema }}
                             value={action.targetSchema || ''}
                             onChange={(value) => updateQuickAction(action.id, { targetSchema: value })}
-                            placeholder="Schema ID"
+                            placeholder={placeholderSchemaId}
                           />
                           {action.action === 'openFormDialog' && (
                             <>
@@ -707,7 +797,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                         <>
                           <div>
                             <TextInput
-                              config={{ name: 'target-url', label: 'Target URL' }}
+                              config={{ name: 'target-url', label: labelTargetUrl }}
                               value={action.targetUrl || ''}
                               onChange={(value) => updateQuickAction(action.id, { targetUrl: value })}
                               placeholder="/page/vendors or /api/export/inquiries"
@@ -768,13 +858,13 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       {action.action === 'runAiAgent' && (
                         <>
                           <div>
-                            <Label className="text-sm font-medium text-gray-700 mb-2 block">AI Agent</Label>
+                            <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelAiAgent}</Label>
                             <UiSelect
                               value={action.agentId || ''}
                               onValueChange={(value) => updateQuickAction(action.id, { agentId: value })}
                             >
                               <SelectTrigger>
-                                <SelectValue placeholder="Select an AI agent" />
+                                <SelectValue placeholder={placeholderSelectAiAgent} />
                               </SelectTrigger>
                               <SelectContent>
                                 {agents.map((agent) => (
@@ -786,7 +876,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                             </UiSelect>
                           </div>
                           <div>
-                            <Label className="text-sm font-medium text-gray-700 mb-2 block">Component Type</Label>
+                            <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelComponentType}</Label>
                             <UiSelect
                               value={action.componentType || 'button'}
                               onValueChange={(value: 'button' | 'ai-agent-response') => updateQuickAction(action.id, { componentType: value })}
@@ -801,10 +891,10 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                             </UiSelect>
                           </div>
                           <div>
-                            <Label className="text-sm font-medium text-gray-700 mb-2 block">Selected Fields</Label>
+                            <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelSelectedFields}</Label>
                             <div className="max-h-48 overflow-y-auto border rounded-md p-3 space-y-2">
                               {availableFields.length === 0 ? (
-                                <p className="text-sm text-gray-500">No fields available</p>
+                                <p className="text-sm text-gray-500">{msgNoFieldsAvailable}</p>
                               ) : (
                                 availableFields.map((field) => (
                                   <div key={field.id} className="flex items-center space-x-2">
@@ -831,10 +921,10 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                             </div>
                           </div>
                           <div>
-                            <Label className="text-sm font-medium text-gray-700 mb-2 block">Selected Sections</Label>
+                            <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelSelectedSections}</Label>
                             <div className="max-h-48 overflow-y-auto border rounded-md p-3 space-y-2">
                               {allSections.length === 0 ? (
-                                <p className="text-sm text-gray-500">No sections available</p>
+                                <p className="text-sm text-gray-500">{msgNoSectionsAvailable}</p>
                               ) : (
                                 allSections.map((section) => (
                                   <div key={section.id} className="flex items-center space-x-2">
@@ -913,7 +1003,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                           </div>
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <Label className="text-sm font-medium text-gray-700 mb-2 block">Run Type</Label>
+                              <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelRunType}</Label>
                               <UiSelect
                                 value={action.runType || 'manual'}
                                 onValueChange={(value: any) => updateQuickAction(action.id, { runType: value })}
@@ -922,13 +1012,13 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="manual">Manual</SelectItem>
-                                  <SelectItem value="automatic">Automatic</SelectItem>
+                                  <SelectItem value="manual">{optionManual}</SelectItem>
+                                  <SelectItem value="automatic">{optionAutomatic}</SelectItem>
                                 </SelectContent>
                               </UiSelect>
                             </div>
                             <div>
-                              <Label className="text-sm font-medium text-gray-700 mb-2 block">Display Type</Label>
+                              <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelDisplayType}</Label>
                               <UiSelect
                                 value={action.displayType || 'showForm'}
                                 onValueChange={(value: any) => updateQuickAction(action.id, { displayType: value })}
@@ -937,14 +1027,14 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  <SelectItem value="showForm">Show Form</SelectItem>
-                                  <SelectItem value="hideForm">Hide Form</SelectItem>
+                                  <SelectItem value="showForm">{optionShowForm}</SelectItem>
+                                  <SelectItem value="hideForm">{optionHideForm}</SelectItem>
                                 </SelectContent>
                               </UiSelect>
                             </div>
                           </div>
                           <div>
-                            <Label className="text-sm font-medium text-gray-700 mb-2 block">Default Language</Label>
+                            <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelDefaultLanguage}</Label>
                             <LanguageSelector
                               config={{
                                 name: 'language',
@@ -956,7 +1046,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                               defaultLanguage="fa"
                             />
                             <p className="text-xs text-gray-500 mt-1">
-                              Default language for AI agent output. If not set, uses 'fa' for most agents or 'en' for image-generation agents.
+                              {msgDefaultLanguageDescription}
                             </p>
                           </div>
                         </>
@@ -993,14 +1083,14 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                   <ChevronDown className="h-4 w-4" />
                 )}
               </Button>
-              <CardTitle>Table Renderers</CardTitle>
+              <CardTitle>{titleTableRenderers}</CardTitle>
               <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                {tableRenderers.length} {tableRenderers.length === 1 ? 'table' : 'tables'}
+                {tableRenderers.length} {tableRenderers.length === 1 ? labelTableSingular : labelTablesPlural}
               </Badge>
             </div>
-            <Button onClick={addTableRenderer} size="sm" variant="outline">
+            <Button onClick={addTableRenderer} size="sm" variant="outline" className="text-xs">
               <Plus className="h-4 w-4 me-2" />
-              Add Table
+              {buttonAddTable}
             </Button>
           </div>
         </CardHeader>
@@ -1021,7 +1111,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                     transition={{ duration: 0.2 }}
                     className="text-sm text-gray-500"
                   >
-                    No table renderers defined.
+                    {msgNoTableRenderers}
                   </motion.p>
                 ) : (
                   <AnimatePresence mode="popLayout">
@@ -1059,7 +1149,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                   className="text-base cursor-pointer hover:text-violet-600 transition-colors flex-1"
                                   onClick={() => toggleItem(`table-${renderer.id}`)}
                                 >
-                                  {renderer.title || 'Untitled Table'}
+                                  {renderer.title || labelUntitledTable}
                                 </CardTitle>
                                 <motion.div
                                   initial={{ scale: 0.8, opacity: 0 }}
@@ -1097,7 +1187,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                 <CardContent className="space-y-4 pt-2">
                       <div>
                         <TextInput
-                          config={{ name: 'renderer-id', label: 'Renderer ID' }}
+                          config={{ name: 'renderer-id', label: labelRendererId }}
                           value={renderer.id}
                           onChange={() => {}}
                           disabled
@@ -1122,15 +1212,15 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <TextInput
-                            config={{ name: 'target-schema', label: 'Target Schema' }}
+                            config={{ name: 'target-schema', label: labelTargetSchema }}
                             value={renderer.targetSchema || ''}
                             onChange={(value) => updateTableRenderer(renderer.id, { targetSchema: value })}
-                            placeholder="Schema ID"
+                            placeholder={placeholderSchemaId}
                           />
                         </div>
                         <div>
                           <TextInput
-                            config={{ name: 'relation-type-id', label: 'Relation Type ID' }}
+                            config={{ name: 'relation-type-id', label: labelRelationTypeId }}
                             value={renderer.relationTypeId || ''}
                             onChange={(value) => updateTableRenderer(renderer.id, { relationTypeId: value })}
                             placeholder="e.g., HAS_INQUIRY_ITEM"
@@ -1139,16 +1229,16 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       </div>
                       <div>
                         <TextInput
-                          config={{ name: 'section-id', label: 'Section ID' }}
+                          config={{ name: 'section-id', label: labelSectionId }}
                           value={renderer.sectionId || ''}
                           onChange={(value) => updateTableRenderer(renderer.id, { sectionId: value })}
-                          placeholder="Section ID from target schema"
+                          placeholder={placeholderSectionIdFromTarget}
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Slider
-                            config={{ name: 'col-span', label: 'Column Span' }}
+                            config={{ name: 'col-span', label: labelColumnSpan }}
                             value={renderer.colSpan || 2}
                             onChange={(value: number) => updateTableRenderer(renderer.id, { colSpan: value })}
                             min={1}
@@ -1157,7 +1247,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                           />
                         </div>
                         <div>
-                          <Label className="text-sm font-medium text-gray-700 mb-2 block">Column Area</Label>
+                          <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelColumnArea}</Label>
                           <UiSelect
                             value={renderer.columnArea || 'main'}
                             onValueChange={(value: 'main' | 'sidebar') => updateTableRenderer(renderer.id, { columnArea: value })}
@@ -1166,8 +1256,8 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="main">Main</SelectItem>
-                              <SelectItem value="sidebar">Sidebar</SelectItem>
+                              <SelectItem value="main">{optionMain}</SelectItem>
+                              <SelectItem value="sidebar">{optionSidebar}</SelectItem>
                             </SelectContent>
                           </UiSelect>
                         </div>
@@ -1175,18 +1265,18 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       <div>
                         <p className="text-xs text-gray-500 mb-2">Leave empty to show all fields from section</p>
                         {availableFields.length === 0 ? (
-                          <p className="text-sm text-gray-500">No fields available.</p>
+                          <p className="text-sm text-gray-500">{msgNoFieldsAvailable}</p>
                         ) : (
                           <SortableSelector
                             availableItems={getAvailableColumns(renderer)}
                             selectedItems={getSelectedColumns(renderer)}
                             onChange={(selectedItems) => handleTableColumnSelectionChange(renderer.id, selectedItems)}
                             isSortable={true}
-                            selectedLabel="Selected Columns"
-                            availableLabel="Available Fields"
+                            selectedLabel={labelSelectedColumns}
+                            availableLabel={labelAvailableFields}
                             maxHeight="max-h-60"
-                            emptySelectedMessage="No columns selected. Select columns below to add them. Leave empty to show all fields."
-                            emptyAvailableMessage="No fields available."
+                            emptySelectedMessage={msgNoColumnsSelected}
+                            emptyAvailableMessage={msgNoFieldsAvailable}
                           />
                         )}
                       </div>
@@ -1202,7 +1292,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                 })}
                               />
                               <Label htmlFor={`sorting-${renderer.id}`} className="cursor-pointer text-sm">
-                                Sorting Enabled
+                                {labelSortingEnabled}
                               </Label>
                             </div>
                             <div className="flex items-center gap-2">
@@ -1214,14 +1304,14 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                 })}
                               />
                               <Label htmlFor={`pagination-${renderer.id}`} className="cursor-pointer text-sm">
-                                Pagination Enabled
+                                {labelPaginationEnabled}
                               </Label>
                             </div>
                           </div>
                           {renderer.tableProperties.paginationEnabled && (
                             <div>
                               <NumberInput
-                                config={{ name: 'page-size', label: 'Page Size' }}
+                                config={{ name: 'page-size', label: labelPageSize }}
                                 value={renderer.tableProperties.paginationPageSize || 20}
                                 onChange={(value) => updateTableRenderer(renderer.id, {
                                   tableProperties: { ...renderer.tableProperties, paginationPageSize: Number(value) || 20 }
@@ -1264,14 +1354,14 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                   <ChevronDown className="h-4 w-4" />
                 )}
               </Button>
-              <CardTitle>Component Renderers</CardTitle>
+              <CardTitle>{titleComponentRenderers}</CardTitle>
               <Badge variant="secondary" className="text-xs px-2 py-0.5">
-                {componentRenderers.length} {componentRenderers.length === 1 ? 'component' : 'components'}
+                {componentRenderers.length} {componentRenderers.length === 1 ? labelComponentSingular : labelComponentsPlural}
               </Badge>
             </div>
-            <Button onClick={addComponentRenderer} size="sm" variant="outline">
+            <Button onClick={addComponentRenderer} size="sm" variant="outline" className="text-xs">
               <Plus className="h-4 w-4 me-2" />
-              Add Component
+              {buttonAddComponent}
             </Button>
           </div>
         </CardHeader>
@@ -1292,7 +1382,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                     transition={{ duration: 0.2 }}
                     className="text-sm text-gray-500"
                   >
-                    No component renderers defined.
+                    {msgNoComponentRenderers}
                   </motion.p>
                 ) : (
                   <AnimatePresence mode="popLayout">
@@ -1330,7 +1420,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                   className="text-base cursor-pointer hover:text-violet-600 transition-colors flex-1"
                                   onClick={() => toggleItem(`component-${renderer.id}`)}
                                 >
-                                  {renderer.componentType || 'Untitled Component'}
+                                  {renderer.componentType || labelUntitledComponent}
                                 </CardTitle>
                                 <motion.div
                                   initial={{ scale: 0.8, opacity: 0 }}
@@ -1368,7 +1458,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                 <CardContent className="space-y-4 pt-2">
                       <div>
                         <TextInput
-                          config={{ name: 'renderer-id', label: 'Renderer ID' }}
+                          config={{ name: 'renderer-id', label: labelRendererId }}
                           value={renderer.id}
                           onChange={() => {}}
                           disabled
@@ -1376,7 +1466,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                         />
                       </div>
                       <div>
-                        <Label className="text-sm font-medium text-gray-700 mb-2 block">Component Type</Label>
+                        <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelComponentType}</Label>
                         <UiSelect
                           value={renderer.componentType}
                           onValueChange={(value: 'kpi' | 'chart' | 'metric' | 'custom') =>
@@ -1397,16 +1487,16 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       {renderer.componentType === 'custom' && (
                         <div>
                           <TextInput
-                            config={{ name: 'component-name', label: 'Component Name' }}
+                            config={{ name: 'component-name', label: labelComponentName }}
                             value={renderer.componentName || ''}
                             onChange={(value) => updateComponentRenderer(renderer.id, { componentName: value })}
-                            placeholder="Custom component name"
+                            placeholder={placeholderCustomComponentName}
                           />
                         </div>
                       )}
                       <div>
                         <TextInput
-                          config={{ name: 'data-path', label: 'Data Path' }}
+                          config={{ name: 'data-path', label: labelDataPath }}
                           value={renderer.dataPath || ''}
                           onChange={(value) => updateComponentRenderer(renderer.id, { dataPath: value })}
                           placeholder="e.g., performanceMetrics.onTimeDelivery"
@@ -1453,7 +1543,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                 <ChevronDown className="h-4 w-4" />
               )}
             </Button>
-            <CardTitle>Layout</CardTitle>
+            <CardTitle>{titleLayout}</CardTitle>
           </div>
         </CardHeader>
         {expandedSections.layout && (
@@ -1461,7 +1551,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Slider
-                  config={{ name: 'main-columns', label: 'Main Columns' }}
+                  config={{ name: 'main-columns', label: labelMainColumns }}
                   value={detailPageMetadata.layout?.mainColumns || 2}
                   onChange={(value: number) => updateDetailPageMetadata({
                     layout: { ...detailPageMetadata.layout, mainColumns: value }
@@ -1473,7 +1563,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
               </div>
               <div>
                 <Slider
-                  config={{ name: 'sidebar-columns', label: 'Sidebar Columns' }}
+                  config={{ name: 'sidebar-columns', label: labelSidebarColumns }}
                   value={detailPageMetadata.layout?.sidebarColumns || 1}
                   onChange={(value: number) => updateDetailPageMetadata({
                     layout: { ...detailPageMetadata.layout, sidebarColumns: value }
@@ -1486,7 +1576,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
             </div>
             <div>
               <NumberInput
-                config={{ name: 'gap', label: 'Gap' }}
+                config={{ name: 'gap', label: labelGap }}
                 value={detailPageMetadata.layout?.gap || 0}
                 onChange={(value) => updateDetailPageMetadata({
                   layout: { ...detailPageMetadata.layout, gap: Number(value) || 0 }
@@ -1514,7 +1604,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                 <ChevronDown className="h-4 w-4" />
               )}
             </Button>
-            <CardTitle>Header</CardTitle>
+            <CardTitle>{titleHeader}</CardTitle>
           </div>
         </CardHeader>
         {expandedSections.header && (
@@ -1529,7 +1619,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                   })}
                 />
                 <Label htmlFor="show-back-button" className="cursor-pointer text-sm">
-                  Show Back Button
+                  {labelShowBackButton}
                 </Label>
               </div>
               <div className="flex items-center gap-2">
@@ -1541,13 +1631,13 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                   })}
                 />
                 <Label htmlFor="show-actions" className="cursor-pointer text-sm">
-                  Show Actions
+                  {labelShowActions}
                 </Label>
               </div>
             </div>
             {detailPageMetadata.header?.showActions && (
               <div>
-                <Label className="text-sm font-medium text-gray-700 mb-2 block">Actions</Label>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">{labelActions}</Label>
                 <div className="space-y-2">
                   {['edit', 'delete', 'export'].map((action) => {
                     const isSelected = detailPageMetadata.header?.actions?.includes(action as any) || false;

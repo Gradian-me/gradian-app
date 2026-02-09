@@ -1479,7 +1479,7 @@
   "invoices": [],
   "applications": [
     {
-      "name": "Change Management",
+      "name": [{"en": "Change Management"}, {"fa": "مدیریت تغییر"}, {"ar": "إدارة التغيير"}, {"es": "Gestión del cambio"}, {"fr": "Gestion du changement"}, {"de": "Änderungsmanagement"}, {"it": "Gestione del cambiamento"}, {"ru": "Управление изменениями"}],
       "icon": "GitBranch",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -1491,7 +1491,7 @@
       "application-schemas": []
     },
     {
-      "name": "Deviation Management",
+      "name": [{"en": "Deviation Management"}, {"fa": "مدیریت انحرافات"}, {"ar": "إدارة الانحرافات"}, {"es": "Gestión de desviaciones"}, {"fr": "Gestion des déviations"}, {"de": "Abweichungsmanagement"}, {"it": "Gestione delle deviazioni"}, {"ru": "Управление отклонениями"}],
       "icon": "AlertTriangle",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -1503,7 +1503,7 @@
       "application-schemas": []
     },
     {
-      "name": "Risk Management",
+      "name": [{"en": "Risk Management"}, {"fa": "مدیریت ریسک"}, {"ar": "إدارة المخاطر"}, {"es": "Gestión de riesgos"}, {"fr": "Gestion des risques"}, {"de": "Risikomanagement"}, {"it": "Gestione dei rischi"}, {"ru": "Управление рисками"}],
       "icon": "ShieldAlert",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -1514,7 +1514,7 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "name": "Complaint Management",
+      "name": [{"en": "Complaint Management"}, {"fa": "مدیریت شکایات"}, {"ar": "إدارة الشكاوى"}, {"es": "Gestión de reclamaciones"}, {"fr": "Gestion des réclamations"}, {"de": "Beschwerdemanagement"}, {"it": "Gestione dei reclami"}, {"ru": "Управление жалобами"}],
       "icon": "FileCheck",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
@@ -1525,7 +1525,7 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "name": "Audit Management",
+      "name": [{"en": "Audit Management"}, {"fa": "مدیریت ممیزی"}, {"ar": "إدارة التدقيق"}, {"es": "Gestión de auditorías"}, {"fr": "Gestion des audits"}, {"de": "Auditmanagement"}, {"it": "Gestione degli audit"}, {"ru": "Управление аудитами"}],
       "icon": "FileSearch",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -1536,7 +1536,7 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "name": "System Administration",
+      "name": [{"en": "System Administration"}, {"fa": "مدیریت سیستم"}, {"ar": "إدارة النظام"}, {"es": "Administración del sistema"}, {"fr": "Administration système"}, {"de": "Systemverwaltung"}, {"it": "Amministrazione di sistema"}, {"ru": "Администрирование системы"}],
       "icon": "Verified",
       "incomplete": false,
       "id": "01KFTQPVC9RCRE9J8ACHECVWNK",
@@ -1546,7 +1546,7 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "name": "Supply Chain Management",
+      "name": [{"en": "Supply Chain Management"}, {"fa": "مدیریت زنجیره تأمین"}, {"ar": "إدارة سلسلة التوريد"}, {"es": "Gestión de la cadena de suministro"}, {"fr": "Gestion de la chaîne d'approvisionnement"}, {"de": "Lieferkettenmanagement"}, {"it": "Gestione della catena di fornitura"}, {"ru": "Управление цепочкой поставок"}],
       "icon": "LucidePlaneTakeoff",
       "incomplete": false,
       "id": "01KFTVYHWWEHFEQDME72PKNA75",
@@ -1556,7 +1556,7 @@
     },
     {
       "application-schemas": [],
-      "name": "Process Management",
+      "name": [{"en": "Process Management"}, {"fa": "مدیریت فرایندها"}, {"ar": "إدارة العمليات"}, {"es": "Gestión de procesos"}, {"fr": "Gestion des processus"}, {"de": "Prozessmanagement"}, {"it": "Gestione dei processi"}, {"ru": "Управление процессами"}],
       "icon": "Workflow",
       "incomplete": false,
       "id": "01KFZFTS259QZVTR2ETNZ1H0GF",
@@ -1566,7 +1566,7 @@
     },
     {
       "application-schemas": [],
-      "name": "General Applications",
+      "name": [{"en": "General Applications"}, {"fa": "برنامه‌های عمومی"}, {"ar": "تطبيقات عامة"}, {"es": "Aplicaciones generales"}, {"fr": "Applications générales"}, {"de": "Allgemeine Anwendungen"}, {"it": "Applicazioni generali"}, {"ru": "Общие приложения"}],
       "icon": "Briefcase",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -1577,7 +1577,7 @@
     },
     {
       "application-schemas": [],
-      "name": "Project Management",
+      "name": [{"en": "Project Management"}, {"fa": "مدیریت پروژه"}, {"ar": "إدارة المشاريع"}, {"es": "Gestión de proyectos"}, {"fr": "Gestion de projet"}, {"de": "Projektmanagement"}, {"it": "Gestione progetti"}, {"ru": "Управление проектами"}],
       "icon": "ActivitySquare",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -2193,10 +2193,10 @@
       ],
       "id": "schemas_sync",
       "createdAt": "2025-11-17T12:19:40.582Z",
-      "updatedAt": "2026-02-08T08:00:00.275Z",
+      "updatedAt": "2026-02-09T07:44:54.845Z",
       "targetDataPath": "",
       "sourceDataPath": "data",
-      "lastSynced": "2026-02-08T08:00:00.275Z",
+      "lastSynced": "2026-02-09T07:44:54.845Z",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -2209,7 +2209,7 @@
           "color": "blue"
         }
       ],
-      "lastSyncMessage": "Processed 53 schemas: 53 succeeded, 0 failed (1 created, 52 updated)"
+      "lastSyncMessage": "Processed 53 schemas: 0 succeeded, 53 failed (0 created, 0 updated)"
     },
     {
       "color": "blue",
@@ -2237,8 +2237,8 @@
       "targetDataPath": "",
       "id": "schema_related_schemas_sync",
       "createdAt": "2025-11-18T13:59:23.884Z",
-      "updatedAt": "2026-02-08T08:00:08.169Z",
-      "lastSynced": "2026-02-08T08:00:08.169Z",
+      "updatedAt": "2026-02-09T07:13:56.902Z",
+      "lastSynced": "2026-02-09T07:13:56.902Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2488,8 +2488,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-02-08T08:02:03.190Z",
-      "lastSynced": "2026-02-08T08:02:03.190Z",
+      "updatedAt": "2026-02-09T07:41:42.324Z",
+      "lastSynced": "2026-02-09T07:41:42.324Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2529,7 +2529,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-02-08T08:02:10.182Z",
+      "updatedAt": "2026-02-09T07:41:52.652Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2539,7 +2539,7 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-02-08T08:02:10.182Z",
+      "lastSynced": "2026-02-09T07:41:52.652Z",
       "lastSyncMessage": "Generated relations for 45 out of 45 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -3641,7 +3641,7 @@
   ],
   "menu-items": [
     {
-      "menuTitle": "Home",
+      "menuTitle": [{"en": "Home"}, {"fa": "خانه"}, {"ar": "الرئيسية"}, {"es": "Inicio"}, {"fr": "Accueil"}, {"de": "Startseite"}, {"it": "Home"}, {"ru": "Главная"}],
       "menuIcon": "Home",
       "sortIndex": 0,
       "hideInAD": false,
@@ -3656,7 +3656,7 @@
       "companies": []
     },
     {
-      "menuTitle": "AI Builder",
+      "menuTitle": [{"en": "AI Builder"}, {"fa": "سازنده هوش مصنوعی"}, {"ar": "منشئ الذكاء الاصطناعي"}, {"es": "Constructor IA"}, {"fr": "Générateur IA"}, {"de": "KI-Builder"}, {"it": "Builder IA"}, {"ru": "Конструктор ИИ"}],
       "menuIcon": "Sparkles",
       "sortIndex": 1,
       "hideInAD": false,
@@ -3683,7 +3683,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": "Chatbot",
+      "menuTitle": [{"en": "Chatbot"}, {"fa": "چت‌بات"}, {"ar": "روبوت الدردشة"}, {"es": "Chatbot"}, {"fr": "Chatbot"}, {"de": "Chatbot"}, {"it": "Chatbot"}, {"ru": "Чат-бот"}],
       "menuIcon": "BotMessageSquare",
       "sortIndex": 2,
       "hideInAD": false,
@@ -3710,7 +3710,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": "Builder",
+      "menuTitle": [{"en": "Builder"}, {"fa": "سازنده"}, {"ar": "المنشئ"}, {"es": "Constructor"}, {"fr": "Générateur"}, {"de": "Builder"}, {"it": "Builder"}, {"ru": "Конструктор"}],
       "menuIcon": "LayoutPanelLeft",
       "sortIndex": 3,
       "hideInAD": false,
@@ -3733,7 +3733,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": "Schema Builder",
+      "menuTitle": [{"en": "Schema Builder"}, {"fa": "سازنده طرح"}, {"ar": "منشئ المخطط"}, {"es": "Constructor de esquemas"}, {"fr": "Générateur de schémas"}, {"de": "Schema-Builder"}, {"it": "Generatore di schemi"}, {"ru": "Конструктор схем"}],
       "menuIcon": "Brackets",
       "sortIndex": 4,
       "hideInAD": false,
@@ -3756,7 +3756,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": "Integrations",
+      "menuTitle": [{"en": "Integrations"}, {"fa": "یکپارچه‌سازی‌ها"}, {"ar": "التكاملات"}, {"es": "Integraciones"}, {"fr": "Intégrations"}, {"de": "Integrationen"}, {"it": "Integrazioni"}, {"ru": "Интеграции"}],
       "menuIcon": "Plug",
       "sortIndex": 5,
       "hideInAD": false,
@@ -3779,7 +3779,7 @@
       ]
     },
     {
-      "menuTitle": "Dashboard",
+      "menuTitle": [{"en": "Dashboard"}, {"fa": "داشبورد"}, {"ar": "لوحة التحكم"}, {"es": "Panel de control"}, {"fr": "Tableau de bord"}, {"de": "Dashboard"}, {"it": "Cruscotto"}, {"ru": "Панель управления"}],
       "menuIcon": "LayoutDashboard",
       "sortIndex": 6,
       "hideInAD": false,
@@ -3802,7 +3802,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": "Graph Designer",
+      "menuTitle": [{"en": "Graph Designer"}, {"fa": "طراح گراف"}, {"ar": "مصمم الرسوم البيانية"}, {"es": "Diseñador de grafos"}, {"fr": "Concepteur de graphes"}, {"de": "Graph-Designer"}, {"it": "Progettista di grafici"}, {"ru": "Конструктор графов"}],
       "menuIcon": "Waypoints",
       "sortIndex": 7,
       "hideInAD": false,
@@ -3825,7 +3825,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": "Tender Calendar",
+      "menuTitle": [{"en": "Tender Calendar"}, {"fa": "تقویم مناقصه"}, {"ar": "تقويم المناقصات"}, {"es": "Calendario de licitaciones"}, {"fr": "Calendrier des appels d'offres"}, {"de": "Ausschreibungskalender"}, {"it": "Calendario gare"}, {"ru": "Календарь тендеров"}],
       "menuIcon": "CalendarDays",
       "sortIndex": 8,
       "hideInAD": true,
@@ -3848,7 +3848,7 @@
       ]
     },
     {
-      "menuTitle": "Tender Analytics",
+      "menuTitle": [{"en": "Tender Analytics"}, {"fa": "تحلیل مناقصه"}, {"ar": "تحليلات المناقصات"}, {"es": "Analíticas de licitaciones"}, {"fr": "Analytiques des appels d'offres"}, {"de": "Ausschreibungsanalysen"}, {"it": "Analisi gare"}, {"ru": "Аналитика тендеров"}],
       "menuIcon": "BarChart3",
       "sortIndex": 9,
       "hideInAD": false,
@@ -3871,7 +3871,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": "EQMS Analytics",
+      "menuTitle": [{"en": "EQMS Analytics"}, {"fa": "تحلیل EQMS"}, {"ar": "تحليلات EQMS"}, {"es": "Analíticas EQMS"}, {"fr": "Analytiques EQMS"}, {"de": "EQMS-Analysen"}, {"it": "Analisi EQMS"}, {"ru": "Аналитика EQMS"}],
       "menuIcon": "ShieldCheck",
       "sortIndex": 10,
       "hideInAD": false,
@@ -3894,7 +3894,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": "Sales Analytics",
+      "menuTitle": [{"en": "Sales Analytics"}, {"fa": "تحلیل فروش"}, {"ar": "تحليلات المبيعات"}, {"es": "Analíticas de ventas"}, {"fr": "Analytiques des ventes"}, {"de": "Vertriebsanalysen"}, {"it": "Analisi vendite"}, {"ru": "Аналитика продаж"}],
       "menuIcon": "TrendingUp",
       "sortIndex": 11,
       "hideInAD": false,
@@ -3923,7 +3923,7 @@
           "label": "Supply Chain Management"
         }
       ],
-      "menuTitle": "Tender List",
+      "menuTitle": [{"en": "Tender List"}, {"fa": "لیست مناقصات"}, {"ar": "قائمة المناقصات"}, {"es": "Lista de licitaciones"}, {"fr": "Liste des appels d'offres"}, {"de": "Ausschreibungsliste"}, {"it": "Elenco gare"}, {"ru": "Список тендеров"}],
       "menuIcon": "BadgeDollarSign",
       "menuUrl": "/dynamic-query/01KDT7XAH1V7CKTPKZFA5VC6H3",
       "incomplete": false,
@@ -4512,12 +4512,12 @@
       "name": "dev",
       "title": "Development Environment",
       "domain": "http://cg-gr-api-dev-1.cinnagen.com",
-      "dbname": "gradian_genora",
+      "dbname": "gradian_config",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBFBGV9151FQN481NB2CT4MX",
       "createdAt": "2025-12-02T11:00:19.878Z",
-      "updatedAt": "2025-12-02T11:00:19.878Z",
+      "updatedAt": "2026-02-09T07:15:02.992Z",
       "defaultDomain": "cinnagen.com",
       "relatedTenants": [
         {
@@ -4645,6 +4645,23 @@
       "updatedAt": "2025-12-15T13:51:18.204Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": [
+        {
+          "en": "English Test"
+        },
+        {
+          "fa": "تست فارسی"
+        }
+      ],
+      "label_en": "Test",
+      "label_fa": "Test",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KGYTTTS5G41R6E9BDRX9B90S",
+      "createdAt": "2026-02-08T14:35:01.332Z",
+      "updatedAt": "2026-02-08T14:35:01.332Z"
     }
   ],
   "quality-assurance-analysis": [

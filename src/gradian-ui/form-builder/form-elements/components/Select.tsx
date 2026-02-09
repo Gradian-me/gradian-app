@@ -31,7 +31,7 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
-import { getT, getDefaultLanguage, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, isRTL, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { useLanguageStore } from '@/stores/language.store';
 
@@ -125,6 +125,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   React.useEffect(() => setIsMounted(true), []);
   const rtl = isMounted ? isRTL(language) : false;
   const noOptionsFoundLabel = getT(TRANSLATION_KEYS.MESSAGE_NO_OPTIONS_FOUND, language, defaultLang);
+  const placeholderSearchOptions = getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH_OPTIONS, language, defaultLang);
 
   // State for search functionality
   const [searchValue, setSearchValue] = React.useState('');
@@ -451,19 +452,22 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     return map;
   }, [normalizedOptions, normalizedValueArray]);
   const hasNormalizedOptions = normalizedOptions.length > 0;
-  
-  // Filter options based on search value
+
+  const selectLang = useLanguageStore((s) => s.getLanguage?.()) ?? getDefaultLanguage();
+  const selectDefaultLang = getDefaultLanguage();
+
+  // Filter options based on search value (resolve labels so translation arrays never get .toLowerCase)
   const filteredOptions = useMemo(() => {
     if (!enableSearch || !searchValue.trim()) {
       return normalizedOptions;
     }
     const searchLower = searchValue.toLowerCase().trim();
     return normalizedOptions.filter((opt) => {
-      const label = (opt.label || opt.id || '').toLowerCase();
+      const labelStr = resolveDisplayLabel(opt.label ?? opt.id ?? '', selectLang, selectDefaultLang);
       const id = (opt.id || '').toLowerCase();
-      return label.includes(searchLower) || id.includes(searchLower);
+      return labelStr.toLowerCase().includes(searchLower) || id.includes(searchLower);
     });
-  }, [normalizedOptions, searchValue, enableSearch]);
+  }, [normalizedOptions, searchValue, enableSearch, selectLang, selectDefaultLang]);
   
   const validOptions = useMemo(
     () => filteredOptions.filter((opt) => opt.id && opt.id !== ''),
@@ -480,9 +484,10 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     const ungrouped: NormalizedOption[] = [];
 
     validOptions.forEach((option) => {
-      const category = (option as any).category || option.category;
-      if (category && String(category).trim()) {
-        const categoryKey = String(category).trim();
+      const rawCategory = (option as any).category ?? option.category;
+      const category = resolveDisplayLabel(rawCategory, selectLang, selectDefaultLang);
+      if (category && category.trim()) {
+        const categoryKey = category.trim();
         if (!groups[categoryKey]) {
           groups[categoryKey] = [];
         }
@@ -501,14 +506,14 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     const sortedGroups: Record<string, NormalizedOption[]> = {};
     sortedGroupEntries.forEach(([category, options]) => {
       sortedGroups[category] = [...options].sort((a, b) => {
-        const labelA = (a.label || a.id || '').toLowerCase();
-        const labelB = (b.label || b.id || '').toLowerCase();
+        const labelA = resolveDisplayLabel(a.label ?? a.id ?? '', selectLang, selectDefaultLang).toLowerCase();
+        const labelB = resolveDisplayLabel(b.label ?? b.id ?? '', selectLang, selectDefaultLang).toLowerCase();
         return labelA.localeCompare(labelB);
       });
     });
 
     return { groups: sortedGroups, ungrouped };
-  }, [validOptions, enableGrouping]);
+  }, [validOptions, enableGrouping, selectLang, selectDefaultLang]);
 
   // Calculate fallback select value for default behavior (must be before any conditional returns)
   const fallbackSelectValue = React.useMemo(() => {
@@ -849,7 +854,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                         // Only prevent event propagation to avoid closing select
                         e.stopPropagation();
                       }}
-                      placeholder="Search options..."
+                      placeholder={placeholderSearchOptions}
                       className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-700 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:border-violet-400 dark:focus:border-violet-500"
                     />
                     {searchValue && (

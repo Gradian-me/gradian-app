@@ -2,17 +2,19 @@ import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../../components/ui/avatar';
 
 /**
- * Get initials from a name string
+ * Get initials from a name string (or value that will be coerced to string).
+ * Safe for translation arrays/objects: only strings get trimmed/split; otherwise returns 'A'.
  * Maximum 3 characters: first two words + last word if more than 2 words
  * Examples:
  * - "Git Sync Environment Variables" -> "GSV" (G from Git, S from Sync, V from Variables)
  * - "John Doe" -> "JD" (J from John, D from Doe)
  * - "Single" -> "SI" (first two characters)
  */
-export const getInitials = (name: string): string => {
-  if (!name) return 'A';
+export const getInitials = (name: unknown): string => {
+  const str = typeof name === 'string' ? name : '';
+  if (!str) return 'A';
   
-  const words = name.trim().split(/\s+/).filter(word => word.length > 0);
+  const words = str.trim().split(/\s+/).filter(word => word.length > 0);
   
   if (words.length === 0) return 'A';
   

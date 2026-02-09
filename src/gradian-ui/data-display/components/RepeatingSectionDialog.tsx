@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { RefreshCw, Plus, List } from 'lucide-react';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
-import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -31,6 +31,7 @@ import { NormalizedOption } from '@/gradian-ui/form-builder/form-elements/utils/
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { toast } from 'sonner';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
+import { getSchemaTranslatedSingularName, getSchemaTranslatedPluralName, getSectionTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
 
 interface RepeatingSectionDialogProps {
   isOpen: boolean;
@@ -56,13 +57,15 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
     [schema.sections, sectionId]
   );
 
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
   const tableDataState = useRepeatingTableData({
     config: {
       id: sectionId,
       schemaId: schema.id,
       sectionId,
       title: sectionTitle,
-      description: section?.description,
+      description: section ? getSectionTranslatedDescription(section, language, section.description ?? '') : undefined,
       targetSchema: section?.repeatingConfig?.targetSchema,
       relationTypeId: section?.repeatingConfig?.relationTypeId,
     },
@@ -99,14 +102,26 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
     targetId: null,
   });
 
-  const language = useLanguageStore((s) => s.language) ?? 'en';
-  const defaultLang = getDefaultLanguage();
+  // Localized schema names
+  const schemaSingularName = useMemo(
+    () =>
+      getSchemaTranslatedSingularName(
+        schema,
+        language,
+        schema.singular_name || getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang),
+      ),
+    [schema, language, defaultLang],
+  );
 
-  // Get parent entity title using getValueByRole
+  // Get parent entity title using getValueByRole (safe for translation arrays)
   const parentTitle = useMemo(() => {
     if (!entityData) return '';
-    return getValueByRole(schema, entityData, 'title') || entityData.name || entityData.title || '';
-  }, [schema, entityData]);
+    const raw =
+      getValueByRole(schema, entityData, 'title') ||
+      (entityData && (entityData.name || entityData.title)) ||
+      '';
+    return resolveDisplayLabel(raw, language, defaultLang);
+  }, [schema, entityData, language, defaultLang]);
 
   // Get repeating config and addType
   const repeatingConfig = effectiveSection?.repeatingConfig;
@@ -118,9 +133,29 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
   const canAddMore = maxItems === undefined || maxItems === 0 || currentItemsCount < maxItems;
 
   const currentEntityId = entityId || entityData?.id;
-  const targetSchemaId = isRelationBased && repeatingConfig?.targetSchema
-    ? repeatingConfig.targetSchema
-    : schema.id;
+  const targetSchemaId =
+    isRelationBased && repeatingConfig?.targetSchema ? repeatingConfig.targetSchema : schema.id;
+
+  // Localized target schema names (for relation-based sections)
+  const targetSchemaSingularName = useMemo(() => {
+    if (!targetSchemaId) return '';
+    const s = (targetSchemaData as FormSchema | undefined) || schema;
+    return getSchemaTranslatedSingularName(
+      s,
+      language,
+      s.singular_name || s.plural_name || targetSchemaId,
+    );
+  }, [targetSchemaData, schema, targetSchemaId, language, defaultLang]);
+
+  const targetSchemaPluralName = useMemo(() => {
+    if (!targetSchemaId) return '';
+    const s = (targetSchemaData as FormSchema | undefined) || schema;
+    return getSchemaTranslatedPluralName(
+      s,
+      language,
+      s.plural_name || s.singular_name || targetSchemaId,
+    );
+  }, [targetSchemaData, schema, targetSchemaId, language, defaultLang]);
 
   // For unique selection, exclude already-related IDs from picker
   const selectedIds: string[] = useMemo(
@@ -223,14 +258,14 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
         enabled: false,
       },
       emptyState: {
-        message: 'No items found',
+        message: getT(TRANSLATION_KEYS.MESSAGE_NO_ITEMS_AVAILABLE, language, defaultLang),
       },
       loading: isLoading,
       striped: true,
       hoverable: true,
       bordered: true,
     }),
-    [columns, sectionData, sectionId, isLoading]
+    [columns, sectionData, sectionId, isLoading, language, defaultLang]
   );
 
   const handleSelectFromPicker = useCallback(
@@ -406,10 +441,12 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 flex-1 min-w-0 justify-between pe-2">
                 <div className="flex flex-col min-w-0">
-                  <DialogTitle className="text-xl font-semibold truncate">{sectionTitle}</DialogTitle>
+                  <DialogTitle className="text-xl font-semibold truncate">
+                    {resolveDisplayLabel(sectionTitle, language, defaultLang)}
+                  </DialogTitle>
                   {parentTitle && (
                     <p className="text-sm font-semibold text-violet-700 dark:text-violet-300 mt-1 truncate">
-                      {schema.singular_name}: {parentTitle}
+                      {schemaSingularName}: {parentTitle}
                     </p>
                   )}
                 </div>
@@ -434,10 +471,8 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
                       className="text-xs inline-flex items-center gap-1.5"
                     >
                       <List className="h-3.5 w-3.5" />
-                      Select{' '}
-                      {targetSchemaData?.plural_name ||
-                        targetSchemaData?.singular_name ||
-                        targetSchemaId}
+                      {/* "Select" is kept as simple English verb; schema name is localized */}
+                      Select {targetSchemaPluralName || targetSchemaId}
                     </Button>
                   )}
 
@@ -460,10 +495,8 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
                       className="text-xs inline-flex items-center gap-1.5"
                     >
                       <Plus className="h-3.5 w-3.5" />
-                      Add{' '}
-                      {targetSchemaData?.singular_name ||
-                        targetSchemaData?.plural_name ||
-                        targetSchemaId}
+                      {/* "Add" is kept as simple English verb; schema name is localized */}
+                      Add {targetSchemaSingularName || targetSchemaId}
                     </Button>
                   )}
 
@@ -489,11 +522,12 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
             <div className="flex items-center justify-end mb-1 pe-1">
               {isLoading ? (
                 <Badge variant="secondary" className="animate-pulse shrink-0">
-                  Loading...
+                  {getT(TRANSLATION_KEYS.MESSAGE_LOADING_ITEMS, language, defaultLang)}
                 </Badge>
               ) : (
                 <Badge variant="secondary" className="shrink-0">
-                  {sectionData.length} {sectionData.length === 1 ? 'item' : 'items'}
+                  {sectionData.length}{' '}
+                  {getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang)}
                 </Badge>
               )}
             </div>
@@ -582,13 +616,10 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
             schemaId={targetSchemaId}
             schema={targetSchemaData || undefined}
             onSelect={handleSelectFromPicker}
-            title={`Select ${
-              targetSchemaData?.plural_name ||
-              targetSchemaData?.singular_name ||
-              targetSchemaId
-            }`}
+            title={`Select ${targetSchemaPluralName || targetSchemaId}`}
             description={`Choose existing ${
-              targetSchemaData?.singular_name || 'items'
+              targetSchemaSingularName ||
+              getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang)
             } to link to this record`}
             excludeIds={shouldExcludeIds ? selectedIds : undefined}
             selectedIds={selectedIds}

@@ -24,7 +24,7 @@ import { useUserStore } from '@/stores/user.store';
 import { getActionConfig, getSingularName, isEditMode } from '../utils/action-config';
 import { AccordionFormSection } from './AccordionFormSection';
 import { useLanguageStore } from '@/stores/language.store';
-import { getT, getDefaultLanguage, getTranslationsArray } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, getTranslationsArray, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getSchemaTranslatedSingularName } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import { FormModal } from './FormModal';
@@ -1592,7 +1592,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                             {state.isSubmitting ? (
                               config.loading || 'Submitting...'
                             ) : (
-                              <span className="hidden md:inline">{config.label}</span>
+                              <span className="hidden md:inline">
+                                {resolveDisplayLabel(config.label, language, defaultLang)}
+                              </span>
                             )}
                           </div>
                         </Button>
@@ -1611,7 +1613,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                         >
                           <div className="flex items-center gap-2 text-xs">
                             {config.icon}
-                            <span className="hidden md:inline">{config.label}</span>
+                            <span className="hidden md:inline">
+                              {resolveDisplayLabel(config.label, language, defaultLang)}
+                            </span>
                           </div>
                         </Button>
                       );
@@ -1626,7 +1630,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                         >
                           <div className="flex items-center gap-2 text-xs">
                             {config.icon}
-                            <span className="hidden md:inline">{config.label}</span>
+                            <span className="hidden md:inline">
+                              {resolveDisplayLabel(config.label, language, defaultLang)}
+                            </span>
                           </div>
                         </Button>
                       );

@@ -7,9 +7,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CompanySelector } from './CompanySelector';
 import { TenantSelector } from './TenantSelector';
+import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useCompanyStore } from '@/stores/company.store';
 import { useLanguageStore } from '@/stores/language.store';
+import { useUserStore } from '@/stores/user.store';
 import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { cn } from '@/gradian-ui/shared/utils';
 import { useTheme } from 'next-themes';
@@ -20,6 +22,9 @@ export function OrganizationSettings() {
   const { selectedTenant } = useTenantStore();
   const { selectedCompany } = useCompanyStore();
   const language = useLanguageStore((s) => s.language);
+  const setLanguage = useLanguageStore((s) => s.setLanguage);
+  const user = useUserStore((s) => s.user);
+  const isLoggedIn = !!user;
   const { resolvedTheme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
   const defaultLang = getDefaultLanguage();
@@ -143,6 +148,20 @@ export function OrganizationSettings() {
                 </p>
                 <CompanySelector fullWidth showLogo="sidebar-avatar" />
               </div>
+
+              {!isLoggedIn && (
+                <div className="pt-2 mt-2 border-t border-gray-200 dark:border-gray-700 space-y-1">
+                  <p className="text-[11px] font-medium text-gray-600 dark:text-gray-300">
+                    {getT(TRANSLATION_KEYS.LABEL_LANGUAGE, language, defaultLang)}
+                  </p>
+                  <LanguageSelector
+                    config={{ name: 'language', label: '' }}
+                    value={language || undefined}
+                    onChange={setLanguage}
+                    className="w-full"
+                  />
+                </div>
+              )}
             </PopoverContent>
           </Popover>
         </div>

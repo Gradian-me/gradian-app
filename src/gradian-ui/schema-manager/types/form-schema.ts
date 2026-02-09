@@ -22,6 +22,8 @@ export interface FormField {
   hidden?: boolean;
   readonly?: boolean;
   canCopy?: boolean;
+  /** When true, text/textarea store value as [{ en: "..." }, { fa: "..." }] and show translation icon. */
+  allowTranslation?: boolean;
   inactive?: boolean;
   addToReferenceMetadata?: boolean;
   isSensitive?: boolean; // If true, field value will be encrypted before storage and decrypted for display
@@ -141,6 +143,11 @@ export interface FormSection {
 export interface CardSection {
   id: string;
   title: string;
+  /** Localized section title: [{"en": "..."}, {"fa": "..."}] */
+  titleTranslations?: Array<Record<string, string>>;
+  description?: string;
+  /** Localized section description; same format as titleTranslations */
+  descriptionTranslations?: Array<Record<string, string>>;
   colSpan?: number;
   fieldIds: string[];
 }
@@ -409,6 +416,8 @@ export interface FormSchema {
   singular_name_translations?: Array<Record<string, string>>;
   /** Localized plural name: same format as singular_name_translations */
   plural_name_translations?: Array<Record<string, string>>;
+  /** Localized schema description; same format as singular_name_translations */
+  description_translations?: Array<Record<string, string>>;
   // Compatibility aliases for form-builder FormSchema
   name?: string; // Alias for singular_name
   title?: string; // Alias for plural_name
@@ -520,7 +529,8 @@ export interface FormSchema {
    */
   applications?: Array<{
     id: string;
-    name: string;
+    /** Display name: string or translation array (same format as all-data.json application.name) */
+    name: string | Array<Record<string, string>>;
     icon?: string;
   }>;
   actions?: Array<'submit' | 'cancel' | 'reset'>;

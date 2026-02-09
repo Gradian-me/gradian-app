@@ -19,6 +19,9 @@ import {
 import { toCamelCase } from '@/gradian-ui/shared/utils/text-utils';
 import { ComponentConfigEditor } from './ComponentConfigEditor';
 import { PopupPicker } from '@/gradian-ui/form-builder/form-elements';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export function FieldEditor({
   field,
@@ -39,6 +42,71 @@ export function FieldEditor({
   const [componentsLoading, setComponentsLoading] = useState(true);
   const [componentsError, setComponentsError] = useState<string | null>(null);
   const [isTargetSchemaPickerOpen, setIsTargetSchemaPickerOpen] = useState(false);
+
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const unnamedField = getT(TRANSLATION_KEYS.FIELD_UNNAMED, language, defaultLang);
+  const labelIncomplete = getT(TRANSLATION_KEYS.FIELD_LABEL_INCOMPLETE, language, defaultLang);
+  const labelRequired = getT(TRANSLATION_KEYS.FIELD_LABEL_REQUIRED, language, defaultLang);
+  const tooltipEdit = getT(TRANSLATION_KEYS.FIELD_TOOLTIP_EDIT, language, defaultLang);
+  const tooltipDelete = getT(TRANSLATION_KEYS.FIELD_TOOLTIP_DELETE, language, defaultLang);
+  const editFieldTitle = getT(TRANSLATION_KEYS.FIELD_EDIT_TITLE, language, defaultLang);
+  const editFieldDesc = getT(TRANSLATION_KEYS.FIELD_DESCRIPTION_DIALOG, language, defaultLang);
+  const labelFieldLabel = getT(TRANSLATION_KEYS.FIELD_LABEL_LABEL, language, defaultLang);
+  const placeholderFieldLabel = getT(TRANSLATION_KEYS.FIELD_PLACEHOLDER_LABEL, language, defaultLang);
+  const labelFieldName = getT(TRANSLATION_KEYS.FIELD_LABEL_NAME, language, defaultLang);
+  const placeholderAutoName = getT(TRANSLATION_KEYS.FIELD_PLACEHOLDER_AUTO_NAME, language, defaultLang);
+  const helperAutoName = getT(TRANSLATION_KEYS.FIELD_HELPER_AUTO_NAME, language, defaultLang);
+  const msgValidLabelRequired = getT(TRANSLATION_KEYS.FIELD_MSG_VALID_LABEL_REQUIRED, language, defaultLang);
+  const labelNewField = getT(TRANSLATION_KEYS.FIELD_LABEL_NEW_FIELD, language, defaultLang);
+  const labelComponent = getT(TRANSLATION_KEYS.FIELD_LABEL_COMPONENT, language, defaultLang);
+  const labelSection = getT(TRANSLATION_KEYS.FIELD_LABEL_SECTION, language, defaultLang);
+  const labelPlaceholder = getT(TRANSLATION_KEYS.FIELD_LABEL_PLACEHOLDER, language, defaultLang);
+  const placeholderEnterPlaceholder = getT(TRANSLATION_KEYS.FIELD_PLACEHOLDER_ENTER_PLACEHOLDER, language, defaultLang);
+  const labelOrder = getT(TRANSLATION_KEYS.FIELD_LABEL_ORDER, language, defaultLang);
+  const placeholderOrder = getT(TRANSLATION_KEYS.FIELD_PLACEHOLDER_ORDER, language, defaultLang);
+  const labelDescription = getT(TRANSLATION_KEYS.FIELD_LABEL_DESCRIPTION, language, defaultLang);
+  const placeholderDescription = getT(TRANSLATION_KEYS.FIELD_PLACEHOLDER_DESCRIPTION, language, defaultLang);
+  const labelTargetSchema = getT(TRANSLATION_KEYS.SECTION_LABEL_TARGET_SCHEMA, language, defaultLang);
+  const placeholderSelectTargetSchema = getT(TRANSLATION_KEYS.SECTION_PLACEHOLDER_SELECT_TARGET_SCHEMA, language, defaultLang);
+  const titleSelectTargetSchema = getT(TRANSLATION_KEYS.FIELD_TITLE_SELECT_TARGET_SCHEMA, language, defaultLang);
+  const descSelectTargetSchema = getT(TRANSLATION_KEYS.FIELD_DESC_SELECT_TARGET_SCHEMA, language, defaultLang);
+  const labelRole = getT(TRANSLATION_KEYS.FIELD_LABEL_ROLE, language, defaultLang);
+  const optionNone = getT(TRANSLATION_KEYS.LABEL_NONE, language, defaultLang);
+  const labelRoleColor = getT(TRANSLATION_KEYS.FIELD_LABEL_ROLE_COLOR, language, defaultLang);
+  const labelColumnSpan = getT(TRANSLATION_KEYS.DETAIL_LABEL_COLUMN_SPAN, language, defaultLang);
+  const labelValidationRules = getT(TRANSLATION_KEYS.FIELD_LABEL_VALIDATION_RULES, language, defaultLang);
+  const labelMinLength = getT(TRANSLATION_KEYS.FIELD_LABEL_MIN_LENGTH, language, defaultLang);
+  const placeholderMinLength = getT(TRANSLATION_KEYS.FIELD_PLACEHOLDER_MIN_LENGTH, language, defaultLang);
+  const labelMaxLength = getT(TRANSLATION_KEYS.FIELD_LABEL_MAX_LENGTH, language, defaultLang);
+  const placeholderMaxLength = getT(TRANSLATION_KEYS.FIELD_PLACEHOLDER_MAX_LENGTH, language, defaultLang);
+  const labelMinValue = getT(TRANSLATION_KEYS.FIELD_LABEL_MIN_VALUE, language, defaultLang);
+  const placeholderMinValue = getT(TRANSLATION_KEYS.FIELD_PLACEHOLDER_MIN_VALUE, language, defaultLang);
+  const labelMaxValue = getT(TRANSLATION_KEYS.FIELD_LABEL_MAX_VALUE, language, defaultLang);
+  const placeholderMaxValue = getT(TRANSLATION_KEYS.FIELD_PLACEHOLDER_MAX_VALUE, language, defaultLang);
+  const labelPattern = getT(TRANSLATION_KEYS.FIELD_LABEL_PATTERN, language, defaultLang);
+  const placeholderPattern = getT(TRANSLATION_KEYS.FIELD_PLACEHOLDER_PATTERN, language, defaultLang);
+  const helperPattern = getT(TRANSLATION_KEYS.FIELD_HELPER_PATTERN, language, defaultLang);
+  const labelDisabled = getT(TRANSLATION_KEYS.FIELD_LABEL_DISABLED, language, defaultLang);
+  const labelReadonly = getT(TRANSLATION_KEYS.FIELD_LABEL_READONLY, language, defaultLang);
+  const labelCanCopy = getT(TRANSLATION_KEYS.FIELD_LABEL_CAN_COPY, language, defaultLang);
+  const labelInactive = getT(TRANSLATION_KEYS.LABEL_INACTIVE, language, defaultLang);
+  const labelAddToReferenceMetadata = getT(TRANSLATION_KEYS.FIELD_LABEL_ADD_TO_REFERENCE_METADATA, language, defaultLang);
+  const labelIsSensitive = getT(TRANSLATION_KEYS.FIELD_LABEL_IS_SENSITIVE, language, defaultLang);
+  const msgLoadingComponents = getT(TRANSLATION_KEYS.FIELD_MSG_LOADING_COMPONENTS, language, defaultLang);
+  const msgErrorLoadingComponents = getT(TRANSLATION_KEYS.FIELD_MSG_ERROR_LOADING_COMPONENTS, language, defaultLang);
+  const buttonCancel = getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang);
+  const buttonSaveChanges = getT(TRANSLATION_KEYS.FIELD_LABEL_SAVE_CHANGES, language, defaultLang);
+  const buttonSave = getT(TRANSLATION_KEYS.BUTTON_SAVE, language, defaultLang);
+  const optionDefault = getT(TRANSLATION_KEYS.FIELD_OPTION_DEFAULT, language, defaultLang);
+  const optionSecondary = getT(TRANSLATION_KEYS.FIELD_OPTION_SECONDARY, language, defaultLang);
+  const optionOutline = getT(TRANSLATION_KEYS.FIELD_OPTION_OUTLINE, language, defaultLang);
+  const optionDestructive = getT(TRANSLATION_KEYS.FIELD_OPTION_DESTRUCTIVE, language, defaultLang);
+  const optionGradient = getT(TRANSLATION_KEYS.FIELD_OPTION_GRADIENT, language, defaultLang);
+  const optionSuccess = getT(TRANSLATION_KEYS.FIELD_OPTION_SUCCESS, language, defaultLang);
+  const optionWarning = getT(TRANSLATION_KEYS.FIELD_OPTION_WARNING, language, defaultLang);
+  const optionInfo = getT(TRANSLATION_KEYS.FIELD_OPTION_INFO, language, defaultLang);
+  const optionMuted = getT(TRANSLATION_KEYS.FIELD_OPTION_MUTED, language, defaultLang);
 
   // Fetch components from API - rigid access, no fallback
   useEffect(() => {
@@ -67,10 +135,10 @@ export function FieldEditor({
     setIsNameCustom(false);
   }, [field]);
 
-  // Check if the label is invalid (empty, whitespace only, or "New Field")
+  // Check if the label is invalid (empty, whitespace only, or default "New Field" in any language)
   const isLabelInvalid = !tempField.label || 
                          tempField.label.trim() === '' || 
-                         tempField.label.trim() === 'New Field';
+                         tempField.label.trim() === labelNewField;
   
   // Disable "Save" if label is invalid
   const canSave = !isLabelInvalid;
@@ -112,11 +180,11 @@ export function FieldEditor({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <span className={`text-sm font-medium truncate ${isIncomplete ? 'text-amber-700' : 'text-gray-800 dark:text-gray-200'}`}>
-              {field.label || 'Unnamed Field'}
+              {field.label || unnamedField}
             </span>
             {isIncomplete && (
               <Badge variant="warning" size="sm" className="text-[10px] px-1.5 py-0">
-                Incomplete
+                {labelIncomplete}
               </Badge>
             )}
             <Badge variant="outline" size="sm" className="text-[10px] px-1.5 py-0">{field.component}</Badge>
@@ -130,7 +198,7 @@ export function FieldEditor({
                 {field.targetSchema}
               </Badge>
             )}
-            {field.validation?.required && <Badge variant="danger" size="sm" className="text-[10px] px-1.5 py-0">Required</Badge>}
+            {field.validation?.required && <Badge variant="danger" size="sm" className="text-[10px] px-1.5 py-0">{labelRequired}</Badge>}
           </div>
           <span className={`text-[10px] truncate block mt-0.5 ${isIncomplete ? 'text-amber-600' : 'text-gray-400 dark:text-gray-300'}`}>
             {field.name}
@@ -139,14 +207,14 @@ export function FieldEditor({
         <div className="flex gap-0.5 ms-2 shrink-0">
           <ButtonMinimal
             icon={Edit}
-            title="Edit Field"
+            title={tooltipEdit}
             color="violet"
             size="md"
             onClick={() => setShowDialog(true)}
           />
           <ButtonMinimal
             icon={Trash2}
-            title="Delete Field"
+            title={tooltipDelete}
             color="red"
             size="md"
             onClick={onDelete}
@@ -158,9 +226,9 @@ export function FieldEditor({
         <Dialog open={showDialog} onOpenChange={(open) => !open && setShowDialog(false)}>
           <DialogContent className="w-[95vw] sm:w-full max-w-3xl max-h-[90vh] flex flex-col p-0 rounded-2xl">
             <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100 dark:border-gray-700 shrink-0">
-              <DialogTitle>Edit Field</DialogTitle>
+              <DialogTitle>{editFieldTitle}</DialogTitle>
               <DialogDescription>
-                Configure field properties and settings
+                {editFieldDesc}
               </DialogDescription>
             </DialogHeader>
             <div className="flex-1 overflow-y-auto px-6">
@@ -170,9 +238,9 @@ export function FieldEditor({
                   <TextInput
                     config={{
                       name: 'label',
-                      label: 'Field Label',
+                      label: labelFieldLabel,
                       type: 'text',
-                      placeholder: 'Enter field label...'
+                      placeholder: placeholderFieldLabel
                     }}
                     value={tempField.label || ''}
                     onChange={handleLabelChange}
@@ -180,15 +248,15 @@ export function FieldEditor({
                   />
                   {isLabelInvalid && (
                     <p className="text-xs text-amber-600 mt-1.5">
-                      Please enter a valid field label (cannot be empty or "New Field").
+                      {msgValidLabelRequired}
                     </p>
                   )}
                 </div>
                 <NameInput
                   config={{ 
                     name: 'field-name', 
-                    label: 'Field Name',
-                    placeholder: 'Auto-generated from label'
+                    label: labelFieldName,
+                    placeholder: placeholderAutoName
                   }}
                   value={tempField.name || ''}
                   onChange={handleNameChange}
@@ -207,13 +275,13 @@ export function FieldEditor({
                     }
                   }}
                   customizeDisabled={false}
-                  helperText={!isNameCustom ? 'Field name auto-generates from the label. Click "Customize" to override.' : undefined}
+                  helperText={!isNameCustom ? helperAutoName : undefined}
                   className="h-9"
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Component</Label>
+                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">{labelComponent}</Label>
                   {componentsError ? (
                     <div className="space-y-1.5">
                       <Select
@@ -230,7 +298,7 @@ export function FieldEditor({
                         disabled={true}
                       />
                       <p className="text-xs text-red-600 dark:text-red-400">
-                        Error loading components: {componentsError}
+                        {msgErrorLoadingComponents} {componentsError}
                       </p>
                     </div>
                   ) : (
@@ -255,13 +323,13 @@ export function FieldEditor({
                         </p>
                       )}
                       {componentsLoading && (
-                        <p className="text-xs text-gray-500 mt-1.5">Loading components...</p>
+                        <p className="text-xs text-gray-500 mt-1.5">{msgLoadingComponents}</p>
                       )}
                     </>
                   )}
                 </div>
                 <div>
-                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Section</Label>
+                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">{labelSection}</Label>
                   <Select
                     value={tempField.sectionId || ''}
                     onValueChange={(value) => setTempField({ ...tempField, sectionId: value })}
@@ -274,9 +342,9 @@ export function FieldEditor({
                   <TextInput
                     config={{
                       name: 'placeholder',
-                      label: 'Placeholder',
+                      label: labelPlaceholder,
                       type: 'text',
-                      placeholder: 'Enter placeholder text...'
+                      placeholder: placeholderEnterPlaceholder
                     }}
                     value={tempField.placeholder || ''}
                     onChange={(value) => setTempField({ ...tempField, placeholder: value })}
@@ -287,9 +355,9 @@ export function FieldEditor({
                   <NumberInput
                     config={{
                       name: 'order',
-                      label: 'Order',
+                      label: labelOrder,
                       type: 'number',
-                      placeholder: 'Field display order'
+                      placeholder: placeholderOrder
                     }}
                     value={tempField.order ?? undefined}
                     onChange={(value) => setTempField({ ...tempField, order: value !== null && value !== undefined ? Number(value) : undefined })}
@@ -301,8 +369,8 @@ export function FieldEditor({
                 <Textarea
                   config={{
                     name: 'description',
-                    label: 'Description',
-                    placeholder: 'Enter field description...'
+                    label: labelDescription,
+                    placeholder: placeholderDescription
                   }}
                   value={tempField.description || ''}
                   onChange={(value) => setTempField({ ...tempField, description: value })}
@@ -311,13 +379,13 @@ export function FieldEditor({
               </div>
               {tempField.component === 'picker' && (
                 <div>
-                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Target Schema</Label>
+                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">{labelTargetSchema}</Label>
                   <Button
                     variant="outline"
                     onClick={() => setIsTargetSchemaPickerOpen(true)}
                     className="w-full justify-between"
                   >
-                    {tempField.targetSchema || 'Select target schema...'}
+                    {tempField.targetSchema || placeholderSelectTargetSchema}
                   </Button>
                   <PopupPicker
                     isOpen={isTargetSchemaPickerOpen}
@@ -338,8 +406,8 @@ export function FieldEditor({
                       }
                       setIsTargetSchemaPickerOpen(false);
                     }}
-                    title="Select Target Schema"
-                    description="Choose a schema for the picker component"
+                    title={titleSelectTargetSchema}
+                    description={descSelectTargetSchema}
                     allowMultiselect={false}
                     columnMap={{
                       response: { data: 'data' },
@@ -361,33 +429,33 @@ export function FieldEditor({
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Role</Label>
+                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">{labelRole}</Label>
                   <Select
                     value={tempField.role || ''}
                     onValueChange={(value) => setTempField({ ...tempField, role: value ? (value as any) : undefined })}
                     options={[
-                      { value: '', label: 'None' },
+                      { value: '', label: optionNone },
                       ...ROLES.map((role) => ({ value: role.value, label: role.label }))
                     ]}
                     sortType="ASC"
                   />
                 </div>
                 <div>
-                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">Role Color</Label>
+                  <Label className="text-xs font-medium text-gray-700 mb-1.5 block">{labelRoleColor}</Label>
                   <Select
                     value={tempField.roleColor || ''}
                     onValueChange={(value) => setTempField({ ...tempField, roleColor: value ? (value as any) : undefined })}
                     options={[
-                      { value: '', label: 'Default' },
-                      { value: 'default', label: 'Default' },
-                      { value: 'secondary', label: 'Secondary' },
-                      { value: 'outline', label: 'Outline' },
-                      { value: 'destructive', label: 'Destructive' },
-                      { value: 'gradient', label: 'Gradient' },
-                      { value: 'success', label: 'Success' },
-                      { value: 'warning', label: 'Warning' },
-                      { value: 'info', label: 'Info' },
-                      { value: 'muted', label: 'Muted' },
+                      { value: '', label: optionDefault },
+                      { value: 'default', label: optionDefault },
+                      { value: 'secondary', label: optionSecondary },
+                      { value: 'outline', label: optionOutline },
+                      { value: 'destructive', label: optionDestructive },
+                      { value: 'gradient', label: optionGradient },
+                      { value: 'success', label: optionSuccess },
+                      { value: 'warning', label: optionWarning },
+                      { value: 'info', label: optionInfo },
+                      { value: 'muted', label: optionMuted },
                     ]}
                   />
                 </div>
@@ -396,7 +464,7 @@ export function FieldEditor({
                 <Slider
                   config={{
                     name: 'colSpan',
-                    label: 'Column Span',
+                    label: labelColumnSpan,
                   }}
                   value={tempField.colSpan || 1}
                   onChange={(value) => setTempField({ ...tempField, colSpan: value })}
@@ -406,15 +474,15 @@ export function FieldEditor({
                 />
               </div>
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">Validation Rules</Label>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 block">{labelValidationRules}</Label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <NumberInput
                       config={{
                         name: 'minLength',
-                        label: 'Min Length',
+                        label: labelMinLength,
                         type: 'number',
-                        placeholder: 'Minimum length'
+                        placeholder: placeholderMinLength
                       }}
                       value={tempField.validation?.minLength ?? undefined}
                       onChange={(value) => setTempField({
@@ -432,9 +500,9 @@ export function FieldEditor({
                     <NumberInput
                       config={{
                         name: 'maxLength',
-                        label: 'Max Length',
+                        label: labelMaxLength,
                         type: 'number',
-                        placeholder: 'Maximum length'
+                        placeholder: placeholderMaxLength
                       }}
                       value={tempField.validation?.maxLength ?? undefined}
                       onChange={(value) => setTempField({
@@ -452,9 +520,9 @@ export function FieldEditor({
                     <NumberInput
                       config={{
                         name: 'min',
-                        label: 'Min Value',
+                        label: labelMinValue,
                         type: 'number',
-                        placeholder: 'Minimum value'
+                        placeholder: placeholderMinValue
                       }}
                       value={tempField.validation?.min ?? undefined}
                       onChange={(value) => setTempField({
@@ -471,9 +539,9 @@ export function FieldEditor({
                     <NumberInput
                       config={{
                         name: 'max',
-                        label: 'Max Value',
+                        label: labelMaxValue,
                         type: 'number',
-                        placeholder: 'Maximum value'
+                        placeholder: placeholderMaxValue
                       }}
                       value={tempField.validation?.max ?? undefined}
                       onChange={(value) => setTempField({
@@ -490,9 +558,9 @@ export function FieldEditor({
                     <TextInput
                       config={{
                         name: 'pattern',
-                        label: 'Pattern (Regex)',
+                        label: labelPattern,
                         type: 'text',
-                        placeholder: 'Enter regex pattern (e.g., ^[A-Za-z]+$)'
+                        placeholder: placeholderPattern
                       }}
                       value={typeof tempField.validation?.pattern === 'string' ? tempField.validation.pattern : ''}
                       onChange={(value) => setTempField({
@@ -505,14 +573,14 @@ export function FieldEditor({
                       className="h-9"
                     />
                     <p className="text-xs text-gray-500 mt-1.5">
-                      Enter a regular expression pattern for validation
+                      {helperPattern}
                     </p>
                   </div>
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Switch
-                  config={{ name: `required-${field.id}`, label: 'Required' }}
+                  config={{ name: `required-${field.id}`, label: labelRequired }}
                   checked={tempField.validation?.required || false}
                   onChange={(checked) => setTempField({ 
                     ...tempField, 
@@ -523,32 +591,32 @@ export function FieldEditor({
                   })}
                 />
                 <Switch
-                  config={{ name: `disabled-${field.id}`, label: 'Disabled' }}
+                  config={{ name: `disabled-${field.id}`, label: labelDisabled }}
                   checked={tempField.disabled || false}
                   onChange={(checked) => setTempField({ ...tempField, disabled: checked })}
                 />
                 <Switch
-                  config={{ name: `readonly-${field.id}`, label: 'Readonly' }}
+                  config={{ name: `readonly-${field.id}`, label: labelReadonly }}
                   checked={tempField.readonly || false}
                   onChange={(checked) => setTempField({ ...tempField, readonly: checked })}
                 />
                 <Switch
-                  config={{ name: `canCopy-${field.id}`, label: 'Can Copy' }}
+                  config={{ name: `canCopy-${field.id}`, label: labelCanCopy }}
                   checked={tempField.canCopy || false}
                   onChange={(checked) => setTempField({ ...tempField, canCopy: checked })}
                 />
                 <Switch
-                  config={{ name: `inactive-${field.id}`, label: 'Inactive' }}
+                  config={{ name: `inactive-${field.id}`, label: labelInactive }}
                   checked={tempField.inactive || false}
                   onChange={(checked) => setTempField({ ...tempField, inactive: checked })}
                 />
                 <Switch
-                  config={{ name: `addToReferenceMetadata-${field.id}`, label: 'Add To Reference Metadata' }}
+                  config={{ name: `addToReferenceMetadata-${field.id}`, label: labelAddToReferenceMetadata }}
                   checked={tempField.addToReferenceMetadata || false}
                   onChange={(checked) => setTempField({ ...tempField, addToReferenceMetadata: checked })}
                 />
                 <Switch
-                  config={{ name: `isSensitive-${field.id}`, label: 'Is Sensitive' }}
+                  config={{ name: `isSensitive-${field.id}`, label: labelIsSensitive }}
                   checked={tempField.isSensitive || false}
                   onChange={(checked) => setTempField({ ...tempField, isSensitive: checked })}
                 />
@@ -563,12 +631,12 @@ export function FieldEditor({
               </div>
             </div>
             <DialogFooter className="px-6 pt-4 pb-6 border-t border-gray-100 dark:border-gray-700 shrink-0 flex-col sm:flex-row gap-2">
-              <Button variant="outline" onClick={() => setShowDialog(false)} className="w-full sm:w-auto text-sm md:text-base">
-                Cancel
+              <Button variant="outline" onClick={() => setShowDialog(false)} className="w-full sm:w-auto text-xs">
+                {buttonCancel}
               </Button>
-              <Button onClick={handleSave} disabled={!canSave} className="w-full sm:w-auto text-sm md:text-base">
-                <span className="hidden md:inline">Save Changes</span>
-                <span className="md:hidden">Save</span>
+              <Button onClick={handleSave} disabled={!canSave} className="w-full sm:w-auto text-xs">
+                <span className="hidden md:inline">{buttonSaveChanges}</span>
+                <span className="md:hidden">{buttonSave}</span>
               </Button>
             </DialogFooter>
           </DialogContent>

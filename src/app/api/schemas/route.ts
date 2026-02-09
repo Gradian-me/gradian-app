@@ -14,6 +14,7 @@ import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 import { readAllRelations } from '@/gradian-ui/shared/domain/utils/relations-storage.util';
 import { readAllData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
 import { getValueByRole, getSingleValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
+import { isTranslationArray } from '@/gradian-ui/shared/utils/translation-utils';
 
 const SCHEMA_SUMMARY_EXCLUDED_KEY_SET = new Set<string>(SCHEMA_SUMMARY_EXCLUDED_KEYS);
 const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
@@ -191,10 +192,20 @@ function writeSchemasAtomically(schemas: any[]): void {
  * Get related applications for a schema
  * Uses the same method as /api/data/all-relations to find applications
  * that have a HAS_SCHEMA relation to this schema
- * 
+ *
  * Relation structure: application (source) -> schema (target) with relationTypeId "HAS_SCHEMA"
+ *
+ * NOTE: Application names can now be either:
+ * - a plain string, or
+ * - a multilingual translation array like [{ en: "..." }, { fa: "..." }, ...]
+ *
+ * We preserve multilingual structures instead of stringifying them so that
+ * the frontend can resolve them based on the active language (similar to menu titles).
  */
-function getRelatedApplications(schemaId: string, tenantIds?: string[]): Array<{ id: string; name: string; icon?: string }> {
+function getRelatedApplications(
+  schemaId: string,
+  tenantIds?: string[],
+): Array<{ id: string; name: string | Array<Record<string, string>> | Record<string, string>; icon?: string }> {
   try {
     // Read all relations
     const allRelations = readAllRelations();
@@ -232,7 +243,11 @@ function getRelatedApplications(schemaId: string, tenantIds?: string[]): Array<{
     const applicationSchema = schemas.find((s: any) => s.id === 'applications');
 
     // Build result array with id, name, and icon
-    const result: Array<{ id: string; name: string; icon?: string }> = [];
+    const result: Array<{
+      id: string;
+      name: string | Array<Record<string, string>> | Record<string, string>;
+      icon?: string;
+    }> = [];
     
     for (const applicationId of applicationIds) {
       const application = applications.find((app: any) => app.id === applicationId);
@@ -246,20 +261,36 @@ function getRelatedApplications(schemaId: string, tenantIds?: string[]): Array<{
           }
         }
 
-        // Get name and icon using field roles
-        // name field has role "title" in applications schema
-        // icon field has role "icon" in applications schema
-        const name = applicationSchema
-          ? (getValueByRole(applicationSchema, application, 'title') || application.name || application.title || applicationId)
-          : (application.name || application.title || applicationId);
-        
+        // Get name and icon: prefer raw application.name when it's a translation array (same format as all-data.json).
         const icon = applicationSchema
           ? (getSingleValueByRole(applicationSchema, application, 'icon') || application.icon)
           : application.icon;
 
+        let name: string | Array<Record<string, string>> | Record<string, string>;
+        const rawNameFromData = application.name;
+        if (isTranslationArray(rawNameFromData)) {
+          name = rawNameFromData;
+        } else {
+          const resolved =
+            applicationSchema
+              ? (getValueByRole(applicationSchema, application, 'title') || application.name || application.title || applicationId)
+              : (application.name || application.title || applicationId);
+          if (Array.isArray(resolved)) {
+            name = resolved as Array<Record<string, string>>;
+          } else if (resolved && typeof resolved === 'object') {
+            name = resolved as Record<string, string>;
+          } else if (typeof resolved === 'string') {
+            name = resolved;
+          } else if (resolved != null) {
+            name = String(resolved);
+          } else {
+            name = applicationId;
+          }
+        }
+
         result.push({
           id: applicationId,
-          name: typeof name === 'string' ? name : String(name),
+          name,
           icon: icon ? String(icon) : undefined,
         });
       }

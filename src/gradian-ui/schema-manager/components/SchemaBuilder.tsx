@@ -9,6 +9,9 @@ import { useSchemaBuilder } from '../hooks/useSchemaBuilder';
 import { SchemaBuilderConfig } from '../types/builder';
 import { FieldEditor } from './FieldEditor';
 import { getFieldsForSection, generateFieldId } from '../utils/builder-utils';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 interface SchemaBuilderProps {
   schemaId: string;
@@ -17,6 +20,13 @@ interface SchemaBuilderProps {
 
 export function SchemaBuilder({ schemaId, config }: SchemaBuilderProps) {
   const { state, actions } = useSchemaBuilder(config);
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const msgNotFound = getT(TRANSLATION_KEYS.SCHEMA_MSG_NOT_FOUND, language, defaultLang);
+  const msgTryDifferent = getT(TRANSLATION_KEYS.SCHEMA_MSG_TRY_DIFFERENT, language, defaultLang);
+  const labelFields = getT(TRANSLATION_KEYS.SECTION_LABEL_FIELDS, language, defaultLang);
+  const labelAddField = getT(TRANSLATION_KEYS.SCHEMA_LABEL_ADD_FIELD, language, defaultLang);
+  const msgNoFieldsYet = getT(TRANSLATION_KEYS.SCHEMA_MSG_NO_FIELDS_YET, language, defaultLang);
 
   useEffect(() => {
     if (schemaId) {
@@ -35,8 +45,8 @@ export function SchemaBuilder({ schemaId, config }: SchemaBuilderProps) {
   if (!state.schema) {
     return (
       <div className="text-center py-20">
-        <h3 className="text-xl font-semibold mb-4">Schema not found</h3>
-        <p className="text-gray-600">Please try loading a different schema.</p>
+        <h3 className="text-xl font-semibold mb-4">{msgNotFound}</h3>
+        <p className="text-gray-600">{msgTryDifferent}</p>
       </div>
     );
   }
@@ -164,16 +174,16 @@ export function SchemaBuilder({ schemaId, config }: SchemaBuilderProps) {
                         <CardContent className="space-y-4 pt-2">
                           <div className="border-t pt-4">
                             <div className="flex justify-between items-center mb-4">
-                              <h4 className="text-sm font-semibold">Fields ({fields.length})</h4>
+                              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{labelFields} ({fields.length})</h4>
                               <button
                                 onClick={() => handleAddField(section.id)}
-                                className="text-sm text-violet-600 hover:text-violet-700"
+                                className="text-xs text-violet-600 hover:text-violet-700"
                               >
-                                + Add Field
+                                + {labelAddField}
                               </button>
                             </div>
                             {fields.length === 0 ? (
-                              <p className="text-center text-gray-400 py-4">No fields yet</p>
+                              <p className="text-center text-gray-400 py-4">{msgNoFieldsYet}</p>
                             ) : (
                               <div className="space-y-3">
                                 {fields.map((field, index) => (

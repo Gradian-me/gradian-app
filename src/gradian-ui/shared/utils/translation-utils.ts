@@ -129,3 +129,97 @@ const RTL_LANGS = new Set(['ar', 'fa']);
 export function isRTL(lang: string): boolean {
   return RTL_LANGS.has(String(lang).toLowerCase());
 }
+
+// --- Translation array value helpers (for allowTranslation fields) ---
+
+/**
+ * Resolve application (or any) display name to a string.
+ * Accepts the same format as API applications[].name: string or translation array.
+ */
+export function resolveDisplayName(
+  name: string | Array<Record<string, string>> | undefined,
+  lang?: string,
+  defaultLang?: string
+): string {
+  if (name == null) return '';
+  const l = lang ?? getDefaultLanguage();
+  const d = defaultLang ?? getDefaultLanguage();
+  if (isTranslationArray(name)) return resolveFromTranslationsArray(name, l, d);
+  return typeof name === 'string' ? name : String(name);
+}
+
+/**
+ * True if value is a non-empty array of single-key records (e.g. [{ en: "x" }, { fa: "y" }]).
+ * Used to distinguish translation array from plain string or other arrays.
+ */
+export function isTranslationArray(value: unknown): value is Array<Record<string, string>> {
+  if (!Array.isArray(value) || value.length === 0) return false;
+  return value.every(
+    (entry) =>
+      typeof entry === 'object' &&
+      entry !== null &&
+      !Array.isArray(entry) &&
+      Object.keys(entry).length === 1 &&
+      Object.values(entry).every((v) => typeof v === 'string')
+  );
+}
+
+/**
+ * Flatten translation array to a record for editing in TranslationDialog.
+ * e.g. [{ en: "x" }, { fa: "y" }] -> { en: "x", fa: "y" }
+ */
+export function translationArrayToRecord(
+  arr: Array<Record<string, string>> | undefined
+): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (!Array.isArray(arr)) return out;
+  for (const rec of arr) {
+    for (const [lang, value] of Object.entries(rec)) {
+      if (value != null && typeof value === 'string') out[lang] = value;
+    }
+  }
+  return out;
+}
+
+/**
+ * Build translation array from record, including only non-empty values.
+ * e.g. { en: "x", fa: "" } -> [{ en: "x" }]
+ */
+export function recordToTranslationArray(record: Record<string, string>): Array<Record<string, string>> {
+  const result: Array<Record<string, string>> = [];
+  for (const [lang, value] of Object.entries(record)) {
+    if (value != null && String(value).trim() !== '') result.push({ [lang]: String(value).trim() });
+  }
+  return result;
+}
+
+/**
+ * Resolve a display label that may be a string or a translation array.
+ * Use for option labels, item names, titles, subtitles, etc. so .trim() and string methods never run on arrays.
+ * Returns: resolved string (never throws).
+ */
+export function resolveDisplayLabel(
+  value: unknown,
+  lang?: string,
+  defaultLang?: string
+): string {
+  if (value == null) return '';
+  if (typeof value === 'string') return value;
+  const l = lang ?? getDefaultLanguage();
+  const d = defaultLang ?? getDefaultLanguage();
+  if (isTranslationArray(value)) return resolveFromTranslationsArray(value, l, d);
+  // Single-key object like { en: "Label" } – treat as one-entry translation
+  if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
+    const entries = Object.entries(value).filter(
+      ([, v]) => v != null && typeof v === 'string' && String(v).trim() !== ''
+    );
+    if (entries.length > 0) {
+      const byLang: LangRecord = Object.fromEntries(entries.map(([k, v]) => [k, String(v).trim()]));
+      if (byLang[l]) return byLang[l];
+      if (byLang[d]) return byLang[d];
+      const first = Object.values(byLang).find(Boolean);
+      if (first) return first;
+    }
+  }
+  return String(value);
+}

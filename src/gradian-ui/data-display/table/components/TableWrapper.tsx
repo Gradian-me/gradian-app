@@ -1,20 +1,20 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { useLanguageStore } from '@/stores/language.store';
-import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
-import { LoadingSkeleton } from '@/gradian-ui/layout/components';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Table } from './Table';
-import { TableAggregations, AggregationConfig } from './TableAggregations';
-import { TableCardView } from '../../components/TableCardView';
-import { TableColumn, TableConfig } from '../types';
-import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { RoleBasedAvatar } from '@/gradian-ui/data-display/utils';
 import { BadgeViewer } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
 import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
+import { LoadingSkeleton } from '@/gradian-ui/layout/components';
+import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants';
+import { getT, getDefaultLanguage, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { useMemo } from 'react';
+import { TableCardView } from '../../components/TableCardView';
+import { TableColumn, TableConfig } from '../types';
 import { formatFieldValue } from '../utils/field-formatters';
-import { cn } from '@/gradian-ui/shared/utils';
-import { RoleBasedAvatar } from '@/gradian-ui/data-display/utils';
+import { Table } from './Table';
+import { AggregationConfig, TableAggregations } from './TableAggregations';
 
 export interface TableWrapperProps<T = any> {
   tableConfig: TableConfig<T>;
@@ -54,6 +54,7 @@ export function TableWrapper<T = any>({
   schema,
 }: TableWrapperProps<T>) {
   const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
   const isRtl = isRTL(language);
 
   // Add dynamic columns for relatedCompanies and status if schema supports them
@@ -72,7 +73,7 @@ export function TableWrapper<T = any>({
     if (schema?.canSelectMultiCompanies) {
       additionalColumns.push({
         id: 'relatedCompanies',
-        label: 'Related Companies',
+        label: getT(TRANSLATION_KEYS.LABEL_RELATED_COMPANIES, language, defaultLang),
         accessor: (row: T) => (row as any)['relatedCompanies'],
         sortable: false,
         align: 'left',
@@ -114,7 +115,7 @@ export function TableWrapper<T = any>({
       
       additionalColumns.push({
         id: 'status',
-        label: 'Status',
+        label: getT(TRANSLATION_KEYS.LABEL_STATUS, language, defaultLang),
         accessor: (row: T) => (row as any)['status'],
         sortable: false,
         align: 'left',
@@ -148,7 +149,7 @@ export function TableWrapper<T = any>({
       
       additionalColumns.push({
         id: 'entityType',
-        label: 'Entity Type',
+        label: getT(TRANSLATION_KEYS.LABEL_ENTITY_TYPE, language, defaultLang),
         accessor: (row: T) => (row as any)['entityType'],
         sortable: false,
         align: 'left',
@@ -178,11 +179,11 @@ export function TableWrapper<T = any>({
       // Create field object with person role - ensure role is explicitly set
       const assignedToFieldWithRole = assignedToField
         ? { ...assignedToField, role: 'person', name: 'assignedTo' }
-        : { id: 'assignedTo', name: 'assignedTo', role: 'person', component: 'picker', targetSchema: 'users', label: 'Assigned To' };
+        : { id: 'assignedTo', name: 'assignedTo', role: 'person', component: 'picker', targetSchema: 'users', label: getT(TRANSLATION_KEYS.LABEL_ASSIGNED_TO, language, defaultLang) };
       
       additionalColumns.push({
         id: 'assignedTo',
-        label: 'Assigned To',
+        label: getT(TRANSLATION_KEYS.LABEL_ASSIGNED_TO, language, defaultLang),
         accessor: (row: T) => (row as any)['assignedTo'],
         sortable: false,
         align: 'left',
@@ -209,7 +210,7 @@ export function TableWrapper<T = any>({
     if (schema?.allowDataRelatedTenants) {
       additionalColumns.push({
         id: 'relatedTenants',
-        label: 'Related Tenants',
+        label: getT(TRANSLATION_KEYS.LABEL_RELATED_TENANTS, language, defaultLang),
         accessor: (row: T) => (row as any)['relatedTenants'],
         sortable: false,
         align: 'left',
@@ -281,13 +282,13 @@ export function TableWrapper<T = any>({
             name: 'dueDate', 
             role: 'duedate', 
             component: 'date',
-            label: 'Due Date'
+            label: getT(TRANSLATION_KEYS.LABEL_DUE_DATE, language, defaultLang)
           };
       
       // Use existing column if we extracted it, otherwise create a new one
       const dueDateCol: TableColumn<T> = dueDateColumn || {
         id: 'dueDate',
-        label: 'Due Date',
+        label: getT(TRANSLATION_KEYS.LABEL_DUE_DATE, language, defaultLang),
         accessor: (row: T) => (row as any)['dueDate'],
         sortable: false,
         align: 'left',
@@ -367,7 +368,7 @@ export function TableWrapper<T = any>({
 
     // If no additional columns, return as is
     return baseColumns;
-  }, [columns, schema, highlightQuery]);
+  }, [columns, schema, highlightQuery, language, defaultLang]);
 
   // Update tableConfig with enhanced columns
   const enhancedTableConfig = useMemo(() => ({

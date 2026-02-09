@@ -12,6 +12,15 @@ import { useMemo, useState, useEffect } from 'react';
 import { FormSchema } from '../types/form-schema';
 import { generateSchemaId } from '../utils/schema-form';
 import {
+  getDefaultLanguage,
+  getT,
+  resolveFromTranslationsArray,
+  isTranslationArray,
+  recordToTranslationArray,
+} from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -52,7 +61,68 @@ export function SectionEditor({
   const [isSectionIdCustom, setIsSectionIdCustom] = useState(false);
   const [isTargetSchemaPickerOpen, setIsTargetSchemaPickerOpen] = useState(false);
   const [isRelationTypePickerOpen, setIsRelationTypePickerOpen] = useState(false);
-  
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const sectionEditTitle = getT(TRANSLATION_KEYS.SECTION_EDIT_TITLE, language, defaultLang);
+  const sectionDescDialog = getT(TRANSLATION_KEYS.SECTION_DESCRIPTION_DIALOG, language, defaultLang);
+  const sectionLabelTitle = getT(TRANSLATION_KEYS.SECTION_LABEL_TITLE, language, defaultLang);
+  const sectionPlaceholderTitle = getT(TRANSLATION_KEYS.SECTION_PLACEHOLDER_TITLE, language, defaultLang);
+  const sectionLabelId = getT(TRANSLATION_KEYS.SECTION_LABEL_ID, language, defaultLang);
+  const sectionPlaceholderId = getT(TRANSLATION_KEYS.SECTION_PLACEHOLDER_ID, language, defaultLang);
+  const sectionHelperId = getT(TRANSLATION_KEYS.SECTION_HELPER_ID, language, defaultLang);
+  const sectionLabelDesc = getT(TRANSLATION_KEYS.SECTION_LABEL_DESCRIPTION, language, defaultLang);
+  const sectionPlaceholderDesc = getT(TRANSLATION_KEYS.SECTION_PLACEHOLDER_DESCRIPTION, language, defaultLang);
+  const sectionLabelInitialState = getT(TRANSLATION_KEYS.SECTION_LABEL_INITIAL_STATE, language, defaultLang);
+  const sectionOptionExpanded = getT(TRANSLATION_KEYS.SECTION_OPTION_EXPANDED, language, defaultLang);
+  const sectionOptionCollapsed = getT(TRANSLATION_KEYS.SECTION_OPTION_COLLAPSED, language, defaultLang);
+  const sectionLabelColumns = getT(TRANSLATION_KEYS.SECTION_LABEL_COLUMNS, language, defaultLang);
+  const sectionLabelInactive = getT(TRANSLATION_KEYS.LABEL_INACTIVE, language, defaultLang);
+  const sectionLabelRepeating = getT(TRANSLATION_KEYS.SECTION_LABEL_REPEATING, language, defaultLang);
+  const sectionLabelFieldRelationType = getT(TRANSLATION_KEYS.SECTION_LABEL_FIELD_RELATION_TYPE, language, defaultLang);
+  const sectionOptionConnect = getT(TRANSLATION_KEYS.SECTION_OPTION_CONNECT_TO_SCHEMA, language, defaultLang);
+  const sectionOptionAddFields = getT(TRANSLATION_KEYS.SECTION_OPTION_ADD_FIELDS, language, defaultLang);
+  const sectionDescConnect = getT(TRANSLATION_KEYS.SECTION_DESC_CONNECT_TO_SCHEMA, language, defaultLang);
+  const sectionDescAddFields = getT(TRANSLATION_KEYS.SECTION_DESC_ADD_FIELDS, language, defaultLang);
+  const sectionLabelShowNA = getT(TRANSLATION_KEYS.SECTION_LABEL_SHOW_NOT_APPLICABLE, language, defaultLang);
+  const sectionLabelConfig = getT(TRANSLATION_KEYS.SECTION_LABEL_CONFIGURATION, language, defaultLang);
+  const sectionLabelTargetSchema = getT(TRANSLATION_KEYS.SECTION_LABEL_TARGET_SCHEMA, language, defaultLang);
+  const sectionPlaceholderTargetSchema = getT(TRANSLATION_KEYS.SECTION_PLACEHOLDER_SELECT_TARGET_SCHEMA, language, defaultLang);
+  const sectionMsgTargetRequired = getT(TRANSLATION_KEYS.SECTION_MSG_TARGET_SCHEMA_REQUIRED, language, defaultLang);
+  const sectionLabelRelationType = getT(TRANSLATION_KEYS.SECTION_LABEL_RELATION_TYPE, language, defaultLang);
+  const sectionPlaceholderRelationType = getT(TRANSLATION_KEYS.SECTION_PLACEHOLDER_SELECT_RELATION_TYPE, language, defaultLang);
+  const sectionMsgRelationRequired = getT(TRANSLATION_KEYS.SECTION_MSG_RELATION_TYPE_REQUIRED, language, defaultLang);
+  const sectionMsgRequiredBoth = getT(TRANSLATION_KEYS.SECTION_MSG_REQUIRED_BOTH, language, defaultLang);
+  const sectionLabelMinItems = getT(TRANSLATION_KEYS.SECTION_LABEL_MIN_ITEMS, language, defaultLang);
+  const sectionLabelMaxItems = getT(TRANSLATION_KEYS.SECTION_LABEL_MAX_ITEMS, language, defaultLang);
+  const sectionTitleSelectTarget = getT(TRANSLATION_KEYS.SECTION_TITLE_SELECT_TARGET_SCHEMA, language, defaultLang);
+  const sectionDescSelectTarget = getT(TRANSLATION_KEYS.SECTION_DESC_SELECT_TARGET_SCHEMA, language, defaultLang);
+  const sectionTitleSelectRelation = getT(TRANSLATION_KEYS.SECTION_TITLE_SELECT_RELATION_TYPE, language, defaultLang);
+  const sectionDescSelectRelation = getT(TRANSLATION_KEYS.SECTION_DESC_SELECT_RELATION_TYPE, language, defaultLang);
+  const sectionErrorTitleInvalid = getT(TRANSLATION_KEYS.SECTION_ERROR_TITLE_INVALID, language, defaultLang);
+  const buttonCancel = getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang);
+  const buttonSaveChanges = getT(TRANSLATION_KEYS.FIELD_LABEL_SAVE_CHANGES, language, defaultLang);
+  const buttonSave = getT(TRANSLATION_KEYS.BUTTON_SAVE, language, defaultLang);
+  const labelAddField = getT(TRANSLATION_KEYS.SCHEMA_LABEL_ADD_FIELD, language, defaultLang);
+  const labelFields = getT(TRANSLATION_KEYS.SECTION_LABEL_FIELDS, language, defaultLang);
+  const msgNoFieldsYet = getT(TRANSLATION_KEYS.SECTION_MSG_NO_FIELDS_YET, language, defaultLang);
+  const sectionDescAddOnly = getT(TRANSLATION_KEYS.SECTION_DESC_ADD_ONLY, language, defaultLang);
+  const sectionDescCanSelect = getT(TRANSLATION_KEYS.SECTION_DESC_CAN_SELECT, language, defaultLang);
+  const sectionDescMustSelect = getT(TRANSLATION_KEYS.SECTION_DESC_MUST_SELECT, language, defaultLang);
+  const sectionLabelUniqueSelection = getT(TRANSLATION_KEYS.SECTION_LABEL_UNIQUE_SELECTION, language, defaultLang);
+  const sectionDescUniqueSelection = getT(TRANSLATION_KEYS.SECTION_DESC_UNIQUE_SELECTION, language, defaultLang);
+  const sectionMsgRelationBased = getT(TRANSLATION_KEYS.SECTION_MSG_RELATION_BASED, language, defaultLang);
+  const sectionMsgFieldsManagedInTarget = getT(TRANSLATION_KEYS.SECTION_MSG_FIELDS_MANAGED_IN_TARGET, language, defaultLang);
+  const msgSaveBeforeAddFields = getT(TRANSLATION_KEYS.SECTION_MSG_SAVE_BEFORE_ADD_FIELDS, language, defaultLang);
+  const sectionLabelDeleteType = getT(TRANSLATION_KEYS.SECTION_LABEL_DELETE_TYPE, language, defaultLang);
+  const sectionOptionDeleteRelationOnly = getT(TRANSLATION_KEYS.SECTION_OPTION_DELETE_RELATION_ONLY, language, defaultLang);
+  const sectionOptionDeleteItemAndRelation = getT(TRANSLATION_KEYS.SECTION_OPTION_DELETE_ITEM_AND_RELATION, language, defaultLang);
+  const sectionDescDeleteRelationOnly = getT(TRANSLATION_KEYS.SECTION_DESC_DELETE_RELATION_ONLY, language, defaultLang);
+  const sectionDescDeleteItemAndRelation = getT(TRANSLATION_KEYS.SECTION_DESC_DELETE_ITEM_AND_RELATION, language, defaultLang);
+  const sectionLabelAddType = getT(TRANSLATION_KEYS.SECTION_LABEL_ADD_TYPE, language, defaultLang);
+  const sectionOptionAddOnly = getT(TRANSLATION_KEYS.SECTION_OPTION_ADD_ONLY, language, defaultLang);
+  const sectionOptionCanSelectFromData = getT(TRANSLATION_KEYS.SECTION_OPTION_CAN_SELECT_FROM_DATA, language, defaultLang);
+  const sectionOptionMustSelectFromData = getT(TRANSLATION_KEYS.SECTION_OPTION_MUST_SELECT_FROM_DATA, language, defaultLang);
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -70,9 +140,16 @@ export function SectionEditor({
         fieldRelationType: 'connectToSchema',
       };
     }
+    // Derive title/description from translations if missing (e.g. legacy data)
+    if (!updatedSection.title && updatedSection.titleTranslations?.length) {
+      updatedSection.title = resolveFromTranslationsArray(updatedSection.titleTranslations, defaultLang, defaultLang);
+    }
+    if (!updatedSection.description && updatedSection.descriptionTranslations?.length) {
+      updatedSection.description = resolveFromTranslationsArray(updatedSection.descriptionTranslations, defaultLang, defaultLang);
+    }
     setTempSection(updatedSection);
     setIsSectionIdCustom(false);
-  }, [section]);
+  }, [section, defaultLang]);
 
   const sortedFields = useMemo(() => {
     return fields.sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -174,34 +251,49 @@ export function SectionEditor({
     <Dialog open={true} onOpenChange={(open) => !open && onClose?.()}>
       <DialogContent className="w-[95vw] sm:w-full max-w-4xl max-h-[90vh] flex flex-col p-0 rounded-2xl">
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-gray-100 shrink-0">
-          <DialogTitle>Edit Section</DialogTitle>
+          <DialogTitle>{sectionEditTitle}</DialogTitle>
           <DialogDescription>
-            Configure section properties and fields
+            {sectionDescDialog}
           </DialogDescription>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto px-6">
           <div className="space-y-5 py-4">
           <TextInput
-            config={{ name: 'section-title', label: 'Section Title', placeholder: 'Section title...' }}
-            value={tempSection.title || ''}
-            onChange={(newTitle) => {
-              setTempSection((prev) => {
-                const updated = { ...prev, title: newTitle };
-                if (!isSectionIdCustom) {
-                  updated.id = generateSchemaId(newTitle);
-                }
-                return updated;
-              });
+            config={{ name: 'section-title', label: sectionLabelTitle, placeholder: sectionPlaceholderTitle }}
+            value={
+              tempSection.titleTranslations ??
+              (tempSection.title
+                ? recordToTranslationArray({ [defaultLang]: tempSection.title })
+                : [])
+            }
+            onChange={(value) => {
+              if (isTranslationArray(value)) {
+                const title = resolveFromTranslationsArray(value, defaultLang, defaultLang) || tempSection.title || '';
+                setTempSection((prev) => {
+                  const updated = { ...prev, titleTranslations: value, title };
+                  if (!isSectionIdCustom) updated.id = generateSchemaId(title);
+                  return updated;
+                });
+              } else if (typeof value === 'string') {
+                setTempSection((prev) => {
+                  const updated = { ...prev, title: value };
+                  if (!isSectionIdCustom) updated.id = generateSchemaId(value);
+                  return updated;
+                });
+              }
             }}
             error={
               isTitleInvalid
-                ? 'Please enter a valid section title (cannot be empty or "New Section").'
+                ? sectionErrorTitleInvalid
                 : undefined
             }
+            allowTranslation
+            language={language}
+            defaultLanguage={defaultLang}
           />
           <div>
             <NameInput
-              config={{ name: 'section-id', label: 'Section ID', placeholder: 'Generated from the section title' }}
+              config={{ name: 'section-id', label: sectionLabelId, placeholder: sectionPlaceholderId }}
               value={tempSection.id}
               onChange={(newValue) => setTempSection(prev => ({ ...prev, id: newValue }))}
               isCustomizable
@@ -215,32 +307,51 @@ export function SectionEditor({
                 }
                 setIsSectionIdCustom(custom);
               }}
-              helperText="Section IDs auto-generate from the title. Customize if you need a specific identifier."
+              helperText={sectionHelperId}
             />
           </div>
           <Textarea
-            config={{ name: 'section-description', label: 'Description', placeholder: 'Section description (optional)...' }}
-            value={tempSection.description || ''}
-            onChange={(value) => setTempSection({ ...tempSection, description: value })}
+            config={{ name: 'section-description', label: sectionLabelDesc, placeholder: sectionPlaceholderDesc }}
+            value={
+              tempSection.descriptionTranslations ??
+              (tempSection.description
+                ? recordToTranslationArray({ [defaultLang]: tempSection.description })
+                : [])
+            }
+            onChange={(value) => {
+              if (isTranslationArray(value)) {
+                setTempSection({
+                  ...tempSection,
+                  descriptionTranslations: value,
+                  description:
+                    resolveFromTranslationsArray(value, defaultLang, defaultLang) || tempSection.description || '',
+                });
+              } else if (typeof value === 'string') {
+                setTempSection({ ...tempSection, description: value });
+              }
+            }}
             rows={2}
             resize="none"
+            allowTranslation
+            language={language}
+            defaultLanguage={defaultLang}
           />
 
           <div className="grid grid-cols-2 gap-4">
             <Select
-              config={{ name: 'initial-state', label: 'Initial State' }}
+              config={{ name: 'initial-state', label: sectionLabelInitialState }}
               value={tempSection.initialState || 'expanded'}
               onValueChange={(value) => setTempSection({ ...tempSection, initialState: value as 'expanded' | 'collapsed' })}
               options={[
-                { value: 'expanded', label: 'Expanded' },
-                { value: 'collapsed', label: 'Collapsed' }
+                { value: 'expanded', label: sectionOptionExpanded },
+                { value: 'collapsed', label: sectionOptionCollapsed }
               ]}
             />
             <div>
               <Slider
                 config={{
                   name: 'columns',
-                  label: 'Columns',
+                  label: sectionLabelColumns,
                 }}
                 value={tempSection.columns || 2}
                 onChange={(value) => setTempSection({ ...tempSection, columns: value })}
@@ -253,12 +364,12 @@ export function SectionEditor({
           
           <div className="space-y-3 pb-2 border-b border-gray-100">
             <Switch
-              config={{ name: `inactive-${section.id}`, label: 'Inactive' }}
+              config={{ name: `inactive-${section.id}`, label: sectionLabelInactive }}
               value={tempSection.inactive || false}
               onChange={(checked: boolean) => setTempSection({ ...tempSection, inactive: checked })}
             />
             <Switch
-              config={{ name: `repeating-${section.id}`, label: 'Repeating Section' }}
+              config={{ name: `repeating-${section.id}`, label: sectionLabelRepeating }}
               value={tempSection.isRepeatingSection || false}
               onChange={(checked: boolean) => {
                 setTempSection({
@@ -274,7 +385,7 @@ export function SectionEditor({
             {/* Field Relation Type Toggle Group - Only show for repeating sections */}
             {tempSection.isRepeatingSection && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Field Relation Type</label>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">{sectionLabelFieldRelationType}</label>
                 <ToggleGroup
                   type="single"
                   value={tempSection.repeatingConfig?.fieldRelationType || 'connectToSchema'}
@@ -285,7 +396,6 @@ export function SectionEditor({
                         repeatingConfig: {
                           ...tempSection.repeatingConfig,
                           fieldRelationType: value as 'addFields' | 'connectToSchema',
-                          // Clear targetSchema and relationTypeId when switching to 'addFields'
                           ...(value === 'addFields' && {
                             targetSchema: undefined,
                             relationTypeId: undefined,
@@ -297,23 +407,23 @@ export function SectionEditor({
                   className="w-full"
                 >
                   <ToggleGroupItem value="connectToSchema" className="flex-1">
-                    Connect To Schema
+                    {sectionOptionConnect}
                   </ToggleGroupItem>
                   <ToggleGroupItem value="addFields" className="flex-1">
-                    Add Fields
+                    {sectionOptionAddFields}
                   </ToggleGroupItem>
                 </ToggleGroup>
                 <p className="text-xs text-gray-500">
                   {tempSection.repeatingConfig?.fieldRelationType === 'connectToSchema'
-                    ? 'Fields will be managed in the connected schema. Configure target schema and relation type below.'
-                    : 'Fields will be added directly to this section.'}
+                    ? sectionDescConnect
+                    : sectionDescAddFields}
                 </p>
               </div>
             )}
             {/* Show N.A switch option only for repeating sections (not with minItems > 1) */}
             {tempSection.isRepeatingSection && (tempSection.repeatingConfig?.minItems ?? 0) <= 1 && (
               <Switch
-                config={{ name: `show-not-applicable-${section.id}`, label: 'Show Not Applicable Switch' }}
+                config={{ name: `show-not-applicable-${section.id}`, label: sectionLabelShowNA }}
                 value={tempSection.showNotApplicable === true}
                 onChange={(checked: boolean) => {
                   const updates: any = { showNotApplicable: checked };
@@ -335,7 +445,7 @@ export function SectionEditor({
           <div className="pt-4 space-y-4 border-t border-gray-100">
             <div className="flex items-center gap-2">
               <div className="h-px flex-1 bg-gray-200"></div>
-              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Configuration</span>
+              <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{sectionLabelConfig}</span>
               <div className="h-px flex-1 bg-gray-200"></div>
             </div>
             
@@ -345,7 +455,7 @@ export function SectionEditor({
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Target Schema <span className="text-red-500">*</span>
+                    {sectionLabelTargetSchema} <span className="text-red-500">*</span>
                   </label>
                   <Button
                     type="button"
@@ -354,11 +464,11 @@ export function SectionEditor({
                     onClick={() => setIsTargetSchemaPickerOpen(true)}
                   >
                     <span className="truncate">
-                      {tempSection.repeatingConfig?.targetSchema || 'Select target schema...'}
+                      {tempSection.repeatingConfig?.targetSchema || sectionPlaceholderTargetSchema}
                     </span>
                   </Button>
                   {!tempSection.repeatingConfig?.targetSchema && isConnectionConfigIncomplete && (
-                    <p className="text-xs text-red-600">Target schema is required when using "Connect To Schema"</p>
+                    <p className="text-xs text-red-600">{sectionMsgTargetRequired}</p>
                   )}
                   <PopupPicker
                     isOpen={isTargetSchemaPickerOpen}
@@ -378,8 +488,8 @@ export function SectionEditor({
                       }
                       setIsTargetSchemaPickerOpen(false);
                     }}
-                    title="Select Target Schema"
-                    description="Choose a schema to link to this repeating section"
+                    title={sectionTitleSelectTarget}
+                    description={sectionDescSelectTarget}
                     allowMultiselect={false}
                     columnMap={{
                       response: { data: 'data' },
@@ -396,7 +506,7 @@ export function SectionEditor({
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Relation Type <span className="text-red-500">*</span>
+                    {sectionLabelRelationType} <span className="text-red-500">*</span>
                   </label>
                   <Button
                     type="button"
@@ -405,11 +515,11 @@ export function SectionEditor({
                     onClick={() => setIsRelationTypePickerOpen(true)}
                   >
                     <span className="truncate">
-                      {tempSection.repeatingConfig?.relationTypeId || 'Select relation type...'}
+                      {tempSection.repeatingConfig?.relationTypeId || sectionPlaceholderRelationType}
                     </span>
                   </Button>
                   {!tempSection.repeatingConfig?.relationTypeId && isConnectionConfigIncomplete && (
-                    <p className="text-xs text-red-600">Relation type is required when using "Connect To Schema"</p>
+                    <p className="text-xs text-red-600">{sectionMsgRelationRequired}</p>
                   )}
                   <PopupPicker
                     isOpen={isRelationTypePickerOpen}
@@ -428,8 +538,8 @@ export function SectionEditor({
                       }
                       setIsRelationTypePickerOpen(false);
                     }}
-                    title="Select Relation Type"
-                    description="Choose a relation type for this repeating section"
+                    title={sectionTitleSelectRelation}
+                    description={sectionDescSelectRelation}
                     allowMultiselect={false}
                     columnMap={{
                       response: { data: 'data' },
@@ -446,7 +556,7 @@ export function SectionEditor({
               {isConnectionConfigIncomplete && (
                 <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
                   <p className="text-xs text-amber-700">
-                    <span className="font-medium">Required:</span> Please select both Target Schema and Relation Type to save this section.
+                    {sectionMsgRequiredBoth}
                   </p>
                 </div>
               )}
@@ -456,7 +566,7 @@ export function SectionEditor({
             {/* Common repeating config fields */}
             <div className="grid grid-cols-2 gap-4">
               <NumberInput
-                config={{ name: 'min-items', label: 'Min Items' }}
+                config={{ name: 'min-items', label: sectionLabelMinItems }}
                 value={tempSection.repeatingConfig?.minItems ?? ''}
                 onChange={(value) =>
                   setTempSection({
@@ -470,7 +580,7 @@ export function SectionEditor({
                 min={0}
               />
               <NumberInput
-                config={{ name: 'max-items', label: 'Max Items' }}
+                config={{ name: 'max-items', label: sectionLabelMaxItems }}
                 value={tempSection.repeatingConfig?.maxItems ?? ''}
                 onChange={(value) =>
                   setTempSection({
@@ -488,7 +598,7 @@ export function SectionEditor({
                 <>
                   <div>
                     <Select
-                      config={{ name: 'delete-type', label: 'Delete Type' }}
+                      config={{ name: 'delete-type', label: sectionLabelDeleteType }}
                       value={tempSection.repeatingConfig?.deleteType || 'itemAndRelation'}
                       onValueChange={(value) =>
                         setTempSection({
@@ -500,19 +610,19 @@ export function SectionEditor({
                         })
                       }
                       options={[
-                        { value: 'relationOnly', label: 'Delete relation only (keep item)' },
-                        { value: 'itemAndRelation', label: 'Delete item and relation' },
+                        { value: 'relationOnly', label: sectionOptionDeleteRelationOnly },
+                        { value: 'itemAndRelation', label: sectionOptionDeleteItemAndRelation },
                       ]}
                     />
                     <p className="text-xs text-gray-500 mt-1.5">
                       {tempSection.repeatingConfig?.deleteType === 'relationOnly' 
-                        ? 'Only the relation will be deleted. The item will remain in the target schema.'
-                        : 'Both the relation and the item will be permanently deleted.'}
+                        ? sectionDescDeleteRelationOnly
+                        : sectionDescDeleteItemAndRelation}
                     </p>
                   </div>
                   <div>
                     <Select
-                      config={{ name: 'add-type', label: 'Add Type' }}
+                      config={{ name: 'add-type', label: sectionLabelAddType }}
                       value={tempSection.repeatingConfig?.addType || 'addOnly'}
                       onValueChange={(value) =>
                         setTempSection({
@@ -524,23 +634,23 @@ export function SectionEditor({
                         })
                       }
                       options={[
-                        { value: 'addOnly', label: 'Add only (create new items)' },
-                        { value: 'canSelectFromData', label: 'Can select from existing data' },
-                        { value: 'mustSelectFromData', label: 'Must select from existing data' },
+                        { value: 'addOnly', label: sectionOptionAddOnly },
+                        { value: 'canSelectFromData', label: sectionOptionCanSelectFromData },
+                        { value: 'mustSelectFromData', label: sectionOptionMustSelectFromData },
                       ]}
                     />
                     <p className="text-xs text-gray-500 mt-1.5">
                       {tempSection.repeatingConfig?.addType === 'addOnly' 
-                        ? 'Users can only create new items. No selection from existing data.'
+                        ? sectionDescAddOnly
                         : tempSection.repeatingConfig?.addType === 'canSelectFromData'
-                        ? 'Users can create new items or select from existing data. Both "Add" and "Select" buttons will be shown.'
-                        : 'Users can only select from existing data. Only "Select" button will be shown.'}
+                        ? sectionDescCanSelect
+                        : sectionDescMustSelect}
                     </p>
                   </div>
                   {(tempSection.repeatingConfig?.addType === 'canSelectFromData' || tempSection.repeatingConfig?.addType === 'mustSelectFromData') && (
                     <div className="space-y-1.5">
                       <Switch
-                        config={{ name: `unique-selection-${section.id}`, label: 'Unique Selection' }}
+                        config={{ name: `unique-selection-${section.id}`, label: sectionLabelUniqueSelection }}
                         value={tempSection.repeatingConfig?.isUnique || false}
                         onChange={(checked: boolean) =>
                           setTempSection({
@@ -550,13 +660,13 @@ export function SectionEditor({
                         }
                       />
                       <p className="text-xs text-gray-500 ps-8">
-                        If enabled, each item can only be selected once. Already selected items will be excluded from the picker.
+                        {sectionDescUniqueSelection}
                       </p>
                     </div>
                   )}
                   <div className="p-3 bg-blue-50/50 border border-blue-100 rounded-lg">
                     <p className="text-xs text-blue-700">
-                      <span className="font-medium">Relation-based section:</span> Fields are managed in the target schema "{tempSection.repeatingConfig?.targetSchema}". 
+                      <span className="font-medium">{sectionMsgRelationBased}</span> {sectionMsgFieldsManagedInTarget} &quot;{tempSection.repeatingConfig?.targetSchema}&quot;.
                     </p>
                   </div>
                 </>
@@ -568,13 +678,13 @@ export function SectionEditor({
           {(!tempSection.isRepeatingSection || !tempSection.repeatingConfig || tempSection.repeatingConfig?.fieldRelationType === 'addFields' || tempSection.repeatingConfig?.fieldRelationType === undefined) && (
           <div className="pt-4 space-y-4 border-t border-gray-100">
             <div className="flex items-center gap-2">
-              <h4 className="text-sm font-semibold text-gray-900">Fields</h4>
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{labelFields}</h4>
               <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{fields.length}</span>
             </div>
 
             {fields.length === 0 ? (
               <div className="text-center py-12 text-gray-400">
-                <p className="text-sm">No fields yet. Click "Add Field" to get started.</p>
+                <p className="text-sm">{msgNoFieldsYet}</p>
               </div>
             ) : (
               <DndContext
@@ -612,10 +722,10 @@ export function SectionEditor({
             )}
             
             <AddButtonFull
-              label="Add Field"
+              label={labelAddField}
               onClick={() => onAddField(section.id)}
               iconSize="w-4 h-4"
-              textSize="text-sm"
+              textSize="text-xs"
               fullWidth={true}
               disabled={!canAddField}
             />
@@ -628,7 +738,7 @@ export function SectionEditor({
             {sectionExistsInSchema && !isNewUnsavedSection && hasUnsavedChanges && (
               <div className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-2.5 flex items-start gap-2">
                 <span className="text-amber-600">⚠</span>
-                <span>Please save your changes before adding fields.</span>
+                <span>{msgSaveBeforeAddFields}</span>
               </div>
             )}
             {hasIncompleteFields && (
@@ -646,20 +756,20 @@ export function SectionEditor({
             {isConnectionConfigIncomplete && (
               <div className="text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5 flex items-start gap-2">
                 <span className="text-red-600">⚠</span>
-                <span>Please select both Target Schema and Relation Type to save this section.</span>
+                <span>{sectionMsgRequiredBoth}</span>
               </div>
             )}
             <div className="flex flex-col sm:flex-row gap-2 w-full">
-              <Button variant="outline" onClick={onClose} className="w-full sm:w-auto text-sm md:text-base">
-                Cancel
+              <Button variant="outline" onClick={onClose} className="w-full sm:w-auto text-xs">
+                {buttonCancel}
               </Button>
               <Button 
                 onClick={handleSave} 
                 disabled={!canSave}
-                className="w-full sm:w-auto text-sm md:text-base"
+                className="w-full sm:w-auto text-xs"
               >
-                <span className="hidden md:inline">Save Changes</span>
-                <span className="md:hidden">Save</span>
+                <span className="hidden md:inline">{buttonSaveChanges}</span>
+                <span className="md:hidden">{buttonSave}</span>
               </Button>
             </div>
           </div>

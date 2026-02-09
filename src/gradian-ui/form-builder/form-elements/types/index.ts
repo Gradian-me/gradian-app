@@ -24,6 +24,9 @@ export interface TextInputProps extends FormElementProps {
   minLength?: number;
   pattern?: string;
   canCopy?: boolean;
+  allowTranslation?: boolean;
+  language?: string;
+  defaultLanguage?: string;
 }
 
 export interface NameInputProps extends TextInputProps {
@@ -73,6 +76,9 @@ export interface TextareaProps extends FormElementProps {
   resize?: 'none' | 'both' | 'horizontal' | 'vertical';
   maxLength?: number;
   canCopy?: boolean;
+  allowTranslation?: boolean;
+  language?: string;
+  defaultLanguage?: string;
   aiAgentId?: string;
   enableVoiceInput?: boolean;
   loadingTextSwitches?: string | string[];

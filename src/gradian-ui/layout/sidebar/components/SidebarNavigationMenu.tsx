@@ -9,6 +9,8 @@ import { useCompanyStore } from '@/stores/company.store';
 import { useMenuItemsStore } from '@/stores/menu-items.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useUserStore } from '@/stores/user.store';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { SidebarNavigationDynamic } from './SidebarNavigationDynamic';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import type { NavigationItem } from '../types';
@@ -25,7 +27,8 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
 }) => {
   const [items, setItems] = useState<NavigationItem[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+
   React.useEffect(() => {
     currentItemsRef.current = items;
   }, [items]);
@@ -118,7 +121,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
       if (!forceFetch) {
         const cachedItems = menuItemsStore.getMenuItems(companyId);
         if (cachedItems && cachedItems.length > 0) {
-          const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant);
+          const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant, language);
           if (isMounted) {
             setItems(mapped);
             currentItemsRef.current = mapped;
@@ -144,7 +147,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
           if (isMounted) {
             const cachedItems = menuItemsStore.getMenuItems(companyId);
             if (cachedItems && cachedItems.length > 0) {
-              const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant);
+              const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant, language);
               setItems(mapped);
               currentItemsRef.current = mapped;
             } else {
@@ -164,7 +167,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         // Store in cache
         menuItemsStore.setMenuItems(rawItems, companyId);
 
-        const mapped = mapMenuItemsToNavigationItems(rawItems, companyId, isLocalTenant);
+        const mapped = mapMenuItemsToNavigationItems(rawItems, companyId, isLocalTenant, language);
         if (isMounted) {
           setItems(mapped);
           currentItemsRef.current = mapped;
@@ -206,7 +209,16 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         window.removeEventListener('menu-items-cleared', handleMenuItemsCleared);
       }
     };
-  }, [companyId, tenantId, userId, isLocalTenant]); // Include userId and isLocalTenant to detect changes
+  }, [companyId, tenantId, userId, isLocalTenant, language]); // Re-run when language changes so titles are re-mapped
+
+  // When language changes, re-map cached menu items so titles update without refetch
+  useEffect(() => {
+    const cachedItems = useMenuItemsStore.getState().getMenuItems(companyId);
+    if (!cachedItems || cachedItems.length === 0) return;
+    const mapped = mapMenuItemsToNavigationItems(cachedItems, companyId, isLocalTenant, language);
+    setItems(mapped);
+    currentItemsRef.current = mapped;
+  }, [language, companyId, isLocalTenant]);
 
   return (
     <>

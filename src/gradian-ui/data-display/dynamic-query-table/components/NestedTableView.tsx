@@ -2,6 +2,8 @@
 
 import React, { useMemo, useCallback } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import { useLanguageStore } from '@/stores/language.store';
+import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { cn } from '@/gradian-ui/shared/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -31,6 +33,8 @@ export function NestedTableView({
   dynamicQueryId,
   onEditEntity
 }: NestedTableViewProps) {
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const isRtl = isRTL(language);
   // Helper function to check if a schema ID is in flattenedSchemas at the current depth
   const isSchemaFlattened = useCallback((schemaId: string, currentDepth: number): boolean => {
     if (!flattenedSchemas || flattenedSchemas.length === 0) return false;
@@ -343,11 +347,11 @@ export function NestedTableView({
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full" dir={isRtl ? 'rtl' : undefined}>
       {/* Toolbar removed - all controls (flatten switch, expand/collapse) are now in DynamicFilterPane */}
 
-      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-x-auto overflow-y-hidden w-full">
-        <table className="border-collapse" style={{ tableLayout: 'auto', width: '-webkit-fill-available' }}>
+      <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-x-auto overflow-y-hidden w-full" dir={isRtl ? 'rtl' : undefined}>
+        <table className="border-collapse" style={{ tableLayout: 'auto', width: '-webkit-fill-available' }} dir={isRtl ? 'rtl' : undefined}>
           <thead className="bg-gray-100 dark:bg-gray-700 border-b border-gray-100 dark:border-gray-700">
             {/* Schema header row for flattened columns */}
             {flattenedColumns.length > 0 && (
@@ -365,6 +369,7 @@ export function NestedTableView({
                         'px-4 py-3 text-start text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
                         getSchemaHeaderBorderColor(-1, false)
                       )}
+                      dir="auto"
                     >
                       {schema.label || schema.id}
                     </th>
@@ -383,6 +388,7 @@ export function NestedTableView({
                         'px-4 py-3 text-start text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider',
                         getSchemaHeaderBorderColor(groupIndex, isLast)
                       )}
+                      dir="auto"
                     >
                       {group.schema.label || group.schema.id}
                     </th>
@@ -412,6 +418,7 @@ export function NestedTableView({
                         'px-4 py-3 text-start text-xs font-semibold text-gray-900 dark:text-gray-200 uppercase tracking-wider',
                         isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo)
                       )}
+                      dir="auto"
                     >
                       {column.label}
                     </th>
@@ -535,10 +542,12 @@ export function NestedTableView({
                               'p-3 text-xs text-gray-900 dark:text-gray-200',
                               isLastColumn ? 'border-r-0' : getBorderColorClasses(column.id, columnToGroupInfo),
                               column.align === 'center' && 'text-center',
-                              column.align === 'right' && 'text-right'
+                              (column.align === 'left' || !column.align) && 'text-start',
+                              column.align === 'right' && 'text-end'
                             )}
+                            dir="auto"
                           >
-                            {column.render ? column.render(value, processedRow, rowIndex) : <span>{String(value ?? '—')}</span>}
+                            {column.render ? column.render(value, processedRow, rowIndex) : <span dir="auto">{String(value ?? '—')}</span>}
                           </td>
                         </React.Fragment>
                       );

@@ -8,6 +8,9 @@ import { PencilRuler, LayoutList, Trash2 } from 'lucide-react';
 import { FormSchema } from '../types';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getSchemaTranslatedPluralName, getSchemaTranslatedDescription } from '../utils/schema-utils';
 
 interface SchemaListViewProps {
   schemas: FormSchema[];
@@ -26,6 +29,7 @@ interface SchemaListItemProps {
 
 const SchemaListItemComponent = memo(
   ({ schema, index, onEdit, onView, onDelete }: SchemaListItemProps) => {
+    const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
     const animationDelay = Math.min(
       index * UI_PARAMS.CARD_INDEX_DELAY.STEP,
       UI_PARAMS.CARD_INDEX_DELAY.MAX,
@@ -82,7 +86,7 @@ const SchemaListItemComponent = memo(
                     : 'text-gray-900 dark:text-gray-100'
                 }`}
               >
-                {schema.plural_name}
+                {getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? schema.singular_name ?? schema.id ?? '')}
               </h3>
               {isInactive && (
                 <Badge className="text-[10px] px-1.5 py-0 bg-gray-300 text-gray-600">
@@ -90,7 +94,7 @@ const SchemaListItemComponent = memo(
                 </Badge>
               )}
             </div>
-            {schema.description && (
+            {(schema.description || schema.description_translations?.length) && (
               <p
                 className={`text-sm line-clamp-1 ${
                   isInactive
@@ -98,7 +102,7 @@ const SchemaListItemComponent = memo(
                     : 'text-gray-500 dark:text-gray-400'
                 }`}
               >
-                {schema.description}
+                {getSchemaTranslatedDescription(schema, language, schema.description ?? '')}
               </p>
             )}
             {showStats && null}

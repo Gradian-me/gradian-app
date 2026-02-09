@@ -18,6 +18,7 @@ import { LoadingSkeleton } from '@/gradian-ui/layout/components';
 import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { useLanguageStore } from '@/stores/language.store';
+import { getSchemaTranslatedPluralName, getSchemaTranslatedDescription } from '../utils/schema-utils';
 
 interface SchemaCardGridProps {
   schemas: FormSchema[];
@@ -95,7 +96,7 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
                     isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'
                   }`}
                 >
-                  {schema.plural_name}
+                  {getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? schema.singular_name ?? schema.id ?? '')}
                 </CardTitle>
                 {schema.showInNavigation && (
                   <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
@@ -108,11 +109,11 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
                   </Badge>
                 )}
               </div>
-              {schema.description && (
+              {(schema.description || schema.description_translations?.length) && (
                 <p className={`text-xs line-clamp-1 mt-1 ${
                   isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'
                 }`}>
-                  {schema.description}
+                  {getSchemaTranslatedDescription(schema, language, schema.description ?? '')}
                 </p>
               )}
             </div>

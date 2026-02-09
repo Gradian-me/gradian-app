@@ -16,6 +16,9 @@ import { QRCodeCanvas } from '@/gradian-ui/form-builder/form-elements/components
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { useQrcodeDownload } from 'react-qrcode-pretty';
 import { toast } from 'sonner';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 import { QRCodeCanvasProps } from '@/gradian-ui/form-builder/form-elements/components/QRCodeCanvas';
 
@@ -36,6 +39,8 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
 }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [setQrcode, download, isReady] = useQrcodeDownload();
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
 
   useEffect(() => {
     setIsMounted(true);
@@ -72,7 +77,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md rounded-2xl">
         <DialogHeader>
-          <DialogTitle>QR Code</DialogTitle>
+          <DialogTitle>{getT(TRANSLATION_KEYS.TITLE_QR_CODE, language, defaultLang)}</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4 py-4">
           <div className="bg-white p-4 rounded-3xl shadow-sm max-w-[400px] mx-auto">
@@ -100,7 +105,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
                   className="h-10 flex-1"
                 >
                   <ExternalLink className="h-4 w-4 me-2" />
-                  Open URL
+                  {getT(TRANSLATION_KEYS.ACTION_OPEN_URL, language, defaultLang)}
                 </Button>
               )}
               <Button
@@ -111,15 +116,15 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
                 className="h-10 flex-1"
               >
                 <Download className="h-4 w-4 me-2" />
-                Download
+                {getT(TRANSLATION_KEYS.ACTION_DOWNLOAD, language, defaultLang)}
               </Button>
               <Button
                 onClick={async () => {
                   if (navigator.share) {
                     try {
                       await navigator.share({
-                        title: 'Share QR Code',
-                        text: 'Check out this QR code',
+                        title: getT(TRANSLATION_KEYS.TITLE_SHARE_QR_CODE, language, defaultLang),
+                        text: getT(TRANSLATION_KEYS.TEXT_CHECK_OUT_THIS_QR_CODE, language, defaultLang),
                         url: value,
                       });
                     } catch (error) {
@@ -130,10 +135,10 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
                   } else {
                     try {
                       await navigator.clipboard.writeText(value);
-                      toast.success('Link copied to clipboard!');
+                      toast.success(getT(TRANSLATION_KEYS.MESSAGE_COPIED_TO_CLIPBOARD, language, defaultLang));
                     } catch (error) {
                       console.error('Error copying to clipboard:', error);
-                      toast.error('Failed to copy to clipboard');
+                      toast.error(getT(TRANSLATION_KEYS.MESSAGE_FAILED_TO_COPY, language, defaultLang));
                     }
                   }
                 }}
@@ -142,7 +147,7 @@ export const QRCodeDialog: React.FC<QRCodeDialogProps> = ({
                 className="h-10 flex-1"
               >
                 <Share2 className="h-4 w-4 me-2" />
-                Share
+                {getT(TRANSLATION_KEYS.ACTION_SHARE, language, defaultLang)}
               </Button>
             </div>
           )}

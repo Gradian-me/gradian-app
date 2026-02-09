@@ -6,6 +6,9 @@ import { TextInput, NameInput, Slider, SortableSelector } from '@/gradian-ui/for
 import type { SortableSelectorItem } from '@/gradian-ui/form-builder/form-elements';
 import { CardSection } from '../types/form-schema';
 import { Pencil } from 'lucide-react';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 interface CardSectionEditorProps {
   section: CardSection;
@@ -38,6 +41,10 @@ export function CardSectionEditor({
   saveDisabled,
   onClose,
 }: CardSectionEditorProps) {
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const msgIdAutoCustomize = getT(TRANSLATION_KEYS.CARD_MSG_ID_AUTO_CUSTOMIZE, language, defaultLang);
+
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="rounded-2xl max-w-3xl w-[95vw]">
@@ -68,7 +75,7 @@ export function CardSectionEditor({
               onCustomModeChange={onCustomModeChange}
               helperText={
                 !isCustomId
-                  ? 'Card Section ID auto-generates from the title. Click "Customize" to override.'
+                  ? msgIdAutoCustomize
                   : undefined
               }
             />
@@ -110,10 +117,10 @@ export function CardSectionEditor({
         </div>
 
         <DialogFooter className="flex justify-between w-full">
-          <Button variant="ghost" onClick={onDelete}>
+          <Button variant="ghost" onClick={onDelete} className="text-xs">
             Delete Section
           </Button>
-          <Button onClick={onSave} disabled={saveDisabled}>
+          <Button onClick={onSave} disabled={saveDisabled} className="text-xs">
             Save Section
           </Button>
         </DialogFooter>

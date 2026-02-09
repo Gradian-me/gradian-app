@@ -1,0 +1,532 @@
+{
+  "schemas": {
+    "en": "Schema definitions and metadata",
+    "fa": "تعاریف و ابرداده اسکیما",
+    "ar": "تعريفات المخطط والبيانات الوصفية",
+    "es": "Definiciones de esquema y metadatos",
+    "fr": "Définitions de schéma et métadonnées",
+    "de": "Schemadefinitionen und Metadaten",
+    "it": "Definizioni schema e metadati",
+    "ru": "Определения схемы и метаданные"
+  },
+  "external_nodes": {
+    "en": "Manage external nodes from external data sources and APIs",
+    "fa": "مدیریت نودهای خارجی از منابع و APIهای داده خارجی",
+    "ar": "إدارة العقد الخارجية من مصادر البيانات وواجهات API الخارجية",
+    "es": "Gestionar nodos externos desde fuentes de datos y APIs externas",
+    "fr": "Gérer les nœuds externes à partir de sources de données et d'API externes",
+    "de": "Externe Knoten aus externen Datenquellen und APIs verwalten",
+    "it": "Gestisci nodi esterni da fonti dati e API esterne",
+    "ru": "Управление внешними узлами из внешних источников данных и API"
+  },
+  "companies": {
+    "en": "Manage company information including registration, address, and contact details",
+    "fa": "مدیریت اطلاعات شرکت شامل ثبت، آدرس و جزئیات تماس",
+    "ar": "إدارة معلومات الشركة بما في ذلك التسجيل والعنوان وتفاصيل الاتصال",
+    "es": "Gestionar información de la empresa incluyendo registro, dirección y datos de contacto",
+    "fr": "Gérer les informations de l'entreprise (inscription, adresse, coordonnées)",
+    "de": "Unternehmensinformationen verwalten (Registrierung, Adresse, Kontaktdaten)",
+    "it": "Gestisci informazioni azienda inclusi registrazione, indirizzo e contatti",
+    "ru": "Управление данными компании: регистрация, адрес и контакты"
+  },
+  "relation-types": {
+    "en": "Define and manage relationships between entities in your application",
+    "fa": "تعریف و مدیریت روابط بین موجودیت‌ها در برنامه",
+    "ar": "تحديد وإدارة العلاقات بين الكيانات في تطبيقك",
+    "es": "Definir y gestionar relaciones entre entidades en tu aplicación",
+    "fr": "Définir et gérer les relations entre entités dans votre application",
+    "de": "Beziehungen zwischen Entitäten in Ihrer Anwendung definieren und verwalten",
+    "it": "Definisci e gestisci le relazioni tra entità nell'applicazione",
+    "ru": "Определение и управление связями между сущностями в приложении"
+  },
+  "applications": {
+    "en": "Define and manage applications in your system",
+    "fa": "تعریف و مدیریت برنامه‌ها در سیستم",
+    "ar": "تحديد وإدارة التطبيقات في نظامك",
+    "es": "Definir y gestionar aplicaciones en tu sistema",
+    "fr": "Définir et gérer les applications dans votre système",
+    "de": "Anwendungen in Ihrem System definieren und verwalten",
+    "it": "Definisci e gestisci le applicazioni nel sistema",
+    "ru": "Определение и управление приложениями в системе"
+  },
+  "user-roles": {
+    "en": "Define and manage user roles in your system",
+    "fa": "تعریف و مدیریت نقش‌های کاربری در سیستم",
+    "ar": "تحديد وإدارة أدوار المستخدمين في نظامك",
+    "es": "Definir y gestionar roles de usuario en tu sistema",
+    "fr": "Définir et gérer les rôles utilisateur dans votre système",
+    "de": "Benutzerrollen in Ihrem System definieren und verwalten",
+    "it": "Definisci e gestisci i ruoli utente nel sistema",
+    "ru": "Определение и управление ролями пользователей в системе"
+  },
+  "business-areas": {
+    "en": "Define and manage business areas in your system",
+    "fa": "تعریف و مدیریت حوزه‌های کسب‌وکار در سیستم",
+    "ar": "تحديد وإدارة المجالات التجارية في نظامك",
+    "es": "Definir y gestionar áreas de negocio en tu sistema",
+    "fr": "Définir et gérer les domaines métier dans votre système",
+    "de": "Geschäftsbereiche in Ihrem System definieren und verwalten",
+    "it": "Definisci e gestisci le aree di business nel sistema",
+    "ru": "Определение и управление бизнес-областями в системе"
+  },
+  "users": {
+    "en": "Manage user accounts and profiles",
+    "fa": "مدیریت حساب‌های کاربری و پروفایل‌ها",
+    "ar": "إدارة حسابات المستخدمين والملفات الشخصية",
+    "es": "Gestionar cuentas de usuario y perfiles",
+    "fr": "Gérer les comptes utilisateur et les profils",
+    "de": "Benutzerkonten und Profile verwalten",
+    "it": "Gestisci account utente e profili",
+    "ru": "Управление учётными записями и профилями пользователей"
+  },
+  "servers": {
+    "en": "Manage server configurations and endpoints",
+    "fa": "مدیریت پیکربندی‌ها و نقاط پایانی سرور",
+    "ar": "إدارة إعدادات الخادم ونقاط النهاية",
+    "es": "Gestionar configuraciones de servidor y endpoints",
+    "fr": "Gérer les configurations serveur et les points de terminaison",
+    "de": "Serverkonfigurationen und Endpunkte verwalten",
+    "it": "Gestisci configurazioni server e endpoint",
+    "ru": "Управление конфигурациями серверов и конечными точками"
+  },
+  "url-repositories": {
+    "en": "Manage and organize URLs with associated metadata",
+    "fa": "مدیریت و سازماندهی URLها با ابرداده مرتبط",
+    "ar": "إدارة وتنظيم عناوين URL مع البيانات الوصفية المرتبطة",
+    "es": "Gestionar y organizar URLs con metadatos asociados",
+    "fr": "Gérer et organiser les URL avec les métadonnées associées",
+    "de": "URLs mit zugehörigen Metadaten verwalten und organisieren",
+    "it": "Gestisci e organizza URL con metadati associati",
+    "ru": "Управление и организация URL с сопутствующими метаданными"
+  },
+  "integrations": {
+    "en": "Manage integrations with external systems and APIs",
+    "fa": "مدیریت یکپارچه‌سازی با سیستم‌ها و APIهای خارجی",
+    "ar": "إدارة التكامل مع الأنظمة وواجهات API الخارجية",
+    "es": "Gestionar integraciones con sistemas externos y APIs",
+    "fr": "Gérer les intégrations avec les systèmes et API externes",
+    "de": "Integrationen mit externen Systemen und APIs verwalten",
+    "it": "Gestisci integrazioni con sistemi esterni e API",
+    "ru": "Управление интеграциями с внешними системами и API"
+  },
+  "databases": {
+    "en": "Manage database configurations and connection settings",
+    "fa": "مدیریت پیکربندی‌های پایگاه داده و تنظیمات اتصال",
+    "ar": "إدارة إعدادات قاعدة البيانات والاتصال",
+    "es": "Gestionar configuraciones de base de datos y conexión",
+    "fr": "Gérer les configurations de base de données et les paramètres de connexion",
+    "de": "Datenbankkonfigurationen und Verbindungseinstellungen verwalten",
+    "it": "Gestisci configurazioni database e impostazioni di connessione",
+    "ru": "Управление настройками БД и подключений"
+  },
+  "tags": {
+    "en": "Create and manage tags with labels, icons, colors, and use cases",
+    "fa": "ایجاد و مدیریت برچسب‌ها با برچسب، آیکون، رنگ و موارد استفاده",
+    "ar": "إنشاء وإدارة العلامات بالتصنيفات والأيقونات والألوان وحالات الاستخدام",
+    "es": "Crear y gestionar etiquetas con etiquetas, iconos, colores y casos de uso",
+    "fr": "Créer et gérer des étiquettes avec libellés, icônes, couleurs et cas d'usage",
+    "de": "Tags mit Bezeichnungen, Symbolen, Farben und Anwendungsfällen verwalten",
+    "it": "Crea e gestisci tag con etichette, icone, colori e casi d'uso",
+    "ru": "Создание и управление тегами с подписями, иконками, цветами и сценариями"
+  },
+  "status-items": {
+    "en": "Define reusable status items with label, icon, color, and inactive handling",
+    "fa": "تعریف آیتم‌های وضعیت قابل استفاده مجدد با برچسب، آیکون، رنگ و مدیریت غیرفعال",
+    "ar": "تحديد عناصر الحالة القابلة لإعادة الاستخدام مع التسمية والأيقونة واللون والمعالجة غير النشطة",
+    "es": "Definir elementos de estado reutilizables con etiqueta, icono, color e inactivos",
+    "fr": "Définir des éléments d'état réutilisables (libellé, icône, couleur, inactif)",
+    "de": "Wiederverwendbare Status-Elemente mit Bezeichnung, Symbol, Farbe und Inaktiv-Behandlung",
+    "it": "Definisci elementi di stato riutilizzabili con etichetta, icona, colore e inattivo",
+    "ru": "Определение переиспользуемых элементов статуса с подписью, иконкой, цветом и неактивностью"
+  },
+  "entity-type-items": {
+    "en": "Define reusable entity type items with label, icon, color, and inactive handling",
+    "fa": "تعریف آیتم‌های نوع موجودیت قابل استفاده مجدد با برچسب، آیکون، رنگ و غیرفعال",
+    "ar": "تحديد عناصر نوع الكيان القابلة لإعادة الاستخدام مع التسمية والأيقونة واللون والمعالجة غير النشطة",
+    "es": "Definir elementos de tipo de entidad reutilizables con etiqueta, icono, color e inactivos",
+    "fr": "Définir des éléments de type d'entité réutilisables (libellé, icône, couleur, inactif)",
+    "de": "Wiederverwendbare Entitätstyp-Elemente mit Bezeichnung, Symbol, Farbe und Inaktiv",
+    "it": "Definisci elementi tipo entità riutilizzabili con etichetta, icona, colore e inattivo",
+    "ru": "Определение переиспользуемых элементов типа сущности с подписью, иконкой, цветом и неактивностью"
+  },
+  "entity-type-groups": {
+    "en": "Group entity type items into reusable entity type groups, optionally scoped to companies",
+    "fa": "گروه‌بندی آیتم‌های نوع موجودیت در گروه‌های قابل استفاده مجدد، اختیاری محدود به شرکت‌ها",
+    "ar": "تجميع عناصر نوع الكيان في مجموعات قابلة لإعادة الاستخدام، اختياريًا محدودة بالشركات",
+    "es": "Agrupar elementos de tipo de entidad en grupos reutilizables, opcionalmente por empresa",
+    "fr": "Grouper les éléments de type d'entité en groupes réutilisables, optionnellement par entreprise",
+    "de": "Entitätstyp-Elemente in wiederverwendbare Gruppen gruppieren, optional pro Unternehmen",
+    "it": "Raggruppa elementi tipo entità in gruppi riutilizzabili, opzionalmente per azienda",
+    "ru": "Группировка элементов типа сущности в переиспользуемые группы, опционально по компаниям"
+  },
+  "status-groups": {
+    "en": "Group status items into reusable status groups, optionally scoped to companies",
+    "fa": "گروه‌بندی آیتم‌های وضعیت در گروه‌های وضعیت قابل استفاده مجدد، اختیاری محدود به شرکت‌ها",
+    "ar": "تجميع عناصر الحالة في مجموعات قابلة لإعادة الاستخدام، اختياريًا محدودة بالشركات",
+    "es": "Agrupar elementos de estado en grupos reutilizables, opcionalmente por empresa",
+    "fr": "Grouper les éléments d'état en groupes réutilisables, optionnellement par entreprise",
+    "de": "Status-Elemente in wiederverwendbare Gruppen gruppieren, optional pro Unternehmen",
+    "it": "Raggruppa elementi di stato in gruppi riutilizzabili, opzionalmente per azienda",
+    "ru": "Группировка элементов статуса в переиспользуемые группы, опционально по компаниям"
+  },
+  "parameter-items": {
+    "en": "Define reusable parameter items with label, icon, color, and inactive handling",
+    "fa": "تعریف آیتم‌های پارامتر قابل استفاده مجدد با برچسب، آیکون، رنگ و غیرفعال",
+    "ar": "تحديد عناصر المعلمات القابلة لإعادة الاستخدام مع التسمية والأيقونة واللون والمعالجة غير النشطة",
+    "es": "Definir elementos de parámetro reutilizables con etiqueta, icono, color e inactivos",
+    "fr": "Définir des éléments de paramètre réutilisables (libellé, icône, couleur, inactif)",
+    "de": "Wiederverwendbare Parameter-Elemente mit Bezeichnung, Symbol, Farbe und Inaktiv",
+    "it": "Definisci elementi parametro riutilizzabili con etichetta, icona, colore e inattivo",
+    "ru": "Определение переиспользуемых элементов параметров с подписью, иконкой, цветом и неактивностью"
+  },
+  "parameter-groups": {
+    "en": "Group parameter items into reusable parameter groups, optionally scoped to companies",
+    "fa": "گروه‌بندی آیتم‌های پارامتر در گروه‌های قابل استفاده مجدد، اختیاری محدود به شرکت‌ها",
+    "ar": "تجميع عناصر المعلمات في مجموعات قابلة لإعادة الاستخدام، اختياريًا محدودة بالشركات",
+    "es": "Agrupar elementos de parámetro en grupos reutilizables, opcionalmente por empresa",
+    "fr": "Grouper les éléments de paramètre en groupes réutilisables, optionnellement par entreprise",
+    "de": "Parameter-Elemente in wiederverwendbare Gruppen gruppieren, optional pro Unternehmen",
+    "it": "Raggruppa elementi parametro in gruppi riutilizzabili, opzionalmente per azienda",
+    "ru": "Группировка элементов параметров в переиспользуемые группы, опционально по компаниям"
+  },
+  "logical-operators": {
+    "en": "Manage logical operators with their symbols, SQL and Cypher equivalents",
+    "fa": "مدیریت عملگرهای منطقی با نمادها، معادل‌های SQL و Cypher",
+    "ar": "إدارة المشغلات المنطقية مع رموزها ومكافئات SQL وCypher",
+    "es": "Gestionar operadores lógicos con símbolos y equivalentes SQL y Cypher",
+    "fr": "Gérer les opérateurs logiques avec symboles et équivalents SQL et Cypher",
+    "de": "Logische Operatoren mit Symbolen, SQL- und Cypher-Äquivalenten verwalten",
+    "it": "Gestisci operatori logici con simboli ed equivalenti SQL e Cypher",
+    "ru": "Управление логическими операторами, символами и эквивалентами SQL и Cypher"
+  },
+  "aggregation-types": {
+    "en": "Manage aggregation types with their symbols, SQL equivalents and formulas",
+    "fa": "مدیریت انواع تجمیع با نمادها، معادل‌های SQL و فرمول‌ها",
+    "ar": "إدارة أنواع التجميع مع رموزها ومكافئات SQL والصيغ",
+    "es": "Gestionar tipos de agregación con símbolos, equivalentes SQL y fórmulas",
+    "fr": "Gérer les types d'agrégation avec symboles, équivalents SQL et formules",
+    "de": "Aggregationstypen mit Symbolen, SQL-Äquivalenten und Formeln verwalten",
+    "it": "Gestisci tipi di aggregazione con simboli, equivalenti SQL e formule",
+    "ru": "Управление типами агрегации с символами, эквивалентами SQL и формулами"
+  },
+  "app-permissions": {
+    "en": "Define and manage application permissions for resources and actions",
+    "fa": "تعریف و مدیریت مجوزهای برنامه برای منابع و اقدامات",
+    "ar": "تحديد وإدارة أذونات التطبيق للموارد والإجراءات",
+    "es": "Definir y gestionar permisos de aplicación para recursos y acciones",
+    "fr": "Définir et gérer les permissions d'application pour ressources et actions",
+    "de": "Anwendungsberechtigungen für Ressourcen und Aktionen definieren und verwalten",
+    "it": "Definisci e gestisci i permessi dell'app per risorse e azioni",
+    "ru": "Определение и управление правами приложения на ресурсы и действия"
+  },
+  "app-access-policies": {
+    "en": "Define and manage access policies with associated permissions",
+    "fa": "تعریف و مدیریت سیاست‌های دسترسی با مجوزهای مرتبط",
+    "ar": "تحديد وإدارة سياسات الوصول مع الأذونات المرتبطة",
+    "es": "Definir y gestionar políticas de acceso con permisos asociados",
+    "fr": "Définir et gérer les politiques d'accès avec les permissions associées",
+    "de": "Zugriffsrichtlinien mit zugehörigen Berechtigungen definieren und verwalten",
+    "it": "Definisci e gestisci le policy di accesso con i permessi associati",
+    "ru": "Определение и управление политиками доступа с сопутствующими правами"
+  },
+  "menu-items": {
+    "en": "Define and manage application menu items",
+    "fa": "تعریف و مدیریت آیتم‌های منوی برنامه",
+    "ar": "تحديد وإدارة عناصر قائمة التطبيق",
+    "es": "Definir y gestionar elementos del menú de la aplicación",
+    "fr": "Définir et gérer les éléments du menu de l'application",
+    "de": "Menüpunkte der Anwendung definieren und verwalten",
+    "it": "Definisci e gestisci le voci di menu dell'applicazione",
+    "ru": "Определение и управление пунктами меню приложения"
+  },
+  "tenants": {
+    "en": "Manage tenant information including name, title, domain, default domain, and database configuration",
+    "fa": "مدیریت اطلاعات مستاجر شامل نام، عنوان، دامنه، دامنه پیش‌فرض و پیکربندی پایگاه داده",
+    "ar": "إدارة معلومات المستأجر بما في ذلك الاسم والعنوان والنطاق والنطاق الافتراضي وإعدادات قاعدة البيانات",
+    "es": "Gestionar información del inquilino: nombre, título, dominio, dominio por defecto y configuración de BD",
+    "fr": "Gérer les informations locataire (nom, titre, domaine, domaine par défaut, configuration BD)",
+    "de": "Mandanteninformationen verwalten (Name, Titel, Domain, Standard-Domain, DB-Konfiguration)",
+    "it": "Gestisci informazioni tenant: nome, titolo, dominio, dominio predefinito e configurazione DB",
+    "ru": "Управление данными арендатора: имя, заголовок, домен, домен по умолчанию и настройки БД"
+  },
+  "change-classifications": {
+    "en": "Manage change classifications with multilingual labels",
+    "fa": "مدیریت طبقه‌بندی‌های تغییر با برچسب‌های چندزبانه",
+    "ar": "إدارة تصنيفات التغيير مع تسميات متعددة اللغات",
+    "es": "Gestionar clasificaciones de cambio con etiquetas multilingües",
+    "fr": "Gérer les classifications de changement avec libellés multilingues",
+    "de": "Änderungsklassifikationen mit mehrsprachigen Bezeichnungen verwalten",
+    "it": "Gestisci classificazioni di modifica con etichette multilingua",
+    "ru": "Управление классификациями изменений с многоязычными подписями"
+  },
+  "deviation-management": {
+    "en": "GMP-compliant deviation management system for tracking and managing deviations from standard operating procedures and specifications",
+    "fa": "سیستم مدیریت انحراف سازگار با GMP برای ردیابی و مدیریت انحرافات از رویه‌ها و مشخصات استاندارد",
+    "ar": "نظام إدارة الانحرافات المتوافق مع GMP لتتبع وإدارة الانحرافات عن الإجراءات والمواصفات القياسية",
+    "es": "Sistema de gestión de desviaciones conforme a GMP para seguimiento y gestión de desviaciones de procedimientos y especificaciones",
+    "fr": "Système de gestion des écarts conforme GMP pour le suivi et la gestion des écarts aux procédures et spécifications",
+    "de": "GMP-konformes Abweichungsmanagementsystem zur Verfolgung und Verwaltung von Abweichungen von SOPs und Spezifikationen",
+    "it": "Sistema di gestione delle deviazioni conforme GMP per tracciare e gestire le deviazioni da procedure e specifiche",
+    "ru": "Система управления отклонениями по GMP для учёта и управления отклонениями от процедур и спецификаций"
+  },
+  "change-management-records": {
+    "en": "GMP-compliant change management system for tracking and managing changes with impact assessment, QA analysis, and closure",
+    "fa": "سیستم مدیریت تغییر سازگار با GMP برای ردیابی و مدیریت تغییرات با ارزیابی اثر، تحلیل QA و بستن",
+    "ar": "نظام إدارة التغيير المتوافق مع GMP لتتبع وإدارة التغييرات مع تقييم الأثر وتحليل ضمان الجودة والإغلاق",
+    "es": "Sistema de gestión de cambios conforme a GMP con evaluación de impacto, análisis QA y cierre",
+    "fr": "Système de gestion des changements conforme GMP avec évaluation d'impact, analyse QA et clôture",
+    "de": "GMP-konformes Änderungsmanagementsystem mit Wirkungsanalyse, QA-Analyse und Abschluss",
+    "it": "Sistema di gestione dei cambiamenti conforme GMP con valutazione d'impatto, analisi QA e chiusura",
+    "ru": "Система управления изменениями по GMP с оценкой воздействия, анализом QA и закрытием"
+  },
+  "quality-assurance-analysis": {
+    "en": "Quality assurance analysis reports and findings",
+    "fa": "گزارش‌ها و یافته‌های تحلیل تضمین کیفیت",
+    "ar": "تقارير وتحليلات ضمان الجودة والنتائج",
+    "es": "Informes y hallazgos de análisis de garantía de calidad",
+    "fr": "Rapports et conclusions d'analyse assurance qualité",
+    "de": "Berichte und Erkenntnisse der Qualitätssicherungsanalyse",
+    "it": "Report e risultati dell'analisi di garanzia della qualità",
+    "ru": "Отчёты и выводы анализа обеспечения качества"
+  },
+  "qa-guideline-analysis": {
+    "en": "QA guideline analysis with document references and justifications",
+    "fa": "تحلیل راهنمای QA با مراجع و توجیهات سند",
+    "ar": "تحليل إرشادات ضمان الجودة مع المراجع والمبررات الوثائقية",
+    "es": "Análisis de directrices QA con referencias documentales y justificaciones",
+    "fr": "Analyse des lignes directrices QA avec références documentaires et justifications",
+    "de": "QA-Richtlinienanalyse mit Dokumentenreferenzen und Begründungen",
+    "it": "Analisi linee guida QA con riferimenti documentali e giustificazioni",
+    "ru": "Анализ руководств по QA с ссылками на документы и обоснованиями"
+  },
+  "change-categories": {
+    "en": "Manage change categories with multilingual labels and hierarchical support",
+    "fa": "مدیریت دسته‌های تغییر با برچسب‌های چندزبانه و پشتیبانی سلسله‌مراتبی",
+    "ar": "إدارة فئات التغيير مع تسميات متعددة اللغات ودعم هرمي",
+    "es": "Gestionar categorías de cambio con etiquetas multilingües y soporte jerárquico",
+    "fr": "Gérer les catégories de changement avec libellés multilingues et hiérarchie",
+    "de": "Änderungskategorien mit mehrsprachigen Bezeichnungen und Hierarchie verwalten",
+    "it": "Gestisci categorie di modifica con etichette multilingua e supporto gerarchico",
+    "ru": "Управление категориями изменений с многоязычными подписями и иерархией"
+  },
+  "related-documents": {
+    "en": "Related documents for change management",
+    "fa": "اسناد مرتبط برای مدیریت تغییر",
+    "ar": "المستندات ذات الصلة بإدارة التغيير",
+    "es": "Documentos relacionados para la gestión del cambio",
+    "fr": "Documents associés à la gestion du changement",
+    "de": "Zugehörige Dokumente für das Änderungsmanagement",
+    "it": "Documenti correlati per la gestione del cambiamento",
+    "ru": "Связанные документы для управления изменениями"
+  },
+  "change-procedure": {
+    "en": "Manage change procedures with multilingual labels",
+    "fa": "مدیریت رویه‌های تغییر با برچسب‌های چندزبانه",
+    "ar": "إدارة إجراءات التغيير مع تسميات متعددة اللغات",
+    "es": "Gestionar procedimientos de cambio con etiquetas multilingües",
+    "fr": "Gérer les procédures de changement avec libellés multilingues",
+    "de": "Änderungsverfahren mit mehrsprachigen Bezeichnungen verwalten",
+    "it": "Gestisci procedure di modifica con etichette multilingua",
+    "ru": "Управление процедурами изменений с многоязычными подписями"
+  },
+  "tasks": {
+    "en": "Manage tasks and follow-up items",
+    "fa": "مدیریت وظایف و آیتم‌های پیگیری",
+    "ar": "إدارة المهام وعناصر المتابعة",
+    "es": "Gestionar tareas y elementos de seguimiento",
+    "fr": "Gérer les tâches et les points de suivi",
+    "de": "Aufgaben und Nachverfolgungselemente verwalten",
+    "it": "Gestisci attività e elementi di follow-up",
+    "ru": "Управление задачами и пунктами последующих действий"
+  },
+  "attachments": {
+    "en": "Manage file attachments and documents",
+    "fa": "مدیریت پیوست‌های فایل و اسناد",
+    "ar": "إدارة المرفقات والوثائق",
+    "es": "Gestionar archivos adjuntos y documentos",
+    "fr": "Gérer les pièces jointes et documents",
+    "de": "Dateianhänge und Dokumente verwalten",
+    "it": "Gestisci allegati e documenti",
+    "ru": "Управление вложениями и документами"
+  },
+  "attachment-folders": {
+    "en": "Organize attachments into hierarchical folders",
+    "fa": "سازماندهی پیوست‌ها در پوشه‌های سلسله‌مراتبی",
+    "ar": "تنظيم المرفقات في مجلدات هرمية",
+    "es": "Organizar adjuntos en carpetas jerárquicas",
+    "fr": "Organiser les pièces jointes en dossiers hiérarchiques",
+    "de": "Anhänge in hierarchische Ordner organisieren",
+    "it": "Organizza allegati in cartelle gerarchiche",
+    "ru": "Организация вложений в иерархические папки"
+  },
+  "reset-password-form": {
+    "en": "Lightweight action form for resetting a user password via custom route",
+    "fa": "فرم اقدام سبک برای بازنشانی رمز عبور کاربر از طریق مسیر سفارشی",
+    "ar": "نموذج إجراء خفيف لإعادة تعيين كلمة مرور المستخدم عبر مسار مخصص",
+    "es": "Formulario de acción ligero para restablecer contraseña de usuario por ruta personalizada",
+    "fr": "Formulaire d'action léger pour réinitialiser le mot de passe utilisateur via une route personnalisée",
+    "de": "Leichtes Aktionsformular zum Zurücksetzen des Benutzerkennworts über benutzerdefinierte Route",
+    "it": "Modulo azione leggero per reimpostare la password utente tramite route personalizzata",
+    "ru": "Облегчённая форма сброса пароля пользователя через пользовательский маршрут"
+  },
+  "oox-analyzer": {
+    "en": "Analyzer for evaluating OOX incidents in quality control, including description, analysis, and compliance reporting.",
+    "fa": "تحلیلگر برای ارزیابی رویدادهای OOX در کنترل کیفیت، شامل توضیح، تحلیل و گزارش انطباق.",
+    "ar": "أداة تحليل لتقييم حوادث OOX في ضبط الجودة، بما في ذلك الوصف والتحليل وتقارير الامتثال.",
+    "es": "Analizador para evaluar incidentes OOX en control de calidad, incluyendo descripción, análisis e informes de conformidad.",
+    "fr": "Analyseur pour évaluer les incidents OOX en contrôle qualité : description, analyse et rapports de conformité.",
+    "de": "Analysewerkzeug für OOX-Vorfälle in der Qualitätskontrolle (Beschreibung, Analyse, Konformitätsberichte).",
+    "it": "Analizzatore per valutare incidenti OOX nel controllo qualità, con descrizione, analisi e report di conformità.",
+    "ru": "Анализатор оценки инцидентов OOX в контроле качества: описание, анализ и отчётность по соответствию."
+  },
+  "process-mappings": {
+    "en": "Define and manage process mappings with hierarchical parent-child relationships.",
+    "fa": "تعریف و مدیریت نگاشت‌های فرآیند با روابط سلسله‌مراتبی والد-فرزند.",
+    "ar": "تحديد وإدارة تعيينات العمليات مع العلاقات الهرمية الأب-الابن.",
+    "es": "Definir y gestionar mapeos de procesos con relaciones jerárquicas padre-hijo.",
+    "fr": "Définir et gérer les mappages de processus avec relations hiérarchiques parent-enfant.",
+    "de": "Prozesszuordnungen mit hierarchischen Eltern-Kind-Beziehungen definieren und verwalten.",
+    "it": "Definisci e gestisci mappature di processo con relazioni gerarchiche padre-figlio.",
+    "ru": "Определение и управление отображениями процессов с иерархическими связями родитель–потомок."
+  },
+  "guidelines": {
+    "en": "Register and manage QA/technical guidelines with codes, editions, and publish years.",
+    "fa": "ثبت و مدیریت راهنماهای QA/فنی با کدها، نسخه‌ها و سال‌های انتشار.",
+    "ar": "تسجيل وإدارة إرشادات ضمان الجودة/الفنية مع الرموز والإصدارات وسنوات النشر.",
+    "es": "Registrar y gestionar directrices QA/técnicas con códigos, ediciones y años de publicación.",
+    "fr": "Enregistrer et gérer les lignes directrices QA/techniques avec codes, éditions et années de publication.",
+    "de": "QA-/technische Richtlinien mit Codes, Ausgaben und Veröffentlichungsjahren registrieren und verwalten.",
+    "it": "Registra e gestisci linee guida QA/tecniche con codici, edizioni e anni di pubblicazione.",
+    "ru": "Регистрация и управление руководствами QA/техническими с кодами, изданиями и годами публикации."
+  },
+  "vendors": {
+    "en": "Manage vendor information and details",
+    "fa": "مدیریت اطلاعات و جزئیات تأمین‌کننده",
+    "ar": "إدارة معلومات الموردين والتفاصيل",
+    "es": "Gestionar información y detalles de proveedores",
+    "fr": "Gérer les informations et détails des fournisseurs",
+    "de": "Lieferanteninformationen und -details verwalten",
+    "it": "Gestisci informazioni e dettagli dei fornitori",
+    "ru": "Управление информацией и данными о поставщиках"
+  },
+  "inquiries": {
+    "en": "Manage inquiries with inquiry number, date, and description",
+    "fa": "مدیریت استعلام‌ها با شماره استعلام، تاریخ و توضیحات",
+    "ar": "إدارة الاستفسارات مع رقم الاستفسار والتاريخ والوصف",
+    "es": "Gestionar consultas con número, fecha y descripción",
+    "fr": "Gérer les demandes avec numéro, date et description",
+    "de": "Anfragen mit Anfragenummer, Datum und Beschreibung verwalten",
+    "it": "Gestisci richieste con numero, data e descrizione",
+    "ru": "Управление запросами с номером, датой и описанием"
+  },
+  "tenders": {
+    "en": "Manage tenders with vendors and description",
+    "fa": "مدیریت مناقصه‌ها با تأمین‌کنندگان و توضیحات",
+    "ar": "إدارة المناقصات مع الموردين والوصف",
+    "es": "Gestionar licitaciones con proveedores y descripción",
+    "fr": "Gérer les appels d'offres avec fournisseurs et description",
+    "de": "Ausschreibungen mit Lieferanten und Beschreibung verwalten",
+    "it": "Gestisci gare con fornitori e descrizione",
+    "ru": "Управление тендерами с поставщиками и описанием"
+  },
+  "tender-items": {
+    "en": "Manage Tender Items with part details, quantities, and requirements",
+    "fa": "مدیریت آیتم‌های مناقصه با جزئیات قطعه، مقادیر و الزامات",
+    "ar": "إدارة بنود المناقصات مع تفاصيل القطع والكميات والمتطلبات",
+    "es": "Gestionar ítems de licitación con detalles de pieza, cantidades y requisitos",
+    "fr": "Gérer les articles d'appel d'offres avec détails pièce, quantités et exigences",
+    "de": "Ausschreibungspositionen mit Teiledetails, Mengen und Anforderungen verwalten",
+    "it": "Gestisci voci di gara con dettagli parte, quantità e requisiti",
+    "ru": "Управление позициями тендера с деталями изделий, количествами и требованиями"
+  },
+  "tender-invitations": {
+    "en": "Manage tender invitations with vendor selection",
+    "fa": "مدیریت دعوت‌های مناقصه با انتخاب تأمین‌کننده",
+    "ar": "إدارة دعوات المناقصات مع اختيار المورد",
+    "es": "Gestionar invitaciones a licitación con selección de proveedor",
+    "fr": "Gérer les invitations d'appel d'offres avec sélection du fournisseur",
+    "de": "Ausschreibungseinladungen mit Lieferantenauswahl verwalten",
+    "it": "Gestisci inviti a gara con selezione fornitore",
+    "ru": "Управление приглашениями на тендер с выбором поставщика"
+  },
+  "quotations": {
+    "en": "Manage quotations with financial details and items",
+    "fa": "مدیریت پیشنهادها با جزئیات مالی و آیتم‌ها",
+    "ar": "إدارة عروض الأسعار مع التفاصيل المالية والبنود",
+    "es": "Gestionar cotizaciones con detalles financieros e ítems",
+    "fr": "Gérer les devis avec détails financiers et articles",
+    "de": "Angebote mit Finanzdetails und Positionen verwalten",
+    "it": "Gestisci preventivi con dettagli finanziari e voci",
+    "ru": "Управление коммерческими предложениями с финансовыми деталями и позициями"
+  },
+  "quotation-items": {
+    "en": "Manage Quotation Items linked to tender items with financial details",
+    "fa": "مدیریت آیتم‌های پیشنهاد مرتبط با آیتم‌های مناقصه با جزئیات مالی",
+    "ar": "إدارة بنود عروض الأسعار المرتبطة ببنود المناقصات مع التفاصيل المالية",
+    "es": "Gestionar ítems de cotización vinculados a ítems de licitación con detalles financieros",
+    "fr": "Gérer les articles de devis liés aux articles d'appel d'offres avec détails financiers",
+    "de": "Angebotspositionen mit Ausschreibungspositionen und Finanzdetails verwalten",
+    "it": "Gestisci voci preventivo collegate a voci di gara con dettagli finanziari",
+    "ru": "Управление позициями КП, связанными с позициями тендера, с финансовыми деталями"
+  },
+  "pages": {
+    "en": "Manage custom pages with configurable layouts, sections, quick actions, and components",
+    "fa": "مدیریت صفحات سفارشی با چیدمان، بخش‌ها، اقدامات سریع و اجزای قابل پیکربندی",
+    "ar": "إدارة الصفحات المخصصة مع تخطيطات وأقسام وإجراءات سريعة ومكونات قابلة للتكوين",
+    "es": "Gestionar páginas personalizadas con diseños, secciones, acciones rápidas y componentes configurables",
+    "fr": "Gérer les pages personnalisées avec mises en page, sections, actions rapides et composants configurables",
+    "de": "Benutzerdefinierte Seiten mit konfigurierbaren Layouts, Abschnitten, Schnellaktionen und Komponenten verwalten",
+    "it": "Gestisci pagine personalizzate con layout, sezioni, azioni rapide e componenti configurabili",
+    "ru": "Управление пользовательскими страницами с настраиваемыми макетами, разделами, быстрыми действиями и компонентами"
+  },
+  "dynamic-queries": {
+    "en": "Manage dynamic queries with configurable parameters",
+    "fa": "مدیریت پرس‌وجوهای پویا با پارامترهای قابل پیکربندی",
+    "ar": "إدارة الاستعلامات الديناميكية مع معلمات قابلة للتكوين",
+    "es": "Gestionar consultas dinámicas con parámetros configurables",
+    "fr": "Gérer les requêtes dynamiques avec paramètres configurables",
+    "de": "Dynamische Abfragen mit konfigurierbaren Parametern verwalten",
+    "it": "Gestisci query dinamiche con parametri configurabili",
+    "ru": "Управление динамическими запросами с настраиваемыми параметрами"
+  },
+  "page-metadata-editor-form": {
+    "en": "Action form for editing page layout metadata",
+    "fa": "فرم اقدام برای ویرایش ابرداده چیدمان صفحه",
+    "ar": "نموذج إجراء لتحرير بيانات تخطيط الصفحة الوصفية",
+    "es": "Formulario de acción para editar metadatos de diseño de página",
+    "fr": "Formulaire d'action pour modifier les métadonnées de mise en page",
+    "de": "Aktionsformular zum Bearbeiten von Seitenlayout-Metadaten",
+    "it": "Modulo azione per modificare i metadati del layout della pagina",
+    "ru": "Форма действия для редактирования метаданных макета страницы"
+  },
+  "lean-management": {
+    "en": "Manage lean management waste analysis and improvement opportunities",
+    "fa": "مدیریت تحلیل اتلاف و فرصت‌های بهبود مدیریت ناب",
+    "ar": "إدارة تحليل الهدر وفرص التحسين في الإدارة الرشيقة",
+    "es": "Gestionar análisis de desperdicio y oportunidades de mejora en gestión lean",
+    "fr": "Gérer l'analyse des gaspillages et les opportunités d'amélioration en gestion lean",
+    "de": "Lean-Management: Analyse von Verschwendung und Verbesserungsmöglichkeiten verwalten",
+    "it": "Gestisci analisi degli sprechi e opportunità di miglioramento nella gestione lean",
+    "ru": "Управление анализом потерь и возможностей улучшения в бережливом управлении"
+  },
+  "project-proposal": {
+    "en": "Project proposal – project definition, evaluation parameters and CEO evaluation",
+    "fa": "پیشنهاد پروژه – تعریف پروژه، پارامترهای ارزیابی و ارزیابی مدیرعامل",
+    "ar": "اقتراح المشروع – تعريف المشروع ومعلمات التقييم وتقييم الرئيس التنفيذي",
+    "es": "Propuesta de proyecto: definición, parámetros de evaluación y evaluación del CEO",
+    "fr": "Proposition de projet – définition, paramètres d'évaluation et évaluation du PDG",
+    "de": "Projektvorschlag – Projektdefinition, Bewertungsparameter und CEO-Bewertung",
+    "it": "Proposta di progetto: definizione, parametri di valutazione e valutazione del CEO",
+    "ru": "Предложение по проекту: определение, параметры оценки и оценка CEO"
+  },
+  "notes": {
+    "en": "Personal notes and checklists - sticky-note style workspace",
+    "fa": "یادداشت‌ها و چک‌لیست‌های شخصی – فضای کاری به سبک یادداشت چسبان",
+    "ar": "ملاحظات وقوائم التحقق الشخصية - مساحة عمل بأسلوب الملاحظات اللاصقة",
+    "es": "Notas personales y listas de verificación: espacio de trabajo estilo nota adhesiva",
+    "fr": "Notes personnelles et listes de contrôle – espace de travail style post-it",
+    "de": "Persönliche Notizen und Checklisten – Arbeitsbereich im Stil von Haftnotizen",
+    "it": "Note personali e checklist – area di lavoro stile post-it",
+    "ru": "Личные заметки и чек-листы – рабочее пространство в стиле стикеров"
+  }
+}

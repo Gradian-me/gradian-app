@@ -8,6 +8,8 @@ import {
 import { NavigationItem } from '../types';
 import { AD_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { getIconComponent, isValidLucideIcon } from '@/gradian-ui/shared/utils/icon-renderer';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage, isTranslationArray } from '@/gradian-ui/shared/utils/translation-utils';
 
 /** Minimal highlight class for search matches in sidebar (dark theme) */
 export const SIDEBAR_HIGHLIGHT_CLASS = 'bg-violet-500/15 text-violet-200 rounded-sm px-0.5';
@@ -31,10 +33,54 @@ export const FALLBACK_HOME_MENU_ITEM: NavigationItem = {
  *   (Skip this filter if showAllItems is true)
  * - Returns [] when no items (Home is shown separately, outside the menu).
  */
+
+// Resolve a menuTitle that may be:
+// - a plain string
+// - a translations array: [{ en: 'Integrations' }, { fa: 'یکپارچه‌سازی‌ها' }, ...]
+// Always returns a safe string for rendering.
+// language: optional current UI language (e.g. from useLanguageStore); when not provided, uses store getState().
+function resolveMenuTitle(rawTitle: unknown, language?: string): string {
+  if (!rawTitle) return 'Menu Item';
+
+  if (typeof rawTitle === 'string') {
+    return rawTitle;
+  }
+
+  if (!Array.isArray(rawTitle)) {
+    try {
+      return String(rawTitle);
+    } catch {
+      return 'Menu Item';
+    }
+  }
+
+  const lang = language ?? (useLanguageStore.getState().getLanguage?.() ?? useLanguageStore.getState().language ?? getDefaultLanguage());
+  const defaultLang = getDefaultLanguage();
+
+  let fallbackValue: string | undefined;
+
+  for (const entry of rawTitle) {
+    if (!entry || typeof entry !== 'object') continue;
+
+    const typedEntry = entry as Record<string, string>;
+
+    if (typedEntry[lang]) {
+      return typedEntry[lang];
+    }
+
+    if (!fallbackValue && typedEntry[defaultLang]) {
+      fallbackValue = typedEntry[defaultLang];
+    }
+  }
+
+  return fallbackValue || 'Menu Item';
+}
+
 export function mapMenuItemsToNavigationItems(
   menuItems: any[],
   companyId?: string | number | null,
-  showAllItems: boolean = false
+  showAllItems: boolean = false,
+  language?: string
 ): NavigationItem[] {
   if (!Array.isArray(menuItems)) {
     return [];
@@ -94,7 +140,7 @@ export function mapMenuItemsToNavigationItems(
 
       return {
         id: item.id,
-        name: item.menuTitle ?? 'Menu Item',
+        name: resolveMenuTitle(item.menuTitle, language),
         href: item.menuUrl ?? '/',
         icon: Icon as LucideIcon,
         description: item.description,
@@ -232,10 +278,17 @@ export const filterFormSchemas = (
     // Search in id (for exact matches)
     const idMatch = schema.id?.toLowerCase().includes(query);
     
-    // Search in application names
-    const applicationMatch = schema.applications?.some((app: { name?: string }) => 
-      app.name?.toLowerCase().includes(query)
-    );
+    // Search in application names (name may be string or translation array)
+    const applicationMatch = schema.applications?.some((app: { name?: string | Array<Record<string, string>> }) => {
+      const name = app.name;
+      if (name == null) return false;
+      if (typeof name === 'string') return name.toLowerCase().includes(query);
+      if (isTranslationArray(name)) {
+        const allValues = name.flatMap((o) => Object.values(o)).join(' ').toLowerCase();
+        return allValues.includes(query);
+      }
+      return false;
+    });
     
     return pluralMatch || singularMatch || descriptionMatch || idMatch || applicationMatch;
   });

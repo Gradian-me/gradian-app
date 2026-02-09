@@ -27,6 +27,8 @@ import { renderHighlightedText } from '../../shared/utils/highlighter';
 import { formatFieldValue } from '../table/utils/field-formatters';
 import { EntityMetadata } from './CreateUpdateDetail';
 import { replaceDynamicContext } from '../../form-builder/utils/dynamic-context-replacer';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 
 export interface DynamicCardRendererProps {
   schema: FormSchema;
@@ -70,6 +72,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   showUserDetails = false,
 }) => {
   const router = useRouter();
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
   const normalizedHighlightQuery = highlightQuery.trim();
   // Get card metadata from schema
   const cardMetadata = schema?.cardMetadata || [] as CardSection[];
@@ -1011,7 +1014,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         section.colSpan === 2 ? "col-span-1 sm:col-span-2" : "col-span-1"
                       )}
                     >
-                      {renderCardSection({ section, schema, data, maxMetrics, onBadgeNavigate: handleNavigateToEntity })}
+                      {renderCardSection({ section, schema, data, maxMetrics, onBadgeNavigate: handleNavigateToEntity, language })}
                     </div>
                   ))}
                 </motion.div>

@@ -1,6 +1,13 @@
 import { FormSchema as BuilderFormSchema, FormField as BuilderFormField } from '@/gradian-ui/schema-manager/types/form-schema';
 import { FormSchema, FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 import { extractLabels } from './option-normalizer';
+import {
+  isTranslationArray,
+  resolveFromTranslationsArray,
+  resolveDisplayLabel,
+  getDefaultLanguage,
+} from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 /**
  * Apply default properties to a field if they are not specified
@@ -63,9 +70,17 @@ export const getValueByRole = (schema: FormSchema, data: any, role: string): str
 
   const joiner = role === 'title' ? ' ' : ' | ';
 
+  const lang = useLanguageStore.getState?.()?.language || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+
   const values = fields
     .map(field => {
       const rawValue = data[field.name];
+
+      if (isTranslationArray(rawValue)) {
+        return resolveFromTranslationsArray(rawValue, lang, defaultLang);
+      }
+
       const valueArray = Array.isArray(rawValue)
         ? rawValue
         : rawValue !== undefined && rawValue !== null
@@ -92,11 +107,11 @@ export const getValueByRole = (schema: FormSchema, data: any, role: string): str
             }
             // If entry is a string/number ID, find matching option
             const entryId = String(entry);
-            const option = field.options.find((opt: { id?: string; value?: string }) => 
+            const option = field.options.find((opt: { id?: string; value?: string; label?: unknown }) =>
               String(opt.id) === entryId || String(opt.value) === entryId
             );
             if (option) {
-              return option.label || option.id || entryId;
+              return resolveDisplayLabel(option.label ?? option.id ?? entryId, lang, defaultLang) || entryId;
             }
             return entryId;
           })
@@ -134,6 +149,13 @@ export const getSingleValueByRole = (schema: FormSchema, data: any, role: string
   if (rawValue === undefined || rawValue === null) {
     return defaultValue;
   }
+
+  const lang = useLanguageStore.getState?.()?.language || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+
+  if (isTranslationArray(rawValue)) {
+    return resolveFromTranslationsArray(rawValue, lang, defaultLang) || defaultValue;
+  }
   
   const valueArray = Array.isArray(rawValue)
     ? rawValue
@@ -164,22 +186,22 @@ export const getSingleValueByRole = (schema: FormSchema, data: any, role: string
         }
         // If entry is a string/number ID, find matching option
         const entryId = String(entry);
-        const option = field.options.find((opt: { id?: string; value?: string }) => 
+        const option = field.options.find((opt: { id?: string; value?: string; label?: unknown }) =>
           String(opt.id) === entryId || String(opt.value) === entryId
         );
         if (option) {
-          return option.label || option.id || entryId;
+          return resolveDisplayLabel(option.label ?? option.id ?? entryId, lang, defaultLang) || entryId;
         }
         return entryId;
       })
       .filter(Boolean);
-    
+
     if (selectStrings.length > 0) {
       return selectStrings[0];
     }
     return defaultValue;
   }
-  
+
   const labels = extractLabels(valueArray);
   if (labels.length > 0) {
     return labels[0];

@@ -165,7 +165,7 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
           <CardWrapper
             config={{
               id: section.id,
-              name: section.title,
+              name: sectionTitle,
               styling: {
                 variant: 'default',
                 size: 'md'
@@ -175,11 +175,11 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
           >
             <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
               <div className="flex items-center gap-2" dir="auto">
-                <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{section.title}</CardTitle>
+                <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{sectionTitle}</CardTitle>
                 <ForceIcon isForce={data?.isForce === true} size="sm" />
               </div>
-              {section.description && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5" dir="auto">{section.description}</p>
+              {sectionDescription && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1.5" dir="auto">{sectionDescription}</p>
               )}
             </CardHeader>
             <CardContent>

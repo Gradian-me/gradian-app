@@ -8,6 +8,7 @@ import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../../components/ui/tooltip';
 import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
+import { getSectionTranslatedTitle } from '@/gradian-ui/schema-manager/utils/schema-utils';
 
 interface RenderSectionProps {
   section: any;
@@ -15,19 +16,23 @@ interface RenderSectionProps {
   data: any;
   maxMetrics?: number;
   onBadgeNavigate?: (schemaId: string, entityId: string) => void;
+  /** Current UI language for resolving titleTranslations/descriptionTranslations */
+  language?: string;
 }
 
 /**
  * Render a card section with its fields
  */
-export const renderCardSection = ({ section, schema, data, maxMetrics = 3, onBadgeNavigate }: RenderSectionProps): React.ReactNode | null => {
+export const renderCardSection = ({ section, schema, data, maxMetrics = 3, onBadgeNavigate, language }: RenderSectionProps): React.ReactNode | null => {
   const fieldIds = section?.fieldIds || [];
   if (fieldIds.length === 0) return null;
+
+  const sectionTitle = getSectionTranslatedTitle(section, language, section?.title || section?.id);
 
   return (
     <div className="space-y-2 mb-1">
       <div className="text-gray-500 dark:text-gray-300 font-medium border-b border-gray-200 dark:border-gray-600 pb-1 mb-2">
-        {section?.title || section?.id}
+        {sectionTitle}
       </div>
       <div className="space-y-2">
         {fieldIds.map((fieldId: string) => {

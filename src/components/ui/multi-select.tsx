@@ -32,6 +32,9 @@ import { normalizeOptionArray, NormalizedOption } from "@/gradian-ui/form-builde
 import { getIconComponent } from "@/gradian-ui/shared/utils/icon-renderer";
 import { ColumnMapConfig } from "@/gradian-ui/shared/utils/column-mapper";
 import { SortType } from "@/gradian-ui/shared/utils/sort-utils";
+import { getT, getDefaultLanguage } from "@/gradian-ui/shared/utils/translation-utils";
+import { useLanguageStore } from "@/stores/language.store";
+import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
 
 /**
  * Animation types and configurations
@@ -395,6 +398,10 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
 		},
 		ref
 	) => {
+		const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+		const defaultLang = getDefaultLanguage();
+		const placeholderSearchOptions = getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH_OPTIONS, language, defaultLang);
+
 		// Fetch options from schemaId or sourceUrl if provided
 		const {
 			options: fetchedOptions,
@@ -1198,7 +1205,7 @@ export const MultiSelect = React.forwardRef<MultiSelectRef, MultiSelectProps>(
 						<Command>
 							{searchable && (
 								<CommandInput
-									placeholder="Search options..."
+									placeholder={placeholderSearchOptions}
 									onKeyDown={handleInputKeyDown}
 									value={searchValue}
 									onValueChange={setSearchValue}

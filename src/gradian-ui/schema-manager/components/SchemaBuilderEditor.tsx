@@ -21,6 +21,9 @@ import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 interface SchemaBuilderEditorProps {
   schemaId?: string;
@@ -41,12 +44,15 @@ export function SchemaBuilderEditor({
   saveSchema,
   onBack,
   title,
-  subtitle = 'Schema Builder',
+  subtitle,
   apiResponse,
   onClearResponse,
   onRefreshSchema,
   refreshing,
 }: SchemaBuilderEditorProps) {
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const subtitleResolved = subtitle ?? getT(TRANSLATION_KEYS.SCHEMA_SUBTITLE_BUILDER, language, defaultLang);
   const [schema, setSchema] = useState<FormSchema | null>(null);
   const [originalSchema, setOriginalSchema] = useState<FormSchema | null>(null);
   const [loading, setLoading] = useState(true);
@@ -94,15 +100,16 @@ export function SchemaBuilderEditor({
       onClearResponse?.();
       await saveSchema(schemaId, schema);
       setOriginalSchema(JSON.parse(JSON.stringify(schema))); // Update original schema
-      toast.success('Schema saved successfully');
+      toast.success(getT(TRANSLATION_KEYS.SCHEMA_SAVED_SUCCESS, language, defaultLang));
       // FormAlert will only show if MessageBoxContainer doesn't have messages
       // The MessageBoxContainer will handle API response messages if they exist
     } catch (error) {
       console.error('Error saving schema:', error);
-      toast.error('Error saving schema');
+      const saveErrorMsg = getT(TRANSLATION_KEYS.SCHEMA_SAVE_ERROR, language, defaultLang);
+      toast.error(saveErrorMsg);
       // Show error feedback if no API response messages are available
       if (!apiResponse?.messages && !apiResponse?.message) {
-        setSaveFeedback({ type: 'error', message: 'Error saving schema' });
+        setSaveFeedback({ type: 'error', message: saveErrorMsg });
       }
     } finally {
       setSaving(false);
@@ -302,7 +309,7 @@ export function SchemaBuilderEditor({
 
   if (loading) {
     return (
-      <MainLayout title={title || 'Loading Schema...'} subtitle={subtitle} icon="Brackets">
+      <MainLayout title={title || getT(TRANSLATION_KEYS.SCHEMA_LOADING, language, defaultLang)} subtitle={subtitleResolved} icon="Brackets">
         <div className="space-y-6 max-w-7xl mx-auto">
           {/* Action Buttons Skeleton */}
           <div className="flex items-center justify-between gap-4">
@@ -366,7 +373,7 @@ export function SchemaBuilderEditor({
 
   if (loadError) {
     return (
-      <MainLayout title={title || 'Schema Not Found'} subtitle={subtitle} icon="Brackets" showEndLine={false}>
+      <MainLayout title={title || getT(TRANSLATION_KEYS.SCHEMA_NOT_FOUND, language, defaultLang)} subtitle={subtitleResolved} icon="Brackets" showEndLine={false}>
         <SchemaNotFound
           onGoBack={onBack}
           showGoBackButton={!!onBack}
@@ -382,10 +389,14 @@ export function SchemaBuilderEditor({
     return null;
   }
 
+  const editTitleTemplate = getT(TRANSLATION_KEYS.SCHEMA_EDIT_TITLE, language, defaultLang);
+  const editTitle = title || (schema.singular_name
+    ? editTitleTemplate.replace('{name}', schema.singular_name)
+    : editTitleTemplate.replace('{name}', schema.plural_name || ''));
   return (
     <MainLayout 
-      title={title || (schema.singular_name ? `Edit ${schema.singular_name}` : `Editing: ${schema.plural_name}`)} 
-      subtitle={subtitle}
+      title={editTitle} 
+      subtitle={subtitleResolved}
       icon="Brackets"
     >
       <div className="space-y-6 max-w-7xl mx-auto">
@@ -412,9 +423,13 @@ export function SchemaBuilderEditor({
           onReset={() => setShowResetDialog(true)}
           viewSchemaListUrl={schemaId ? `/page/${schemaId}` : undefined}
           saving={saving}
+          backLabel={getT(TRANSLATION_KEYS.SCHEMA_BUTTON_BACK_TO_SCHEMAS, language, defaultLang)}
+          saveLabel={getT(TRANSLATION_KEYS.SCHEMA_BUTTON_SAVE_SCHEMA, language, defaultLang)}
+          resetLabel={getT(TRANSLATION_KEYS.BUTTON_RESET, language, defaultLang)}
+          viewSchemaListLabel={getT(TRANSLATION_KEYS.BUTTON_VIEW_LIST, language, defaultLang)}
           onRefresh={onRefreshSchema}
           refreshing={refreshing}
-          refreshLabel="Refresh"
+          refreshLabel={getT(TRANSLATION_KEYS.BUTTON_REFRESH, language, defaultLang)}
         />
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -424,31 +439,31 @@ export function SchemaBuilderEditor({
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
               <Settings className="h-4 w-4 me-1 sm:me-2" />
-              <span className="truncate">General</span>
+              <span className="truncate">{getT(TRANSLATION_KEYS.SCHEMA_TAB_GENERAL, language, defaultLang)}</span>
             </TabsTrigger>
             <TabsTrigger
               value="sections"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
               <Layers className="h-4 w-4 me-1 sm:me-2" />
-              <span className="truncate hidden sm:inline">Sections & Fields</span>
-              <span className="truncate sm:hidden">Fields</span>
+              <span className="truncate hidden sm:inline">{getT(TRANSLATION_KEYS.SCHEMA_TAB_SECTIONS, language, defaultLang)}</span>
+              <span className="truncate sm:hidden">{getT(TRANSLATION_KEYS.SCHEMA_TAB_SECTIONS, language, defaultLang)}</span>
             </TabsTrigger>
             <TabsTrigger
               value="card"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
               <Layout className="h-4 w-4 me-1 sm:me-2" />
-              <span className="truncate hidden sm:inline">Card Metadata</span>
-              <span className="truncate sm:hidden">Card</span>
+              <span className="truncate hidden sm:inline">{getT(TRANSLATION_KEYS.SCHEMA_TAB_CARD_METADATA, language, defaultLang)}</span>
+              <span className="truncate sm:hidden">{getT(TRANSLATION_KEYS.SCHEMA_TAB_CARD_METADATA, language, defaultLang)}</span>
             </TabsTrigger>
             <TabsTrigger
               value="detail"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
               <FileText className="h-4 w-4 me-1 sm:me-2" />
-              <span className="truncate hidden sm:inline">Detail Page</span>
-              <span className="truncate sm:hidden">Detail</span>
+              <span className="truncate hidden sm:inline">{getT(TRANSLATION_KEYS.SCHEMA_TAB_DETAIL_PAGE, language, defaultLang)}</span>
+              <span className="truncate sm:hidden">{getT(TRANSLATION_KEYS.SCHEMA_TAB_DETAIL_PAGE, language, defaultLang)}</span>
             </TabsTrigger>
           </TabsList>
 

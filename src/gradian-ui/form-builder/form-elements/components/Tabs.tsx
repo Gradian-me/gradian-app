@@ -67,9 +67,8 @@ const FormTabsList = React.forwardRef<React.ElementRef<typeof BaseTabsList>, For
       <BaseTabsList
         ref={ref}
         className={cn(
-          'inline-flex gap-2 bg-gray-100 dark:bg-gray-800 p-1.5 justify-start',
-          'rounded-xl md:gap-3',
-          '[&>*]:shrink-0',
+          'inline-flex gap-2 bg-gray-100 dark:bg-gray-800 justify-start rounded-xl md:gap-3 [&>*]:shrink-0',
+          'ps-1.5 pe-1.5 pt-1.5 pb-1.5',
           className
         )}
         {...props}

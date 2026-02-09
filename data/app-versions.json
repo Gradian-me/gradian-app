@@ -6650,5 +6650,41 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50004000000000000001",
+    "timestamp": "2026-02-09T00:00:00.000Z",
+    "version": "1.50.004",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Enhanced multilingual support by updating application names in all-data.json to include translations for various languages.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data",
+          "i18n"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Improved schema definitions in all-schemas.json to support multilingual translations for singular and plural names, enhancing accessibility.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schema",
+          "i18n",
+          "accessibility"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "Implemented language handling improvements in multiple components to ensure consistent user experience across different languages. This update significantly enhances internationalization support and user interaction throughout the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "i18n",
+          "ui",
+          "layout"
+        ]
+      }
+    ]
   }
 ]

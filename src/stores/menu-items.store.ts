@@ -5,7 +5,9 @@ import { getZustandDevToolsConfig } from '@/gradian-ui/shared/utils/zustand-devt
 
 interface MenuItem {
   id: string;
-  menuTitle?: string;
+  // menuTitle can be a plain string or a translations array like:
+  // [{ en: 'Integrations' }, { fa: 'یکپارچه‌سازی‌ها' }, ...]
+  menuTitle?: string | Array<Record<string, string>>;
   menuUrl?: string;
   menuIcon?: string;
   companies?: Array<{ id: string | number; [key: string]: any }>;

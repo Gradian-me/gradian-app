@@ -148,7 +148,7 @@ export function SchemaManagerWrapper() {
           {isSearching ? 'Try adjusting your search query' : 'Get started by creating your first schema'}
         </p>
         {!isSearching && (
-          <Button onClick={openCreateDialog}>
+          <Button onClick={openCreateDialog} className="text-xs">
             <Plus className="h-4 w-4 me-2" />
             Create Your First Schema
           </Button>
@@ -173,7 +173,7 @@ export function SchemaManagerWrapper() {
         )}
 
         <div className="flex items-center justify-between gap-2 mb-2">
-          <Button variant="outline" onClick={() => router.push('/builder')}>
+          <Button variant="outline" onClick={() => router.push('/builder')} className="text-xs">
             <BackIcon className="h-4 w-4 me-2" />
             Back to Builder
           </Button>
@@ -183,7 +183,7 @@ export function SchemaManagerWrapper() {
               size="sm"
               onClick={handleClearCache}
               disabled={isClearingCache}
-              className="whitespace-nowrap"
+              className="whitespace-nowrap text-xs"
             >
               {isClearingCache ? (
                 <>
@@ -197,7 +197,7 @@ export function SchemaManagerWrapper() {
                 </>
               )}
             </Button>
-            <Button size="sm" onClick={openCreateDialog}>
+            <Button size="sm" onClick={openCreateDialog} className="text-xs">
               <Plus className="h-4 w-4 me-2" />
               New Schema
             </Button>
