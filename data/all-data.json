@@ -1441,15 +1441,38 @@
         }
       ],
       "username": "taghipouram@cinnagen.com",
-      "firstName": "Amir",
-      "lastName": "Taghipour",
+      "firstName": [
+        {
+          "en": "Amir"
+        },
+        {
+          "fa": "امیر"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Taghipour"
+        },
+        {
+          "fa": "تقی پور"
+        }
+      ],
       "email": "taghipouram@cinnagen.com",
-      "postTitle": "BI Supervisor",
+      "postTitle": [
+        {
+          "en": "BI Supervisor"
+        },
+        {
+          "fa": "سرپرست هوش تجاری"
+        }
+      ],
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KE9M6RS2HZPTC88WMG7XZVAX",
       "createdAt": "2026-01-06T12:23:45.701Z",
-      "updatedAt": "2026-01-06T12:23:45.797Z"
+      "updatedAt": "2026-02-10T10:56:48.436Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "employeeCode": "1676"
     }
   ],
   "purchaseOrders": [],

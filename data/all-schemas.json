@@ -4069,6 +4069,7 @@
         "component": "text",
         "placeholder": "Enter first name",
         "role": "title",
+        "allowTranslation": true,
         "translations": [
           {
             "en": "First Name"
@@ -4136,6 +4137,7 @@
         "component": "text",
         "placeholder": "Enter last name",
         "role": "title",
+        "allowTranslation": true,
         "translations": [
           {
             "en": "Last Name"
@@ -4269,6 +4271,7 @@
         "component": "text",
         "placeholder": "Enter post title",
         "required": false,
+        "allowTranslation": true,
         "translations": [
           {
             "en": "Post Title"
@@ -4323,6 +4326,68 @@
         ],
         "colSpan": 1,
         "order": 5
+      },
+      {
+        "id": "employee-code",
+        "name": "employeeCode",
+        "label": "Employee Code",
+        "sectionId": "basic-information",
+        "component": "text",
+        "placeholder": "Enter employee code",
+        "translations": [
+          {
+            "en": "Employee Code"
+          },
+          {
+            "fa": "کد پرسنلی"
+          },
+          {
+            "ar": "رمز الموظف"
+          },
+          {
+            "es": "Código de empleado"
+          },
+          {
+            "fr": "Code employé"
+          },
+          {
+            "de": "Mitarbeitercode"
+          },
+          {
+            "it": "Codice dipendente"
+          },
+          {
+            "ru": "Код сотрудника"
+          }
+        ],
+        "placeholderTranslations": [
+          {
+            "en": "Enter employee code"
+          },
+          {
+            "fa": "کد پرسنلی را وارد کنید"
+          },
+          {
+            "ar": "أدخل رمز الموظف"
+          },
+          {
+            "es": "Ingrese el código de empleado"
+          },
+          {
+            "fr": "Entrez le code employé"
+          },
+          {
+            "de": "Mitarbeitercode eingeben"
+          },
+          {
+            "it": "Inserisci codice dipendente"
+          },
+          {
+            "ru": "Введите код сотрудника"
+          }
+        ],
+        "colSpan": 1,
+        "order": 6
       },
       {
         "id": "company",
@@ -4386,7 +4451,7 @@
           }
         ],
         "colSpan": 1,
-        "order": 6
+        "order": 7
       },
       {
         "id": "authentication-type",
@@ -4603,7 +4668,40 @@
       {
         "ru": "Управление учётными записями и профилями пользователей"
       }
-    ]
+    ],
+    "applications": [
+      {
+        "id": "01KFTQPVC9RCRE9J8ACHECVWNK",
+        "name": [
+          {
+            "en": "System Administration"
+          },
+          {
+            "fa": "مدیریت سیستم"
+          },
+          {
+            "ar": "إدارة النظام"
+          },
+          {
+            "es": "Administración del sistema"
+          },
+          {
+            "fr": "Administration système"
+          },
+          {
+            "de": "Systemverwaltung"
+          },
+          {
+            "it": "Amministrazione di sistema"
+          },
+          {
+            "ru": "Администрирование системы"
+          }
+        ],
+        "icon": "Verified"
+      }
+    ],
+    "allowDataInactive": true
   },
   {
     "id": "servers",
