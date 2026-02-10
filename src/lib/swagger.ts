@@ -69,8 +69,252 @@ export const swaggerDocument = {
       name: 'Git',
       description: 'Git and CI/CD integration endpoints.',
     },
+    {
+      name: 'Graph',
+      description: 'Graph visualization, storage, and ETL endpoints.',
+    },
   ],
   paths: {
+    '/api/graph': {
+      get: {
+        tags: ['Graph'],
+        summary: 'Get graph nodes and edges',
+        description:
+          'Returns all data as graph nodes and relations as edges for visualization. ' +
+          'Supports schema, tenant, and company filters and can return only nodes or only edges.',
+        parameters: [
+          {
+            name: 'includedSchemaIds',
+            in: 'query',
+            required: false,
+            schema: { type: 'string' },
+            description:
+              'Comma-separated list of schema IDs to include. For nodes: only entities from these schemas are included. For edges: edges are included if either sourceSchema OR targetSchema matches.',
+          },
+          {
+            name: 'excludedSchemaIds',
+            in: 'query',
+            required: false,
+            schema: { type: 'string' },
+            description:
+              'Comma-separated list of schema IDs to exclude. Nodes and edges for these schemas are omitted.',
+          },
+          {
+            name: 'graphType',
+            in: 'query',
+            required: false,
+            schema: { type: 'string', enum: ['nodes', 'edges'] },
+            description:
+              "Filter by graph type: 'nodes' returns only nodes, 'edges' returns only edges. If omitted, returns both.",
+          },
+          {
+            name: 'tenantIds',
+            in: 'query',
+            required: false,
+            schema: { type: 'string' },
+            description:
+              'Comma-separated tenant IDs to filter schema visibility and entity-level data (multi-tenant support).',
+          },
+          {
+            name: 'companyIds',
+            in: 'query',
+            required: false,
+            schema: { type: 'string' },
+            description:
+              'Comma-separated company IDs used for company scoping via relatedCompanies metadata.',
+          },
+          {
+            name: 'companyId',
+            in: 'query',
+            required: false,
+            schema: { type: 'string' },
+            description: 'Legacy single companyId parameter (backward-compatible with companyIds).',
+          },
+        ],
+        responses: {
+          200: {
+            description: 'Graph data retrieved successfully.',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    message: { type: 'string', example: 'Retrieved N nodes and M edges' },
+                    data: {
+                      type: 'object',
+                      properties: {
+                        nodes: {
+                          type: 'array',
+                          items: { type: 'object', additionalProperties: true },
+                        },
+                        edges: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              id: { type: 'string' },
+                              sourceId: { type: 'string' },
+                              targetId: { type: 'string' },
+                              sourceSchema: { type: 'string' },
+                              targetSchema: { type: 'string' },
+                              relationTypeId: { type: 'string' },
+                              fieldId: { type: 'string', nullable: true },
+                              createdAt: { type: 'string', format: 'date-time' },
+                              updatedAt: { type: 'string', format: 'date-time' },
+                            },
+                            additionalProperties: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: 'Invalid graphType or other query parameter.',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+        },
+      },
+      post: {
+        tags: ['Graph'],
+        summary: 'Create a new graph',
+        description:
+          'Creates and persists a graph definition from nodes and edges. ' +
+          'Stores full node data under the `graph-nodes` schema and full edges in relations storage, ' +
+          'while `graphs.json` tracks graph metadata and node/edge IDs.',
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  graphId: {
+                    type: 'string',
+                    description: 'Unique graph identifier. Must not already exist when creating.',
+                  },
+                  nodes: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      description: 'Graph node including payload and schemaId.',
+                      properties: {
+                        id: { type: 'string', description: 'Graph node ID used by edges.' },
+                        title: { type: 'string' },
+                        schemaId: { type: 'string', description: 'Underlying data schema ID.' },
+                        nodeId: {
+                          type: 'string',
+                          nullable: true,
+                          description: 'Optional extra nodeId metadata.',
+                        },
+                        incomplete: {
+                          type: 'boolean',
+                          nullable: true,
+                          description: 'True if node data is incomplete.',
+                        },
+                        payload: {
+                          type: 'object',
+                          description:
+                            'Arbitrary payload for the node; often includes an `id` for the underlying entity.',
+                        },
+                      },
+                      required: ['id', 'schemaId'],
+                      additionalProperties: true,
+                    },
+                  },
+                  edges: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      description: 'Graph edge definition.',
+                      properties: {
+                        id: { type: 'string' },
+                        source: { type: 'string', description: 'Source graph node id.' },
+                        target: { type: 'string', description: 'Target graph node id.' },
+                        sourceSchema: { type: 'string' },
+                        targetSchema: { type: 'string' },
+                        relationTypeId: { type: 'string' },
+                        fieldId: {
+                          type: 'string',
+                          nullable: true,
+                          description:
+                            'Optional field id used especially for HAS_FIELD_VALUE relations.',
+                        },
+                      },
+                      required: ['id', 'source', 'target', 'sourceSchema', 'targetSchema', 'relationTypeId'],
+                      additionalProperties: true,
+                    },
+                  },
+                },
+                required: ['graphId', 'nodes', 'edges'],
+              },
+            },
+          },
+        },
+        responses: {
+          201: {
+            description: 'Graph created successfully.',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    message: { type: 'string', example: 'Graph created successfully' },
+                    data: {
+                      type: 'object',
+                      description: 'Graph summary stored in graphs.json.',
+                      properties: {
+                        graphId: { type: 'string' },
+                        nodes: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              id: { type: 'string' },
+                              title: { type: 'string' },
+                              schemaId: { type: 'string' },
+                              nodeId: { type: 'string', nullable: true },
+                              incomplete: { type: 'boolean', nullable: true },
+                            },
+                          },
+                        },
+                        edges: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              id: { type: 'string' },
+                              title: { type: 'string' },
+                            },
+                          },
+                        },
+                        createdAt: { type: 'string', format: 'date-time' },
+                        updatedAt: { type: 'string', format: 'date-time' },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description:
+              'Validation error (missing graphId, nodes/edges not arrays, or edges referencing unknown nodes).',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          409: {
+            description: 'Graph with the same graphId already exists.',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+        },
+      },
+    },
     '/api/auth/login': {
       post: {
         tags: ['Auth'],
@@ -717,6 +961,147 @@ export const swaggerDocument = {
           },
           500: {
             description: 'Internal server error or backend service unavailable.',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+        },
+      },
+    },
+    '/api/graph/merge': {
+      post: {
+        tags: ['Graph'],
+        summary: 'Merge external graph data into existing schema data',
+        description:
+          'Merges external graph node data (by schemaId) into existing collections. ' +
+          'Uses mergeColumns to detect inserts, updates (hash changed), and deactivations.',
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: 'mergeColumns',
+            in: 'query',
+            required: true,
+            description:
+              'JSON array like `[{"key":"employeeCode"},{"hash":"hashRecordId"}]` used to build composite keys and an optional hash column.',
+            schema: { type: 'string' },
+          },
+          {
+            name: 'includedSchemaIds',
+            in: 'query',
+            required: false,
+            description:
+              'Comma-separated schema IDs to merge (e.g. `users`). If omitted, merges all schemaIds present in the payload.',
+            schema: { type: 'string' },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                oneOf: [
+                  {
+                    type: 'object',
+                    properties: {
+                      graphId: { type: 'string', description: 'Optional graph identifier.' },
+                      nodes: {
+                        type: 'array',
+                        description: 'Graph nodes; node.payload is treated as the entity.',
+                        items: {
+                          type: 'object',
+                          properties: {
+                            schemaId: {
+                              type: 'string',
+                              description: 'Target schema ID (e.g. `users`).',
+                            },
+                            payload: {
+                              type: 'object',
+                              description:
+                                'Entity payload, including key/hash columns (e.g. employeeCode, hashRecordId).',
+                            },
+                          },
+                          required: ['schemaId', 'payload'],
+                        },
+                      },
+                      edges: {
+                        type: 'array',
+                        description: 'Currently ignored by the merge process.',
+                        items: { type: 'object' },
+                      },
+                    },
+                    required: ['nodes'],
+                  },
+                  {
+                    type: 'array',
+                    description:
+                      'Alternative format: direct array of entities with `schemaId` property.',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        schemaId: {
+                          type: 'string',
+                          description: 'Target schema ID (e.g. `users`).',
+                        },
+                      },
+                      required: ['schemaId'],
+                      additionalProperties: true,
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        },
+        responses: {
+          200: {
+            description: 'Merge completed successfully.',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    success: { type: 'boolean', example: true },
+                    message: { type: 'string', example: 'Graph data merged successfully.' },
+                    data: {
+                      type: 'object',
+                      properties: {
+                        summaries: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              schemaId: { type: 'string', example: 'users' },
+                              inserted: { type: 'integer', example: 10 },
+                              updated: { type: 'integer', example: 5 },
+                              deactivated: { type: 'integer', example: 2 },
+                              skippedInvalidKey: { type: 'integer', example: 1 },
+                            },
+                          },
+                        },
+                        total: {
+                          type: 'object',
+                          properties: {
+                            inserted: { type: 'integer', example: 10 },
+                            updated: { type: 'integer', example: 5 },
+                            deactivated: { type: 'integer', example: 2 },
+                            skippedInvalidKey: { type: 'integer', example: 1 },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          400: {
+            description: 'Bad request (invalid mergeColumns or body).',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          401: {
+            description: 'Unauthorized (missing or invalid auth).',
+            content: { 'application/json': { schema: errorResponse } },
+          },
+          501: {
+            description: 'Not implemented for backend mode (only works in demo mode).',
             content: { 'application/json': { schema: errorResponse } },
           },
         },

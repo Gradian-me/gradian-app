@@ -24081,7 +24081,7 @@
       }
     ],
     "allowDataDueDate": true,
-    "allowDataAssignedTo": true,
+    "allowDataAssignedTo": false,
     "allowDataForce": true,
     "detailPageMetadata": {
       "quickActions": [
@@ -24162,6 +24162,38 @@
       },
       {
         "ru": "Анализатор оценки инцидентов OOX в контроле качества: описание, анализ и отчётность по соответствию."
+      }
+    ],
+    "applications": [
+      {
+        "id": "01KBFCM00000000000000000003",
+        "name": [
+          {
+            "en": "Deviation Management"
+          },
+          {
+            "fa": "مدیریت انحرافات"
+          },
+          {
+            "ar": "إدارة الانحرافات"
+          },
+          {
+            "es": "Gestión de desviaciones"
+          },
+          {
+            "fr": "Gestion des déviations"
+          },
+          {
+            "de": "Abweichungsmanagement"
+          },
+          {
+            "it": "Gestione delle deviazioni"
+          },
+          {
+            "ru": "Управление отклонениями"
+          }
+        ],
+        "icon": "AlertTriangle"
       }
     ]
   },
@@ -33568,6 +33600,10 @@
       {
         "id": "01KBFBGV9151FQN481NB2CT4MX",
         "label": "Development Environment"
+      },
+      {
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
       }
     ],
     "detailPageMetadata": {
@@ -33715,6 +33751,38 @@
       },
       {
         "ru": "Управление анализом потерь и возможностей улучшения в бережливом управлении"
+      }
+    ],
+    "applications": [
+      {
+        "id": "01KFZFTS259QZVTR2ETNZ1H0GF",
+        "name": [
+          {
+            "en": "Process Management"
+          },
+          {
+            "fa": "مدیریت فرایندها"
+          },
+          {
+            "ar": "إدارة العمليات"
+          },
+          {
+            "es": "Gestión de procesos"
+          },
+          {
+            "fr": "Gestion des processus"
+          },
+          {
+            "de": "Prozessmanagement"
+          },
+          {
+            "it": "Gestione dei processi"
+          },
+          {
+            "ru": "Управление процессами"
+          }
+        ],
+        "icon": "Workflow"
       }
     ]
   },
