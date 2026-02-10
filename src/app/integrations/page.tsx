@@ -1285,15 +1285,7 @@ export default function IntegrationsPage() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
                           >
-              <Card className={`transition-shadow duration-200 ${syncing.has(integration.id) ? 'relative overflow-visible' : ''} ${integration.inactive === true ? 'opacity-60 grayscale pointer-events-none' : 'hover:shadow-lg'}`}>
-                {syncing.has(integration.id) && (
-                  <div className="absolute -top-2 -right-2 z-10">
-                    <span className="flex h-4 w-4">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-4 w-4 bg-yellow-500"></span>
-                    </span>
-                  </div>
-                )}
+              <Card className={`transition-shadow duration-200 ${syncing.has(integration.id) ? 'bg-yellow-50 dark:bg-yellow-500/15 border-yellow-200 dark:border-yellow-500/30' : ''} ${integration.inactive === true ? 'opacity-60 grayscale pointer-events-none' : 'hover:shadow-lg'}`}>
                 <CardContent className="p-4 h-full">
                   <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                     <div className="flex-1 min-w-0 w-full">

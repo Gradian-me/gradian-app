@@ -27,7 +27,8 @@ import { formatRelativeTime, formatFullDate, formatDateTime } from '@/gradian-ui
 import { BadgeRenderer } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
 import { useLanguageStore } from '@/stores/language.store';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
-import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { getDefaultLanguage, getT, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { cn } from '@/gradian-ui/shared/utils';
 
 interface NotificationDialogProps {
   notification: Notification | null;
@@ -43,7 +44,9 @@ interface NotificationDialogProps {
 export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead, onAcknowledge, onMarkAsUnread, localeCode: localeCodeProp }: NotificationDialogProps) {
   const language = useLanguageStore((s) => s.language);
   const defaultLang = getDefaultLanguage();
-  const localeCode = localeCodeProp ?? language ?? undefined;
+  const effectiveLanguage = language || defaultLang;
+  const isRTLLanguage = isRTL(effectiveLanguage);
+  const localeCode = localeCodeProp ?? effectiveLanguage ?? undefined;
   const [isMarkingAsRead, setIsMarkingAsRead] = useState(false);
   const [isAcknowledging, setIsAcknowledging] = useState(false);
   const [isMarkingAsUnread, setIsMarkingAsUnread] = useState(false);
@@ -65,6 +68,24 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
       default:
         return <Info className="h-6 w-6 text-gray-500" />;
     }
+  };
+
+  const getTypeLabel = (type: string) => {
+    const dynamicKey = `LABEL_${String(type).toUpperCase()}` as keyof typeof TRANSLATION_KEYS;
+    if (dynamicKey in TRANSLATION_KEYS) {
+      return getT(TRANSLATION_KEYS[dynamicKey], effectiveLanguage, defaultLang);
+    }
+    // Fallback to raw type when no translation key exists
+    return type;
+  };
+
+  const getPriorityLabel = (priority: string) => {
+    const dynamicKey = `PRIORITY_${String(priority).toUpperCase()}` as keyof typeof TRANSLATION_KEYS;
+    if (dynamicKey in TRANSLATION_KEYS) {
+      return getT(TRANSLATION_KEYS[dynamicKey], effectiveLanguage, defaultLang);
+    }
+    // Fallback to raw priority when no translation key exists
+    return priority;
   };
 
   const getTypeBadgeVariant = (type: string) => {
@@ -141,21 +162,38 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full h-full rounded-2xl lg:max-w-4xl lg:max-h-[90vh] p-0 flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
+      <DialogContent
+        suppressHydrationWarning
+        dir={isRTLLanguage ? 'rtl' : 'ltr'}
+        className={cn(
+          'w-full h-full rounded-2xl lg:max-w-4xl lg:max-h-[90vh] p-0 flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100',
+          isRTLLanguage ? 'direction-rtl' : 'direction-ltr'
+        )}
+      >
         <DialogHeader className="p-4 border-b border-gray-200 dark:border-gray-800 shrink-0">
           <div className="flex items-start justify-between">
-            <div className="flex items-start space-x-3 flex-1">
+            <div
+              className={cn(
+                'flex items-start flex-1',
+                isRTLLanguage ? 'space-x-reverse space-x-3' : 'space-x-3'
+              )}
+            >
               {getTypeIcon(notification.type)}
               <div className="flex-1">
                 <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                   {notification.title}
                 </DialogTitle>
-                <div className="flex items-center space-x-2">
+                <div
+                  className={cn(
+                    'flex items-center',
+                    isRTLLanguage ? 'space-x-reverse space-x-2' : 'space-x-2'
+                  )}
+                >
                   <Badge variant={getTypeBadgeVariant(notification.type)} className="text-xs">
-                    {notification.type}
+                    {getTypeLabel(notification.type)}
                   </Badge>
                   <Badge variant={getPriorityBadgeVariant(notification.priority)} className="text-xs">
-                    {notification.priority}
+                    {getPriorityLabel(notification.priority)}
                   </Badge>
                   {!notification.isRead && (
                     <Badge variant="default" className="text-xs bg-violet-600">
@@ -173,7 +211,12 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
             {/* Message Content */}
             <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center space-x-2 text-gray-900 dark:text-gray-100">
+                <CardTitle
+                  className={cn(
+                    'text-lg flex items-center text-gray-900 dark:text-gray-100',
+                    isRTLLanguage ? 'space-x-reverse space-x-2' : 'space-x-2'
+                  )}
+                >
                   <AlertCircle className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   <span>{getT(TRANSLATION_KEYS.LABEL_MESSAGE, language, defaultLang)}</span>
                 </CardTitle>
@@ -189,7 +232,12 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
             {notification.metadata && Object.keys(notification.metadata).length > 0 && (
               <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-lg flex items-center space-x-2 text-gray-900 dark:text-gray-100">
+                  <CardTitle
+                    className={cn(
+                      'text-lg flex items-center text-gray-900 dark:text-gray-100',
+                      isRTLLanguage ? 'space-x-reverse space-x-2' : 'space-x-2'
+                    )}
+                  >
                     <Tag className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                     <span>{getT(TRANSLATION_KEYS.LABEL_DETAILS, language, defaultLang)}</span>
                   </CardTitle>
@@ -232,7 +280,12 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
             {/* Timestamps */}
             <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg flex items-center space-x-2 text-gray-900 dark:text-gray-100">
+                <CardTitle
+                  className={cn(
+                    'text-lg flex items-center text-gray-900 dark:text-gray-100',
+                    isRTLLanguage ? 'space-x-reverse space-x-2' : 'space-x-2'
+                  )}
+                >
                   <Clock className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                   <span>{getT(TRANSLATION_KEYS.LABEL_TIMELINE, language, defaultLang)}</span>
                 </CardTitle>
@@ -278,8 +331,18 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
 
         {/* Actions Footer - Fixed at bottom */}
         <div className="p-6 border-t border-gray-200 dark:border-gray-800 shrink-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
+        <div
+            className={cn(
+              'flex items-center justify-between',
+              isRTLLanguage ? 'flex-row-reverse' : 'flex-row'
+            )}
+          >
+            <div
+              className={cn(
+                'flex items-center',
+                isRTLLanguage ? 'space-x-reverse space-x-2' : 'space-x-2'
+              )}
+            >
               {!notification.isRead ? (
                 needsAcknowledgement ? (
                   onAcknowledge ? (
@@ -318,8 +381,13 @@ export function NotificationDialog({ notification, isOpen, onClose, onMarkAsRead
                 )
               )}
             </div>
-            
-            <div className="flex items-center space-x-3">
+
+            <div
+              className={cn(
+                'flex items-center',
+                isRTLLanguage ? 'space-x-reverse space-x-3' : 'space-x-3'
+              )}
+            >
               {notification.actionUrl && (
                 <Button
                   variant="default"

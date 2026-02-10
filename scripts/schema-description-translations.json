@@ -241,7 +241,7 @@
   },
   "tenants": {
     "en": "Manage tenant information including name, title, domain, default domain, and database configuration",
-    "fa": "مدیریت اطلاعات مستاجر شامل نام، عنوان، دامنه، دامنه پیش‌فرض و پیکربندی پایگاه داده",
+    "fa": "مدیریت اطلاعات Tenant شامل نام، عنوان، دامنه، دامنه پیش‌فرض و پیکربندی پایگاه داده",
     "ar": "إدارة معلومات المستأجر بما في ذلك الاسم والعنوان والنطاق والنطاق الافتراضي وإعدادات قاعدة البيانات",
     "es": "Gestionar información del inquilino: nombre, título, dominio, dominio por defecto y configuración de BD",
     "fr": "Gérer les informations locataire (nom, titre, domaine, domaine par défaut, configuration BD)",

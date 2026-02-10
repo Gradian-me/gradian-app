@@ -65,11 +65,11 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   return (
     <TooltipProvider delayDuration={200}>
       <ScrollArea
-        className={cn("h-full px-2", className)}
+        className={cn("h-full px-1", className)}
         scrollbarVariant="minimal"
         dir={isRTL(language) ? 'rtl' : undefined}
       >
-        <div className="space-y-1 pt-2 pb-4">
+        <div className="space-y-1 pt-2 pb-4 px-1">
           {/* Home link - always shown, outside Menu */}
           <div className="space-y-1">
             {shouldShowTooltip ? (

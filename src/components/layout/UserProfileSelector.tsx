@@ -13,7 +13,7 @@ import { useUserStore } from '@/stores/user.store';
 import { useLanguageStore } from '@/stores/language.store';
 import { useTheme } from 'next-themes';
 import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
-import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { ProfileSelectorConfig } from '@/gradian-ui/layout/profile-selector/types';
 import { UserProfile } from '@/gradian-ui/shared/types';
@@ -43,6 +43,7 @@ export function UserProfileSelector({
   const setLanguage = useLanguageStore((state) => state.setLanguage);
   const defaultLang = getDefaultLanguage();
   const { resolvedTheme } = useTheme();
+  const isRTLLanguage = isRTL(language);
 
   // Access user store normally - but ensure we always render placeholder until mounted
   // This prevents hydration mismatch because server and client both render placeholder initially
@@ -96,7 +97,8 @@ export function UserProfileSelector({
   const isAdmin = isMounted && user?.role === 'admin';
 
   const triggerClasses = cn(
-    'flex h-10 items-center space-x-2 rounded-xl border transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0',
+    'flex h-10 items-center rounded-xl border transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0',
+    isRTLLanguage ? 'space-x-reverse space-x-2' : 'space-x-2',
     isDarkVariant
       ? 'border-violet-300/60 bg-gray-900 text-violet-200 hover:bg-gray-800 focus-visible:ring-violet-500 focus-visible:ring-offset-gray-900'
       : 'border-violet-200 bg-white text-violet-700 hover:bg-violet-50 hover:border-violet-300 focus-visible:ring-violet-500 focus-visible:ring-offset-white',
@@ -111,7 +113,8 @@ export function UserProfileSelector({
     'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
     'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
     'data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2',
-    "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-100 dark:text-gray-900"
+    "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-100 dark:text-gray-900",
+    isRTLLanguage ? 'direction-rtl' : 'direction-ltr'
   );
   const separatorClasses = cn(
     '-mx-1 my-1 h-px',
@@ -119,7 +122,7 @@ export function UserProfileSelector({
   );
   const itemClasses = cn(
     'relative flex cursor-pointer select-none items-center rounded-lg px-3 py-2 text-sm outline-none transition-colors',
-    'hover:bg-violet-50 focus:bg-violet-50 text-gray-800 data-[highlighted]:bg-violet-100 dark:hover:bg-violet-500/10 dark:focus:bg-violet-500/10 dark:text-gray-100 dark:data-[highlighted]:bg-violet-500/15'
+    'hover:bg-violet-50 focus:bg-violet-50 text-gray-800 data-[highlighted]:bg-violet-100 dark:hover:bg-violet-500/10 dark:focus:bg-violet-500/10 dark:text-gray-100 dark:data-[highlighted]:bg-violet-500/15',
   );
 
   const handleNavigate = useCallback((path: string) => {
@@ -146,14 +149,15 @@ export function UserProfileSelector({
   // SECURITY: Use static classes to ensure server/client match
   if (!isMounted) {
     const placeholderClasses = cn(
-      'flex h-10 items-center space-x-2 rounded-xl border transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0',
+      'flex h-10 items-center rounded-xl border transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0',
+      isRTLLanguage ? 'space-x-reverse space-x-2' : 'space-x-2',
       'border-violet-200 bg-white text-violet-700',
       fullWidth ? 'w-full justify-between' : ''
     );
 
     // Render a plain button without Radix UI to avoid hydration mismatch
     return (
-      <div suppressHydrationWarning>
+      <div suppressHydrationWarning dir={isRTLLanguage ? 'rtl' : 'ltr'}>
         <button
           className={cn(placeholderClasses, 'cursor-not-allowed opacity-50')}
           aria-label="User profile"
@@ -162,7 +166,7 @@ export function UserProfileSelector({
           suppressHydrationWarning
         >
           <Avatar
-            className="h-8 w-8 border border-gray-100 rounded-full bg-violet-100 text-violet-800 shrink-0"
+            className="h-8 w-8 border border-gray-100 rounded-full bg-violet-100 text-violet-800 shrink-0 m-0"
           >
             <AvatarFallback className="bg-violet-100 text-violet-800 text-xs">
               --
@@ -170,7 +174,7 @@ export function UserProfileSelector({
           </Avatar>
           <div
             className={cn(
-              'flex flex-col text-start leading-tight',
+              'flex flex-col leading-tight text-start mx-2',
               fullWidth ? 'flex-1 overflow-hidden' : 'max-w-[140px] overflow-hidden'
             )}
           >
@@ -178,7 +182,7 @@ export function UserProfileSelector({
               {getT(TRANSLATION_KEYS.PAGINATION_LOADING, language, defaultLang)}
             </span>
           </div>
-          <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 text-gray-500" />
+          <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200 text-gray-500 dark:text-gray-300" />
         </button>
       </div>
     );
@@ -203,8 +207,8 @@ export function UserProfileSelector({
   const dropdownActions = [
     {
       id: 'profile',
-      label: 'Profile',
-      description: 'View your profile',
+      label: getT(TRANSLATION_KEYS.PROFILE_MENU_PROFILE, language, defaultLang),
+      description: getT(TRANSLATION_KEYS.PROFILE_MENU_PROFILE_DESCRIPTION, language, defaultLang),
       icon: UserIcon,
       action: () => {
         onProfileSelect?.(profilePayload);
@@ -213,22 +217,22 @@ export function UserProfileSelector({
     },
     {
       id: 'settings',
-      label: 'Account Settings',
-      description: 'Manage your preferences',
+      label: getT(TRANSLATION_KEYS.PROFILE_MENU_ACCOUNT_SETTINGS, language, defaultLang),
+      description: getT(TRANSLATION_KEYS.PROFILE_MENU_ACCOUNT_SETTINGS_DESCRIPTION, language, defaultLang),
       icon: Settings,
       action: () => handleNavigate('/settings'),
     },
     {
       id: 'password',
-      label: 'Change Password',
-      description: 'Update your credentials',
+      label: getT(TRANSLATION_KEYS.PROFILE_MENU_CHANGE_PASSWORD, language, defaultLang),
+      description: getT(TRANSLATION_KEYS.PROFILE_MENU_CHANGE_PASSWORD_DESCRIPTION, language, defaultLang),
       icon: KeyRound,
       action: () => handleNavigate('/authentication/change-password'),
     },
   ];
 
   return (
-    <div suppressHydrationWarning>
+    <div suppressHydrationWarning dir={isRTLLanguage ? 'rtl' : 'ltr'}>
       <DropdownMenuPrimitive.Root
         open={isMenuOpen}
         onOpenChange={(open) => {
@@ -253,7 +257,7 @@ export function UserProfileSelector({
           >
             <Avatar
               className={cn(
-                'h-8 w-8 border rounded-full bg-violet-100 text-violet-800 shrink-0',
+                'h-8 w-8 border rounded-full bg-violet-100 text-violet-800 shrink-0 m-0',
                 isDarkVariant ? 'border-gray-700' : 'border-gray-100'
               )}
             >
@@ -269,7 +273,7 @@ export function UserProfileSelector({
             </Avatar>
             <div
               className={cn(
-                'flex flex-col text-start leading-tight',
+                'flex flex-col leading-tight text-start mx-2',
                 fullWidth ? 'flex-1 overflow-hidden' : 'max-w-[140px] overflow-hidden'
               )}
             >
@@ -303,6 +307,7 @@ export function UserProfileSelector({
                     minWidth: triggerWidth || undefined,
                     width: triggerWidth || undefined,
                   }}
+                  dir={isRTLLanguage ? 'rtl' : 'ltr'}
                 >
                   <div className="px-3 py-2">
                     <div className="flex items-center gap-2">
@@ -314,10 +319,10 @@ export function UserProfileSelector({
                           variant="outline"
                           size="sm"
                           color="violet"
-                          tooltip="Administrator access"
+                          tooltip={getT(TRANSLATION_KEYS.PROFILE_MENU_ADMIN_TOOLTIP, language, defaultLang)}
                           className="shrink-0"
                         >
-                          Admin
+                          {getT(TRANSLATION_KEYS.PROFILE_MENU_ADMIN_BADGE, language, defaultLang)}
                         </FormBadge>
                       )}
                     </div>
@@ -364,7 +369,7 @@ export function UserProfileSelector({
                         action();
                       }}
                     >
-                      <Icon className="me-3 h-4 w-4" />
+                      <Icon className={cn('h-4 w-4 me-3')} />
                       <div className="flex flex-col">
                         <span className="text-sm font-medium">{label}</span>
                         <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -386,11 +391,11 @@ export function UserProfileSelector({
                       handleLogout();
                     }}
                   >
-                    <LogOut className="me-3 h-4 w-4" />
+                    <LogOut className={cn('h-4 w-4 me-3')} />
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium">Logout</span>
+                      <span className="text-sm font-medium">{getT(TRANSLATION_KEYS.PROFILE_MENU_LOGOUT, language, defaultLang)}</span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        Sign out of your account
+                        {getT(TRANSLATION_KEYS.PROFILE_MENU_LOGOUT_DESCRIPTION, language, defaultLang)}
                       </span>
                     </div>
                   </DropdownMenuPrimitive.Item>

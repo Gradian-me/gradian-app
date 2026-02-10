@@ -28,7 +28,7 @@ const IconInput = React.forwardRef<HTMLInputElement, IconInputProps>(
 
     return (
       <div className="relative">
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+        <div className="absolute end-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
           {isEmpty ? (
             <span className="text-gray-400 text-sm dark:text-slate-500">Icon</span>
           ) : isValid ? (
@@ -54,7 +54,7 @@ const IconInput = React.forwardRef<HTMLInputElement, IconInputProps>(
           placeholder="Type icon name (e.g., User, Home, Search)"
           {...props}
         />
-        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+        <div className="absolute start-3 top-1/2 -translate-y-1/2 pointer-events-none">
           <span className={cn(
             'text-xs',
             isEmpty

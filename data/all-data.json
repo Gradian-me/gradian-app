@@ -1479,7 +1479,32 @@
   "invoices": [],
   "applications": [
     {
-      "name": [{"en": "Change Management"}, {"fa": "مدیریت تغییر"}, {"ar": "إدارة التغيير"}, {"es": "Gestión del cambio"}, {"fr": "Gestion du changement"}, {"de": "Änderungsmanagement"}, {"it": "Gestione del cambiamento"}, {"ru": "Управление изменениями"}],
+      "name": [
+        {
+          "en": "Change Management"
+        },
+        {
+          "fa": "مدیریت تغییر"
+        },
+        {
+          "ar": "إدارة التغيير"
+        },
+        {
+          "es": "Gestión del cambio"
+        },
+        {
+          "fr": "Gestion du changement"
+        },
+        {
+          "de": "Änderungsmanagement"
+        },
+        {
+          "it": "Gestione del cambiamento"
+        },
+        {
+          "ru": "Управление изменениями"
+        }
+      ],
       "icon": "GitBranch",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -1491,7 +1516,32 @@
       "application-schemas": []
     },
     {
-      "name": [{"en": "Deviation Management"}, {"fa": "مدیریت انحرافات"}, {"ar": "إدارة الانحرافات"}, {"es": "Gestión de desviaciones"}, {"fr": "Gestion des déviations"}, {"de": "Abweichungsmanagement"}, {"it": "Gestione delle deviazioni"}, {"ru": "Управление отклонениями"}],
+      "name": [
+        {
+          "en": "Deviation Management"
+        },
+        {
+          "fa": "مدیریت انحرافات"
+        },
+        {
+          "ar": "إدارة الانحرافات"
+        },
+        {
+          "es": "Gestión de desviaciones"
+        },
+        {
+          "fr": "Gestion des déviations"
+        },
+        {
+          "de": "Abweichungsmanagement"
+        },
+        {
+          "it": "Gestione delle deviazioni"
+        },
+        {
+          "ru": "Управление отклонениями"
+        }
+      ],
       "icon": "AlertTriangle",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -1503,7 +1553,32 @@
       "application-schemas": []
     },
     {
-      "name": [{"en": "Risk Management"}, {"fa": "مدیریت ریسک"}, {"ar": "إدارة المخاطر"}, {"es": "Gestión de riesgos"}, {"fr": "Gestion des risques"}, {"de": "Risikomanagement"}, {"it": "Gestione dei rischi"}, {"ru": "Управление рисками"}],
+      "name": [
+        {
+          "en": "Risk Management"
+        },
+        {
+          "fa": "مدیریت ریسک"
+        },
+        {
+          "ar": "إدارة المخاطر"
+        },
+        {
+          "es": "Gestión de riesgos"
+        },
+        {
+          "fr": "Gestion des risques"
+        },
+        {
+          "de": "Risikomanagement"
+        },
+        {
+          "it": "Gestione dei rischi"
+        },
+        {
+          "ru": "Управление рисками"
+        }
+      ],
       "icon": "ShieldAlert",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -1514,7 +1589,32 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "name": [{"en": "Complaint Management"}, {"fa": "مدیریت شکایات"}, {"ar": "إدارة الشكاوى"}, {"es": "Gestión de reclamaciones"}, {"fr": "Gestion des réclamations"}, {"de": "Beschwerdemanagement"}, {"it": "Gestione dei reclami"}, {"ru": "Управление жалобами"}],
+      "name": [
+        {
+          "en": "Complaint Management"
+        },
+        {
+          "fa": "مدیریت شکایات"
+        },
+        {
+          "ar": "إدارة الشكاوى"
+        },
+        {
+          "es": "Gestión de reclamaciones"
+        },
+        {
+          "fr": "Gestion des réclamations"
+        },
+        {
+          "de": "Beschwerdemanagement"
+        },
+        {
+          "it": "Gestione dei reclami"
+        },
+        {
+          "ru": "Управление жалобами"
+        }
+      ],
       "icon": "FileCheck",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
@@ -1525,7 +1625,32 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "name": [{"en": "Audit Management"}, {"fa": "مدیریت ممیزی"}, {"ar": "إدارة التدقيق"}, {"es": "Gestión de auditorías"}, {"fr": "Gestion des audits"}, {"de": "Auditmanagement"}, {"it": "Gestione degli audit"}, {"ru": "Управление аудитами"}],
+      "name": [
+        {
+          "en": "Audit Management"
+        },
+        {
+          "fa": "مدیریت ممیزی"
+        },
+        {
+          "ar": "إدارة التدقيق"
+        },
+        {
+          "es": "Gestión de auditorías"
+        },
+        {
+          "fr": "Gestion des audits"
+        },
+        {
+          "de": "Auditmanagement"
+        },
+        {
+          "it": "Gestione degli audit"
+        },
+        {
+          "ru": "Управление аудитами"
+        }
+      ],
       "icon": "FileSearch",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -1536,7 +1661,32 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "name": [{"en": "System Administration"}, {"fa": "مدیریت سیستم"}, {"ar": "إدارة النظام"}, {"es": "Administración del sistema"}, {"fr": "Administration système"}, {"de": "Systemverwaltung"}, {"it": "Amministrazione di sistema"}, {"ru": "Администрирование системы"}],
+      "name": [
+        {
+          "en": "System Administration"
+        },
+        {
+          "fa": "مدیریت سیستم"
+        },
+        {
+          "ar": "إدارة النظام"
+        },
+        {
+          "es": "Administración del sistema"
+        },
+        {
+          "fr": "Administration système"
+        },
+        {
+          "de": "Systemverwaltung"
+        },
+        {
+          "it": "Amministrazione di sistema"
+        },
+        {
+          "ru": "Администрирование системы"
+        }
+      ],
       "icon": "Verified",
       "incomplete": false,
       "id": "01KFTQPVC9RCRE9J8ACHECVWNK",
@@ -1546,7 +1696,32 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "name": [{"en": "Supply Chain Management"}, {"fa": "مدیریت زنجیره تأمین"}, {"ar": "إدارة سلسلة التوريد"}, {"es": "Gestión de la cadena de suministro"}, {"fr": "Gestion de la chaîne d'approvisionnement"}, {"de": "Lieferkettenmanagement"}, {"it": "Gestione della catena di fornitura"}, {"ru": "Управление цепочкой поставок"}],
+      "name": [
+        {
+          "en": "Supply Chain Management"
+        },
+        {
+          "fa": "مدیریت زنجیره تأمین"
+        },
+        {
+          "ar": "إدارة سلسلة التوريد"
+        },
+        {
+          "es": "Gestión de la cadena de suministro"
+        },
+        {
+          "fr": "Gestion de la chaîne d'approvisionnement"
+        },
+        {
+          "de": "Lieferkettenmanagement"
+        },
+        {
+          "it": "Gestione della catena di fornitura"
+        },
+        {
+          "ru": "Управление цепочкой поставок"
+        }
+      ],
       "icon": "LucidePlaneTakeoff",
       "incomplete": false,
       "id": "01KFTVYHWWEHFEQDME72PKNA75",
@@ -1556,7 +1731,32 @@
     },
     {
       "application-schemas": [],
-      "name": [{"en": "Process Management"}, {"fa": "مدیریت فرایندها"}, {"ar": "إدارة العمليات"}, {"es": "Gestión de procesos"}, {"fr": "Gestion des processus"}, {"de": "Prozessmanagement"}, {"it": "Gestione dei processi"}, {"ru": "Управление процессами"}],
+      "name": [
+        {
+          "en": "Process Management"
+        },
+        {
+          "fa": "مدیریت فرایندها"
+        },
+        {
+          "ar": "إدارة العمليات"
+        },
+        {
+          "es": "Gestión de procesos"
+        },
+        {
+          "fr": "Gestion des processus"
+        },
+        {
+          "de": "Prozessmanagement"
+        },
+        {
+          "it": "Gestione dei processi"
+        },
+        {
+          "ru": "Управление процессами"
+        }
+      ],
       "icon": "Workflow",
       "incomplete": false,
       "id": "01KFZFTS259QZVTR2ETNZ1H0GF",
@@ -1566,7 +1766,32 @@
     },
     {
       "application-schemas": [],
-      "name": [{"en": "General Applications"}, {"fa": "برنامه‌های عمومی"}, {"ar": "تطبيقات عامة"}, {"es": "Aplicaciones generales"}, {"fr": "Applications générales"}, {"de": "Allgemeine Anwendungen"}, {"it": "Applicazioni generali"}, {"ru": "Общие приложения"}],
+      "name": [
+        {
+          "en": "General Applications"
+        },
+        {
+          "fa": "برنامه‌های عمومی"
+        },
+        {
+          "ar": "تطبيقات عامة"
+        },
+        {
+          "es": "Aplicaciones generales"
+        },
+        {
+          "fr": "Applications générales"
+        },
+        {
+          "de": "Allgemeine Anwendungen"
+        },
+        {
+          "it": "Applicazioni generali"
+        },
+        {
+          "ru": "Общие приложения"
+        }
+      ],
       "icon": "Briefcase",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -1577,7 +1802,32 @@
     },
     {
       "application-schemas": [],
-      "name": [{"en": "Project Management"}, {"fa": "مدیریت پروژه"}, {"ar": "إدارة المشاريع"}, {"es": "Gestión de proyectos"}, {"fr": "Gestion de projet"}, {"de": "Projektmanagement"}, {"it": "Gestione progetti"}, {"ru": "Управление проектами"}],
+      "name": [
+        {
+          "en": "Project Management"
+        },
+        {
+          "fa": "مدیریت پروژه"
+        },
+        {
+          "ar": "إدارة المشاريع"
+        },
+        {
+          "es": "Gestión de proyectos"
+        },
+        {
+          "fr": "Gestion de projet"
+        },
+        {
+          "de": "Projektmanagement"
+        },
+        {
+          "it": "Gestione progetti"
+        },
+        {
+          "ru": "Управление проектами"
+        }
+      ],
       "icon": "ActivitySquare",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -2488,8 +2738,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-02-09T07:41:42.324Z",
-      "lastSynced": "2026-02-09T07:41:42.324Z",
+      "updatedAt": "2026-02-09T14:37:57.175Z",
+      "lastSynced": "2026-02-09T14:37:57.175Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -3641,7 +3891,32 @@
   ],
   "menu-items": [
     {
-      "menuTitle": [{"en": "Home"}, {"fa": "خانه"}, {"ar": "الرئيسية"}, {"es": "Inicio"}, {"fr": "Accueil"}, {"de": "Startseite"}, {"it": "Home"}, {"ru": "Главная"}],
+      "menuTitle": [
+        {
+          "en": "Home"
+        },
+        {
+          "fa": "خانه"
+        },
+        {
+          "ar": "الرئيسية"
+        },
+        {
+          "es": "Inicio"
+        },
+        {
+          "fr": "Accueil"
+        },
+        {
+          "de": "Startseite"
+        },
+        {
+          "it": "Home"
+        },
+        {
+          "ru": "Главная"
+        }
+      ],
       "menuIcon": "Home",
       "sortIndex": 0,
       "hideInAD": false,
@@ -3656,7 +3931,32 @@
       "companies": []
     },
     {
-      "menuTitle": [{"en": "AI Builder"}, {"fa": "سازنده هوش مصنوعی"}, {"ar": "منشئ الذكاء الاصطناعي"}, {"es": "Constructor IA"}, {"fr": "Générateur IA"}, {"de": "KI-Builder"}, {"it": "Builder IA"}, {"ru": "Конструктор ИИ"}],
+      "menuTitle": [
+        {
+          "en": "AI Builder"
+        },
+        {
+          "fa": "سازنده هوش مصنوعی"
+        },
+        {
+          "ar": "منشئ الذكاء الاصطناعي"
+        },
+        {
+          "es": "Constructor IA"
+        },
+        {
+          "fr": "Générateur IA"
+        },
+        {
+          "de": "KI-Builder"
+        },
+        {
+          "it": "Builder IA"
+        },
+        {
+          "ru": "Конструктор ИИ"
+        }
+      ],
       "menuIcon": "Sparkles",
       "sortIndex": 1,
       "hideInAD": false,
@@ -3683,7 +3983,32 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": [{"en": "Chatbot"}, {"fa": "چت‌بات"}, {"ar": "روبوت الدردشة"}, {"es": "Chatbot"}, {"fr": "Chatbot"}, {"de": "Chatbot"}, {"it": "Chatbot"}, {"ru": "Чат-бот"}],
+      "menuTitle": [
+        {
+          "en": "Chatbot"
+        },
+        {
+          "fa": "چت‌بات"
+        },
+        {
+          "ar": "روبوت الدردشة"
+        },
+        {
+          "es": "Chatbot"
+        },
+        {
+          "fr": "Chatbot"
+        },
+        {
+          "de": "Chatbot"
+        },
+        {
+          "it": "Chatbot"
+        },
+        {
+          "ru": "Чат-бот"
+        }
+      ],
       "menuIcon": "BotMessageSquare",
       "sortIndex": 2,
       "hideInAD": false,
@@ -3710,7 +4035,32 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": [{"en": "Builder"}, {"fa": "سازنده"}, {"ar": "المنشئ"}, {"es": "Constructor"}, {"fr": "Générateur"}, {"de": "Builder"}, {"it": "Builder"}, {"ru": "Конструктор"}],
+      "menuTitle": [
+        {
+          "en": "Builder"
+        },
+        {
+          "fa": "سازنده"
+        },
+        {
+          "ar": "المنشئ"
+        },
+        {
+          "es": "Constructor"
+        },
+        {
+          "fr": "Générateur"
+        },
+        {
+          "de": "Builder"
+        },
+        {
+          "it": "Builder"
+        },
+        {
+          "ru": "Конструктор"
+        }
+      ],
       "menuIcon": "LayoutPanelLeft",
       "sortIndex": 3,
       "hideInAD": false,
@@ -3733,7 +4083,32 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": [{"en": "Schema Builder"}, {"fa": "سازنده طرح"}, {"ar": "منشئ المخطط"}, {"es": "Constructor de esquemas"}, {"fr": "Générateur de schémas"}, {"de": "Schema-Builder"}, {"it": "Generatore di schemi"}, {"ru": "Конструктор схем"}],
+      "menuTitle": [
+        {
+          "en": "Schema Builder"
+        },
+        {
+          "fa": "سازنده طرح"
+        },
+        {
+          "ar": "منشئ المخطط"
+        },
+        {
+          "es": "Constructor de esquemas"
+        },
+        {
+          "fr": "Générateur de schémas"
+        },
+        {
+          "de": "Schema-Builder"
+        },
+        {
+          "it": "Generatore di schemi"
+        },
+        {
+          "ru": "Конструктор схем"
+        }
+      ],
       "menuIcon": "Brackets",
       "sortIndex": 4,
       "hideInAD": false,
@@ -3756,7 +4131,32 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": [{"en": "Integrations"}, {"fa": "یکپارچه‌سازی‌ها"}, {"ar": "التكاملات"}, {"es": "Integraciones"}, {"fr": "Intégrations"}, {"de": "Integrationen"}, {"it": "Integrazioni"}, {"ru": "Интеграции"}],
+      "menuTitle": [
+        {
+          "en": "Integrations"
+        },
+        {
+          "fa": "یکپارچه‌سازی‌ها"
+        },
+        {
+          "ar": "التكاملات"
+        },
+        {
+          "es": "Integraciones"
+        },
+        {
+          "fr": "Intégrations"
+        },
+        {
+          "de": "Integrationen"
+        },
+        {
+          "it": "Integrazioni"
+        },
+        {
+          "ru": "Интеграции"
+        }
+      ],
       "menuIcon": "Plug",
       "sortIndex": 5,
       "hideInAD": false,
@@ -3779,7 +4179,32 @@
       ]
     },
     {
-      "menuTitle": [{"en": "Dashboard"}, {"fa": "داشبورد"}, {"ar": "لوحة التحكم"}, {"es": "Panel de control"}, {"fr": "Tableau de bord"}, {"de": "Dashboard"}, {"it": "Cruscotto"}, {"ru": "Панель управления"}],
+      "menuTitle": [
+        {
+          "en": "Dashboard"
+        },
+        {
+          "fa": "داشبورد"
+        },
+        {
+          "ar": "لوحة التحكم"
+        },
+        {
+          "es": "Panel de control"
+        },
+        {
+          "fr": "Tableau de bord"
+        },
+        {
+          "de": "Dashboard"
+        },
+        {
+          "it": "Cruscotto"
+        },
+        {
+          "ru": "Панель управления"
+        }
+      ],
       "menuIcon": "LayoutDashboard",
       "sortIndex": 6,
       "hideInAD": false,
@@ -3802,7 +4227,32 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": [{"en": "Graph Designer"}, {"fa": "طراح گراف"}, {"ar": "مصمم الرسوم البيانية"}, {"es": "Diseñador de grafos"}, {"fr": "Concepteur de graphes"}, {"de": "Graph-Designer"}, {"it": "Progettista di grafici"}, {"ru": "Конструктор графов"}],
+      "menuTitle": [
+        {
+          "en": "Graph Designer"
+        },
+        {
+          "fa": "طراح گراف"
+        },
+        {
+          "ar": "مصمم الرسوم البيانية"
+        },
+        {
+          "es": "Diseñador de grafos"
+        },
+        {
+          "fr": "Concepteur de graphes"
+        },
+        {
+          "de": "Graph-Designer"
+        },
+        {
+          "it": "Progettista di grafici"
+        },
+        {
+          "ru": "Конструктор графов"
+        }
+      ],
       "menuIcon": "Waypoints",
       "sortIndex": 7,
       "hideInAD": false,
@@ -3825,7 +4275,32 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": [{"en": "Tender Calendar"}, {"fa": "تقویم مناقصه"}, {"ar": "تقويم المناقصات"}, {"es": "Calendario de licitaciones"}, {"fr": "Calendrier des appels d'offres"}, {"de": "Ausschreibungskalender"}, {"it": "Calendario gare"}, {"ru": "Календарь тендеров"}],
+      "menuTitle": [
+        {
+          "en": "Tender Calendar"
+        },
+        {
+          "fa": "تقویم مناقصه"
+        },
+        {
+          "ar": "تقويم المناقصات"
+        },
+        {
+          "es": "Calendario de licitaciones"
+        },
+        {
+          "fr": "Calendrier des appels d'offres"
+        },
+        {
+          "de": "Ausschreibungskalender"
+        },
+        {
+          "it": "Calendario gare"
+        },
+        {
+          "ru": "Календарь тендеров"
+        }
+      ],
       "menuIcon": "CalendarDays",
       "sortIndex": 8,
       "hideInAD": true,
@@ -3848,7 +4323,32 @@
       ]
     },
     {
-      "menuTitle": [{"en": "Tender Analytics"}, {"fa": "تحلیل مناقصه"}, {"ar": "تحليلات المناقصات"}, {"es": "Analíticas de licitaciones"}, {"fr": "Analytiques des appels d'offres"}, {"de": "Ausschreibungsanalysen"}, {"it": "Analisi gare"}, {"ru": "Аналитика тендеров"}],
+      "menuTitle": [
+        {
+          "en": "Tender Analytics"
+        },
+        {
+          "fa": "تحلیل مناقصه"
+        },
+        {
+          "ar": "تحليلات المناقصات"
+        },
+        {
+          "es": "Analíticas de licitaciones"
+        },
+        {
+          "fr": "Analytiques des appels d'offres"
+        },
+        {
+          "de": "Ausschreibungsanalysen"
+        },
+        {
+          "it": "Analisi gare"
+        },
+        {
+          "ru": "Аналитика тендеров"
+        }
+      ],
       "menuIcon": "BarChart3",
       "sortIndex": 9,
       "hideInAD": false,
@@ -3871,7 +4371,32 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": [{"en": "EQMS Analytics"}, {"fa": "تحلیل EQMS"}, {"ar": "تحليلات EQMS"}, {"es": "Analíticas EQMS"}, {"fr": "Analytiques EQMS"}, {"de": "EQMS-Analysen"}, {"it": "Analisi EQMS"}, {"ru": "Аналитика EQMS"}],
+      "menuTitle": [
+        {
+          "en": "EQMS Analytics"
+        },
+        {
+          "fa": "تحلیل EQMS"
+        },
+        {
+          "ar": "تحليلات EQMS"
+        },
+        {
+          "es": "Analíticas EQMS"
+        },
+        {
+          "fr": "Analytiques EQMS"
+        },
+        {
+          "de": "EQMS-Analysen"
+        },
+        {
+          "it": "Analisi EQMS"
+        },
+        {
+          "ru": "Аналитика EQMS"
+        }
+      ],
       "menuIcon": "ShieldCheck",
       "sortIndex": 10,
       "hideInAD": false,
@@ -3894,7 +4419,32 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
     },
     {
-      "menuTitle": [{"en": "Sales Analytics"}, {"fa": "تحلیل فروش"}, {"ar": "تحليلات المبيعات"}, {"es": "Analíticas de ventas"}, {"fr": "Analytiques des ventes"}, {"de": "Vertriebsanalysen"}, {"it": "Analisi vendite"}, {"ru": "Аналитика продаж"}],
+      "menuTitle": [
+        {
+          "en": "Sales Analytics"
+        },
+        {
+          "fa": "تحلیل فروش"
+        },
+        {
+          "ar": "تحليلات المبيعات"
+        },
+        {
+          "es": "Analíticas de ventas"
+        },
+        {
+          "fr": "Analytiques des ventes"
+        },
+        {
+          "de": "Vertriebsanalysen"
+        },
+        {
+          "it": "Analisi vendite"
+        },
+        {
+          "ru": "Аналитика продаж"
+        }
+      ],
       "menuIcon": "TrendingUp",
       "sortIndex": 11,
       "hideInAD": false,
@@ -3923,7 +4473,32 @@
           "label": "Supply Chain Management"
         }
       ],
-      "menuTitle": [{"en": "Tender List"}, {"fa": "لیست مناقصات"}, {"ar": "قائمة المناقصات"}, {"es": "Lista de licitaciones"}, {"fr": "Liste des appels d'offres"}, {"de": "Ausschreibungsliste"}, {"it": "Elenco gare"}, {"ru": "Список тендеров"}],
+      "menuTitle": [
+        {
+          "en": "Tender List"
+        },
+        {
+          "fa": "لیست مناقصات"
+        },
+        {
+          "ar": "قائمة المناقصات"
+        },
+        {
+          "es": "Lista de licitaciones"
+        },
+        {
+          "fr": "Liste des appels d'offres"
+        },
+        {
+          "de": "Ausschreibungsliste"
+        },
+        {
+          "it": "Elenco gare"
+        },
+        {
+          "ru": "Список тендеров"
+        }
+      ],
       "menuIcon": "BadgeDollarSign",
       "menuUrl": "/dynamic-query/01KDT7XAH1V7CKTPKZFA5VC6H3",
       "incomplete": false,
@@ -4554,6 +5129,31 @@
           "label": "Local Development"
         }
       ]
+    },
+    {
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "name": "gradianapp",
+      "title": "Gradian App",
+      "domain": "https://app1.cinnagen.com",
+      "defaultDomain": "app1.cinnagen.com",
+      "dbname": "gradian_app",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KH39DYCW17SXF2APAV1KZZQT",
+      "createdAt": "2026-02-10T08:07:05.383Z",
+      "updatedAt": "2026-02-10T08:07:30.785Z",
+      "relatedTenants": [
+        {
+          "id": "01KH39DYCW17SXF2APAV1KZZQT",
+          "label": "Gradian App"
+        }
+      ],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "routes": [],
@@ -5879,7 +6479,7 @@
           "id": "01KDG66XCHTD0GGQX3A2E69T85"
         }
       ],
-      "dueDate": "2026-01-28",
+      "dueDate": "2026-02-24",
       "status": [
         {
           "id": "01KBSVZ3N828YPGRXFDY84D15W",
@@ -5902,7 +6502,7 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KEBX0709K2G44QVF3DKE7CC3",
       "createdAt": "2026-01-07T09:35:56.962Z",
-      "updatedAt": "2026-01-07T09:35:57.237Z"
+      "updatedAt": "2026-02-09T14:07:50.132Z"
     },
     {
       "isForce": true,
@@ -19586,6 +20186,20 @@
       "icon": "CheckCircle",
       "color": "success",
       "sourceUrl": "field-options:project-proposal:project-proposal-approval-status"
+    },
+    {
+      "id": "passed",
+      "label": "Passed",
+      "icon": "CheckCircle2",
+      "color": "emerald",
+      "sourceUrl": "field-options:backup-restore-logs:test-status"
+    },
+    {
+      "id": "pass",
+      "label": "Pass",
+      "icon": "CheckCircle",
+      "color": "emerald",
+      "sourceUrl": "field-options:backup-restore-logs:test-result"
     }
   ],
   "deviation-management": [

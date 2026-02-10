@@ -3,7 +3,7 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AppWindow, Grid3X3, List, RefreshCw, Sparkles } from 'lucide-react';
+import { AppWindow, Grid3X3, List, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
@@ -62,6 +62,9 @@ const AppListItem: React.FC<AppListItemProps> = ({
   const isSystemSchema = schemaType === 'system';
 
   const isGrid = viewMode === 'grid';
+  const isRtl =
+    typeof language === 'string' &&
+    ['ar', 'fa', 'he', 'ur'].some((rtlCode) => language.toLowerCase().startsWith(rtlCode));
 
   if (isGrid) {
     return (
@@ -117,14 +120,14 @@ const AppListItem: React.FC<AppListItemProps> = ({
             <div className="flex items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
               <Badge
                 variant="outline"
-                className="border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-200"
+                className="border-violet-200 bg-violet-50 text-violet-700 hover:bg-violet-100/70 hover:text-violet-900 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-200 dark:hover:bg-violet-500/30 dark:hover:text-violet-50"
               >
                 {getT(TRANSLATION_KEYS.BADGE_APP, language, defaultLang)}
               </Badge>
               {isSystemSchema && (
                 <Badge
                   variant="outline"
-                  className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200"
+                  className="border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100/70 hover:text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200 dark:hover:bg-amber-500/30 dark:hover:text-amber-50"
                 >
                   {getT(TRANSLATION_KEYS.BADGE_SYSTEM, language, defaultLang)}
                 </Badge>
@@ -150,7 +153,11 @@ const AppListItem: React.FC<AppListItemProps> = ({
                 }
               }}
             >
-              <Sparkles className="h-3.5 w-3.5" />
+              {isRtl ? (
+                <ChevronLeft className="h-3.5 w-3.5" />
+              ) : (
+                <ChevronRight className="h-3.5 w-3.5" />
+              )}
             </Button>
           </CardContent>
         </Card>
@@ -197,7 +204,7 @@ const AppListItem: React.FC<AppListItemProps> = ({
             {isSystemSchema && (
               <Badge
                 variant="outline"
-                className="border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200"
+                className="border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100/70 hover:text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200 dark:hover:bg-amber-500/30 dark:hover:text-amber-50"
               >
                 {getT(TRANSLATION_KEYS.BADGE_SYSTEM, language, defaultLang)}
               </Badge>
@@ -234,7 +241,11 @@ const AppListItem: React.FC<AppListItemProps> = ({
           }
         }}
       >
-        <Sparkles className="h-3.5 w-3.5" />
+        {isRtl ? (
+          <ChevronLeft className="h-3.5 w-3.5" />
+        ) : (
+          <ChevronRight className="h-3.5 w-3.5" />
+        )}
       </Button>
     </motion.div>
   );
@@ -483,7 +494,10 @@ export function AppListWrapper() {
           <div className="flex flex-row items-center gap-2">
             <div className="flex-1 min-w-0">
               <SearchInput
-                config={{ name: 'search', placeholder: 'Search Apps' }}
+                config={{
+                  name: 'search',
+                  placeholder: getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH_APPS, language, defaultLang),
+                }}
                 value={searchQuery}
                 onChange={setSearchQuery}
                 onClear={() => setSearchQuery('')}

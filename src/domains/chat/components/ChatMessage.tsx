@@ -609,7 +609,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     >
       {/* Avatar */}
       {isUser ? (
-        <Avatar className="h-8 w-8 border rounded-full bg-violet-100 text-violet-800 shrink-0 border-gray-200 dark:border-gray-700">
+        <Avatar className="h-8 w-8 border rounded-full bg-violet-100 text-violet-800 shrink-0 border-gray-200 dark:border-gray-700 m-0">
           {user?.avatar ? (
             <AvatarImage
               src={user.avatar}

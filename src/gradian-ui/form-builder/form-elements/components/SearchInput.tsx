@@ -71,7 +71,7 @@ export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
       error
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',
-      value && onClear ? 'ps-10 pe-10' : 'ps-10',
+      value && onClear ? 'ps-10 pe-10' : 'pe-10',
       className
     );
 
@@ -95,7 +95,7 @@ export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
           </label>
         )}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-5 w-5 pointer-events-none" />
+          <Search className="absolute end-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-5 w-5 pointer-events-none" />
           <input
             ref={inputRef}
             id={fieldName}
@@ -113,7 +113,6 @@ export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
             required={required ?? (config as any).validation?.required ?? false}
             disabled={disabled}
             autoComplete="off"
-            dir="auto"
             className={inputClasses}
             {...props}
           />
@@ -121,7 +120,7 @@ export const SearchInput = forwardRef<FormElementRef, SearchInputProps>(
             <button
               type="button"
               onClick={handleClear}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:text-gray-600 dark:focus:text-gray-300 transition-colors"
+              className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:text-gray-600 dark:focus:text-gray-300 transition-colors"
               aria-label="Clear search"
             >
               <svg

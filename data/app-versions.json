@@ -6686,5 +6686,42 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50005000000000000001",
+    "timestamp": "2026-02-10T00:00:00.000Z",
+    "version": "1.50.005",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "Enhanced multilingual support by updating translations for tenant-related terms in various files, ensuring consistency across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "i18n",
+          "tenant",
+          "data"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "Improved layout handling in components to support right-to-left text direction based on language settings.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "i18n",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "Updated user interface elements to better accommodate language-specific adjustments, enhancing user experience and accessibility.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "i18n",
+          "accessibility"
+        ]
+      }
+    ]
   }
 ]

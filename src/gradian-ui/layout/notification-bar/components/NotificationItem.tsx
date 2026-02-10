@@ -104,9 +104,9 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
   if (!isVisible) return null;
 
   const notificationClasses = cn(
-    'flex items-start p-4 border rounded-md shadow-sm transition-all duration-300',
+    'flex items-start p-4 border rounded-md shadow-sm transform transition duration-150 ease-out',
     getTypeStyles(notification.type),
-    clickToDismiss && 'cursor-pointer hover:shadow-md',
+    clickToDismiss && 'cursor-pointer hover:shadow-md hover:-translate-y-0.5',
     className
   );
 
