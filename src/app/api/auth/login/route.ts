@@ -39,9 +39,7 @@ const applyTokenCookies = (response: NextResponse, tokens?: any): void => {
     });
   }
 
-  if (tokens.sessionToken) {
-    response.cookies.set(AUTH_CONFIG.SESSION_TOKEN_COOKIE ?? 'session_token', tokens.sessionToken, baseOptions);
-  }
+  // Do not set session_token cookie: sso_session (forwarded from auth) has the same value and is used for SSO.
 
   if (tokens.userSessionId) {
     response.cookies.set(
