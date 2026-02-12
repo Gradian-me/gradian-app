@@ -310,16 +310,17 @@ export async function POST(request: NextRequest) {
     } : { success: true };
     
     const response = NextResponse.json(responseData, { status: upstreamResponse.status });
-    
-    // IMPORTANT: Forward external auth cookies FIRST (including sso_session), then apply our own cookies.
-    // We use axios (not fetch) so Set-Cookie is preserved; fetch strips it on cross-origin responses.
-    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Forwarding set-cookie headers from external auth...');
-    forwardSetCookieHeadersFromAxios(upstreamResponse.headers, response);
-    
-    // Apply our token cookies AFTER forwarding external cookies
-    // This ensures refresh token cookie is set with correct path='/', sameSite='lax', etc.
+
+    // Apply our token cookies FIRST (refresh_token, session_token, user_session_id).
+    // NextResponse.cookies.set() can replace/clear manually appended Set-Cookie headers,
+    // so we must append upstream cookies (sso_session) AFTER calling cookies.set().
     loggingCustom(LogType.LOGIN_LOG, 'debug', 'Applying token cookies from external auth (refresh token only)...');
     applyTokenCookies(response, upstreamJson?.tokens);
+
+    // THEN forward external auth Set-Cookie headers (including sso_session).
+    // Order matters: if we did this before cookies.set(), the latter would overwrite and drop sso_session.
+    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Forwarding set-cookie headers from external auth...');
+    forwardSetCookieHeadersFromAxios(upstreamResponse.headers, response);
     
     // Log cookie configuration for debugging
     if (upstreamJson?.tokens?.refreshToken) {
