@@ -2,10 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { isDemoModeEnabled, proxyEngagementRequest } from '@/app/api/data/utils';
 import { countEngagements, getApiMessage, TRANSLATION_KEYS } from '../../utils';
 import type { EngagementType } from '@/domains/engagements/types';
 
 const ENGAGEMENT_TYPE: EngagementType = 'notification';
+
+function getTargetPath(request: NextRequest): string {
+  return `${request.nextUrl.pathname}${request.nextUrl.search}`;
+}
 
 /**
  * GET /api/engagements/notifications/count
@@ -15,6 +20,10 @@ const ENGAGEMENT_TYPE: EngagementType = 'notification';
 export async function GET(request: NextRequest) {
   const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) return authResult;
+
+  if (!isDemoModeEnabled()) {
+    return proxyEngagementRequest(request, getTargetPath(request));
+  }
 
   try {
     const { searchParams } = new URL(request.url);

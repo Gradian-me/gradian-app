@@ -33,6 +33,8 @@ type ProxyOptions = {
   body?: unknown;
   method?: string;
   headers?: HeadersInit;
+  /** When true, response is returned as-is (no data envelope normalization). Used for engagement APIs. */
+  skipNormalize?: boolean;
 };
 
 type NormalizeContext = {
@@ -391,12 +393,22 @@ const normalizeUpstreamDataResponse = (payload: unknown, context: NormalizeConte
   return payload;
 };
 
+/**
+ * Base URL for engagement API proxy. Uses URL_ENGAGEMENTS_CRUD when set, otherwise URL_DATA_CRUD
+ * (same backend can serve both). Used by proxyEngagementRequest.
+ */
+const getEngagementProxyBaseUrl = (): string | undefined =>
+  (process.env.URL_ENGAGEMENTS_CRUD || process.env.URL_DATA_CRUD)?.replace(/\/+$/, '');
+
 export const proxyDataRequest = async (
   request: NextRequest,
   targetPathWithQuery: string,
-  options: ProxyOptions = {}
+  options: ProxyOptions = {},
+  /** Override base URL (e.g. for engagements). When set, response is not normalized. */
+  baseUrlOverride?: string
 ) => {
-  const baseUrl = process.env.URL_DATA_CRUD?.replace(/\/+$/, '');
+  const baseUrl = (baseUrlOverride ?? process.env.URL_DATA_CRUD)?.replace(/\/+$/, '');
+  const isEngagementProxy = Boolean(baseUrlOverride) || targetPathWithQuery.startsWith('/api/engagement');
 
   if (!baseUrl) {
     loggingCustom(LogType.INFRA_LOG, 'error', 'URL_DATA_CRUD environment variable is not defined.');
@@ -415,6 +427,7 @@ export const proxyDataRequest = async (
   }
 
   const targetUrl = `${baseUrl}${targetPathWithQuery}`;
+  const skipNormalize = options.skipNormalize === true || isEngagementProxy;
 
   // Extract tenant domain BEFORE creating new Headers object to ensure we check original request
   // IMPORTANT: Tenant domain must come from the browser/app domain, NOT from backend service URLs
@@ -805,12 +818,14 @@ export const proxyDataRequest = async (
         'debug',
         `Response body: ${truncateForLog(stringifyForLog(data))}`
       );
-      const normalized = normalizeUpstreamDataResponse(data, {
-        method,
-        status: response.status,
-        targetPathWithQuery,
-      });
-      return NextResponse.json(normalized, { status: response.status });
+      const payload = skipNormalize
+        ? data
+        : normalizeUpstreamDataResponse(data, {
+            method,
+            status: response.status,
+            targetPathWithQuery,
+          });
+      return NextResponse.json(payload, { status: response.status });
     }
 
     const text = await response.text();
@@ -853,5 +868,29 @@ export const proxyDataRequest = async (
       { status: 502 }
     );
   }
+};
+
+/**
+ * Proxy engagement API requests to backend in live mode.
+ * Uses URL_ENGAGEMENTS_CRUD when set, otherwise URL_DATA_CRUD (same backend can serve both).
+ * Response is returned as-is (no envelope normalization).
+ */
+export const proxyEngagementRequest = async (
+  request: NextRequest,
+  targetPathWithQuery: string,
+  options: ProxyOptions = {}
+): Promise<NextResponse> => {
+  const baseUrl = getEngagementProxyBaseUrl();
+  if (!baseUrl) {
+    loggingCustom(LogType.INFRA_LOG, 'error', 'URL_ENGAGEMENTS_CRUD and URL_DATA_CRUD are not defined.');
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Engagement service URL is not configured. Set URL_ENGAGEMENTS_CRUD or URL_DATA_CRUD.',
+      },
+      { status: 503 }
+    );
+  }
+  return proxyDataRequest(request, targetPathWithQuery, { ...options, skipNormalize: true }, baseUrl);
 };
 

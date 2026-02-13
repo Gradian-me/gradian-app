@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 import { useRouter } from 'next/navigation';
 import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
 import { NotificationService } from '@/domains/notifications/services/notification.service';
+import { useNotificationCount } from '@/domains/notifications/hooks/useNotificationCount';
+import { notifyNotificationCountUpdate } from '@/domains/notifications/notification-count-sync';
 import { formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { NotificationDialog } from '@/domains/notifications/components/NotificationDialog';
@@ -20,13 +22,18 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 interface NotificationsDropdownProps {
+  /** Initial count before first fetch (avoids badge flashing). */
   initialCount?: number;
   onOpenChange?: (isOpen: boolean) => void;
 }
 
 export function NotificationsDropdown({ initialCount = 3, onOpenChange }: NotificationsDropdownProps) {
+  const { count: notificationCount, refetch: refetchCount } = useNotificationCount({
+    initialCount,
+    pollIntervalMs: 60_000,
+    refetchOnFocus: true,
+  });
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
-  const [notificationCount, setNotificationCount] = useState(initialCount);
   const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,7 +60,7 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
     setIsMounted(true);
   }, []);
 
-  // Fetch notifications from API (engagements/notifications)
+  // Fetch notifications from API when dropdown opens; refresh badge count when opening
   useEffect(() => {
     if (!isMounted) return;
 
@@ -61,21 +68,19 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
       setIsLoading(true);
       try {
         const allNotifications = await NotificationService.getNotifications({});
-        const totalUnreadCount = await NotificationService.getUnreadCount();
-        setNotificationCount(totalUnreadCount);
         const top10 = allNotifications.slice(0, 10);
         setNotifications(top10);
+        if (isOpen) void refetchCount();
       } catch (error) {
         loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching notifications: ${error instanceof Error ? error.message : String(error)}`);
         setNotifications([]);
-        setNotificationCount(0);
       } finally {
         setIsLoading(false);
       }
     };
 
     void fetchNotifications();
-  }, [isMounted, isOpen]); // Refetch when dropdown opens
+  }, [isMounted, isOpen, refetchCount]);
 
   const handleViewAllClick = () => {
     router.push('/notifications');
@@ -101,8 +106,7 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
           prev ? { ...prev, isRead: true, readAt: new Date() } : null,
         );
       }
-      const totalUnreadCount = await NotificationService.getUnreadCount();
-      setNotificationCount(totalUnreadCount);
+      notifyNotificationCountUpdate();
     } catch (error) {
       loggingCustom(LogType.CLIENT_LOG, 'error', `Error marking notification as read: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -139,8 +143,7 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
           prev ? { ...prev, isRead: false } : null,
         );
       }
-      const totalUnreadCount = await NotificationService.getUnreadCount();
-      setNotificationCount(totalUnreadCount);
+      notifyNotificationCountUpdate();
     } catch (error) {
       loggingCustom(LogType.CLIENT_LOG, 'error', `Error marking notification as unread: ${error instanceof Error ? error.message : String(error)}`);
     }

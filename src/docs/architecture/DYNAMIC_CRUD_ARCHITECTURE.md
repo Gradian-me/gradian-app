@@ -781,8 +781,8 @@ curl -X DELETE http://localhost:3000/api/data/vendors/{id}
 
 The application supports two modes:
 
-- **Demo Mode** (`DEMO_MODE=true`): Uses local file storage (`data/all-data.json`, `data/all-schemas.json`)
-- **Live Mode** (`DEMO_MODE=false`): Proxies requests to external backend services
+- **Demo Mode** (`NEXT_PUBLIC_DEMO_MODE=true`): Uses local data (e.g. `data/all-data.json`, `data/engagements.json`, engagement JSON files). All `/api/data/*` and engagement APIs (`/api/engagement-groups`, `/api/engagements/*`, `/api/engagement-interactions`, `/api/data/:schemaId/:id/engagements/*`) serve from local storage.
+- **Live Mode** (`NEXT_PUBLIC_DEMO_MODE=false`): Proxies requests to external backends. Data CRUD uses `URL_DATA_CRUD`. Engagement APIs use `URL_ENGAGEMENTS_CRUD` when set, otherwise fall back to `URL_DATA_CRUD` (same backend can serve both).
 
 Routes automatically detect the mode and handle proxying/fallback logic accordingly.
 

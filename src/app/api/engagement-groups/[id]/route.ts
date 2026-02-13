@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { isDemoModeEnabled, proxyEngagementRequest } from '@/app/api/data/utils';
 import {
   loadEngagementGroups,
   saveEngagementGroups,
@@ -10,12 +11,20 @@ import {
   TRANSLATION_KEYS,
 } from '@/app/api/engagements/utils';
 
+function getTargetPath(request: NextRequest): string {
+  return `${request.nextUrl.pathname}${request.nextUrl.search}`;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) return authResult;
+
+  if (!isDemoModeEnabled()) {
+    return proxyEngagementRequest(request, getTargetPath(request));
+  }
 
   try {
     const { id } = await params;
@@ -52,9 +61,22 @@ export async function PUT(
   const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) return authResult;
 
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    body = undefined;
+  }
+  if (!isDemoModeEnabled()) {
+    return proxyEngagementRequest(request, getTargetPath(request), {
+      method: 'PUT',
+      body,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   try {
     const { id } = await params;
-    const body = await request.json();
     const groups = loadEngagementGroups();
     const active = filterOutDeletedGroups(groups);
     const index = groups.findIndex((g) => g.id === id);
@@ -79,8 +101,9 @@ export async function PUT(
       'referenceInstanceId',
     ] as const;
     const updated = { ...groups[index] };
+    const bodyObj = body as Record<string, unknown>;
     for (const key of allowed) {
-      if (key in body) (updated as Record<string, unknown>)[key] = body[key];
+      if (key in bodyObj) (updated as Record<string, unknown>)[key] = bodyObj[key];
     }
     updated.updatedAt = new Date().toISOString();
     groups[index] = updated;
@@ -117,6 +140,20 @@ export async function DELETE(
   const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) return authResult;
 
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    body = undefined;
+  }
+  if (!isDemoModeEnabled()) {
+    return proxyEngagementRequest(request, getTargetPath(request), {
+      method: 'DELETE',
+      body,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   try {
     const { id } = await params;
     const groups = loadEngagementGroups();
@@ -130,13 +167,7 @@ export async function DELETE(
     }
 
     const now = new Date().toISOString();
-    let deletedBy: string | undefined;
-    try {
-      const body = await request.json();
-      deletedBy = body?.deletedBy;
-    } catch {
-      // No body or invalid JSON
-    }
+    const deletedBy = (body as { deletedBy?: string } | undefined)?.deletedBy;
     groups[index] = {
       ...groups[index],
       deletedBy: deletedBy ?? undefined,

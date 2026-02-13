@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { isDemoModeEnabled, proxyEngagementRequest } from '@/app/api/data/utils';
 import type { EngagementInteraction } from '@/domains/engagements/types';
 import {
   findInteractionsByEngagementIds,
@@ -11,9 +12,17 @@ import {
   TRANSLATION_KEYS,
 } from '@/app/api/engagements/utils';
 
+function getTargetPath(request: NextRequest): string {
+  return `${request.nextUrl.pathname}${request.nextUrl.search}`;
+}
+
 export async function GET(request: NextRequest) {
   const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) return authResult;
+
+  if (!isDemoModeEnabled()) {
+    return proxyEngagementRequest(request, getTargetPath(request));
+  }
 
   try {
     const { searchParams } = new URL(request.url);
@@ -74,10 +83,24 @@ export async function POST(request: NextRequest) {
   const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) return authResult;
 
+  let body: unknown;
   try {
-    const body = await request.json();
-    const engagementId = body.engagementId as string;
-    const userId = body.userId as string;
+    body = await request.json();
+  } catch {
+    body = undefined;
+  }
+  if (!isDemoModeEnabled()) {
+    return proxyEngagementRequest(request, getTargetPath(request), {
+      method: 'POST',
+      body,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  try {
+    const bodyObj = body as Record<string, unknown>;
+    const engagementId = bodyObj.engagementId as string;
+    const userId = bodyObj.userId as string;
 
     if (!engagementId || !userId) {
       return NextResponse.json(
@@ -90,12 +113,12 @@ export async function POST(request: NextRequest) {
     }
 
     const updates: Parameters<typeof upsertInteraction>[2] = {};
-    if (typeof body.isRead === 'boolean') updates.isRead = body.isRead;
-    if (body.readAt != null) updates.readAt = body.readAt;
-    if (body.interactedAt != null) updates.interactedAt = body.interactedAt;
-    if (body.outputType != null) updates.outputType = body.outputType;
-    if (body.comment != null) updates.comment = body.comment;
-    if (body.dueDate != null) updates.dueDate = body.dueDate;
+    if (typeof bodyObj.isRead === 'boolean') updates.isRead = bodyObj.isRead;
+    if (bodyObj.readAt != null) updates.readAt = bodyObj.readAt as string;
+    if (bodyObj.interactedAt != null) updates.interactedAt = bodyObj.interactedAt as string;
+    if (bodyObj.outputType != null) updates.outputType = bodyObj.outputType as 'approved' | 'rejected';
+    if (bodyObj.comment != null) updates.comment = bodyObj.comment as string;
+    if (bodyObj.dueDate != null) updates.dueDate = bodyObj.dueDate as string;
 
     const interaction = upsertInteraction(engagementId, userId, updates);
 

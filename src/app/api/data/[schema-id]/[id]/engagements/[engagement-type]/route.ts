@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { isDemoModeEnabled, proxyEngagementRequest } from '@/app/api/data/utils';
 import {
   createEngagement,
   findGroupByReference,
@@ -11,6 +12,10 @@ import {
   TRANSLATION_KEYS,
 } from '@/app/api/engagements/utils';
 import type { EngagementType } from '@/domains/engagements/types';
+
+function getTargetPath(request: NextRequest): string {
+  return `${request.nextUrl.pathname}${request.nextUrl.search}`;
+}
 
 const VALID_ENGAGEMENT_TYPES: EngagementType[] = [
   'notification',
@@ -43,6 +48,10 @@ export async function GET(
 ) {
   const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) return authResult;
+
+  if (!isDemoModeEnabled()) {
+    return proxyEngagementRequest(request, getTargetPath(request));
+  }
 
   const { 'schema-id': schemaId, id: instanceId, 'engagement-type': engagementType } =
     await params;
@@ -114,6 +123,20 @@ export async function POST(
   const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) return authResult;
 
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    body = undefined;
+  }
+  if (!isDemoModeEnabled()) {
+    return proxyEngagementRequest(request, getTargetPath(request), {
+      method: 'POST',
+      body,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   const { 'schema-id': schemaId, id: instanceId, 'engagement-type': engagementType } =
     await params;
 
@@ -130,10 +153,10 @@ export async function POST(
   }
 
   try {
-    const body = await request.json();
-    const createdBy = body.createdBy as string | undefined;
+    const bodyObj = body as Record<string, unknown>;
+    const createdBy = bodyObj.createdBy as string | undefined;
     const group = getOrCreateGroupForReference(schemaId, instanceId, createdBy);
-    const created = createEngagement(body, engagementType, group.id, createdBy);
+    const created = createEngagement(bodyObj, engagementType, group.id, createdBy);
     const typeLabel =
       TYPE_LABELS[engagementType].charAt(0).toUpperCase() + TYPE_LABELS[engagementType].slice(1);
 

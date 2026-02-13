@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { isDemoModeEnabled, proxyEngagementRequest } from '@/app/api/data/utils';
 import {
   countEngagements,
   findGroupByReference,
@@ -9,6 +10,10 @@ import {
   TRANSLATION_KEYS,
 } from '@/app/api/engagements/utils';
 import type { EngagementType } from '@/domains/engagements/types';
+
+function getTargetPath(request: NextRequest): string {
+  return `${request.nextUrl.pathname}${request.nextUrl.search}`;
+}
 
 const VALID_ENGAGEMENT_TYPES: EngagementType[] = [
   'notification',
@@ -39,6 +44,10 @@ export async function GET(
 ) {
   const authResult = await requireApiAuth(request);
   if (authResult instanceof NextResponse) return authResult;
+
+  if (!isDemoModeEnabled()) {
+    return proxyEngagementRequest(request, getTargetPath(request));
+  }
 
   const { 'schema-id': schemaId, id: instanceId, 'engagement-type': engagementType } =
     await params;
