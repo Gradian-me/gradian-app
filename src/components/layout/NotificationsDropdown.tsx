@@ -11,7 +11,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useRouter } from 'next/navigation';
 import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
-import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { NotificationService } from '@/domains/notifications/services/notification.service';
 import { formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { NotificationDialog } from '@/domains/notifications/components/NotificationDialog';
@@ -53,56 +53,18 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
     setIsMounted(true);
   }, []);
 
-  // Fetch notifications from API
+  // Fetch notifications from API (engagements/notifications)
   useEffect(() => {
     if (!isMounted) return;
 
     const fetchNotifications = async () => {
       setIsLoading(true);
       try {
-        const response = await apiRequest<Notification[]>('/api/notifications', {
-          method: 'GET',
-          callerName: 'NotificationsDropdown.fetchNotifications',
-        });
-
-        if (response.success && response.data) {
-          // Get all notifications from API
-          const allRawNotifications = Array.isArray(response.data)
-            ? response.data
-            : [];
-          
-          // Count total unread notifications from all notifications
-          const totalUnreadCount = allRawNotifications.filter((n: any) => !n.isRead).length;
-          setNotificationCount(totalUnreadCount);
-          
-          // Get top 10 notifications for display (already sorted by createdAt desc from API)
-          const rawNotifications = allRawNotifications.slice(0, 10);
-          
-          // Transform API data to Notification type
-          const transformedNotifications: NotificationType[] = rawNotifications.map((n: any) => ({
-            id: n.id,
-            title: n.title,
-            message: n.message,
-            type: (n.type === 'error' ? 'important' : n.type) as 'success' | 'info' | 'warning' | 'important',
-            category: n.category as 'quotation' | 'purchase_order' | 'shipment' | 'vendor' | 'tender' | 'system',
-            priority: n.priority as 'low' | 'medium' | 'high' | 'urgent',
-            isRead: n.isRead,
-            createdAt: new Date(n.createdAt),
-            readAt: n.readAt ? new Date(n.readAt) : undefined,
-            acknowledgedAt: n.acknowledgedAt ? new Date(n.acknowledgedAt) : undefined,
-            interactionType: (n.interactionType ?? 'canRead') as 'canRead' | 'needsAcknowledgement',
-            createdBy: n.createdBy,
-            assignedTo: n.assignedTo?.map((item: any) => ({
-              userId: item.userId,
-              interactedAt: item.interactedAt ? new Date(item.interactedAt) : undefined,
-              comment: item.comment
-            })),
-            actionUrl: n.actionUrl,
-            metadata: n.metadata
-          }));
-          
-          setNotifications(transformedNotifications);
-        }
+        const allNotifications = await NotificationService.getNotifications({});
+        const totalUnreadCount = await NotificationService.getUnreadCount();
+        setNotificationCount(totalUnreadCount);
+        const top10 = allNotifications.slice(0, 10);
+        setNotifications(top10);
       } catch (error) {
         loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching notifications: ${error instanceof Error ? error.message : String(error)}`);
         setNotifications([]);
@@ -128,39 +90,19 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
 
   const handleMarkAsRead = async (notificationId: string) => {
     try {
-      await apiRequest(`/api/notifications/${notificationId}`, {
-        method: 'PUT',
-        body: { isRead: true, readAt: new Date().toISOString() },
-        callerName: 'NotificationsDropdown.markAsRead',
-      });
-      
-      // Update local state
-      setNotifications(prev => 
-        prev.map(n => 
-          n.id === notificationId 
-            ? { ...n, isRead: true, readAt: new Date() }
-            : n
-        )
+      await NotificationService.markAsRead(notificationId);
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === notificationId ? { ...n, isRead: true, readAt: new Date() } : n,
+        ),
       );
-      
-      // Update selected notification if it's the one being marked as read
       if (selectedNotification?.id === notificationId) {
-        setSelectedNotification(prev => 
-          prev ? { ...prev, isRead: true, readAt: new Date() } : null
+        setSelectedNotification((prev) =>
+          prev ? { ...prev, isRead: true, readAt: new Date() } : null,
         );
       }
-      
-      // Refetch notifications to get updated unread count
-      const response = await apiRequest<NotificationType[]>('/api/notifications', {
-        method: 'GET',
-        callerName: 'NotificationsDropdown.refreshAfterRead',
-      });
-      
-      if (response.success && response.data) {
-        const allRawNotifications = Array.isArray(response.data) ? response.data : [];
-        const totalUnreadCount = allRawNotifications.filter((n: any) => !n.isRead).length;
-        setNotificationCount(totalUnreadCount);
-      }
+      const totalUnreadCount = await NotificationService.getUnreadCount();
+      setNotificationCount(totalUnreadCount);
     } catch (error) {
       loggingCustom(LogType.CLIENT_LOG, 'error', `Error marking notification as read: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -168,25 +110,15 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
 
   const handleAcknowledge = async (notificationId: string) => {
     try {
-      await apiRequest(`/api/notifications/${notificationId}`, {
-        method: 'PUT',
-        body: { acknowledgedAt: new Date().toISOString() },
-        callerName: 'NotificationsDropdown.acknowledge',
-      });
-      
-      // Update local state
-      setNotifications(prev => 
-        prev.map(n => 
-          n.id === notificationId 
-            ? { ...n, acknowledgedAt: new Date() }
-            : n
-        )
+      await NotificationService.acknowledge(notificationId);
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === notificationId ? { ...n, acknowledgedAt: new Date() } : n,
+        ),
       );
-      
-      // Update selected notification if it's the one being acknowledged
       if (selectedNotification?.id === notificationId) {
-        setSelectedNotification(prev => 
-          prev ? { ...prev, acknowledgedAt: new Date() } : null
+        setSelectedNotification((prev) =>
+          prev ? { ...prev, acknowledgedAt: new Date() } : null,
         );
       }
     } catch (error) {
@@ -196,39 +128,19 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
 
   const handleMarkAsUnread = async (notificationId: string) => {
     try {
-      await apiRequest(`/api/notifications/${notificationId}`, {
-        method: 'PUT',
-        body: { isRead: false },
-        callerName: 'NotificationsDropdown.markAsUnread',
-      });
-      
-      // Update local state
-      setNotifications(prev => 
-        prev.map(n => 
-          n.id === notificationId 
-            ? { ...n, isRead: false }
-            : n
-        )
+      await NotificationService.markAsUnread(notificationId);
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === notificationId ? { ...n, isRead: false } : n,
+        ),
       );
-      
-      // Update selected notification if it's the one being marked as unread
       if (selectedNotification?.id === notificationId) {
-        setSelectedNotification(prev => 
-          prev ? { ...prev, isRead: false } : null
+        setSelectedNotification((prev) =>
+          prev ? { ...prev, isRead: false } : null,
         );
       }
-      
-      // Refetch notifications to get updated unread count
-      const response = await apiRequest<NotificationType[]>('/api/notifications', {
-        method: 'GET',
-        callerName: 'NotificationsDropdown.refreshAfterUnread',
-      });
-      
-      if (response.success && response.data) {
-        const allRawNotifications = Array.isArray(response.data) ? response.data : [];
-        const totalUnreadCount = allRawNotifications.filter((n: any) => !n.isRead).length;
-        setNotificationCount(totalUnreadCount);
-      }
+      const totalUnreadCount = await NotificationService.getUnreadCount();
+      setNotificationCount(totalUnreadCount);
     } catch (error) {
       loggingCustom(LogType.CLIENT_LOG, 'error', `Error marking notification as unread: ${error instanceof Error ? error.message : String(error)}`);
     }

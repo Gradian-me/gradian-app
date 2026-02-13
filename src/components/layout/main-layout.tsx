@@ -15,6 +15,11 @@ const PageActionButtons = dynamic(
   () => import('@/gradian-ui/layout/components/PageActionButtons').then(mod => ({ default: mod.PageActionButtons })),
   { ssr: false }
 );
+// Dynamically import NotificationsDropdown to avoid prerender "Cannot access before initialization" (bundle/cycle)
+const NotificationsDropdown = dynamic(
+  () => import('@/components/layout/NotificationsDropdown').then(mod => ({ default: mod.NotificationsDropdown })),
+  { ssr: false }
+);
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
@@ -22,7 +27,6 @@ import { CompanySelector } from './CompanySelector';
 import { TenantSelector } from './TenantSelector';
 import { OrganizationSettings } from './OrganizationSettings';
 import { useCompanyStore } from '@/stores/company.store';
-import { NotificationsDropdown } from './NotificationsDropdown';
 import { UserProfileSelector } from './UserProfileSelector';
 import { DemoModeBadge } from './DemoModeBadge';
 import { DEMO_MODE, ENABLE_NOTIFICATION, ENABLE_BUILDER } from '@/gradian-ui/shared/configs/env-config';

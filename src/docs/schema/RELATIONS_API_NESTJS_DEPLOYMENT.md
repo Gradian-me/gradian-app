@@ -973,52 +973,30 @@ Send email template.
 
 ---
 
-### 9. Notifications
+### 9. Engagements (Notifications, Discussions, Stickies, Todos)
 
-**Base Path**: `/api/notifications`
+Notifications and other engagement types are served by the engagements API. Read/ack state is stored in engagement-interactions.
 
-#### GET `/api/notifications`
+**Engagements (by type):**
+- `GET /api/engagements/notifications` - List notification-type engagements (query: `currentUserId`, `search`, `type`, `priority`, `isRead`, etc.)
+- `POST /api/engagements/notifications` - Create notification (body: `message`, `metadata`, `priority`, `type`, `interactionType`)
+- Same pattern for `/api/engagements/discussion`, `/api/engagements/sticky`, `/api/engagements/todo`
+- `GET /api/engagements/{id}` - Get engagement by ID
+- `PUT /api/engagements/{id}` - Update engagement content
+- `DELETE /api/engagements/{id}` - Soft-delete engagement
 
-Get all notifications (filtered by authenticated user).
+**Engagement groups:**
+- `GET /api/engagement-groups` - List groups (query: `referenceSchemaId`, `referenceInstanceId`)
+- `POST /api/engagement-groups` - Create group
+- `GET /api/engagement-groups/{id}`, `PUT`, `DELETE` - By ID
 
-**Query Parameters:**
-- `unread` - Filter unread notifications only
-- `limit` - Items per page
-- `offset` - Offset
+**Engagement interactions (read/ack state):**
+- `GET /api/engagement-interactions` - List (query: `engagementId`, `engagementIds`, `userId`)
+- `POST /api/engagement-interactions` - Upsert (body: `engagementId`, `userId`, `isRead`, `readAt`, `interactedAt`, `outputType`, `comment`)
 
-#### POST `/api/notifications`
-
-Create notification.
-
-**Request Body:**
-```json
-{
-  "userId": "user-123",
-  "title": "Notification Title",
-  "message": "Notification message",
-  "type": "info",
-  "read": false
-}
-```
-
-#### GET `/api/notifications/{id}`
-
-Get notification by ID.
-
-#### PUT `/api/notifications/{id}`
-
-Update notification (e.g., mark as read).
-
-**Request Body:**
-```json
-{
-  "read": true
-}
-```
-
-#### DELETE `/api/notifications/{id}`
-
-Delete notification.
+**Record-scoped engagements:**
+- `GET /api/data/{schema-id}/{id}/engagements/{type}` - List engagements for that record (type: notification, discussion, sticky, todo)
+- `POST /api/data/{schema-id}/{id}/engagements/{type}` - Create engagement; group is found or created from schema-id + id
 
 ---
 

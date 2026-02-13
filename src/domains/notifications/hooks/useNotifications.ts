@@ -1,12 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Notification, NotificationFilters, NotificationGroup, GroupByOption } from '../types';
 import { NotificationService } from '../services/notification.service';
-
-// Get current user ID - This should be replaced with actual auth context
-const getCurrentUserId = (): string => {
-  // TODO: Replace with actual auth context
-  return 'mahyar'; // Default user ID
-};
+import { useUserStore } from '@/stores/user.store';
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -16,7 +11,7 @@ export function useNotifications() {
   const [filters, setFilters] = useState<NotificationFilters>({});
   const [groupBy, setGroupBy] = useState<GroupByOption>('category');
   const [unreadCount, setUnreadCount] = useState(0);
-  const currentUserId = getCurrentUserId();
+  const currentUserId = useUserStore((s) => s.user?.id ?? null);
 
   const fetchNotifications = useCallback(async (newFilters?: NotificationFilters, newGroupBy?: GroupByOption) => {
     setIsLoading(true);
@@ -26,9 +21,9 @@ export function useNotifications() {
       const currentFilters = newFilters || filters;
       const currentGroupBy = newGroupBy || groupBy;
       const [notificationsData, groupedData, unreadCountData] = await Promise.all([
-        NotificationService.getNotifications(currentFilters, currentUserId),
-        NotificationService.getGroupedNotifications(currentFilters, currentGroupBy, currentUserId),
-        NotificationService.getUnreadCount()
+        NotificationService.getNotifications(currentFilters, currentUserId ?? undefined),
+        NotificationService.getGroupedNotifications(currentFilters, currentGroupBy, currentUserId ?? undefined),
+        NotificationService.getUnreadCount(currentUserId ?? undefined),
       ]);
       
       setNotifications(notificationsData);

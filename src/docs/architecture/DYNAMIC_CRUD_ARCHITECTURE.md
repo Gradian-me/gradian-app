@@ -608,13 +608,21 @@ curl -X DELETE http://localhost:3000/api/data/vendors/{id}
 - `PUT /api/email-templates/{id}/content` - Update email template content
 - `POST /api/email-templates/send` - Send email template
 
-#### Notifications
+#### Engagements (notifications, discussions, stickies, todos)
 
-- `GET /api/notifications` - Get all notifications
-- `POST /api/notifications` - Create notification
-- `GET /api/notifications/{id}` - Get notification by ID
-- `PUT /api/notifications/{id}` - Update notification
-- `DELETE /api/notifications/{id}` - Delete notification
+- `GET /api/engagements/notifications` - List notification-type engagements
+- `POST /api/engagements/notifications` - Create notification
+- `GET /api/engagements/discussion` - List discussions (same pattern for `sticky`, `todo`)
+- `POST /api/engagements/discussion` - Create discussion
+- `GET /api/engagements/{id}` - Get engagement by ID
+- `PUT /api/engagements/{id}` - Update engagement
+- `DELETE /api/engagements/{id}` - Soft-delete engagement
+- `GET /api/engagement-groups` - List engagement groups
+- `POST /api/engagement-groups` - Create group
+- `GET /api/engagement-interactions` - List interactions (e.g. read/ack state)
+- `POST /api/engagement-interactions` - Upsert interaction (mark read, acknowledge)
+- `GET /api/data/{schema-id}/{id}/engagements/{type}` - List engagements for a record (type: notification, discussion, sticky, todo)
+- `POST /api/data/{schema-id}/{id}/engagements/{type}` - Create engagement scoped to that record
 
 #### Media & Assets
 
