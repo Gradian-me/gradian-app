@@ -81,6 +81,7 @@ export interface FormContentProps extends BaseComponentProps {
 }
 
 export interface FormFooterProps extends BaseComponentProps {
+  discussionConfig?: DiscussionConfig;
   actions?: FormActionProps[] | {
     submit?: {
       label: string;
@@ -118,8 +119,16 @@ export interface FormActionProps {
   icon?: React.ReactNode;
 }
 
+/** Discussion config for forms (schemaId + instanceId scopes discussions to a record) */
+export interface DiscussionConfig {
+  schemaId: string;
+  instanceId: string;
+  currentUserId?: string;
+}
+
 export interface FormActionsProps extends BaseComponentProps, Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   actions: FormActionProps[];
+  discussionConfig?: DiscussionConfig;
   direction?: 'row' | 'column';
   justify?: 'start' | 'center' | 'end' | 'between' | 'around';
   align?: 'start' | 'center' | 'end' | 'stretch';

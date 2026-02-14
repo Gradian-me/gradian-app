@@ -3,7 +3,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/gradian-ui/form-builder/form-elements';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -11,6 +11,7 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { DiscussionsDialog, type DiscussionConfig } from '@/gradian-ui/communication';
 
 export type ActionType = 'view' | 'edit' | 'delete';
 
@@ -44,6 +45,11 @@ export interface DynamicActionButtonsProps {
    * @default true
    */
   stopPropagation?: boolean;
+
+  /**
+   * When provided, shows a discussions button that opens the discussions dialog
+   */
+  discussionConfig?: DiscussionConfig;
 }
 
 /**
@@ -55,7 +61,9 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
   variant = 'minimal',
   className,
   stopPropagation = true,
+  discussionConfig,
 }) => {
+  const [discussionOpen, setDiscussionOpen] = useState(false);
   const router = useRouter();
   const language = useLanguageStore((s) => s.language);
   const defaultLang = getDefaultLanguage();
@@ -112,13 +120,40 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
       }
     : {};
 
-  if (variant === 'expanded') {
-    return (
-      <div
+  const discussionButton = discussionConfig ? (
+    <Button
+      key="discussion"
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={(e) => {
+        e.preventDefault();
+        if (stopPropagation) e.stopPropagation();
+        setDiscussionOpen(true);
+      }}
+      className={cn(
+        variant === 'minimal'
+          ? 'h-8 w-8 p-0'
+          : 'flex-1',
+        'transition-all duration-200 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600',
+        'hover:bg-sky-50 hover:border-sky-300 hover:text-sky-400'
+      )}
+      data-action-button
+    >
+      <IconRenderer iconName="MessageCircle" className="h-4 w-4" />
+      {variant === 'expanded' && (
+        <span className="ms-2">Discussions</span>
+      )}
+    </Button>
+  ) : null;
+
+  const buttonsContent = variant === 'expanded' ? (
+    <div
         {...containerProps}
         className={cn('flex gap-2 flex-row w-full flex-wrap', className)}
         data-action-button
       >
+        {discussionButton}
         {actions.map((action, index) => {
           const config = getActionConfig(action.type);
           return (
@@ -143,16 +178,13 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
           );
         })}
       </div>
-    );
-  }
-
-  // Minimal variant (icon-only)
-  return (
+  ) : (
     <div
       {...containerProps}
       className={cn('flex items-center justify-center gap-1', className)}
       data-action-button
     >
+      {discussionButton}
       {actions.map((action, index) => {
         const config = getActionConfig(action.type);
         return (
@@ -176,6 +208,19 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
         );
       })}
     </div>
+  );
+
+  return (
+    <>
+      {buttonsContent}
+      {discussionConfig && (
+        <DiscussionsDialog
+          isOpen={discussionOpen}
+          onOpenChange={setDiscussionOpen}
+          config={discussionConfig}
+        />
+      )}
+    </>
   );
 };
 

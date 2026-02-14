@@ -5,6 +5,8 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { isDemoModeEnabled, proxyEngagementRequest } from '@/app/api/data/utils';
 import {
   createEngagement,
+  enrichEngagementWithCreatedBy,
+  enrichEngagementsWithCreatedBy,
   enrichEngagementsWithInteractions,
   listEngagements,
   getApiMessage,
@@ -45,6 +47,7 @@ export async function GET(request: NextRequest) {
     if (currentUserId) {
       data = enrichEngagementsWithInteractions(data, currentUserId);
     }
+    data = await enrichEngagementsWithCreatedBy(data);
 
     return NextResponse.json({
       success: true,
@@ -91,10 +94,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const created = createEngagement(body as Record<string, unknown>, ENGAGEMENT_TYPE, null);
+    const data = await enrichEngagementWithCreatedBy(created);
     return NextResponse.json(
       {
         success: true,
-        data: created,
+        data,
         message: 'Notification created successfully',
       },
       { status: 201 },

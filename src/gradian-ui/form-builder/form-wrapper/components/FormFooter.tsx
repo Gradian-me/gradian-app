@@ -1,13 +1,17 @@
+'use client';
+
 // Form Footer Component
 
-import React from 'react';
-import { X, RotateCcw, Save } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, RotateCcw, Save, MessageCircle } from 'lucide-react';
 import { FormFooterProps } from '../types';
 import { FormActions } from './FormActions';
 import { cn } from '../../../shared/utils';
+import { DiscussionsDialog } from '@/gradian-ui/communication';
 
 export const FormFooter: React.FC<FormFooterProps> = ({
   actions,
+  discussionConfig,
   showReset = true,
   showCancel = false,
   onSubmit,
@@ -102,7 +106,22 @@ export const FormFooter: React.FC<FormFooterProps> = ({
     return actionsArray.length > 0 ? actionsArray : defaultActions;
   };
 
-  const finalActions = convertActionsToArray(actions);
+  const [discussionOpen, setDiscussionOpen] = useState(false);
+  let finalActions = convertActionsToArray(actions);
+
+  if (discussionConfig) {
+    finalActions = [
+      {
+        type: 'custom' as const,
+        label: 'Discussions',
+        variant: 'ghost' as const,
+        icon: <MessageCircle className="h-4 w-4" />,
+        disabled: disabled || loading,
+        onClick: () => setDiscussionOpen(true),
+      },
+      ...finalActions,
+    ];
+  }
 
   const footerClasses = cn(
     'flex items-center justify-end space-x-4 pt-8 pb-4 border-t border-gray-200',
@@ -110,9 +129,18 @@ export const FormFooter: React.FC<FormFooterProps> = ({
   );
 
   return (
-    <div className={footerClasses} {...props}>
-      {children || <FormActions actions={finalActions} />}
-    </div>
+    <>
+      <div className={footerClasses} {...props}>
+        {children || <FormActions actions={finalActions} />}
+      </div>
+      {discussionConfig && (
+        <DiscussionsDialog
+          isOpen={discussionOpen}
+          onOpenChange={setDiscussionOpen}
+          config={discussionConfig}
+        />
+      )}
+    </>
   );
 };
 

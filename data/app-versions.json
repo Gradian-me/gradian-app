@@ -6840,5 +6840,39 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000004",
+    "timestamp": "2026-02-14T00:00:00.000Z",
+    "version": "1.51.005",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "UPDATE: Enhanced engagement handling by introducing createdBy enrichment for engagements, allowing for detailed user information in responses.",
+        "priority": "High",
+        "affectedDomains": [
+          "engagements",
+          "api"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "REFACTOR: Updated engagement-related routes and utilities to support the new createdBy structure, improving data consistency and usability.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "engagements",
+          "api"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "ADD: Implemented ulid for unique ID generation in engagement groups and interactions, enhancing uniqueness and reliability. This update significantly improves the engagement management capabilities and user experience across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "engagements",
+          "api"
+        ]
+      }
+    ]
   }
 ]

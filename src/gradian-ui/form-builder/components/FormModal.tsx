@@ -566,6 +566,15 @@ export const FormModal: React.FC<FormModalProps> = ({
           <SchemaFormWrapper
             key={entityId ? `edit-${entityId}-${targetSchema.id}` : `create-${targetSchema.id}`}
             schema={targetSchema}
+            discussionConfig={
+              entityId && targetSchema?.id
+                ? {
+                    schemaId: targetSchema.id,
+                    instanceId: String(entityId),
+                    currentUserId: undefined,
+                  }
+                : undefined
+            }
             onSubmit={handleSubmit}
             onReset={() => {}}
             onCancel={handleClose}

@@ -279,6 +279,8 @@ export interface SelectProps extends BaseComponentProps {
 export interface AvatarProps extends BaseComponentProps {
   src?: string;
   alt?: string;
+  /** Username for avatar URL template (NEXT_PUBLIC_URL_AVATAR). Used when src is not provided. */
+  username?: string;
   fallback: string;
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
   variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';

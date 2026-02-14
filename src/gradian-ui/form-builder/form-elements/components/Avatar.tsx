@@ -4,10 +4,12 @@ import React from 'react';
 import { Avatar as RadixAvatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { AvatarProps } from '../types';
 import { cn } from '../../../shared/utils';
+import { getAvatarUrlFromUsername } from '../../../shared/utils/avatar-url';
 
 export const Avatar: React.FC<AvatarProps> = ({
   src,
   alt,
+  username,
   fallback,
   size = 'md',
   variant = 'default',
@@ -15,6 +17,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   children,
   ...props
 }) => {
+  const resolvedSrc = src ?? (username ? getAvatarUrlFromUsername(username) : undefined);
   const sizeClasses = {
     xs: 'h-6 w-6',
     sm: 'h-8 w-8',
@@ -42,7 +45,7 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   return (
     <RadixAvatar className={avatarClasses} {...props}>
-      {src && <AvatarImage src={src} alt={alt} />}
+      {resolvedSrc && <AvatarImage src={resolvedSrc} alt={alt ?? fallback} />}
       <AvatarFallback className={variantClasses[variant]}>
         {fallback || children}
       </AvatarFallback>

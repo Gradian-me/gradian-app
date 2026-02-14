@@ -1,14 +1,38 @@
 import fs from 'fs';
 import path from 'path';
+import { headers } from 'next/headers';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { isDemoModeEnabled } from '@/app/api/data/utils';
 import type {
   Engagement,
+  EngagementCreatedByUser,
   EngagementType,
   EngagementWithInteraction,
 } from '@/domains/engagements/types';
+import { readSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
 import { findGroupByReference } from './groups';
 import { findInteractionsByEngagementIds } from './interactions';
+
+/** Build createdBy object from user record (users schema) */
+function toCreatedByUser(userId: string, user?: Record<string, unknown> | null): EngagementCreatedByUser {
+  if (!user) {
+    return {
+      userId,
+      username: 'Unknown',
+      firstName: null,
+      lastName: null,
+      avatarUrl: null,
+    };
+  }
+  return {
+    userId: String(user.id ?? userId),
+    username: (user.username ?? user.name ?? user.email ?? 'Unknown') as string,
+    firstName: (user.firstName ?? null) as string | null,
+    lastName: (user.lastName ?? user.lastname ?? null) as string | null,
+    avatarUrl: (user.avatarUrl ?? null) as string | null,
+  };
+}
 
 const ENGAGEMENTS_PATH = path.join(process.cwd(), 'data', 'engagements.json');
 
@@ -148,16 +172,27 @@ export function createEngagement(
   engagementGroupId?: string | null,
   createdBy?: string,
 ): Engagement {
-  const { generateSecureId } =
-    require('@/gradian-ui/shared/utils/security-utils');
+  const { ulid } = require('ulid');
   const now = new Date().toISOString();
-  const id = (body.id as string) ?? `e-${Date.now()}-${generateSecureId(9)}`;
+  const id = (body.id as string) ?? ulid();
+
+  const rawMessage = typeof body.message === 'string' ? body.message : '';
+  const message = rawMessage.trim();
+  if (engagementType === 'discussion' && !message) {
+    throw new Error('Discussion message is required');
+  }
+
+  const referenceEngagementId =
+    typeof body.referenceEngagementId === 'string' && body.referenceEngagementId.trim()
+      ? body.referenceEngagementId.trim()
+      : undefined;
 
   const engagement: Engagement = {
     id,
     engagementGroupId: engagementGroupId ?? undefined,
+    referenceEngagementId: referenceEngagementId ?? undefined,
     engagementType,
-    message: typeof body.message === 'string' ? body.message : '',
+    message,
     metadata:
       body.metadata &&
       typeof body.metadata === 'object' &&
@@ -211,6 +246,7 @@ export function updateEngagement(
     'reactions',
     'hashtags',
     'engagementGroupId',
+    'referenceEngagementId',
   ] as const;
   const updated = { ...list[index] };
   for (const key of allowed) {
@@ -258,4 +294,95 @@ export function enrichEngagementsWithInteractions(
     const interaction = byEngagement.get(e.id) ?? null;
     return { ...e, interaction };
   });
+}
+
+/** Fetch users from /api/data/users (demo mode only). Live mode enrichment is handled by backend. */
+async function fetchUsersFromDataApi(): Promise<Record<string, unknown>[]> {
+  if (!isDemoModeEnabled()) return [];
+  try {
+    const headersList = await headers();
+    const host = headersList.get('x-forwarded-host') ?? headersList.get('host') ?? 'localhost:3000';
+    const proto = headersList.get('x-forwarded-proto') ?? 'http';
+    const baseUrl = `${proto}://${host}`;
+    const url = `${baseUrl}/api/data/users`;
+    const forwardedHeaders: Record<string, string> = {};
+    const cookie = headersList.get('cookie');
+    const auth = headersList.get('authorization') ?? headersList.get('Authorization');
+    if (cookie) forwardedHeaders.cookie = cookie;
+    if (auth) forwardedHeaders.authorization = auth;
+    const xTenant = headersList.get('x-tenant-domain') ?? headersList.get('X-Tenant-Domain');
+    if (xTenant) forwardedHeaders['x-tenant-domain'] = xTenant;
+    const res = await fetch(url, {
+      headers: forwardedHeaders,
+      cache: 'no-store',
+    });
+    if (!res.ok) return [];
+    const json = (await res.json()) as { success?: boolean; data?: unknown };
+    const data = json?.data;
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    loggingCustom(
+      LogType.INFRA_LOG,
+      'warn',
+      `[enrichEngagementsWithCreatedBy] Could not fetch users from API: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return [];
+  }
+}
+
+/** User map for createdBy enrichment. In demo mode uses /api/data/users; fallback to readSchemaData. */
+async function buildUserMap(): Promise<Map<string, Record<string, unknown>>> {
+  const map = new Map<string, Record<string, unknown>>();
+  let users: Record<string, unknown>[] = [];
+  if (isDemoModeEnabled()) {
+    users = await fetchUsersFromDataApi();
+  }
+  if (users.length === 0) {
+    try {
+      users = readSchemaData<Record<string, unknown>>('users');
+    } catch (err) {
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'warn',
+        `[enrichEngagementsWithCreatedBy] Could not load users: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+  for (const u of users) {
+    if (u && typeof u.id === 'string') {
+      map.set(String(u.id), u);
+    }
+  }
+  return map;
+}
+
+/**
+ * Replace createdBy (string userId) with full createdBy object for demo mode responses.
+ * Uses /api/data/users for user lookup. Live mode enrichment is handled by backend.
+ * Matches backend format: { firstName, lastName, username, avatarUrl, userId }.
+ */
+export async function enrichEngagementsWithCreatedBy<T extends { createdBy?: string | EngagementCreatedByUser }>(
+  items: T[],
+): Promise<T[]> {
+  if (items.length === 0) return [];
+  const userMap = await buildUserMap();
+  return items.map((e) => {
+    const cb = e.createdBy;
+    if (cb == null) return e;
+    if (typeof cb === 'object' && 'userId' in cb) return e;
+    const userId = String(cb);
+    const createdByObj = toCreatedByUser(userId, userMap.get(userId) ?? null);
+    return { ...e, createdBy: createdByObj };
+  });
+}
+
+/**
+ * Replace createdBy (string userId) with full createdBy object for a single engagement.
+ */
+export async function enrichEngagementWithCreatedBy<T extends { createdBy?: string | EngagementCreatedByUser }>(
+  item: T | null | undefined,
+): Promise<T | null | undefined> {
+  if (!item) return item;
+  const enriched = await enrichEngagementsWithCreatedBy([item]);
+  return enriched[0] ?? item;
 }

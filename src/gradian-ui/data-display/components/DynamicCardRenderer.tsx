@@ -28,6 +28,7 @@ import { formatFieldValue } from '../table/utils/field-formatters';
 import { EntityMetadata } from './CreateUpdateDetail';
 import { replaceDynamicContext } from '../../form-builder/utils/dynamic-context-replacer';
 import { useLanguageStore } from '@/stores/language.store';
+import { useUserStore } from '@/stores/user.store';
 import { getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 
 export interface DynamicCardRendererProps {
@@ -1295,9 +1296,22 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
 
                     {/* Action Buttons for List View at far right */}
                     {(onView || onViewDetail || onEdit || onDelete) && (
-                      <div className="flex items-center">
+                      <div
+                        className="flex items-center"
+                        onClick={(e) => e.stopPropagation()}
+                        onMouseDown={(e) => e.stopPropagation()}
+                      >
                         <DynamicActionButtons
                           variant="minimal"
+                          discussionConfig={
+                            schema?.id && data?.id
+                              ? {
+                                  schemaId: schema.id,
+                                  instanceId: String(data.id),
+                                  currentUserId: useUserStore.getState().user?.id ?? undefined,
+                                }
+                              : undefined
+                          }
                           actions={[
                             ...(onViewDetail || onView
                               ? [
@@ -1342,9 +1356,22 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
 
           {/* Action Buttons - Only for Grid View */}
           {viewMode === 'grid' && (
-            <div className="mt-auto pt-4">
+            <div
+              className="mt-auto pt-4"
+              onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
               <DynamicActionButtons
                 variant="expanded"
+                discussionConfig={
+                  schema?.id && data?.id
+                    ? {
+                        schemaId: schema.id,
+                        instanceId: String(data.id),
+                        currentUserId: useUserStore.getState().user?.id ?? undefined,
+                      }
+                    : undefined
+                }
                 actions={[
                   ...(onViewDetail || onView ? [{
                     type: 'view' as const,

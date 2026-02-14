@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
+import { getUserIdFromRequest } from '@/domains/chat/utils/auth-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { isDemoModeEnabled, proxyEngagementRequest } from '@/app/api/data/utils';
 import {
   createEngagement,
+  enrichEngagementWithCreatedBy,
+  enrichEngagementsWithCreatedBy,
   enrichEngagementsWithInteractions,
   listEngagements,
   getApiMessage,
@@ -45,6 +48,7 @@ export async function GET(request: NextRequest) {
     if (currentUserId) {
       data = enrichEngagementsWithInteractions(data, currentUserId);
     }
+    data = await enrichEngagementsWithCreatedBy(data);
 
     return NextResponse.json({
       success: true,
@@ -93,12 +97,17 @@ export async function POST(request: NextRequest) {
 
   try {
     const bodyObj = body as Record<string, unknown>;
+    const bodyCreatedBy = bodyObj.createdBy as string | undefined;
+    const authUserId = authResult.userId?.trim();
+    const tokenUserId = !authUserId ? getUserIdFromRequest(request) : null;
+    const createdBy = bodyCreatedBy?.trim() || authUserId || (tokenUserId ?? undefined);
     const engagementGroupId = bodyObj.engagementGroupId ?? null;
-    const created = createEngagement(bodyObj, ENGAGEMENT_TYPE, engagementGroupId as string | null);
+    const created = createEngagement(bodyObj, ENGAGEMENT_TYPE, engagementGroupId as string | null, createdBy);
+    const data = await enrichEngagementWithCreatedBy(created);
     return NextResponse.json(
       {
         success: true,
-        data: created,
+        data,
         message: getApiMessage(request, TRANSLATION_KEYS.API_ENGAGEMENT_DISCUSSION_CREATED),
       },
       { status: 201 },

@@ -119,6 +119,11 @@ export async function POST(request: NextRequest) {
     if (bodyObj.outputType != null) updates.outputType = bodyObj.outputType as 'approved' | 'rejected';
     if (bodyObj.comment != null) updates.comment = bodyObj.comment as string;
     if (bodyObj.dueDate != null) updates.dueDate = bodyObj.dueDate as string;
+    if (bodyObj.referenceEngagementId !== undefined)
+      updates.referenceEngagementId =
+        bodyObj.referenceEngagementId === null || bodyObj.referenceEngagementId === ''
+          ? null
+          : (bodyObj.referenceEngagementId as string);
 
     const interaction = upsertInteraction(engagementId, userId, updates);
 

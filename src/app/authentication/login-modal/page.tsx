@@ -286,11 +286,8 @@ function LoginModalContent() {
 
       await new Promise((resolve) => setTimeout(resolve, 500));
 
-      if (returnOrigin) {
-        handleEmbedSuccess();
-      } else {
-        router.replace('/');
-      }
+      // With returnOrigin: use allowlist + postMessage/opener reload. Without: close popup + reload opener, or reload parent (iframe).
+      handleEmbedSuccess();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred during login. Please try again.';
       setError(errorMessage);

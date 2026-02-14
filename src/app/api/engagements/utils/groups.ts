@@ -79,12 +79,11 @@ export function getOrCreateGroupForReference(
   const existing = findGroupByReference(schemaId, instanceId);
   if (existing) return existing;
 
-  const { generateSecureId } =
-    require('@/gradian-ui/shared/utils/security-utils');
+  const { ulid } = require('ulid');
   const groups = loadEngagementGroups();
   const now = new Date().toISOString();
   const newGroup: EngagementGroup = {
-    id: `eg-${Date.now()}-${generateSecureId(9)}`,
+    id: ulid(),
     referenceSchemaId: schemaId,
     referenceInstanceId: instanceId,
     createdBy,

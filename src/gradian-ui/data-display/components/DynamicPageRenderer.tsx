@@ -32,6 +32,7 @@ import { getValueByRole, getSingleValueByRole } from '../../form-builder/form-el
 import { LoadingSkeleton } from '@/gradian-ui/layout/components';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useCompanyStore } from '@/stores/company.store';
+import { useUserStore } from '@/stores/user.store';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ImageText } from '../../form-builder/form-elements';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
@@ -839,9 +840,19 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       align: 'center',
       width: 120,
       render: (value: any, row: any) => {
+        const currentUserId = useUserStore.getState().user?.id ?? undefined;
         return (
           <DynamicActionButtons
             variant="minimal"
+            discussionConfig={
+              schema?.id && row?.id
+                ? {
+                    schemaId: schema.id,
+                    instanceId: String(row.id),
+                    currentUserId,
+                  }
+                : undefined
+            }
             actions={[
               {
                 type: 'view',

@@ -1,12 +1,286 @@
 [
-  {"id":"1","engagementGroupId":null,"engagementType":"notification","message":"Transfarma submitted a quotation for HPLC Columns. The quotation includes detailed pricing for 50 units of HPLC columns with 2-year warranty and technical support.","metadata":{"vendor":"Transfarma","product":"HPLC Columns","quantity":50,"value":25000,"currency":"USD","title":"New Quotation Received","category":"quotation","actionUrl":"/quotations/1"},"priority":"medium","type":"success","interactionType":"needsAcknowledgement","createdAt":"2024-12-10T10:30:00.000Z","updatedAt":"2025-11-05T10:44:17.901Z"},
-  {"id":"2","engagementGroupId":null,"engagementType":"notification","message":"PO-2024-001 has been approved by finance team. The purchase order for laboratory equipment has been processed and vendor has been notified for shipment.","metadata":{"poNumber":"PO-2024-001","amount":45000,"currency":"USD","vendor":"Merck","approver":"Finance Team","title":"Purchase Order Approved","category":"purchase_order","actionUrl":"/purchase-orders/1"},"priority":"high","type":"info","interactionType":"canRead","createdAt":"2024-12-10T09:15:00.000Z"},
-  {"id":"3","engagementGroupId":null,"engagementType":"notification","message":"SH-2024-001 is experiencing delays due to severe weather conditions affecting the shipping route. Expected delay of 2-3 business days.","metadata":{"shipmentId":"SH-2024-001","delayReason":"Weather Conditions","expectedDelay":"2-3 business days","carrier":"FedEx","trackingNumber":"1234567890","title":"Shipment Delayed","category":"shipment","actionUrl":"/shipments/1"},"priority":"urgent","type":"warning","interactionType":"canRead","createdAt":"2024-12-10T08:45:00.000Z","updatedAt":"2025-11-04T11:30:33.351Z"},
-  {"id":"4","engagementGroupId":null,"engagementType":"notification","message":"New vendor Merck has been successfully registered and approved. All documentation has been verified and vendor is now active in the system.","metadata":{"vendorName":"Merck","registrationDate":"2024-12-09","approver":"Supply Chain Manager","status":"Active","title":"Vendor Registration Complete","category":"vendor","actionUrl":"/vendors/merck"},"priority":"low","type":"success","interactionType":"canRead","createdAt":"2024-12-09T14:20:00.000Z"},
-  {"id":"5","engagementGroupId":null,"engagementType":"notification","message":"Tender T-2024-003 for laboratory equipment closes in 2 days. Please ensure all required documentation is submitted before the deadline.","metadata":{"tenderId":"T-2024-003","deadline":"2024-12-12T17:00:00.000Z","category":"Laboratory Equipment","estimatedValue":100000,"currency":"USD","title":"Tender Deadline Approaching","actionUrl":"/tenders/t-2024-003"},"priority":"high","type":"warning","interactionType":"canRead","createdAt":"2024-12-10T07:30:00.000Z","updatedAt":"2025-11-04T13:04:12.043Z"},
-  {"id":"6","engagementGroupId":null,"engagementType":"notification","message":"System will be under maintenance on Sunday from 2AM to 4AM EST. All users will be logged out during this period. Please save your work before the maintenance window.","metadata":{"maintenanceDate":"2024-12-15","startTime":"02:00","endTime":"04:00","timezone":"EST","affectedServices":["Database","API","File Storage"],"title":"System Maintenance Scheduled","category":"system"},"priority":"medium","type":"info","interactionType":"canRead","createdAt":"2024-12-08T16:00:00.000Z","updatedAt":"2025-11-04T11:45:08.174Z"},
-  {"id":"7","engagementGroupId":null,"engagementType":"notification","message":"Payment for PO-2024-002 failed due to insufficient funds in the designated account. Please update payment method or add funds to complete the transaction.","metadata":{"poNumber":"PO-2024-002","amount":32000,"currency":"USD","paymentMethod":"Bank Transfer","failureReason":"Insufficient Funds","title":"Payment Failed","category":"purchase_order","actionUrl":"/purchase-orders/2"},"priority":"urgent","type":"error","interactionType":"canRead","createdAt":"2024-12-10T11:00:00.000Z","updatedAt":"2025-11-05T11:03:16.309Z"},
-  {"id":"8","engagementGroupId":null,"engagementType":"notification","message":"PharmaCorp has submitted a vendor application for pharmaceutical supplies. Application includes all required documentation and certifications.","metadata":{"vendorName":"PharmaCorp","applicationDate":"2024-12-10","category":"Pharmaceutical Supplies","certifications":["ISO 9001","GMP","FDA Approved"],"status":"Pending Review","title":"New Vendor Application","actionUrl":"/vendors/applications/pharmacorp"},"priority":"medium","type":"info","interactionType":"canRead","createdAt":"2024-12-10T06:00:00.000Z","updatedAt":"2025-11-05T10:43:07.869Z"},
-  {"id":"9","engagementGroupId":null,"engagementType":"notification","message":"Quality inspection for batch QC-2024-001 has passed all tests. Products are approved for shipment and distribution.","metadata":{"batchId":"QC-2024-001","product":"HPLC Columns","quantity":100,"inspector":"Quality Control Team","testResults":"All tests passed","title":"Quality Inspection Passed","category":"system","actionUrl":"/quality-control/qc-2024-001"},"priority":"medium","type":"success","interactionType":"canRead","createdAt":"2024-12-10T12:15:00.000Z"},
-  {"id":"10","engagementGroupId":null,"engagementType":"notification","message":"Contract with Transfarma expires in 30 days. Please review terms and initiate renewal process to avoid service interruption.","metadata":{"vendorName":"Transfarma","contractId":"CT-2023-001","expiryDate":"2025-01-10","contractValue":500000,"currency":"USD","title":"Contract Renewal Reminder","category":"vendor","actionUrl":"/contracts/transfarma"},"priority":"high","type":"warning","interactionType":"canRead","createdAt":"2024-12-10T13:45:00.000Z","updatedAt":"2025-11-05T10:43:10.009Z"}
+  {
+    "id": "1",
+    "engagementGroupId": null,
+    "engagementType": "notification",
+    "message": "Transfarma submitted a quotation for HPLC Columns. The quotation includes detailed pricing for 50 units of HPLC columns with 2-year warranty and technical support.",
+    "metadata": {
+      "vendor": "Transfarma",
+      "product": "HPLC Columns",
+      "quantity": 50,
+      "value": 25000,
+      "currency": "USD",
+      "title": "New Quotation Received",
+      "category": "quotation",
+      "actionUrl": "/quotations/1"
+    },
+    "priority": "medium",
+    "type": "success",
+    "interactionType": "needsAcknowledgement",
+    "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "createdAt": "2024-12-10T10:30:00.000Z",
+    "updatedAt": "2025-11-05T10:44:17.901Z"
+  },
+  {
+    "id": "2",
+    "engagementGroupId": null,
+    "engagementType": "notification",
+    "message": "PO-2024-001 has been approved by finance team. The purchase order for laboratory equipment has been processed and vendor has been notified for shipment.",
+    "metadata": {
+      "poNumber": "PO-2024-001",
+      "amount": 45000,
+      "currency": "USD",
+      "vendor": "Merck",
+      "approver": "Finance Team",
+      "title": "Purchase Order Approved",
+      "category": "purchase_order",
+      "actionUrl": "/purchase-orders/1"
+    },
+    "priority": "high",
+    "type": "info",
+    "interactionType": "canRead",
+    "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "createdAt": "2024-12-10T09:15:00.000Z"
+  },
+  {
+    "id": "3",
+    "engagementGroupId": null,
+    "engagementType": "notification",
+    "message": "SH-2024-001 is experiencing delays due to severe weather conditions affecting the shipping route. Expected delay of 2-3 business days.",
+    "metadata": {
+      "shipmentId": "SH-2024-001",
+      "delayReason": "Weather Conditions",
+      "expectedDelay": "2-3 business days",
+      "carrier": "FedEx",
+      "trackingNumber": "1234567890",
+      "title": "Shipment Delayed",
+      "category": "shipment",
+      "actionUrl": "/shipments/1"
+    },
+    "priority": "urgent",
+    "type": "warning",
+    "interactionType": "canRead",
+    "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "createdAt": "2024-12-10T08:45:00.000Z",
+    "updatedAt": "2025-11-04T11:30:33.351Z"
+  },
+  {
+    "id": "4",
+    "engagementGroupId": null,
+    "engagementType": "notification",
+    "message": "New vendor Merck has been successfully registered and approved. All documentation has been verified and vendor is now active in the system.",
+    "metadata": {
+      "vendorName": "Merck",
+      "registrationDate": "2024-12-09",
+      "approver": "Supply Chain Manager",
+      "status": "Active",
+      "title": "Vendor Registration Complete",
+      "category": "vendor",
+      "actionUrl": "/vendors/merck"
+    },
+    "priority": "low",
+    "type": "success",
+    "interactionType": "canRead",
+    "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "createdAt": "2024-12-09T14:20:00.000Z"
+  },
+  {
+    "id": "5",
+    "engagementGroupId": null,
+    "engagementType": "notification",
+    "message": "Tender T-2024-003 for laboratory equipment closes in 2 days. Please ensure all required documentation is submitted before the deadline.",
+    "metadata": {
+      "tenderId": "T-2024-003",
+      "deadline": "2024-12-12T17:00:00.000Z",
+      "category": "Laboratory Equipment",
+      "estimatedValue": 100000,
+      "currency": "USD",
+      "title": "Tender Deadline Approaching",
+      "actionUrl": "/tenders/t-2024-003"
+    },
+    "priority": "high",
+    "type": "warning",
+    "interactionType": "canRead",
+    "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "createdAt": "2024-12-10T07:30:00.000Z",
+    "updatedAt": "2025-11-04T13:04:12.043Z"
+  },
+  {
+    "id": "6",
+    "engagementGroupId": null,
+    "engagementType": "notification",
+    "message": "System will be under maintenance on Sunday from 2AM to 4AM EST. All users will be logged out during this period. Please save your work before the maintenance window.",
+    "metadata": {
+      "maintenanceDate": "2024-12-15",
+      "startTime": "02:00",
+      "endTime": "04:00",
+      "timezone": "EST",
+      "affectedServices": [
+        "Database",
+        "API",
+        "File Storage"
+      ],
+      "title": "System Maintenance Scheduled",
+      "category": "system"
+    },
+    "priority": "medium",
+    "type": "info",
+    "interactionType": "canRead",
+    "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "createdAt": "2024-12-08T16:00:00.000Z",
+    "updatedAt": "2025-11-04T11:45:08.174Z"
+  },
+  {
+    "id": "7",
+    "engagementGroupId": null,
+    "engagementType": "notification",
+    "message": "Payment for PO-2024-002 failed due to insufficient funds in the designated account. Please update payment method or add funds to complete the transaction.",
+    "metadata": {
+      "poNumber": "PO-2024-002",
+      "amount": 32000,
+      "currency": "USD",
+      "paymentMethod": "Bank Transfer",
+      "failureReason": "Insufficient Funds",
+      "title": "Payment Failed",
+      "category": "purchase_order",
+      "actionUrl": "/purchase-orders/2"
+    },
+    "priority": "urgent",
+    "type": "error",
+    "interactionType": "canRead",
+    "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "createdAt": "2024-12-10T11:00:00.000Z",
+    "updatedAt": "2025-11-05T11:03:16.309Z"
+  },
+  {
+    "id": "8",
+    "engagementGroupId": null,
+    "engagementType": "notification",
+    "message": "PharmaCorp has submitted a vendor application for pharmaceutical supplies. Application includes all required documentation and certifications.",
+    "metadata": {
+      "vendorName": "PharmaCorp",
+      "applicationDate": "2024-12-10",
+      "category": "Pharmaceutical Supplies",
+      "certifications": [
+        "ISO 9001",
+        "GMP",
+        "FDA Approved"
+      ],
+      "status": "Pending Review",
+      "title": "New Vendor Application",
+      "actionUrl": "/vendors/applications/pharmacorp"
+    },
+    "priority": "medium",
+    "type": "info",
+    "interactionType": "canRead",
+    "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "createdAt": "2024-12-10T06:00:00.000Z",
+    "updatedAt": "2025-11-05T10:43:07.869Z"
+  },
+  {
+    "id": "9",
+    "engagementGroupId": null,
+    "engagementType": "notification",
+    "message": "Quality inspection for batch QC-2024-001 has passed all tests. Products are approved for shipment and distribution.",
+    "metadata": {
+      "batchId": "QC-2024-001",
+      "product": "HPLC Columns",
+      "quantity": 100,
+      "inspector": "Quality Control Team",
+      "testResults": "All tests passed",
+      "title": "Quality Inspection Passed",
+      "category": "system",
+      "actionUrl": "/quality-control/qc-2024-001"
+    },
+    "priority": "medium",
+    "type": "success",
+    "interactionType": "canRead",
+    "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "createdAt": "2024-12-10T12:15:00.000Z"
+  },
+  {
+    "id": "10",
+    "engagementGroupId": null,
+    "engagementType": "notification",
+    "message": "Contract with Transfarma expires in 30 days. Please review terms and initiate renewal process to avoid service interruption.",
+    "metadata": {
+      "vendorName": "Transfarma",
+      "contractId": "CT-2023-001",
+      "expiryDate": "2025-01-10",
+      "contractValue": 500000,
+      "currency": "USD",
+      "title": "Contract Renewal Reminder",
+      "category": "vendor",
+      "actionUrl": "/contracts/transfarma"
+    },
+    "priority": "high",
+    "type": "warning",
+    "interactionType": "canRead",
+    "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "createdAt": "2024-12-10T13:45:00.000Z",
+    "updatedAt": "2025-11-05T10:43:10.009Z"
+  },
+  {
+    "id": "01KHE83THAPMMB35EH5TBZYRMV",
+    "engagementGroupId": "01KHE6TGY3S2NB8KZW1R9XWB8Y",
+    "engagementType": "discussion",
+    "message": "hi 1",
+    "priority": "medium",
+    "interactionType": "canRead",
+    "createdBy": "01KE9M6RS2HZPTC88WMG7XZVAX",
+    "createdAt": "2026-02-14T14:15:43.913Z"
+  },
+  {
+    "id": "01KHE84ER0R24ZZN1WAEAYBMFD",
+    "engagementGroupId": "01KHE6TGY3S2NB8KZW1R9XWB8Y",
+    "referenceEngagementId": "01KHE83THAPMMB35EH5TBZYRMV",
+    "engagementType": "discussion",
+    "message": "hi 2",
+    "priority": "high",
+    "interactionType": "canRead",
+    "createdBy": "01KE9M6RS2HZPTC88WMG7XZVAX",
+    "createdAt": "2026-02-14T14:16:04.608Z"
+  },
+  {
+    "id": "01KHE84NAD4KW0FY4PFY9JX4XG",
+    "engagementGroupId": "01KHE6TGY3S2NB8KZW1R9XWB8Y",
+    "engagementType": "discussion",
+    "message": "hi 3",
+    "priority": "medium",
+    "interactionType": "canRead",
+    "createdBy": "01KE9M6RS2HZPTC88WMG7XZVAX",
+    "createdAt": "2026-02-14T14:16:11.341Z"
+  },
+  {
+    "id": "01KHEC6V2W6WJ39XM83M2VVGCW",
+    "engagementGroupId": "01KHE6TGY3S2NB8KZW1R9XWB8Y",
+    "engagementType": "discussion",
+    "message": "test 4",
+    "priority": "low",
+    "interactionType": "canRead",
+    "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "createdAt": "2026-02-14T15:27:17.084Z"
+  },
+  {
+    "id": "01KHEC8RHJS6JD6PCV8MGADG5C",
+    "engagementGroupId": "01KHE6TGY3S2NB8KZW1R9XWB8Y",
+    "referenceEngagementId": "01KHEC6V2W6WJ39XM83M2VVGCW",
+    "engagementType": "discussion",
+    "message": "test 5",
+    "priority": "urgent",
+    "interactionType": "canRead",
+    "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "createdAt": "2026-02-14T15:28:20.018Z"
+  },
+  {
+    "id": "01KHEC9AQC49CFK52KG4C8HBW5",
+    "engagementGroupId": "01KHE6TGY3S2NB8KZW1R9XWB8Y",
+    "referenceEngagementId": "01KHEC8RHJS6JD6PCV8MGADG5C",
+    "engagementType": "discussion",
+    "message": "test 6",
+    "priority": "medium",
+    "interactionType": "canRead",
+    "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "createdAt": "2026-02-14T15:28:38.636Z"
+  }
 ]

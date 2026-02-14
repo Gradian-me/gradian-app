@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
+import { getUserIdFromRequest } from '@/domains/chat/utils/auth-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { isDemoModeEnabled, proxyEngagementRequest } from '@/app/api/data/utils';
 import {
   createEngagement,
+  enrichEngagementWithCreatedBy,
+  enrichEngagementsWithCreatedBy,
   findGroupByReference,
   getOrCreateGroupForReference,
   listEngagements,
@@ -81,10 +84,11 @@ export async function GET(
       });
     }
 
-    const data = listEngagements({
+    let data = listEngagements({
       engagementType,
       engagementGroupId: group.id,
     });
+    data = await enrichEngagementsWithCreatedBy(data);
 
     return NextResponse.json({
       success: true,
@@ -154,16 +158,20 @@ export async function POST(
 
   try {
     const bodyObj = body as Record<string, unknown>;
-    const createdBy = bodyObj.createdBy as string | undefined;
+    const bodyCreatedBy = bodyObj.createdBy as string | undefined;
+    const authUserId = authResult.userId?.trim();
+    const tokenUserId = !authUserId ? getUserIdFromRequest(request) : null;
+    const createdBy = bodyCreatedBy?.trim() || authUserId || (tokenUserId ?? undefined);
     const group = getOrCreateGroupForReference(schemaId, instanceId, createdBy);
     const created = createEngagement(bodyObj, engagementType, group.id, createdBy);
+    const data = await enrichEngagementWithCreatedBy(created);
     const typeLabel =
       TYPE_LABELS[engagementType].charAt(0).toUpperCase() + TYPE_LABELS[engagementType].slice(1);
 
     return NextResponse.json(
       {
         success: true,
-        data: created,
+        data,
         message: getApiMessage(request, TRANSLATION_KEYS.API_ENGAGEMENT_CREATED, {
           type: typeLabel,
         }),

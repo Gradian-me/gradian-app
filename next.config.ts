@@ -141,9 +141,28 @@ const nextConfig: NextConfig = {
 
   // Security headers for production
   async headers() {
-    const loginEmbedOrigins = typeof process.env.NEXT_PUBLIC_LOGIN_EMBED_ALLOWED_ORIGINS === 'string'
+    let loginEmbedOrigins: string[] = typeof process.env.NEXT_PUBLIC_LOGIN_EMBED_ALLOWED_ORIGINS === 'string'
       ? process.env.NEXT_PUBLIC_LOGIN_EMBED_ALLOWED_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
       : [];
+    // Fallback: allow same-app embedding when env not set (e.g. app1.cinnagen.com embedding its own login-modal)
+    if (loginEmbedOrigins.length === 0 && typeof process.env.NEXT_PUBLIC_APP_URL === 'string') {
+      try {
+        const u = new URL(process.env.NEXT_PUBLIC_APP_URL.trim());
+        const origin = u.origin;
+        loginEmbedOrigins = [origin];
+        if (u.protocol === 'https:') loginEmbedOrigins.push(u.origin.replace('https:', 'http:'));
+        else if (u.protocol === 'http:') loginEmbedOrigins.push(u.origin.replace('http:', 'https:'));
+      } catch {
+        // ignore invalid URL
+      }
+    }
+    // Always allow localhost for dev (when not in production or when explicitly desired)
+    if (process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_LOGIN_EMBED_ALLOWED_ORIGINS?.includes('localhost')) {
+      const localhostOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+      for (const o of localhostOrigins) {
+        if (!loginEmbedOrigins.includes(o)) loginEmbedOrigins.push(o);
+      }
+    }
     const loginModalFrameAncestors = ['\'self\'', ...loginEmbedOrigins].join(' ');
 
     return [

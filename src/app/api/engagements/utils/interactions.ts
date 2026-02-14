@@ -75,10 +75,10 @@ export function upsertInteraction(
     outputType?: 'approved' | 'rejected';
     comment?: string;
     dueDate?: string;
+    referenceEngagementId?: string | null;
   },
 ): EngagementInteraction {
-  const { generateSecureId } =
-    require('@/gradian-ui/shared/utils/security-utils');
+  const { ulid } = require('ulid');
   const list = loadEngagementInteractions();
   const idx = list.findIndex(
     (i) => i.engagementId === engagementId && i.userId === userId,
@@ -94,6 +94,8 @@ export function upsertInteraction(
       existing.outputType = updates.outputType;
     if (updates.comment !== undefined) existing.comment = updates.comment;
     if (updates.dueDate !== undefined) existing.dueDate = updates.dueDate;
+    if (updates.referenceEngagementId !== undefined)
+      existing.referenceEngagementId = updates.referenceEngagementId;
     list[idx] = existing;
     saveEngagementInteractions(list);
     return existing;
@@ -101,7 +103,7 @@ export function upsertInteraction(
 
   const now = new Date().toISOString();
   const newInteraction: EngagementInteraction = {
-    id: `ei-${Date.now()}-${generateSecureId(9)}`,
+    id: ulid(),
     engagementId,
     userId,
     isRead: updates.isRead ?? false,
@@ -111,6 +113,7 @@ export function upsertInteraction(
       updates.interactedAt ?? (updates.outputType ? now : undefined),
     outputType: updates.outputType,
     comment: updates.comment,
+    referenceEngagementId: updates.referenceEngagementId ?? undefined,
   };
   if (updates.isRead && !newInteraction.readAt) newInteraction.readAt = now;
 
@@ -135,6 +138,7 @@ export function updateInteraction(
     outputType: 'approved' | 'rejected';
     comment: string;
     dueDate: string;
+    referenceEngagementId: string | null;
   }>,
 ): EngagementInteraction | null {
   const list = loadEngagementInteractions();
@@ -148,6 +152,7 @@ export function updateInteraction(
     'outputType',
     'comment',
     'dueDate',
+    'referenceEngagementId',
   ] as const;
   const updated = { ...list[idx] };
   for (const key of allowed) {

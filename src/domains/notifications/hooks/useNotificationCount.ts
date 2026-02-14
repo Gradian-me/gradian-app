@@ -21,9 +21,9 @@ const DEFAULT_POLL_INTERVAL_MS = 60_000;
  * - Initial fetch and optional polling (when tab visible)
  * - Refetch when tab gains focus (visibilitychange)
  * - Refetch when notified by notification-count-sync (e.g. after mark read/unread; later WebSocket)
+ * - Refetch when user logs in (user store updates)
  *
- * For real-time updates without polling, call notifyNotificationCountUpdate() from
- * a WebSocket handler when the server pushes notification events.
+ * Uses current user id from user store. When no user is logged in, returns 0 without calling API.
  */
 export function useNotificationCount(options: UseNotificationCountOptions = {}) {
   const {

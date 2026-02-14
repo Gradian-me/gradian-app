@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": "01KHE6TGY3S2NB8KZW1R9XWB8Y",
+    "referenceSchemaId": "users",
+    "referenceInstanceId": "01KE9M6RS2HZPTC88WMG7XZVAX",
+    "createdAt": "2026-02-14T13:53:10.593Z",
+    "owners": [],
+    "members": [],
+    "viewers": []
+  }
+]

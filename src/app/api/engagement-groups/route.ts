@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
-import { generateSecureId } from '@/gradian-ui/shared/utils/security-utils';
+import { ulid } from 'ulid';
 import { isDemoModeEnabled, proxyEngagementRequest } from '@/app/api/data/utils';
 import {
   loadEngagementGroups,
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
     const groups = loadEngagementGroups();
 
     const now = new Date().toISOString();
-    const id = bodyObj.id ?? `eg-${Date.now()}-${generateSecureId(9)}`;
+    const id = (bodyObj.id as string) ?? ulid();
     const newGroup: EngagementGroup = {
       id: String(id),
       referenceSchemaId: bodyObj.referenceSchemaId as string | undefined,

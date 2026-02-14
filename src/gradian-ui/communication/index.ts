@@ -29,6 +29,22 @@ export type {
 } from './professional-writing';
 export { SUPPORTED_LANGUAGES } from './professional-writing';
 
+// Discussion Service
+export * as Discussion from './discussion';
+export {
+  DiscussionsDialog,
+  DiscussionInputDialog,
+  DiscussionThread,
+  DiscussionMessage,
+  AvatarGroup,
+  useDiscussions,
+} from './discussion';
+export type {
+  DiscussionConfig,
+  DiscussionParticipant,
+  DiscussionMessage as DiscussionMessageType,
+} from './discussion';
+
 // Future services can be added here:
 // export * as SMS from './sms';
 // export * as PushNotifications from './push-notifications';

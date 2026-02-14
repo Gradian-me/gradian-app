@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Notification, NotificationFilters, NotificationGroup, GroupByOption } from '../types';
 import { NotificationService } from '../services/notification.service';
-import { useUserStore } from '@/stores/user.store';
 
 export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -11,7 +10,6 @@ export function useNotifications() {
   const [filters, setFilters] = useState<NotificationFilters>({});
   const [groupBy, setGroupBy] = useState<GroupByOption>('category');
   const [unreadCount, setUnreadCount] = useState(0);
-  const currentUserId = useUserStore((s) => s.user?.id ?? null);
 
   const fetchNotifications = useCallback(async (newFilters?: NotificationFilters, newGroupBy?: GroupByOption) => {
     setIsLoading(true);
@@ -21,9 +19,9 @@ export function useNotifications() {
       const currentFilters = newFilters || filters;
       const currentGroupBy = newGroupBy || groupBy;
       const [notificationsData, groupedData, unreadCountData] = await Promise.all([
-        NotificationService.getNotifications(currentFilters, currentUserId ?? undefined),
-        NotificationService.getGroupedNotifications(currentFilters, currentGroupBy, currentUserId ?? undefined),
-        NotificationService.getUnreadCount(currentUserId ?? undefined),
+        NotificationService.getNotifications(currentFilters),
+        NotificationService.getGroupedNotifications(currentFilters, currentGroupBy),
+        NotificationService.getUnreadCount(),
       ]);
       
       setNotifications(notificationsData);
@@ -34,7 +32,7 @@ export function useNotifications() {
     } finally {
       setIsLoading(false);
     }
-  }, [filters, groupBy, currentUserId]);
+  }, [filters, groupBy]);
 
   const updateFilters = useCallback((newFilters: Partial<NotificationFilters>) => {
     const updatedFilters = { ...filters, ...newFilters };

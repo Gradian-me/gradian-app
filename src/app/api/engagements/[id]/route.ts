@@ -4,6 +4,7 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { isDemoModeEnabled, proxyEngagementRequest } from '@/app/api/data/utils';
 import {
+  enrichEngagementWithCreatedBy,
   getEngagementById,
   softDeleteEngagement,
   updateEngagement,
@@ -35,7 +36,8 @@ export async function GET(
         { status: 404 },
       );
     }
-    return NextResponse.json({ success: true, data: engagement });
+    const data = await enrichEngagementWithCreatedBy(engagement);
+    return NextResponse.json({ success: true, data });
   } catch (error) {
     return NextResponse.json(
       {
@@ -80,9 +82,10 @@ export async function PUT(
         { status: 404 },
       );
     }
+    const data = await enrichEngagementWithCreatedBy(updated);
     return NextResponse.json({
       success: true,
-      data: updated,
+      data,
       message: 'Engagement updated successfully',
     });
   } catch (error) {

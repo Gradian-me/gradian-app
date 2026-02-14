@@ -32,9 +32,10 @@ import { FormSystemSection } from './FormSystemSection';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { replaceDynamicContext } from '../utils/dynamic-context-replacer';
 import { AiFormFillerDialog } from '@/domains/ai-builder/components/AiFormFillerDialog';
-import { Sparkles, MoreVertical } from 'lucide-react';
+import { Sparkles, MoreVertical, MessageCircle } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { DynamicQuickActions } from '@/gradian-ui/data-display/components/DynamicQuickActions';
+import { DiscussionsDialog } from '@/gradian-ui/communication';
 
 export const useFormContext = () => {
   const context = useContext(FormContext);
@@ -431,6 +432,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   hideCollapseExpandButtons = false,
   forceExpandedSections = false,
   hideGoToTopButton = false,
+  discussionConfig,
   ...props
 }) => {
   // Normalize schema so sections/fields are always arrays (never null) - prevents "Cannot read properties of null (reading 'length')"
@@ -494,6 +496,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
   // State for AI Form Filler dialog
   const [isFormFillerOpen, setIsFormFillerOpen] = React.useState(false);
+  // State for Discussions dialog
+  const [isDiscussionsOpen, setIsDiscussionsOpen] = React.useState(false);
 
   // State to track which sections are expanded
   const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>(() => {
@@ -1558,7 +1562,19 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             <div className="space-y-3 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10">
               <div className="flex items-center justify-between py-1 gap-3">
                 {/* Fill With AI Button - Only show in create mode */}
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
+                  {discussionConfig && (
+                    <Button
+                      type="button"
+                      variant="link"
+                      onClick={() => setIsDiscussionsOpen(true)}
+                      disabled={disabled}
+                      className="flex items-center gap-2 text-xs"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      <span className="hidden md:inline">Discussions</span>
+                    </Button>
+                  )}
                   {!editMode && (
                     <Button
                       type="button"
@@ -1666,6 +1682,14 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
               </div>
             </div>
+          )}
+
+          {discussionConfig && (
+            <DiscussionsDialog
+              isOpen={isDiscussionsOpen}
+              onOpenChange={setIsDiscussionsOpen}
+              config={discussionConfig}
+            />
           )}
 
           {/* Collapse/Expand All Buttons */}

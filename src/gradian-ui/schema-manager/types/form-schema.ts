@@ -592,8 +592,17 @@ export interface FormContextType {
   unregisterDeferredField?: (fieldName: string) => void;
 }
 
+/** Discussion config for form discussion button (schemaId + instanceId) */
+export interface FormDiscussionConfig {
+  schemaId: string;
+  instanceId: string;
+  currentUserId?: string;
+}
+
 export interface FormWrapperProps {
   schema: FormSchema;
+  /** When provided in edit mode, shows a Discussions button in the form actions */
+  discussionConfig?: FormDiscussionConfig;
   onSubmit: (data: FormData, options?: { isIncomplete?: boolean }) => void | Promise<void>;
   onReset?: () => void;
   onCancel?: () => void;

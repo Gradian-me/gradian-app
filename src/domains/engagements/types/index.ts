@@ -13,6 +13,15 @@ export type EngagementInteractionType = 'canRead' | 'needsAcknowledgement';
 
 export type EngagementOutputType = 'approved' | 'rejected';
 
+/** Backend-returned createdBy user object */
+export interface EngagementCreatedByUser {
+  firstName?: string | null;
+  lastName?: string | null;
+  username?: string | null;
+  avatarUrl?: string | null;
+  userId: string;
+}
+
 export interface EngagementGroup {
   id: string;
   referenceSchemaId?: string;
@@ -32,6 +41,8 @@ export interface EngagementGroup {
 export interface Engagement {
   id: string;
   engagementGroupId?: string | null;
+  /** Optional reference to another engagement (e.g. follow-up, related, linked). */
+  referenceEngagementId?: string | null;
   engagementType: EngagementType;
   message: string;
   metadata?: Record<string, unknown>;
@@ -40,7 +51,8 @@ export interface Engagement {
   interactionType: EngagementInteractionType;
   reactions?: unknown[];
   hashtags?: string[];
-  createdBy?: string;
+  /** Created by: string (userId) or full user object from backend */
+  createdBy?: string | EngagementCreatedByUser;
   createdAt: string;
   updatedBy?: string;
   updatedAt?: string;
@@ -50,17 +62,25 @@ export interface Engagement {
 
 export interface EngagementInteraction {
   id: string;
+  /** Backend may return interactionId; treat as id alias */
+  interactionId?: string;
   engagementId: string;
+  /** Optional reference to another engagement (e.g. in response to, linked). */
+  referenceEngagementId?: string | null;
   userId: string;
   isRead: boolean;
   readAt?: string;
-  dueDate?: string;
+  /** Backend uses interactedAt; can represent read/interaction time */
   interactedAt?: string;
+  dueDate?: string;
   outputType?: EngagementOutputType;
   comment?: string;
 }
 
-/** Engagement + current user's interaction for API responses */
+/** Engagement + interaction(s) for API responses. Backend returns interactions array. */
 export interface EngagementWithInteraction extends Engagement {
+  /** Singular interaction (current user) - legacy/demo format */
   interaction?: EngagementInteraction | null;
+  /** Backend returns interactions array with all users who interacted */
+  interactions?: EngagementInteraction[];
 }

@@ -32,7 +32,7 @@ function engagementToNotification(item: EngagementWithInteraction): Notification
     interactionType: (e.interactionType ?? 'canRead') as
       | 'canRead'
       | 'needsAcknowledgement',
-    createdBy: e.createdBy,
+    createdBy: typeof e.createdBy === 'string' ? e.createdBy : e.createdBy?.userId,
     assignedTo: undefined,
     actionUrl,
     metadata: e.metadata as Notification['metadata'],
@@ -49,14 +49,13 @@ const getCurrentUserId = (): string | null => {
   }
 };
 
-const DEFAULT_USER_ID = 'mahyar';
-
 async function getNotificationsFromAPI(
   filters?: NotificationFilters,
-  currentUserId?: string,
 ): Promise<Notification[]> {
+  const userId = getCurrentUserId();
+  if (!userId) return [];
+
   try {
-    const userId = currentUserId ?? getCurrentUserId() ?? DEFAULT_USER_ID;
     const params: Record<string, string> = {
       currentUserId: userId,
     };
@@ -83,11 +82,10 @@ async function getNotificationsFromAPI(
     );
 
     if (filters?.sourceType) {
-      const uid = currentUserId ?? getCurrentUserId() ?? DEFAULT_USER_ID;
       list = list.filter((n) => {
-        if (filters.sourceType === 'createdByMe') return n.createdBy === uid;
+        if (filters.sourceType === 'createdByMe') return n.createdBy === userId;
         if (filters.sourceType === 'assignedToMe')
-          return n.assignedTo?.some((a) => a.userId === uid) ?? false;
+          return n.assignedTo?.some((a) => a.userId === userId) ?? false;
         return true;
       });
     }
@@ -106,9 +104,8 @@ async function getNotificationsFromAPI(
 export class NotificationService {
   static async getNotifications(
     filters: NotificationFilters = {},
-    currentUserId?: string,
   ): Promise<Notification[]> {
-    const notifications = await getNotificationsFromAPI(filters, currentUserId);
+    const notifications = await getNotificationsFromAPI(filters);
     let filtered = [...notifications];
 
     if (filters.search) {
@@ -133,7 +130,7 @@ export class NotificationService {
     groupBy: 'category' | 'type' | 'priority' | 'status' = 'category',
     currentUserId?: string,
   ): Promise<NotificationGroup[]> {
-    const notifications = await this.getNotifications(filters, currentUserId);
+    const notifications = await this.getNotifications(filters);
     const needsAcknowledgement = notifications.filter(
       (n) => n.interactionType === 'needsAcknowledgement',
     );
@@ -179,7 +176,8 @@ export class NotificationService {
   }
 
   static async markAsRead(notificationId: string): Promise<void> {
-    const userId = getCurrentUserId() ?? DEFAULT_USER_ID;
+    const userId = getCurrentUserId();
+    if (!userId) throw new Error('User must be logged in to mark notification as read');
     const response = await apiRequest('/api/engagement-interactions', {
       method: 'POST',
       body: {
@@ -196,7 +194,8 @@ export class NotificationService {
   }
 
   static async acknowledge(notificationId: string): Promise<void> {
-    const userId = getCurrentUserId() ?? DEFAULT_USER_ID;
+    const userId = getCurrentUserId();
+    if (!userId) throw new Error('User must be logged in to acknowledge notification');
     const response = await apiRequest('/api/engagement-interactions', {
       method: 'POST',
       body: {
@@ -213,7 +212,8 @@ export class NotificationService {
   }
 
   static async markAsUnread(notificationId: string): Promise<void> {
-    const userId = getCurrentUserId() ?? DEFAULT_USER_ID;
+    const userId = getCurrentUserId();
+    if (!userId) throw new Error('User must be logged in to mark notification as unread');
     const response = await apiRequest('/api/engagement-interactions', {
       method: 'POST',
       body: {
@@ -231,11 +231,12 @@ export class NotificationService {
   }
 
   static async markAllAsRead(): Promise<void> {
+    const userId = getCurrentUserId();
+    if (!userId) throw new Error('User must be logged in to mark all as read');
     const notifications = await getNotificationsFromAPI({ isRead: false });
     const toMark = notifications.filter(
       (n) => n.interactionType !== 'needsAcknowledgement',
     );
-    const userId = getCurrentUserId() ?? DEFAULT_USER_ID;
     await Promise.all(
       toMark.map((n) =>
         apiRequest('/api/engagement-interactions', {
@@ -252,8 +253,8 @@ export class NotificationService {
   }
 
   static async getUnreadCount(currentUserId?: string): Promise<number> {
-    const userId =
-      currentUserId ?? getCurrentUserId() ?? DEFAULT_USER_ID;
+    const userId = currentUserId ?? getCurrentUserId();
+    if (!userId) return 0;
     try {
       const response = await apiRequest<number>(
         '/api/engagements/notifications/count',

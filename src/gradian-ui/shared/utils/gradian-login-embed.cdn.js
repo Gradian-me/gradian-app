@@ -35,11 +35,16 @@
 
   /**
    * Open login in a centered popup. On success the login page closes popup and reloads window.opener.
+   * Centers relative to the opener window, not the whole screen.
    */
   function openPopup() {
     var url = buildLoginUrl(false);
-    var left = (window.screen.width - POPUP_W) / 2;
-    var top = (window.screen.height - POPUP_H) / 2;
+    var x = typeof window.screenX === 'number' ? window.screenX : (window.screenLeft ?? 0);
+    var y = typeof window.screenY === 'number' ? window.screenY : (window.screenTop ?? 0);
+    var w = window.outerWidth || window.screen.width;
+    var h = window.outerHeight || window.screen.height;
+    var left = x + Math.max(0, (w - POPUP_W) / 2);
+    var top = y + Math.max(0, (h - POPUP_H) / 2);
     var features = 'width=' + POPUP_W + ',height=' + POPUP_H + ',left=' + Math.round(left) + ',top=' + Math.round(top) + ',scrollbars=yes';
     return window.open(url, 'nx_gradian_login', features);
   }
