@@ -9,10 +9,11 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import {
   buildAuthServiceUrl,
   buildProxyHeaders,
-  forwardSetCookieHeaders,
+  forwardSetCookieHeadersFromAxios,
   getAuthServiceAppId,
   isServerDemoMode,
 } from '@/app/api/auth/helpers/external-auth.util';
+import axios from 'axios';
 import { storeAccessToken } from '@/app/api/auth/helpers/server-token-cache';
 
 const getCookieBaseOptions = (maxAge?: number) => ({
@@ -38,9 +39,7 @@ const applyTokenCookies = (response: NextResponse, tokens?: any): void => {
     });
   }
 
-  if (tokens.sessionToken) {
-    response.cookies.set(AUTH_CONFIG.SESSION_TOKEN_COOKIE ?? 'session_token', tokens.sessionToken, baseOptions);
-  }
+  // Do not set session_token cookie: sso_session (forwarded from auth) has the same value and is used for SSO.
 
   if (tokens.userSessionId) {
     response.cookies.set(
@@ -220,13 +219,19 @@ export async function POST(request: NextRequest) {
     }
     
     const fetchStartTime = Date.now();
-    let upstreamResponse: Response;
+    let upstreamResponse: { status: number; statusText: string; data: any; headers: Record<string, unknown> };
     try {
-      upstreamResponse = await fetch(authServiceUrl, {
-        method: 'POST',
-        headers: proxyHeaders,
-        body: JSON.stringify(proxyBody),
+      const axiosResponse = await axios.post(authServiceUrl, proxyBody, {
+        headers: proxyHeaders as Record<string, string>,
+        validateStatus: () => true, // accept any status so we can read body and forward Set-Cookie
+        maxRedirects: 0,
       });
+      upstreamResponse = {
+        status: axiosResponse.status,
+        statusText: axiosResponse.statusText,
+        data: axiosResponse.data,
+        headers: axiosResponse.headers as Record<string, unknown>,
+      };
     } catch (fetchError) {
       loggingCustom(LogType.LOGIN_LOG, 'error', `Failed to connect to external auth service: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}`);
       return NextResponse.json(
@@ -235,16 +240,18 @@ export async function POST(request: NextRequest) {
       );
     }
     const fetchDuration = Date.now() - fetchStartTime;
+    const headersForLog = { ...upstreamResponse.headers };
+    if (headersForLog['set-cookie']) (headersForLog as any)['set-cookie'] = '[REDACTED]';
     loggingCustom(LogType.LOGIN_LOG, 'info', `External auth service response: ${JSON.stringify({
       duration: `${fetchDuration}ms`,
       status: upstreamResponse.status,
       statusText: upstreamResponse.statusText,
-      ok: upstreamResponse.ok,
-      headers: Object.fromEntries(upstreamResponse.headers.entries()),
+      ok: upstreamResponse.status >= 200 && upstreamResponse.status < 300,
+      headers: headersForLog,
     })}`);
 
     loggingCustom(LogType.LOGIN_LOG, 'debug', 'Parsing external auth service response...');
-    const upstreamJson = await upstreamResponse.json().catch(() => null);
+    const upstreamJson = upstreamResponse.data ?? null;
     loggingCustom(LogType.LOGIN_LOG, 'debug', `External auth service response data: ${JSON.stringify({
       success: upstreamJson?.success,
       hasUser: !!upstreamJson?.user,
@@ -254,7 +261,7 @@ export async function POST(request: NextRequest) {
       fullData: JSON.stringify(upstreamJson, null, 2),
     })}`);
 
-    if (!upstreamResponse.ok) {
+    if (upstreamResponse.status < 200 || upstreamResponse.status >= 300) {
       loggingCustom(LogType.LOGIN_LOG, 'error', `External auth service returned error: ${JSON.stringify({
         status: upstreamResponse.status,
         error: upstreamJson?.error,
@@ -267,12 +274,12 @@ export async function POST(request: NextRequest) {
           upstreamJson?.message ||
           `Authentication service responded with status ${upstreamResponse.status}`,
       };
-      
+
       // Forward cookies even on error responses (external service may set session cookies)
       const errorNextResponse = NextResponse.json(errorResponse, { status: upstreamResponse.status });
       loggingCustom(LogType.LOGIN_LOG, 'debug', 'Forwarding set-cookie headers from external auth (error response)...');
-      forwardSetCookieHeaders(upstreamResponse, errorNextResponse);
-      
+      forwardSetCookieHeadersFromAxios(upstreamResponse.headers, errorNextResponse);
+
       loggingCustom(LogType.LOGIN_LOG, 'error', `Response (${upstreamResponse.status} - External Auth): ${JSON.stringify(errorResponse, null, 2)}`);
       return errorNextResponse;
     }
@@ -301,16 +308,17 @@ export async function POST(request: NextRequest) {
     } : { success: true };
     
     const response = NextResponse.json(responseData, { status: upstreamResponse.status });
-    
-    // IMPORTANT: Forward external auth cookies FIRST, then apply our own cookies
-    // This ensures our manually set cookies (with correct path/domain) take precedence
-    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Forwarding set-cookie headers from external auth...');
-    forwardSetCookieHeaders(upstreamResponse, response);
-    
-    // Apply our token cookies AFTER forwarding external cookies
-    // This ensures refresh token cookie is set with correct path='/', sameSite='lax', etc.
+
+    // Apply our token cookies FIRST (refresh_token, session_token, user_session_id).
+    // NextResponse.cookies.set() can replace/clear manually appended Set-Cookie headers,
+    // so we must append upstream cookies (sso_session) AFTER calling cookies.set().
     loggingCustom(LogType.LOGIN_LOG, 'debug', 'Applying token cookies from external auth (refresh token only)...');
     applyTokenCookies(response, upstreamJson?.tokens);
+
+    // THEN forward external auth Set-Cookie headers (including sso_session).
+    // Order matters: if we did this before cookies.set(), the latter would overwrite and drop sso_session.
+    loggingCustom(LogType.LOGIN_LOG, 'debug', 'Forwarding set-cookie headers from external auth...');
+    forwardSetCookieHeadersFromAxios(upstreamResponse.headers, response);
     
     // Log cookie configuration for debugging
     if (upstreamJson?.tokens?.refreshToken) {

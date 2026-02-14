@@ -164,4 +164,54 @@ export function forwardSetCookieHeaders(upstream: Response, downstream: NextResp
   }
 }
 
+/**
+ * Forward Set-Cookie headers from an Axios response to a NextResponse.
+ * Use this instead of fetch() + forwardSetCookieHeaders when calling the auth service,
+ * because fetch() (and Node's undici) strips or hides Set-Cookie on cross-origin responses
+ * (forbidden response header), so sso_session and other cookies never reach the client.
+ * Axios returns raw response headers, so all Set-Cookie headers are preserved.
+ */
+export function forwardSetCookieHeadersFromAxios(
+  axiosHeaders: Record<string, unknown>,
+  downstream: NextResponse,
+): void {
+  try {
+    const setCookieHeader = axiosHeaders['set-cookie'];
+    if (setCookieHeader == null) {
+      loggingCustom(LogType.LOGIN_LOG, 'debug', 'No set-cookie header in axios response');
+      return;
+    }
+    const setCookieValues: string[] = Array.isArray(setCookieHeader)
+      ? setCookieHeader
+      : [String(setCookieHeader)];
 
+    if (setCookieValues.length === 0) {
+      loggingCustom(LogType.LOGIN_LOG, 'debug', 'No set-cookie values in external auth response');
+      return;
+    }
+
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Forwarding ${setCookieValues.length} cookie(s) from external auth service (axios)`);
+    setCookieValues.forEach((cookie, index) => {
+      if (cookie && String(cookie).trim()) {
+        const cookieStr = String(cookie).trim();
+        const isDeletion =
+          cookieStr.includes('Max-Age=0') ||
+          cookieStr.includes('Expires=Thu, 01 Jan 1970') ||
+          /^[^=]+=\s*;\s*Expires=/.test(cookieStr);
+
+        if (!isDeletion) {
+          try {
+            downstream.headers.append('set-cookie', cookieStr);
+            loggingCustom(LogType.LOGIN_LOG, 'debug', `Forwarded cookie ${index + 1}: ${cookieStr.substring(0, 50)}...`);
+          } catch (cookieError) {
+            loggingCustom(LogType.LOGIN_LOG, 'warn', `Failed to forward cookie ${index + 1}: ${cookieError instanceof Error ? cookieError.message : String(cookieError)}`);
+          }
+        } else {
+          loggingCustom(LogType.LOGIN_LOG, 'debug', `Skipping cookie deletion header: ${cookieStr.substring(0, 50)}...`);
+        }
+      }
+    });
+  } catch (error) {
+    loggingCustom(LogType.LOGIN_LOG, 'error', `Error forwarding set-cookie headers from axios: ${error instanceof Error ? error.message : String(error)}`);
+  }
+}
