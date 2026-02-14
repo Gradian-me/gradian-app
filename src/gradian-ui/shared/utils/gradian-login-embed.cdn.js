@@ -21,7 +21,6 @@
   var LOGIN_BASE_URL = 'http://app1.cinnagen.com';
   var LOGIN_PATH = '/authentication/login-modal';
   var RETURN_ORIGIN_FALLBACK = 'http://localhost:3000';
-  var TENANT_DOMAIN = 'app1.cinnagen.com';
   var POPUP_W = 420;
   var POPUP_H = 540;
   var OVERLAY_ID = 'nx_gradian_login_embed_overlay';
@@ -37,15 +36,12 @@
     return RETURN_ORIGIN_FALLBACK;
   }
 
-  /** Build login URL with returnOrigin = embedder origin, modalMode, tenantDomain. */
+  /** Build login URL with returnOrigin = embedder origin and modalMode. Tenant is derived from request host. */
   function buildLoginUrl(modalMode) {
     var base = (LOGIN_BASE_URL || '').replace(/\/$/, '');
     var returnOrigin = getEmbedderOrigin();
     var url = base + LOGIN_PATH + '?returnOrigin=' + encodeURIComponent(returnOrigin);
     if (modalMode) url += '&modalMode=true';
-    if (TENANT_DOMAIN && /^[a-zA-Z0-9.\-]+$/.test(TENANT_DOMAIN.trim())) {
-      url += '&tenantDomain=' + encodeURIComponent(TENANT_DOMAIN.trim());
-    }
     return url;
   }
 
