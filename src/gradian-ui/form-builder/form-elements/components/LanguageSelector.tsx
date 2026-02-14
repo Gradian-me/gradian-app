@@ -2,12 +2,14 @@
 'use client';
 
 import React from 'react';
-import { FormElementProps } from '../types';
+import type { FormElementProps } from '../types';
 import { Select, SelectOption } from './Select';
+import 'flag-icons/css/flag-icons.min.css';
 import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { useLanguageStore } from '@/stores/language.store';
-import { SUPPORTED_LOCALES } from '@/gradian-ui/shared/utils/date-utils';
+import { SUPPORTED_LOCALES } from '@/gradian-ui/shared/utils/language-availables';
+import { getAvailableLanguageCodes } from '@/gradian-ui/shared/configs/env-config';
 
 export interface LanguageSelectorProps extends Omit<FormElementProps, 'config'> {
   config?: any;
@@ -23,12 +25,13 @@ export interface LanguageSelectorProps extends Omit<FormElementProps, 'config'> 
   defaultLanguage?: string;
 }
 
-// Default language options from date-utils (each option includes locale e.g. 'en-US' for formatting)
-const DEFAULT_LANGUAGES: SelectOption[] = SUPPORTED_LOCALES.map(({ code, label, isRTL, locale }) => ({
+// Default language options; use flag when available (LanguageSelector shows flag instead of icon)
+const DEFAULT_LANGUAGES: SelectOption[] = SUPPORTED_LOCALES.map(({ code, label, isRTL, locale, flag }) => ({
   id: code,
   value: code,
   label,
-  icon: 'Languages',
+  icon: flag ? undefined : 'Languages',
+  flagCode: flag,
   color: 'default',
   isRTL,
   locale,
@@ -53,8 +56,13 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   const defaultLabel = getT(TRANSLATION_KEYS.LABEL_LANGUAGE, language, defaultLang);
   const defaultPlaceholder = getT(TRANSLATION_KEYS.PLACEHOLDER_SELECT_LANGUAGE, language, defaultLang);
 
-  // Get languages from config or use defaults
-  const languages = config?.options || DEFAULT_LANGUAGES;
+  // Get languages from config or use defaults; always filter by NEXT_PUBLIC_AVAILABLE_LANGUAGES when set
+  const allLanguages = config?.options || DEFAULT_LANGUAGES;
+  const availableCodes = getAvailableLanguageCodes();
+  const languages =
+    availableCodes.length > 0
+      ? allLanguages.filter((opt: SelectOption) => availableCodes.includes((opt.id ?? opt.value ?? '').toLowerCase()))
+      : allLanguages;
 
   // Get field configuration
   const fieldName = config?.name || config?.id || 'language';

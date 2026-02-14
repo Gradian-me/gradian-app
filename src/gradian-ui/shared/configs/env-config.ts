@@ -136,6 +136,25 @@ export const ENABLE_SIGN_UP: boolean = (() => {
 // ===========================================
 
 /**
+ * Comma-separated list of language codes to show in the app.
+ * Set via NEXT_PUBLIC_AVAILABLE_LANGUAGES (required for client) or AVAILABLE_LANGUAGES.
+ * Formats accepted: "en,fa,ar" or "['en','fa','ar']". When unset or empty, returns [] so all locales are shown.
+ * Uses static process.env access so Next.js inlines the value in the client bundle.
+ */
+export function getAvailableLanguageCodes(): string[] {
+  const raw =
+    process.env.NEXT_PUBLIC_AVAILABLE_LANGUAGES || process.env.AVAILABLE_LANGUAGES;
+  if (raw === undefined || raw === null || typeof raw !== 'string') return [];
+  const trimmed = raw.trim();
+  if (trimmed === '') return [];
+  const normalized = trimmed.replace(/^\[|\]$/g, ''); // strip leading/trailing brackets
+  return normalized
+    .split(',')
+    .map((s) => s.trim().replace(/^['"]|['"]$/g, '').toLowerCase()) // strip quotes, then lowercase
+    .filter(Boolean);
+}
+
+/**
  * Default app language (e.g. 'en', 'fa'). Used when no language is persisted.
  * Set via NEXT_PUBLIC_DEFAULT_LANGUAGE (client and server).
  * Resolved in getDefaultLanguage() from translation-utils.

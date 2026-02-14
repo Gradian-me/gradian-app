@@ -6815,5 +6815,30 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000003",
+    "timestamp": "2026-02-14T00:00:00.000Z",
+    "version": "1.51.004",
+    "changes": [
+      {
+        "changeType": "add",
+        "description": "ADD: Integrated 'flag-icons' package for enhanced language selection visuals in LanguageSelector component.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "i18n"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "REFACTOR: Updated LanguageSelector and Select components to utilize flag icons, improving user experience in language selection. This update enhances the multilingual support and visual appeal of the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "i18n"
+        ]
+      }
+    ]
   }
 ]

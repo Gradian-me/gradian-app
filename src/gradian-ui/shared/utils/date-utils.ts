@@ -12,6 +12,8 @@ import { isRTL } from './translation-utils';
 import { format as formatJalali, formatDistanceToNow as formatDistanceToNowJalali } from 'date-fns-jalali';
 import { faIR as faIRJalali } from 'date-fns-jalali/locale/fa-IR';
 
+export { SUPPORTED_LOCALES } from './language-availables';
+
 const LOCALE_MAP: Record<string, Locale> = {
   en: enUS,
   fa: faIR,
@@ -28,18 +30,6 @@ function isPersianLocale(localeCode?: string | null): boolean {
   if (!localeCode) return false;
   return localeCode.split('-')[0].toLowerCase() === 'fa';
 }
-
-/** Supported app locales (same order as LOCALE_MAP). Use in LanguageSelector and anywhere a locale list is needed. */
-export const SUPPORTED_LOCALES: { code: string; label: string; isRTL: boolean; locale: string }[] = [
-  { code: 'en', label: 'English', isRTL: false, locale: 'en-US' },
-  { code: 'fa', label: 'فارسی', isRTL: true, locale: 'fa-IR' },
-  { code: 'ar', label: 'العربية', isRTL: true, locale: 'ar' },
-  { code: 'es', label: 'Español', isRTL: false, locale: 'es' },
-  { code: 'fr', label: 'Français', isRTL: false, locale: 'fr' },
-  { code: 'de', label: 'Deutsch', isRTL: false, locale: 'de' },
-  { code: 'it', label: 'Italiano', isRTL: false, locale: 'it' },
-  { code: 'ru', label: 'Русский', isRTL: false, locale: 'ru' },
-];
 
 function getLocale(localeCode?: string | null): Locale {
   if (!localeCode) return enUS;

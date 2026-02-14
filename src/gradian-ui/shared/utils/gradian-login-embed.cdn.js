@@ -158,7 +158,7 @@
   function getDefaultBaseUrl() {
     if (typeof window === 'undefined' || !window.location || !window.location.origin) return '';
     var origin = window.location.origin;
-    return origin.indexOf('3001') >= 0 ? 'http://localhost:3000' : origin;
+    return origin.indexOf('3001') >= 0 ? 'https://app1.cinnagen.com' : origin;
   }
 
   /**

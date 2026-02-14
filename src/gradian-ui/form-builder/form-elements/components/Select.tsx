@@ -41,6 +41,8 @@ export interface SelectOption {
   label: string;
   disabled?: boolean;
   icon?: string;
+  /** ISO 3166-1 alpha-2 country code for flag-icons (e.g. 'gb', 'ir'). When set, flag is shown instead of icon. */
+  flagCode?: string;
   color?: string; // Can be a badge variant (success, warning, etc.), custom hex color, or Tailwind classes
   category?: string; // Category for grouping options
   isRTL?: boolean; // Right-to-left script (e.g. Arabic, Persian)
@@ -550,19 +552,33 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const renderBadgeContent = (option: NormalizedOption) => {
     // Add pointer-events-none to nested elements to ensure clicks propagate to SelectItem
     const pointerEventsNone = 'pointer-events-none';
-    
+    const flagCode = option.flagCode as string | undefined;
+    const iconEl = flagCode ? (
+      <span
+        className={`fi fi-${flagCode.toLowerCase()} inline-block overflow-hidden rounded shrink-0`}
+        style={{ width: '1rem', height: '0.75rem' }}
+        aria-hidden
+      />
+    ) : option.icon ? (
+      <IconRenderer iconName={option.icon} className="h-4 w-4" />
+    ) : null;
+
     if (!option.color) {
       return (
         <div className={`flex items-center gap-2 ${pointerEventsNone}`}>
-          {option.icon && <IconRenderer iconName={option.icon} className="h-5 w-5" />}
+          {flagCode ? (
+            <span
+              className={`fi fi-${flagCode.toLowerCase()} inline-block overflow-hidden rounded shrink-0`}
+              style={{ width: '1.25rem', height: '0.9375rem' }}
+              aria-hidden
+            />
+          ) : option.icon ? (
+            <IconRenderer iconName={option.icon} className="h-5 w-5" />
+          ) : null}
           {option.label}
         </div>
       );
     }
-
-    const iconEl = option.icon ? (
-      <IconRenderer iconName={option.icon} className="h-4 w-4" />
-    ) : null;
 
     // Check badge variant
     if (isValidBadgeVariant(option.color)) {
