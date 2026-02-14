@@ -17,12 +17,17 @@ import { normalizeUsernameToEmail } from '@/domains/auth/utils/username-email.ut
 import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
 import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { TenantSelector } from '@/components/layout/TenantSelector';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 const OTP_LENGTH = 6;
 
 function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const language = useLanguageStore((s) => s.language);
+  const t = (key: string) => getT(key, language);
   const { selectedTenant } = useTenantStore();
   const [username, setUsername] = useState('');
   const [userId, setUserId] = useState('');
@@ -36,8 +41,8 @@ function ResetPasswordContent() {
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    document.title = 'Reset Password | Gradian';
-  }, []);
+    document.title = t(TRANSLATION_KEYS.AUTH_TITLE_PAGE_RESET_PASSWORD);
+  }, [language]);
 
   useEffect(() => {
     const id = searchParams?.get('userId');
@@ -68,35 +73,35 @@ function ResetPasswordContent() {
     const trimmedOtp = otp.trim();
 
     if (!trimmedUsername) {
-      const message = 'Please enter your username or email.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_ENTER_USERNAME_OR_EMAIL);
       setError(message);
       toast.error(message);
       return;
     }
 
     if (trimmedOtp.length !== OTP_LENGTH) {
-      const message = 'Please enter the full 6-digit verification code.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_ENTER_FULL_6_DIGIT_CODE);
       setError(message);
       toast.error(message);
       return;
     }
 
     if (!password || !confirmPassword) {
-      const message = 'Please enter and confirm your new password.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_ENTER_AND_CONFIRM_PASSWORD);
       setError(message);
       toast.error(message);
       return;
     }
 
     if (password !== confirmPassword) {
-      const message = 'Passwords do not match.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_PASSWORDS_DO_NOT_MATCH);
       setError(message);
       toast.error(message);
       return;
     }
 
     if (password.length < 8) {
-      const message = 'Password must be at least 8 characters long.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_PASSWORD_MIN_8);
       setError(message);
       toast.error(message);
       return;
@@ -141,7 +146,7 @@ function ResetPasswordContent() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        const message = data.error || 'Password reset failed. Please try again.';
+        const message = data.error || t(TRANSLATION_KEYS.AUTH_ERROR_RESET_FAILED);
         setError(message);
         toast.error(message);
         setIsLoading(false);
@@ -149,13 +154,13 @@ function ResetPasswordContent() {
       }
 
       toast.success(
-        data.message || 'Password reset successfully. Please log in with your new password.',
+        data.message || t(TRANSLATION_KEYS.AUTH_SUCCESS_RESET),
       );
       setIsLoading(false);
       router.push('/authentication/login');
     } catch (err) {
       console.error('Password reset error:', err);
-      const message = 'An unexpected error occurred. Please try again.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_UNEXPECTED);
       setError(message);
       toast.error(message);
       setIsLoading(false);
@@ -187,7 +192,7 @@ function ResetPasswordContent() {
     const resolvedUserId = userId || normalizedEmail;
 
     if (!resolvedUserId) {
-      const message = 'Enter your username or email before requesting a code.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_ENTER_USERNAME_BEFORE_CODE);
       setError(message);
       toast.error(message);
       throw new Error(message);
@@ -197,7 +202,7 @@ function ResetPasswordContent() {
     const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
 
     if (!clientId || !secretKey) {
-      const message = 'Client credentials are not configured. Please contact support.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_CLIENT_CREDENTIALS);
       setError(message);
       toast.error(message);
       throw new Error(message);
@@ -223,14 +228,14 @@ function ResetPasswordContent() {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
-      const message = data.message || data.error || 'Failed to send verification code.';
+      const message = data.message || data.error || t(TRANSLATION_KEYS.AUTH_ERROR_SEND_CODE_FAILED);
       setError(message);
       toast.error(message);
       throw new Error(message);
     }
 
     setError(null);
-    toast.success('Verification code sent. Please check your authenticator or email.');
+    toast.success(t(TRANSLATION_KEYS.AUTH_SUCCESS_CODE_SENT));
     setOtp('');
   };
 
@@ -258,10 +263,10 @@ function ResetPasswordContent() {
                 fontSize: "clamp(1.5rem, 3vw + 0.5rem, 3rem)"
               }}
             >
-              Reset password
+              {t(TRANSLATION_KEYS.AUTH_RESET_PASSWORD_TITLE)}
             </h1>
             <p className="animate-element animate-delay-200 text-muted-foreground">
-              Verify your identity and create a secure new password.
+              {t(TRANSLATION_KEYS.AUTH_RESET_PASSWORD_DESCRIPTION)}
             </p>
 
           {error && (
@@ -274,7 +279,7 @@ function ResetPasswordContent() {
             <div className="animate-element animate-delay-300 flex flex-col gap-2">
               <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <UserIcon className="h-4 w-4" />
-                Username or email
+                {t(TRANSLATION_KEYS.AUTH_LABEL_USERNAME_OR_EMAIL)}
               </label>
               <GlassInputWrapper>
                 <input
@@ -285,7 +290,7 @@ function ResetPasswordContent() {
                     setUsername(event.target.value);
                     setError(null);
                   }}
-                  placeholder="Enter your username or email"
+                  placeholder={t(TRANSLATION_KEYS.AUTH_PLACEHOLDER_USERNAME_OR_EMAIL)}
                   autoComplete="username"
                   className="flex-1 bg-transparent text-sm p-4 rounded-2xl focus:outline-none"
                 />
@@ -295,17 +300,17 @@ function ResetPasswordContent() {
             <div className="animate-element animate-delay-350 flex flex-col gap-2">
               <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4" />
-                Verification code
+                {t(TRANSLATION_KEYS.AUTH_LABEL_VERIFICATION_CODE)}
               </label>
               <InputOTP
                 maxLength={OTP_LENGTH}
                 value={otp}
                 onChange={setOtp}
                 disabled={isLoading}
-                aria-label="One-time verification code"
+                aria-label={t(TRANSLATION_KEYS.AUTH_LABEL_VERIFICATION_CODE)}
                 resendDuration={10}
                 onResend={handleResendCode}
-                resendButtonLabel="Send verification code"
+                resendButtonLabel={t(TRANSLATION_KEYS.AUTH_BUTTON_SEND_VERIFICATION_CODE)}
               >
                 <InputOTPGroup>
                   {Array.from({ length: 3 }).map((_, index) => (
@@ -331,7 +336,7 @@ function ResetPasswordContent() {
             <div className="animate-element animate-delay-400 flex flex-col gap-2">
               <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <LockIcon className="h-4 w-4" />
-                New password
+                {t(TRANSLATION_KEYS.AUTH_LABEL_NEW_PASSWORD)}
               </label>
               <GlassInputWrapper>
                 <input
@@ -340,14 +345,14 @@ function ResetPasswordContent() {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   autoComplete="new-password"
-                  placeholder="Create a strong password"
+                  placeholder={t(TRANSLATION_KEYS.AUTH_PLACEHOLDER_NEW_PASSWORD)}
                   className="flex-1 bg-transparent text-sm p-4 pe-12 rounded-2xl focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute inset-y-0 right-3 flex items-center z-10"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t(TRANSLATION_KEYS.AUTH_ARIA_HIDE_PASSWORD) : t(TRANSLATION_KEYS.AUTH_ARIA_SHOW_PASSWORD)}
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
@@ -361,7 +366,7 @@ function ResetPasswordContent() {
             <div className="animate-element animate-delay-450 flex flex-col gap-2">
               <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <LockIcon className="h-4 w-4" />
-                Confirm password
+                {t(TRANSLATION_KEYS.AUTH_LABEL_CONFIRM_PASSWORD)}
               </label>
               <GlassInputWrapper>
                 <input
@@ -370,14 +375,14 @@ function ResetPasswordContent() {
                   value={confirmPassword}
                   onChange={(event) => setConfirmPassword(event.target.value)}
                   autoComplete="new-password"
-                  placeholder="Repeat your new password"
+                  placeholder={t(TRANSLATION_KEYS.AUTH_PLACEHOLDER_CONFIRM_PASSWORD)}
                   className="flex-1 bg-transparent text-sm p-4 pe-12 rounded-2xl focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
                   className="absolute inset-y-0 right-3 flex items-center z-10"
-                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showConfirmPassword ? t(TRANSLATION_KEYS.AUTH_ARIA_HIDE_PASSWORD) : t(TRANSLATION_KEYS.AUTH_ARIA_SHOW_PASSWORD)}
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
@@ -393,18 +398,18 @@ function ResetPasswordContent() {
               disabled={isSubmitDisabled}
               className="animate-element animate-delay-550 w-full rounded-2xl bg-violet-500 dark:bg-violet-600 py-4 font-medium text-white hover:bg-violet-600 dark:hover:bg-violet-700 transition-all cursor-pointer disabled:opacity-60 disabled:bg-violet-400 dark:disabled:bg-violet-700/50 disabled:hover:bg-violet-400 dark:disabled:hover:bg-violet-700/50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Updating password...' : 'Reset password'}
+              {isLoading ? t(TRANSLATION_KEYS.AUTH_BUTTON_RESETTING) : t(TRANSLATION_KEYS.AUTH_BUTTON_RESET_PASSWORD)}
             </button>
           </form>
 
           <p className="animate-element animate-delay-700 text-center text-sm text-muted-foreground">
-            Remembered your password?{' '}
+            {t(TRANSLATION_KEYS.AUTH_RESET_REMEMBERED_PASSWORD)}{' '}
             <button
               type="button"
               onClick={() => router.push('/authentication/login')}
               className="text-violet-400 hover:underline transition-colors"
             >
-              Return to login
+              {t(TRANSLATION_KEYS.AUTH_RESET_RETURN_TO_LOGIN)}
             </button>
           </p>
         </div>

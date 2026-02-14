@@ -69,6 +69,30 @@ export interface FormLoadedMessage extends FormEmbedMessage {
 }
 
 /**
+ * Login embed: message from login-modal iframe/popup to parent on successful login.
+ * No sensitive data; parent should refresh after receiving.
+ */
+export interface LoginSuccessMessage {
+  type: 'login-success';
+  timestamp: number;
+}
+
+export function createLoginSuccessMessage(): LoginSuccessMessage {
+  return { type: 'login-success', timestamp: Date.now() };
+}
+
+export function isLoginSuccessMessage(data: unknown): data is LoginSuccessMessage {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    'type' in data &&
+    (data as LoginSuccessMessage).type === 'login-success' &&
+    'timestamp' in data &&
+    typeof (data as LoginSuccessMessage).timestamp === 'number'
+  );
+}
+
+/**
  * Helper function to create a typed message
  */
 export function createFormEmbedMessage<T extends FormEmbedMessage>(

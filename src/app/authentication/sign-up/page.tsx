@@ -13,7 +13,7 @@ import { config } from '@/lib/config';
 import { useCompanyStore } from '@/stores/company.store';
 import { AuthenticationLayout } from '@/components/authentication';
 import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
-import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
+import { DEMO_MODE, ENABLE_SIGN_UP } from '@/gradian-ui/shared/configs/env-config';
 import { TenantSelector } from '@/components/layout/TenantSelector';
 
 interface FeedbackState {
@@ -34,6 +34,14 @@ export default function SignUpPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    if (!ENABLE_SIGN_UP) {
+      router.replace('/authentication/login');
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (!ENABLE_SIGN_UP) return;
+
     let isMounted = true;
 
     const loadSchema = async () => {
@@ -289,6 +297,14 @@ export default function SignUpPage() {
       />
     );
   }, [isLoading, loadError, schema, handleSubmit, isSubmitting]);
+
+  if (!ENABLE_SIGN_UP) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">Redirecting...</p>
+      </div>
+    );
+  }
 
   return (
     <>

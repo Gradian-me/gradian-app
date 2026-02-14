@@ -9,9 +9,14 @@ import { useUserStore } from '@/stores/user.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { normalizeUsernameToEmail } from '@/domains/auth/utils/username-email.util';
 import { AuthenticationLayout, GlassInputWrapper } from '@/components/authentication';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export default function ChangePasswordPage() {
   const router = useRouter();
+  const language = useLanguageStore((s) => s.language);
+  const t = (key: string) => getT(key, language);
   const storeUser = useUserStore((state) => state.user);
   const { selectedTenant } = useTenantStore();
 
@@ -27,9 +32,9 @@ export default function ChangePasswordPage() {
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.title = 'Change Password | Gradian';
+      document.title = t(TRANSLATION_KEYS.AUTH_TITLE_PAGE_CHANGE_PASSWORD);
     }
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     if (storeUser?.email) {
@@ -54,21 +59,21 @@ export default function ChangePasswordPage() {
     const trimmedUsername = username.trim();
 
     if (!trimmedUsername) {
-      const message = 'Please enter your email or username.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_ENTER_USERNAME_OR_EMAIL);
       setError(message);
       toast.error(message);
       return;
     }
 
     if (newPassword.length < 8) {
-      const message = 'New password must be at least 8 characters long.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_NEW_PASSWORD_MIN_8);
       setError(message);
       toast.error(message);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      const message = 'New passwords do not match.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_NEW_PASSWORDS_DO_NOT_MATCH);
       setError(message);
       toast.error(message);
       return;
@@ -78,7 +83,7 @@ export default function ChangePasswordPage() {
     const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY;
 
     if (!clientId || !secretKey) {
-      const message = 'Client credentials are not configured. Please contact support.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_CLIENT_CREDENTIALS);
       setError(message);
       toast.error(message);
       return;
@@ -124,14 +129,14 @@ export default function ChangePasswordPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        const message = data.error || 'Failed to change password. Please verify your credentials.';
+        const message = data.error || t(TRANSLATION_KEYS.AUTH_ERROR_CHANGE_FAILED);
         setError(message);
         toast.error(message);
         setIsLoading(false);
         return;
       }
 
-      toast.success(data.message || 'Password changed successfully. Please sign in again.');
+      toast.success(data.message || t(TRANSLATION_KEYS.AUTH_SUCCESS_CHANGE));
       // Clear tokens using secure utility (tokens should be in httpOnly cookies)
       if (typeof window !== 'undefined') {
         try {
@@ -148,7 +153,7 @@ export default function ChangePasswordPage() {
       router.push('/authentication/login');
     } catch (err) {
       console.error('Change password error:', err);
-      const message = 'An unexpected error occurred. Please try again.';
+      const message = t(TRANSLATION_KEYS.AUTH_ERROR_UNEXPECTED);
       setError(message);
       toast.error(message);
       setIsLoading(false);
@@ -163,10 +168,10 @@ export default function ChangePasswordPage() {
       <div className="w-full max-w-md">
         <div className="flex flex-col gap-6">
           <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">
-            Change password
+            {t(TRANSLATION_KEYS.AUTH_CHANGE_PASSWORD_TITLE)}
           </h1>
           <p className="animate-element animate-delay-200 text-muted-foreground">
-            Update your password securely. You will be asked to sign in again once the change is complete.
+            {t(TRANSLATION_KEYS.AUTH_CHANGE_PASSWORD_DESCRIPTION)}
           </p>
 
           {error && (
@@ -179,7 +184,7 @@ export default function ChangePasswordPage() {
             <div className="animate-element animate-delay-300 flex flex-col gap-2">
               <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <UserIcon className="h-4 w-4" />
-                Email or username
+                {t(TRANSLATION_KEYS.AUTH_LABEL_EMAIL_OR_USERNAME_CHANGE)}
               </label>
               <GlassInputWrapper>
                 <input
@@ -188,7 +193,7 @@ export default function ChangePasswordPage() {
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
                   autoComplete="username"
-                  placeholder="Enter your email or username"
+                  placeholder={t(TRANSLATION_KEYS.AUTH_PLACEHOLDER_EMAIL_OR_USERNAME)}
                   className="flex-1 bg-transparent text-sm p-4 rounded-2xl focus:outline-none"
                 />
               </GlassInputWrapper>
@@ -227,7 +232,7 @@ export default function ChangePasswordPage() {
             <div className="animate-element animate-delay-400 flex flex-col gap-2">
               <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                 <LockIcon className="h-4 w-4" />
-                New password
+                {t(TRANSLATION_KEYS.AUTH_LABEL_NEW_PASSWORD)}
               </label>
               <GlassInputWrapper>
                 <input
@@ -236,14 +241,14 @@ export default function ChangePasswordPage() {
                   value={newPassword}
                   onChange={(event) => setNewPassword(event.target.value)}
                   autoComplete="new-password"
-                  placeholder="Enter your new password"
+                  placeholder={t(TRANSLATION_KEYS.AUTH_PLACEHOLDER_NEW_PASSWORD_CHANGE)}
                   className="flex-1 bg-transparent text-sm p-4 pe-12 rounded-2xl focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowNewPassword((prev) => !prev)}
                   className="absolute inset-y-0 right-3 flex items-center z-10"
-                  aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                  aria-label={showNewPassword ? t(TRANSLATION_KEYS.AUTH_ARIA_HIDE_PASSWORD) : t(TRANSLATION_KEYS.AUTH_ARIA_SHOW_PASSWORD)}
                 >
                   {showNewPassword ? (
                     <EyeOff className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
@@ -289,18 +294,18 @@ export default function ChangePasswordPage() {
               disabled={isSubmitDisabled}
               className="animate-element animate-delay-550 w-full rounded-2xl bg-violet-500 py-4 font-medium text-violet-50 hover:bg-violet-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Updating password...' : 'Change password'}
+              {isLoading ? t(TRANSLATION_KEYS.AUTH_BUTTON_UPDATING_PASSWORD) : t(TRANSLATION_KEYS.AUTH_BUTTON_CHANGE_PASSWORD)}
             </button>
           </form>
 
           <p className="animate-element animate-delay-700 text-center text-sm text-muted-foreground">
-            Need to reset instead?{' '}
+            {t(TRANSLATION_KEYS.AUTH_NEED_RESET_INSTEAD)}{' '}
             <button
               type="button"
               onClick={() => router.push('/authentication/reset-password')}
               className="text-violet-400 hover:underline transition-colors"
             >
-              Go to reset password
+              {t(TRANSLATION_KEYS.AUTH_LINK_GO_TO_RESET_PASSWORD)}
             </button>
           </p>
         </div>

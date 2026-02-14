@@ -34,6 +34,12 @@ const buildConfigs = [
     output: 'gradian-table-embed.min.js',
     source: 'src/gradian-ui/data-display/table/utils/gradian-table-embed.cdn.js',
   },
+  {
+    name: 'Login Embed Helper',
+    config: 'scripts/webpack-cdn/webpack.cdn.login.config.js',
+    output: 'gradian-login-embed.min.js',
+    source: 'src/gradian-ui/shared/utils/gradian-login-embed.cdn.js',
+  },
 ];
 
 const projectRoot = path.resolve(__dirname, '..');

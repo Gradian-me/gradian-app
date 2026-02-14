@@ -17,12 +17,17 @@ import { toast } from 'sonner';
 import { decryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util';
 import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 const ACCESS_TOKEN_COOKIE = AUTH_CONFIG?.ACCESS_TOKEN_COOKIE || 'access_token';
 
 function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const language = useLanguageStore((s) => s.language);
+  const t = (key: string) => getT(key, language);
   const { setUser } = useUserStore();
   const [isMounted, setIsMounted] = useState(false);
   
@@ -40,7 +45,7 @@ function LoginPageContent() {
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    document.title = 'Login | Gradian';
+    document.title = t(TRANSLATION_KEYS.AUTH_TITLE_PAGE_LOGIN);
 
     // Decrypt returnUrl from query parameters
     const encryptedReturnUrl = searchParams.get('returnUrl');
@@ -74,7 +79,7 @@ function LoginPageContent() {
       .catch((err) => {
         loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN] Fingerprint init failed: ${err instanceof Error ? err.message : String(err)}`);
       });
-  }, [searchParams]);
+  }, [searchParams, language]);
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] ========== LOGIN PROCESS STARTED ==========');
@@ -97,7 +102,7 @@ function LoginPageContent() {
       })}`);
 
       if (!emailInput || !password) {
-        const errorMessage = 'Please enter both email and password';
+        const errorMessage = t(TRANSLATION_KEYS.AUTH_ERROR_ENTER_EMAIL_AND_PASSWORD);
         loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Validation failed: ${errorMessage}`);
         setError(errorMessage);
         toast.error(errorMessage);
@@ -135,11 +140,11 @@ function LoginPageContent() {
       loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Normalized email: ${email.includes('@') ? `${email.substring(0, 3)}***@${email.split('@')[1]}` : email}`);
       loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Original input: ${emailInput}, Tenant defaultDomain: ${tenantWithDefaultDomain?.defaultDomain || 'not set'}`);
 
-      // Derive tenant domain from explicit selection or current host (sent as X-Tenant-Domain)
-      const currentHost =
-        typeof window !== 'undefined' ? window.location.host : null;
-      const sanitizedHost = currentHost?.replace(/[^a-zA-Z0-9\.\-:]/g, '');
-      const tenantDomain = selectedTenant?.domain || sanitizedHost || null;
+      // Derive tenant domain: use selected tenant's domain, or app1.cinnagen.com when tenant is "none".
+      // Do not use current host (localhost/app host) when no tenant is selected—auth backend expects a tenant domain.
+      const DEFAULT_TENANT_DOMAIN = 'app1.cinnagen.com';
+      const tenantDomain = selectedTenant?.domain ?? DEFAULT_TENANT_DOMAIN;
+      const currentHost = typeof window !== 'undefined' ? window.location.host : null;
       loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Tenant domain: ${tenantDomain}`);
       loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Selected tenant: ${JSON.stringify(selectedTenant)}`);
       loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Current host: ${currentHost}`);
@@ -249,7 +254,7 @@ function LoginPageContent() {
           stack: fetchError instanceof Error ? fetchError.stack : undefined,
           name: fetchError instanceof Error ? fetchError.name : undefined,
         })}`);
-        const errorMessage = 'Network error: Failed to connect to the server';
+        const errorMessage = t(TRANSLATION_KEYS.AUTH_ERROR_NETWORK);
         setError(errorMessage);
         setStatusCode(null);
         setErrorDetails(null);

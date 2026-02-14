@@ -262,25 +262,31 @@ export async function POST(request: NextRequest) {
     })}`);
 
     if (upstreamResponse.status < 200 || upstreamResponse.status >= 300) {
+      const is5xx = upstreamResponse.status >= 500;
       loggingCustom(LogType.LOGIN_LOG, 'error', `External auth service returned error: ${JSON.stringify({
         status: upstreamResponse.status,
         error: upstreamJson?.error,
         message: upstreamJson?.message,
+        ...(is5xx && upstreamJson ? { fullUpstreamBody: upstreamJson } : {}),
       })}`);
+
+      const upstreamMessage = upstreamJson?.error || upstreamJson?.message;
+      const clientError =
+        is5xx
+          ? 'The authentication service is temporarily unavailable. Please try again later.'
+          : upstreamMessage || `Authentication service responded with status ${upstreamResponse.status}`;
+
       const errorResponse = {
         success: false,
-        error:
-          upstreamJson?.error ||
-          upstreamJson?.message ||
-          `Authentication service responded with status ${upstreamResponse.status}`,
+        error: clientError,
       };
 
-      // Forward cookies even on error responses (external service may set session cookies)
-      const errorNextResponse = NextResponse.json(errorResponse, { status: upstreamResponse.status });
+      const responseStatus = is5xx ? 502 : upstreamResponse.status;
+      const errorNextResponse = NextResponse.json(errorResponse, { status: responseStatus });
       loggingCustom(LogType.LOGIN_LOG, 'debug', 'Forwarding set-cookie headers from external auth (error response)...');
       forwardSetCookieHeadersFromAxios(upstreamResponse.headers, errorNextResponse);
 
-      loggingCustom(LogType.LOGIN_LOG, 'error', `Response (${upstreamResponse.status} - External Auth): ${JSON.stringify(errorResponse, null, 2)}`);
+      loggingCustom(LogType.LOGIN_LOG, 'error', `Response (${responseStatus} - External Auth${is5xx ? ', upstream 5xx' : ''}): ${JSON.stringify(errorResponse, null, 2)}`);
       return errorNextResponse;
     }
 

@@ -6770,5 +6770,50 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000002",
+    "timestamp": "2026-02-14T00:00:00.000Z",
+    "version": "1.51.003",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "FEATURE: Added login modal iframe embedding support with security headers for allowed origins, enhancing user authentication experience.",
+        "priority": "High",
+        "affectedDomains": [
+          "authentication",
+          "security",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "ADD: Introduced new build configuration for login embed helper.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "build",
+          "infrastructure"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "REFACTOR: Updated authentication pages to utilize translation keys for improved multilingual support.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "authentication",
+          "i18n"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "This update significantly enhances the security and accessibility of the authentication process across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "authentication",
+          "security",
+          "accessibility"
+        ]
+      }
+    ]
   }
 ]

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login embed via CDN</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f1f5f9; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; }
+    .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); max-width: 360px; }
+    h1 { font-size: 1.25rem; margin: 0 0 1rem; color: #1e293b; }
+    .btn { display: block; width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+    .btn-primary { background: #7c3aed; color: white; }
+    .btn-primary:hover { background: #6d28d9; }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-secondary:hover { background: #cbd5e1; }
+    p { color: #64748b; font-size: 0.875rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Login via CDN helper</h1>
+    <p>Uses <code>gradian-login-embed.min.js</code> only.</p>
+    <button type="button" class="btn btn-primary" id="nx_btnModal">Open login (modal)</button>
+  </div>
+
+  <script src="/cdn/gradian-login-embed.min.js"></script>
+  <!-- CDN auto-inits: reads ?app= and ?tenantDomain= (default tenant: app1.cinnagen.com), binds to #nx_btnModal and #nx_btnPopup. Override with GradianLoginEmbed.init({ baseUrl, tenantDomain, ... }). -->
+</body>
+</html>

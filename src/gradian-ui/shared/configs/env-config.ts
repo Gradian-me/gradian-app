@@ -120,6 +120,17 @@ export const ENABLE_BUILDER: boolean = (() => {
   return result;
 })();
 
+/**
+ * Enable sign-up (Create Account link on login, access to /authentication/sign-up)
+ * Server: ENABLE_SIGN_UP=true
+ * Client: NEXT_PUBLIC_ENABLE_SIGN_UP=true
+ */
+export const ENABLE_SIGN_UP: boolean = (() => {
+  if (typeof process === 'undefined') return false;
+  const value = process.env.NEXT_PUBLIC_ENABLE_SIGN_UP || process.env.ENABLE_SIGN_UP;
+  return toBoolean(value, false);
+})();
+
 // ===========================================
 // Localization
 // ===========================================
