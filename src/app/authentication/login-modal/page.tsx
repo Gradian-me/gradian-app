@@ -106,15 +106,39 @@ function LoginModalContent() {
 
   const handleEmbedSuccess = useCallback(() => {
     if (typeof window === 'undefined') return;
-    const allowed = isReturnOriginAllowed(returnOrigin);
-    if (!allowed || !returnOrigin) {
-      loggingCustom(LogType.CLIENT_LOG, 'warn', '[LOGIN-MODAL] returnOrigin missing or not in allowlist; redirecting to home');
+
+    const hasOpener = typeof window.opener !== 'undefined' && window.opener !== null && window.opener !== window;
+    const isPopup = hasOpener && !modalMode;
+
+    // No returnOrigin: close popup and reload opener, or reload parent (iframe modal)
+    if (!returnOrigin) {
+      if (isPopup && window.opener) {
+        try {
+          window.opener.location.reload();
+        } catch (e) {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN-MODAL] Opener reload failed: ${e instanceof Error ? e.message : String(e)}`);
+        }
+        window.close();
+        return;
+      }
+      if (modalMode) {
+        try {
+          window.parent.location.reload();
+        } catch (e) {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN-MODAL] Parent reload failed: ${e instanceof Error ? e.message : String(e)}`);
+        }
+        return;
+      }
       router.replace('/');
       return;
     }
 
-    const hasOpener = typeof window.opener !== 'undefined' && window.opener !== null && window.opener !== window;
-    const isPopup = hasOpener && !modalMode;
+    const allowed = isReturnOriginAllowed(returnOrigin);
+    if (!allowed) {
+      loggingCustom(LogType.CLIENT_LOG, 'warn', '[LOGIN-MODAL] returnOrigin not in allowlist; redirecting to home');
+      router.replace('/');
+      return;
+    }
 
     if (isPopup && window.opener) {
       try {
@@ -137,7 +161,6 @@ function LoginModalContent() {
     } catch (e) {
       loggingCustom(LogType.CLIENT_LOG, 'error', `[LOGIN-MODAL] postMessage failed: ${e instanceof Error ? e.message : String(e)}`);
     }
-    // Parent is expected to close the iframe on login-success; avoid navigating so overlay closes cleanly
   }, [returnOrigin, modalMode, router]);
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {

@@ -2,7 +2,7 @@
  * Gradian Login Embed - CDN helper for third-party sites
  *
  * Route: http://app1.cinnagen.com/authentication/login-modal
- * returnOrigin is set to the origin of the page where the button was clicked (window.location.origin).
+ * No returnOrigin. On successful login: popup closes and window.opener reloads; iframe modal triggers window.parent reload.
  *
  * Usage:
  * <script src="https://your-app.com/cdn/gradian-login-embed.min.js"></script>
@@ -11,8 +11,6 @@
  *   // or
  *   GradianLoginEmbed.openPopup();
  * </script>
- *
- * On login success: modal closes and page reloads; popup closes and opener reloads.
  */
 
 (function (global) {
@@ -20,7 +18,6 @@
 
   var LOGIN_BASE_URL = 'http://app1.cinnagen.com';
   var LOGIN_PATH = '/authentication/login-modal';
-  var RETURN_ORIGIN_FALLBACK = 'http://localhost:3000';
   var POPUP_W = 420;
   var POPUP_H = 540;
   var OVERLAY_ID = 'nx_gradian_login_embed_overlay';
@@ -28,26 +25,16 @@
   var FRAME_ID = 'nx_gradian_login_embed_frame';
   var CLOSE_ID = 'nx_gradian_login_embed_close';
 
-  /** Origin of the page that contains the embed (where the button was clicked). */
-  function getEmbedderOrigin() {
-    if (typeof window !== 'undefined' && window.location && window.location.origin) {
-      return window.location.origin;
-    }
-    return RETURN_ORIGIN_FALLBACK;
-  }
-
-  /** Build login URL with returnOrigin = embedder origin and modalMode. Tenant is derived from request host. */
+  /** Build login URL with only modalMode (no returnOrigin). On success login page reloads parent/opener. */
   function buildLoginUrl(modalMode) {
     var base = (LOGIN_BASE_URL || '').replace(/\/$/, '');
-    var returnOrigin = getEmbedderOrigin();
-    var url = base + LOGIN_PATH + '?returnOrigin=' + encodeURIComponent(returnOrigin);
-    if (modalMode) url += '&modalMode=true';
+    var url = base + LOGIN_PATH;
+    if (modalMode) url += '?modalMode=true';
     return url;
   }
 
   /**
-   * Open login in a centered popup. On success the opener reloads and popup closes.
-   * returnOrigin = origin of the page where the button was clicked (embedder).
+   * Open login in a centered popup. On success the login page closes popup and reloads window.opener.
    */
   function openPopup() {
     var url = buildLoginUrl(false);
@@ -100,8 +87,7 @@
   }
 
   /**
-   * Open login in an in-page modal (iframe). On login-success the modal closes and page reloads.
-   * returnOrigin = origin of the page where the button was clicked (embedder).
+   * Open login in an in-page modal (iframe). On success the login page reloads window.parent (this page).
    */
   function openModal() {
     var url = buildLoginUrl(true);
@@ -111,26 +97,9 @@
     var frame = dom.frame;
     var closeBtn = dom.close;
 
-    function closeAndReload() {
-      overlay.style.display = 'none';
-      frame.src = 'about:blank';
-      window.removeEventListener('message', onMessage);
-      window.location.reload();
-    }
-
     function closeOnly() {
       overlay.style.display = 'none';
       frame.src = 'about:blank';
-      window.removeEventListener('message', onMessage);
-    }
-
-    function onMessage(event) {
-      try {
-        if (event.origin !== new URL(LOGIN_BASE_URL).origin) return;
-      } catch (e) { return; }
-      if (event.data && event.data.type === 'login-success') {
-        closeAndReload();
-      }
     }
 
     closeBtn.onclick = closeOnly;
@@ -138,7 +107,6 @@
       if (e.target === overlay) closeOnly();
     };
 
-    window.addEventListener('message', onMessage);
     frame.src = url;
     overlay.style.display = 'flex';
   }
