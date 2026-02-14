@@ -1,12 +1,15 @@
 /**
  * Gradian Login Embed - CDN helper for third-party sites
  *
+ * Route: http://app1.cinnagen.com/authentication/login-modal
+ * returnOrigin is set to the origin of the page where the button was clicked (window.location.origin).
+ *
  * Usage:
  * <script src="https://your-app.com/cdn/gradian-login-embed.min.js"></script>
  * <script>
- *   GradianLoginEmbed.openModal({ baseUrl: 'https://your-app.com' });
+ *   GradianLoginEmbed.openModal();
  *   // or
- *   GradianLoginEmbed.openPopup({ baseUrl: 'https://your-app.com' });
+ *   GradianLoginEmbed.openPopup();
  * </script>
  *
  * On login success: modal closes and page reloads; popup closes and opener reloads.
@@ -15,7 +18,10 @@
 (function (global) {
   'use strict';
 
+  var LOGIN_BASE_URL = 'http://app1.cinnagen.com';
   var LOGIN_PATH = '/authentication/login-modal';
+  var RETURN_ORIGIN_FALLBACK = 'http://localhost:3000';
+  var TENANT_DOMAIN = 'app1.cinnagen.com';
   var POPUP_W = 420;
   var POPUP_H = 540;
   var OVERLAY_ID = 'nx_gradian_login_embed_overlay';
@@ -23,29 +29,32 @@
   var FRAME_ID = 'nx_gradian_login_embed_frame';
   var CLOSE_ID = 'nx_gradian_login_embed_close';
 
-  function buildLoginUrl(baseUrl, returnOrigin, modalMode, tenantDomain) {
-    var base = (baseUrl || '').replace(/\/$/, '');
-    var url = base + LOGIN_PATH + '?returnOrigin=' + encodeURIComponent(returnOrigin || (typeof window !== 'undefined' ? window.location.origin : ''));
+  /** Origin of the page that contains the embed (where the button was clicked). */
+  function getEmbedderOrigin() {
+    if (typeof window !== 'undefined' && window.location && window.location.origin) {
+      return window.location.origin;
+    }
+    return RETURN_ORIGIN_FALLBACK;
+  }
+
+  /** Build login URL with returnOrigin = embedder origin, modalMode, tenantDomain. */
+  function buildLoginUrl(modalMode) {
+    var base = (LOGIN_BASE_URL || '').replace(/\/$/, '');
+    var returnOrigin = getEmbedderOrigin();
+    var url = base + LOGIN_PATH + '?returnOrigin=' + encodeURIComponent(returnOrigin);
     if (modalMode) url += '&modalMode=true';
-    if (tenantDomain && typeof tenantDomain === 'string' && /^[a-zA-Z0-9.\-]+$/.test(tenantDomain.trim())) {
-      url += '&tenantDomain=' + encodeURIComponent(tenantDomain.trim());
+    if (TENANT_DOMAIN && /^[a-zA-Z0-9.\-]+$/.test(TENANT_DOMAIN.trim())) {
+      url += '&tenantDomain=' + encodeURIComponent(TENANT_DOMAIN.trim());
     }
     return url;
   }
 
   /**
    * Open login in a centered popup. On success the opener reloads and popup closes.
+   * returnOrigin = origin of the page where the button was clicked (embedder).
    */
-  function openPopup(options) {
-    options = options || {};
-    var baseUrl = options.baseUrl;
-    if (!baseUrl) {
-      console.warn('[GradianLoginEmbed] baseUrl is required');
-      return null;
-    }
-    var returnOrigin = options.returnOrigin || (typeof window !== 'undefined' ? window.location.origin : '');
-    var tenantDomain = options.tenantDomain || '';
-    var url = buildLoginUrl(baseUrl, returnOrigin, false, tenantDomain);
+  function openPopup() {
+    var url = buildLoginUrl(false);
     var left = (window.screen.width - POPUP_W) / 2;
     var top = (window.screen.height - POPUP_H) / 2;
     var features = 'width=' + POPUP_W + ',height=' + POPUP_H + ',left=' + Math.round(left) + ',top=' + Math.round(top) + ',scrollbars=yes';
@@ -96,17 +105,10 @@
 
   /**
    * Open login in an in-page modal (iframe). On login-success the modal closes and page reloads.
+   * returnOrigin = origin of the page where the button was clicked (embedder).
    */
-  function openModal(options) {
-    options = options || {};
-    var baseUrl = options.baseUrl;
-    if (!baseUrl) {
-      console.warn('[GradianLoginEmbed] baseUrl is required');
-      return;
-    }
-    var returnOrigin = options.returnOrigin || (typeof window !== 'undefined' ? window.location.origin : '');
-    var tenantDomain = options.tenantDomain || '';
-    var url = buildLoginUrl(baseUrl, returnOrigin, true, tenantDomain);
+  function openModal() {
+    var url = buildLoginUrl(true);
 
     var dom = ensureModalDOM();
     var overlay = dom.overlay;
@@ -128,7 +130,7 @@
 
     function onMessage(event) {
       try {
-        if (event.origin !== new URL(baseUrl).origin) return;
+        if (event.origin !== new URL(LOGIN_BASE_URL).origin) return;
       } catch (e) { return; }
       if (event.data && event.data.type === 'login-success') {
         closeAndReload();
@@ -147,45 +149,27 @@
 
   var DEFAULT_MODAL_BTN_ID = 'nx_btnModal';
   var DEFAULT_POPUP_BTN_ID = 'nx_btnPopup';
-  var DEFAULT_TENANT_DOMAIN = 'app1.cinnagen.com';
-
-  function getQueryParam(name, fallback) {
-    if (typeof window === 'undefined' || !window.location || !window.location.search) return fallback;
-    var p = new URLSearchParams(window.location.search).get(name);
-    return p !== null && p !== '' ? p : fallback;
-  }
-
-  function getDefaultBaseUrl() {
-    if (typeof window === 'undefined' || !window.location || !window.location.origin) return '';
-    var origin = window.location.origin;
-    return origin.indexOf('3001') >= 0 ? 'https://app1.cinnagen.com' : origin;
-  }
 
   /**
-   * Optional init: read baseUrl and tenantDomain from URL params (or defaults), bind to buttons.
-   * Call with no args to use default button ids nx_btnModal, nx_btnPopup and params app, tenantDomain.
-   * Options: baseUrl, tenantDomain, modalButtonId, popupButtonId, paramApp, paramTenantDomain, defaultTenantDomain.
+   * Optional init: bind default button ids (nx_btnModal, nx_btnPopup) to openModal/openPopup.
+   * Route and params are fixed in-code (app1.cinnagen.com, returnOrigin, tenantDomain).
+   * Options: modalButtonId, popupButtonId.
    */
   function init(options) {
     options = options || {};
     var doc = typeof document !== 'undefined' ? document : null;
     if (!doc) return;
 
-    var paramApp = options.paramApp != null ? options.paramApp : 'app';
-    var paramTenantDomain = options.paramTenantDomain != null ? options.paramTenantDomain : 'tenantDomain';
-    var defaultTenant = options.defaultTenantDomain != null ? options.defaultTenantDomain : DEFAULT_TENANT_DOMAIN;
-    var baseUrl = options.baseUrl != null ? options.baseUrl : getQueryParam(paramApp, getDefaultBaseUrl());
-    var tenantDomain = options.tenantDomain != null ? options.tenantDomain : getQueryParam(paramTenantDomain, defaultTenant);
     var modalId = options.modalButtonId != null ? options.modalButtonId : DEFAULT_MODAL_BTN_ID;
     var popupId = options.popupButtonId != null ? options.popupButtonId : DEFAULT_POPUP_BTN_ID;
 
     var modalBtn = doc.getElementById(modalId);
     var popupBtn = doc.getElementById(popupId);
     if (modalBtn) {
-      modalBtn.onclick = function () { openModal({ baseUrl: baseUrl, tenantDomain: tenantDomain }); };
+      modalBtn.onclick = function () { openModal(); };
     }
     if (popupBtn) {
-      popupBtn.onclick = function () { openPopup({ baseUrl: baseUrl, tenantDomain: tenantDomain }); };
+      popupBtn.onclick = function () { openPopup(); };
     }
   }
 
