@@ -97,11 +97,21 @@ export const DiscussionInputDialog: React.FC<DiscussionInputDialogProps> = ({
     [isSubmitting, onOpenChange]
   );
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleSubmit();
+      }
+    },
+    [handleSubmit]
+  );
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
-        className={cn('max-w-3xl z-[110]', className)}
-        overlayClassName="z-[105] bg-black/70 backdrop-blur-sm"
+        className={cn('max-w-4xl w-[95vw] z-[110]', className)}
+        overlayClassName="z-[105] bg-black/70 dark:bg-black/80 backdrop-blur-sm"
         hideCloseButton={isSubmitting}
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
@@ -113,22 +123,33 @@ export const DiscussionInputDialog: React.FC<DiscussionInputDialogProps> = ({
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div>
-            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+            <label className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide block mb-2">
               {t(TRANSLATION_KEYS.DISCUSSION_LABEL_MESSAGE)}
             </label>
             <Textarea
               config={{
                 name: 'discussion-message',
-                placeholder: t('DISCUSSION_PLACEHOLDER_MESSAGE'),
+                placeholder: t(TRANSLATION_KEYS.DISCUSSION_PLACEHOLDER_MESSAGE),
               }}
               value={message}
               onChange={(v) => setMessage(typeof v === 'string' ? v : '')}
+              onKeyDown={handleKeyDown}
               rows={5}
               disabled={isSubmitting}
-              resize="none"
+              resize="vertical"
               aiAgentId="professional-writing"
               enableVoiceInput
-              className="resize-none"
+              className={cn(
+                'min-h-[120px] md:min-h-[140px] px-4 md:px-5 py-3 md:py-4 rounded-xl border',
+                'bg-white/80 dark:bg-gray-700/80 backdrop-blur-sm',
+                'border-violet-200/50 dark:border-violet-700/50',
+                'text-gray-900 dark:text-gray-100',
+                'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+                'focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:border-violet-400',
+                'dark:focus-visible:ring-violet-500/50 dark:focus-visible:border-violet-500 dark:ring-offset-gray-900',
+                'shadow-sm transition-all duration-200 direction-auto leading-relaxed text-sm',
+                'disabled:dark:bg-gray-800/50 disabled:dark:text-gray-400'
+              )}
             />
           </div>
           <div>

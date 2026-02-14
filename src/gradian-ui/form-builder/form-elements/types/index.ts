@@ -82,6 +82,7 @@ export interface TextareaProps extends FormElementProps {
   aiAgentId?: string;
   enableVoiceInput?: boolean;
   loadingTextSwitches?: string | string[];
+  onKeyDown?: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
 }
 
 export interface CheckboxProps extends FormElementProps {
