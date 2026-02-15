@@ -117,6 +117,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         onValueChange={handleValueChange}
         onNormalizedChange={handleNormalizedChange}
         options={optionsWithConfig}
+        sortAtoZ={false}
         disabled={disabled}
         error={error}
         required={required}

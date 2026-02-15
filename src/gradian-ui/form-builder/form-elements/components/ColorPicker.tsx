@@ -77,27 +77,27 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   // Use options from config if provided, otherwise use default Tailwind colors
   const colorOptions = config?.options && config.options.length > 0
     ? config.options.map((opt: any) => {
-        const colorId = String(opt.id || opt.value || opt);
-        const colorName = opt.color || colorId;
-        // If color already starts with 'bg-', use it as-is, otherwise prepend 'bg-' and append '-500'
-        const colorClass = colorName.startsWith('bg-') 
-          ? colorName 
-          : `bg-${colorName}-500`;
-        return {
-          id: colorId,
-          label: opt.label || colorId,
-          color: colorClass,
-        };
-      })
+      const colorId = String(opt.id || opt.value || opt);
+      const colorName = opt.color || colorId;
+      // If color already starts with 'bg-', use it as-is, otherwise prepend 'bg-' and append '-500'
+      const colorClass = colorName.startsWith('bg-')
+        ? colorName
+        : `bg-${colorName}-500`;
+      return {
+        id: colorId,
+        label: opt.label || colorId,
+        color: colorClass,
+      };
+    })
     : TAILWIND_COLOR_OPTIONS;
-  
+
   // Use defaultValue from config if value is not provided
   const resolvedValue = value ?? config?.defaultValue ?? undefined;
 
   // Handle value change from Select component
   const handleValueChange = (selectedValue: string) => {
     if (!onChange) return;
-    
+
     // Support both value handler (new - preferred) and event handler (old - backward compatibility)
     if (typeof onChange === 'function') {
       // Try value handler first (new pattern - preferred)
@@ -118,13 +118,14 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
           validation: config?.validation,
         }}
         options={colorOptions}
-          value={resolvedValue}
+        value={resolvedValue}
         onValueChange={handleValueChange}
         error={error}
-          disabled={disabled}
+        disabled={disabled}
         required={isRequired}
+        sortAtoZ={false}
         className={className}
-        />
+      />
     </div>
   );
 };

@@ -6942,5 +6942,30 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000007",
+    "timestamp": "2026-02-16T00:00:00.000Z",
+    "version": "1.51.009",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "REFACTOR: Improved IntegrationCompaniesPicker component to utilize tenant-specific related companies, ensuring better data handling and user experience.",
+        "priority": "High",
+        "affectedDomains": [
+          "integrations",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "ADD: Enhanced CompanySelector to exclusively use tenant-store related companies, streamlining company selection logic. This update significantly improves data integrity and user interaction across the application.",
+        "priority": "High",
+        "affectedDomains": [
+          "ui",
+          "layout"
+        ]
+      }
+    ]
   }
 ]

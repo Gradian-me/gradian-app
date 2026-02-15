@@ -10,7 +10,6 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useCompanyStore } from '@/stores/company.store';
 import { useTenantStore } from '@/stores/tenant.store';
-import { useUserStore } from '@/stores/user.store';
 import { useTheme } from 'next-themes';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -51,7 +50,6 @@ export function CompanySelector({
 }: CompanySelectorProps) {
   const { selectedCompany, setSelectedCompany } = useCompanyStore();
   const { selectedTenant } = useTenantStore();
-  const user = useUserStore((state) => state.user);
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
@@ -82,17 +80,12 @@ export function CompanySelector({
 
     const loadCompanies = async () => {
       try {
-        // Prefer user.relatedCompanies to avoid network call
-        const relatedFromUser: RelatedCompanyLike[] = (user?.relatedCompanies || []) as RelatedCompanyLike[];
-
+        // Use only tenant-store relatedCompanies. Never use user.relatedCompanies.
         const tenant = selectedTenant;
         
-        // If not in store, read directly from localStorage
         let relatedCompanies: RelatedCompanyLike[] = [];
         
-        if (relatedFromUser && relatedFromUser.length > 0) {
-          relatedCompanies = relatedFromUser;
-        } else if (tenant && tenant['relatedCompanies']) {
+        if (tenant && tenant['relatedCompanies'] && (tenant['relatedCompanies'] as RelatedCompanyLike[]).length > 0) {
           relatedCompanies = tenant['relatedCompanies'] as RelatedCompanyLike[];
         } else if (typeof window !== 'undefined') {
           const tenantStoreData = localStorage.getItem('tenant-store');
@@ -104,7 +97,7 @@ export function CompanySelector({
           }
         }
 
-        // If we have relatedCompanies from user/tenant, use them
+        // If we have relatedCompanies from tenant, use them
         if (relatedCompanies && relatedCompanies.length > 0) {
           const mappedCompanies: Company[] = relatedCompanies.map((company: RelatedCompanyLike) => ({
             id: company.id,

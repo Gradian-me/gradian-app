@@ -14,6 +14,7 @@ import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
 import { useLanguageStore } from '@/stores/language.store';
+import { useTenantStore } from '@/stores/tenant.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
@@ -53,18 +54,23 @@ interface Tenant {
   [key: string]: any;
 }
 
+type RelatedCompanyLike = { id: string | number; label?: string; name?: string };
+
 interface IntegrationCompaniesPickerProps {
   integrationId: string;
+  selectedTenant: { id: string | number; name: string; domain?: string; relatedCompanies?: RelatedCompanyLike[]; [key: string]: any } | null;
   selectedCompanies: Array<{ id: string; label: string }>;
   onCompaniesChange: (companies: Array<{ id: string; label: string }>) => void;
 }
 
 const IntegrationCompaniesPicker: React.FC<IntegrationCompaniesPickerProps> = ({
   integrationId,
+  selectedTenant,
   selectedCompanies,
   onCompaniesChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { selectedTenant: globalTenant } = useTenantStore();
 
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
@@ -73,12 +79,27 @@ const IntegrationCompaniesPicker: React.FC<IntegrationCompaniesPickerProps> = ({
     onCompaniesChange(selections);
   };
 
+  // Use only tenant's relatedCompanies - never fetch all companies. Fallback to tenant-store when card tenant matches global.
+  const companyOptions = useMemo(() => {
+    let related = selectedTenant?.['relatedCompanies'] as RelatedCompanyLike[] | undefined;
+    if ((!related || related.length === 0) && selectedTenant && globalTenant && String(selectedTenant.id) === String(globalTenant.id)) {
+      related = (globalTenant as any)?.['relatedCompanies'];
+    }
+    if (!related || !Array.isArray(related) || related.length === 0) return [];
+    return related.map((c) => ({
+      id: String(c.id),
+      label: c.label ?? c.name ?? String(c.id),
+    }));
+  }, [selectedTenant, globalTenant]);
+
   const label =
     selectedCompanies.length === 0
       ? 'All companies'
       : selectedCompanies.length === 1
         ? selectedCompanies[0].label
         : `${selectedCompanies.length} companies selected`;
+
+  const isDisabled = !selectedTenant || companyOptions.length === 0;
 
   return (
     <div className="flex flex-col gap-1">
@@ -88,16 +109,24 @@ const IntegrationCompaniesPicker: React.FC<IntegrationCompaniesPickerProps> = ({
       <button
         type="button"
         onClick={handleOpen}
-        className="inline-flex items-center justify-between w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-900 dark:text-gray-100 shadow-sm hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        disabled={isDisabled}
+        className="inline-flex items-center justify-between w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-gray-900 dark:text-gray-100 shadow-sm hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-background"
       >
-        <span className="truncate text-start">{label}</span>
-        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">Change</span>
+        <span className="truncate text-start">
+          {!selectedTenant
+            ? 'Select tenant first'
+            : companyOptions.length === 0
+              ? 'No companies for this tenant'
+              : label}
+        </span>
+        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400 shrink-0">Change</span>
       </button>
 
       <PopupPicker
         isOpen={isOpen}
         onClose={handleClose}
         schemaId="companies"
+        staticItems={companyOptions}
         onSelect={async (selections, _raw) => {
           await handleSelect(
             selections.map((s) => ({
@@ -109,7 +138,7 @@ const IntegrationCompaniesPicker: React.FC<IntegrationCompaniesPickerProps> = ({
           handleClose();
         }}
         title="Select companies"
-        description="Select one or more companies to scope this integration."
+        description="Select one or more companies to scope this integration. Only companies for the selected tenant are shown."
         allowMultiselect
         selectedIds={selectedCompanies.map((c) => c.id)}
         showAddButton={false}
@@ -1326,12 +1355,19 @@ export default function IntegrationsPage() {
                                 ...prev,
                                 [integration.id]: tenant,
                               }));
+                              // Clear companies when tenant changes - companies are tenant-scoped
+                              setCardCompanies(prev => {
+                                const next = { ...prev };
+                                delete next[integration.id];
+                                return next;
+                              });
                             }}
                           />
 
                           {/* Optional related companies picker after tenant */}
                           <IntegrationCompaniesPicker
                             integrationId={integration.id}
+                            selectedTenant={cardTenants[integration.id]}
                             selectedCompanies={cardCompanies[integration.id] || []}
                             onCompaniesChange={(companies) => {
                               setCardCompanies((prev) => ({
