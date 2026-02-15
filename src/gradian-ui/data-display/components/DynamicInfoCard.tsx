@@ -8,6 +8,7 @@ import React from 'react';
 import { useLanguageStore } from '@/stores/language.store';
 import { isRTL, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { getSectionTranslatedTitle, getSectionTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
+import { resolveSchemaFieldLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { resolveFieldById } from '../../form-builder/form-elements/utils/field-resolver';
 import { CardContent, CardHeader, CardTitle, CardWrapper } from '../card/components/CardWrapper';
@@ -69,8 +70,16 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const defaultLang = getDefaultLanguage();
   const isRtl = isRTL(language);
-  const sectionTitle = getSectionTranslatedTitle(section, language ?? defaultLang, section.title || section.id);
-  const sectionDescription = getSectionTranslatedDescription(section, language ?? defaultLang, section.description ?? '');
+  const sectionTitle = getSectionTranslatedTitle(
+    section,
+    language ?? defaultLang,
+    typeof section.title === 'string' ? section.title : section.id
+  );
+  const sectionDescription = getSectionTranslatedDescription(
+    section,
+    language ?? defaultLang,
+    typeof section.description === 'string' ? (section.description ?? '') : ''
+  );
 
   // Default grid columns and gap (removed from schema)
   const gridColumns = 2 as 1 | 2 | 3;
@@ -80,16 +89,22 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
   // Note: colSpan is now handled at the parent grid container level in DynamicDetailPageRenderer
   const cardClasses = cn(className);
 
-  // Resolve fields by IDs
+  // Resolve fields by IDs; translate labels from field.translations or field.label
   const fields = (section.fieldIds || []).map(fieldId => {
     const field = resolveFieldById(schema, fieldId);
     if (!field) return null;
     
     const value = getFieldValue(field, data);
+    const resolvedLabel =
+      resolveSchemaFieldLabel(
+        { label: field.label, translations: field.translations },
+        language ?? defaultLang,
+        defaultLang
+      ) || (typeof field.label === 'string' ? field.label : field.name);
     return {
       ...field,
       value,
-      label: field.label || field.name,
+      label: resolvedLabel,
       icon: field.icon
     };
   }).filter(Boolean);
@@ -369,12 +384,12 @@ export const DynamicInfoCard: React.FC<DynamicInfoCardProps> = ({
                   <div className={cn(
                     "flex items-center gap-2",
                     (isListInput || isPicker) && "flex-col items-start"
-                  )} dir="auto">
+                  )}>
                     <div className={cn(
                       "text-sm text-gray-900 dark:text-gray-200 overflow-wrap-anywhere wrap-break-word",
                       (isListInput || isPicker) ? "w-full min-w-0" : "flex-1 min-w-0",
                       (isListInput || isPicker) && "min-w-0"
-                    )} dir="auto">
+                    )}>
                       {field.component === 'formula' && field.formula ? (
                         <FormulaDisplay field={field} data={data} schema={schema} />
                       ) : (

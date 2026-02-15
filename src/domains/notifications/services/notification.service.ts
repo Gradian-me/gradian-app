@@ -2,6 +2,11 @@ import { Notification, NotificationFilters, NotificationGroup } from '../types';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import type { EngagementWithInteraction } from '@/domains/engagements/types';
 
+function getCreatedByUserId(createdBy: Notification['createdBy']): string | undefined {
+  if (createdBy == null) return undefined;
+  return typeof createdBy === 'string' ? createdBy : createdBy.userId;
+}
+
 /** Transform engagement + interaction from API to Notification shape for UI */
 function engagementToNotification(item: EngagementWithInteraction): Notification {
   const e = item;
@@ -10,6 +15,13 @@ function engagementToNotification(item: EngagementWithInteraction): Notification
   const category = (meta.category as string) ?? 'system';
   const actionUrl = meta.actionUrl as string | undefined;
   const interaction = item.interaction;
+
+  const isRead =
+    interaction?.interactionType === 'read' ||
+    interaction?.interactionType === 'acknowledge' ||
+    interaction?.interactionType === 'mention' ||
+    (interaction?.isRead ?? false);
+  const readAt = interaction?.interactedAt ?? interaction?.readAt;
 
   return {
     id: e.id,
@@ -22,9 +34,9 @@ function engagementToNotification(item: EngagementWithInteraction): Notification
       | 'important',
     category: category as Notification['category'],
     priority: (e.priority ?? 'medium') as Notification['priority'],
-    isRead: interaction?.isRead ?? false,
+    isRead,
     createdAt: new Date(e.createdAt),
-    readAt: interaction?.readAt ? new Date(interaction.readAt) : undefined,
+    readAt: readAt ? new Date(readAt) : undefined,
     acknowledgedAt:
       interaction?.outputType && interaction.interactedAt
         ? new Date(interaction.interactedAt)
@@ -32,7 +44,7 @@ function engagementToNotification(item: EngagementWithInteraction): Notification
     interactionType: (e.interactionType ?? 'canRead') as
       | 'canRead'
       | 'needsAcknowledgement',
-    createdBy: typeof e.createdBy === 'string' ? e.createdBy : e.createdBy?.userId,
+    createdBy: e.createdBy,
     assignedTo: undefined,
     actionUrl,
     metadata: e.metadata as Notification['metadata'],
@@ -52,13 +64,8 @@ const getCurrentUserId = (): string | null => {
 async function getNotificationsFromAPI(
   filters?: NotificationFilters,
 ): Promise<Notification[]> {
-  const userId = getCurrentUserId();
-  if (!userId) return [];
-
   try {
-    const params: Record<string, string> = {
-      currentUserId: userId,
-    };
+    const params: Record<string, string> = {};
     if (filters?.search) params.search = filters.search;
     if (filters?.type) params.type = filters.type;
     if (filters?.category) params.category = filters.category;
@@ -70,7 +77,7 @@ async function getNotificationsFromAPI(
       '/api/engagements/notifications',
       {
         method: 'GET',
-        params,
+        params: Object.keys(params).length ? params : undefined,
         callerName: 'NotificationService.getNotifications',
       },
     );
@@ -82,8 +89,10 @@ async function getNotificationsFromAPI(
     );
 
     if (filters?.sourceType) {
+      const userId = getCurrentUserId();
       list = list.filter((n) => {
-        if (filters.sourceType === 'createdByMe') return n.createdBy === userId;
+        if (!userId) return true;
+        if (filters.sourceType === 'createdByMe') return getCreatedByUserId(n.createdBy) === userId;
         if (filters.sourceType === 'assignedToMe')
           return n.assignedTo?.some((a) => a.userId === userId) ?? false;
         return true;
@@ -131,18 +140,9 @@ export class NotificationService {
     currentUserId?: string,
   ): Promise<NotificationGroup[]> {
     const notifications = await this.getNotifications(filters);
-    const needsAcknowledgement = notifications.filter(
-      (n) => n.interactionType === 'needsAcknowledgement',
-    );
-    const other = notifications.filter(
-      (n) => n.interactionType !== 'needsAcknowledgement',
-    );
-    needsAcknowledgement.sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-    );
 
     const groups: Record<string, Notification[]> = {};
-    other.forEach((n) => {
+    notifications.forEach((n) => {
       const key =
         groupBy === 'type'
           ? n.type
@@ -150,28 +150,25 @@ export class NotificationService {
             ? n.priority
             : groupBy === 'status'
               ? (n.isRead ? 'read' : 'unread')
-              : n.category;
+              : n.interactionType === 'needsAcknowledgement'
+                ? 'needs_acknowledgement'
+                : n.category;
       if (!groups[key]) groups[key] = [];
       groups[key].push(n);
     });
 
-    const result: NotificationGroup[] = [];
-    if (needsAcknowledgement.length > 0) {
-      result.push({
-        category: 'needs_acknowledgement',
-        notifications: needsAcknowledgement,
-        unreadCount: needsAcknowledgement.filter((n) => !n.isRead).length,
-        totalCount: needsAcknowledgement.length,
-      });
-    }
-    result.push(
-      ...Object.entries(groups).map(([category, notifications]) => ({
+    const sortByDateDesc = (a: Notification, b: Notification) =>
+      b.createdAt.getTime() - a.createdAt.getTime();
+
+    const result: NotificationGroup[] = Object.entries(groups)
+      .map(([category, notifs]) => ({
         category,
-        notifications,
-        unreadCount: notifications.filter((n) => !n.isRead).length,
-        totalCount: notifications.length,
-      })),
-    );
+        notifications: [...notifs].sort(sortByDateDesc),
+        unreadCount: notifs.filter((n) => !n.isRead).length,
+        totalCount: notifs.length,
+      }))
+      .sort((a, b) => a.category.localeCompare(b.category, undefined, { sensitivity: 'base' }));
+
     return result;
   }
 
@@ -252,15 +249,14 @@ export class NotificationService {
     );
   }
 
-  static async getUnreadCount(currentUserId?: string): Promise<number> {
-    const userId = currentUserId ?? getCurrentUserId();
-    if (!userId) return 0;
+  static async getUnreadCount(_currentUserId?: string): Promise<number> {
+    if (!getCurrentUserId()) return 0;
     try {
       const response = await apiRequest<number>(
         '/api/engagements/notifications/count',
         {
           method: 'GET',
-          params: { currentUserId: userId, isRead: 'false' },
+          params: { isRead: 'false' },
           callerName: 'NotificationService.getUnreadCount',
         },
       );

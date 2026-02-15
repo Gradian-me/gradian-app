@@ -1,3 +1,5 @@
+import type { EngagementCreatedByUser } from '@/domains/engagements/types';
+
 export interface AssignedToItem {
   userId: string;
   interactedAt?: Date;
@@ -16,7 +18,8 @@ export interface Notification {
   readAt?: Date;
   acknowledgedAt?: Date;
   interactionType?: 'canRead' | 'needsAcknowledgement';
-  createdBy?: string;
+  /** User id (string) or full user object from API for display */
+  createdBy?: string | EngagementCreatedByUser;
   assignedTo?: AssignedToItem[];
   actionUrl?: string;
   metadata?: Record<string, any>;

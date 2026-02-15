@@ -477,8 +477,9 @@ label {
   }
 }
 
-/* Sonner Toast Styles */
+/* Sonner Toast Styles - use site font (Estedad) for Persian/RTL support */
 [data-sonner-toast] {
+  font-family: 'Estedad', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
   background-color: hsl(var(--popover)) !important;
   color: hsl(var(--popover-foreground)) !important;
   border: 1px solid hsl(var(--border)) !important;

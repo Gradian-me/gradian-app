@@ -30,12 +30,22 @@ export async function GET(request: NextRequest) {
     const active = filterOutDeletedGroups(groups);
 
     const { searchParams } = new URL(request.url);
-    const referenceSchemaId = searchParams.get('referenceSchemaId');
-    const referenceInstanceId = searchParams.get('referenceInstanceId');
+    const referenceType = searchParams.get('referenceType') ?? undefined;
+    const referenceId = searchParams.get('referenceId') ?? undefined;
+    const referenceSchemaId = searchParams.get('referenceSchemaId') ?? undefined; // legacy
+    const referenceInstanceId = searchParams.get('referenceInstanceId') ?? undefined;
 
     let filtered = active;
-    if (referenceSchemaId)
-      filtered = filtered.filter((g) => g.referenceSchemaId === referenceSchemaId);
+    if (referenceType && referenceId)
+      filtered = filtered.filter(
+        (g) => g.referenceType === referenceType && g.referenceId === referenceId,
+      );
+    else if (referenceSchemaId)
+      filtered = filtered.filter(
+        (g) =>
+          g.referenceSchemaId === referenceSchemaId ||
+          (g.referenceType === 'schema' && g.referenceId === referenceSchemaId),
+      );
     if (referenceInstanceId)
       filtered = filtered.filter(
         (g) => g.referenceInstanceId === referenceInstanceId,
@@ -92,9 +102,13 @@ export async function POST(request: NextRequest) {
 
     const now = new Date().toISOString();
     const id = (bodyObj.id as string) ?? ulid();
+    const refType = bodyObj.referenceType as string | undefined;
+    const refId = bodyObj.referenceId as string | undefined;
+    const refSchemaId = bodyObj.referenceSchemaId as string | undefined;
     const newGroup: EngagementGroup = {
       id: String(id),
-      referenceSchemaId: bodyObj.referenceSchemaId as string | undefined,
+      referenceType: refType ?? (refSchemaId ? 'schema' : undefined),
+      referenceId: refId ?? refSchemaId,
       referenceInstanceId: bodyObj.referenceInstanceId as string | undefined,
       title: bodyObj.title as string | undefined,
       description: bodyObj.description as string | undefined,

@@ -83,7 +83,6 @@ export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            dir="ltr"
             className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}

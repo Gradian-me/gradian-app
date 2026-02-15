@@ -8,6 +8,7 @@ import {
   createEngagement,
   enrichEngagementWithCreatedBy,
   enrichEngagementsWithCreatedBy,
+  enrichEngagementsWithInteractions,
   findGroupByReference,
   getOrCreateGroupForReference,
   listEngagements,
@@ -84,10 +85,21 @@ export async function GET(
       });
     }
 
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get('search') ?? undefined;
+    const authUserId = authResult.userId?.trim();
+    const tokenUserId = !authUserId ? getUserIdFromRequest(request) : null;
+    const currentUserId =
+      searchParams.get('currentUserId') ?? authUserId ?? (tokenUserId ?? undefined);
+
     let data = listEngagements({
       engagementType,
       engagementGroupId: group.id,
+      search,
     });
+    if (currentUserId) {
+      data = enrichEngagementsWithInteractions(data, currentUserId);
+    }
     data = await enrichEngagementsWithCreatedBy(data);
 
     return NextResponse.json({

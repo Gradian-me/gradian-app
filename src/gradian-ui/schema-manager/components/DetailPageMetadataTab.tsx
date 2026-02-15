@@ -16,7 +16,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useAiAgents } from '@/domains/ai-builder';
 import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
-import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, isTranslationArray, recordToTranslationArray, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
@@ -373,7 +373,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                   className="text-base cursor-pointer hover:text-violet-600 transition-colors flex-1"
                                   onClick={() => toggleItem(`section-${section.id}`)}
                                 >
-                                  {section.title || labelUntitledSection}
+                                  {resolveDisplayLabel(section.title, language, defaultLang) || labelUntitledSection}
                                 </CardTitle>
                                 <motion.div
                                   initial={{ scale: 0.8, opacity: 0 }}
@@ -421,16 +421,26 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       <div>
                         <TextInput
                           config={{ name: 'section-title', label: labelTitle }}
-                          value={section.title || ''}
+                          value={
+                            isTranslationArray(section.title)
+                              ? section.title
+                              : recordToTranslationArray({ [defaultLang]: typeof section.title === 'string' ? (section.title || '') : '' })
+                          }
                           onChange={(value) => updateSection(section.id, { title: value })}
+                          allowTranslation
                         />
                       </div>
                       <div>
                         <Textarea
                           config={{ name: 'section-description', label: labelDescription }}
-                          value={section.description || ''}
+                          value={
+                            isTranslationArray(section.description)
+                              ? section.description
+                              : recordToTranslationArray({ [defaultLang]: typeof section.description === 'string' ? (section.description || '') : '' })
+                          }
                           onChange={(value) => updateSection(section.id, { description: value })}
                           rows={2}
+                          allowTranslation
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
@@ -645,7 +655,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                                   className="text-base cursor-pointer hover:text-violet-600 transition-colors flex-1"
                                   onClick={() => toggleItem(`action-${action.id}`)}
                                 >
-                                  {action.label || labelUntitledAction}
+                                  {resolveDisplayLabel(action.label, language, defaultLang) || labelUntitledAction}
                                 </CardTitle>
                                 <motion.div
                                   initial={{ scale: 0.8, opacity: 0 }}
@@ -693,8 +703,13 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
                       <div>
                         <TextInput
                           config={{ name: 'action-label', label: labelFieldLabel }}
-                          value={action.label || ''}
+                          value={
+                            isTranslationArray(action.label)
+                              ? action.label
+                              : recordToTranslationArray({ [defaultLang]: typeof action.label === 'string' ? (action.label || '') : '' })
+                          }
                           onChange={(value) => updateQuickAction(action.id, { label: value })}
+                          allowTranslation
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">

@@ -2,13 +2,22 @@ import fs from 'fs';
 import path from 'path';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
-import type { EngagementInteraction } from '@/domains/engagements/types';
+import type {
+  EngagementInteraction,
+  EngagementInteractionUserType,
+} from '@/domains/engagements/types';
 
 const INTERACTIONS_PATH = path.join(
   process.cwd(),
   'data',
   'engagement-interactions.json',
 );
+
+const VALID_INTERACTION_TYPES: EngagementInteractionUserType[] = [
+  'read',
+  'acknowledge',
+  'mention',
+];
 
 export function loadEngagementInteractions(): EngagementInteraction[] {
   try {
@@ -69,13 +78,15 @@ export function upsertInteraction(
   engagementId: string,
   userId: string,
   updates: {
-    isRead?: boolean;
-    readAt?: string;
+    interactionType?: EngagementInteractionUserType;
     interactedAt?: string;
     outputType?: 'approved' | 'rejected';
     comment?: string;
-    dueDate?: string;
     referenceEngagementId?: string | null;
+    /** @deprecated Use interactionType: 'read' instead */
+    isRead?: boolean;
+    /** @deprecated Use interactedAt instead */
+    readAt?: string;
   },
 ): EngagementInteraction {
   const { ulid } = require('ulid');
@@ -84,16 +95,22 @@ export function upsertInteraction(
     (i) => i.engagementId === engagementId && i.userId === userId,
   );
 
+  const now = new Date().toISOString();
+  const resolvedInteractionType =
+    updates.interactionType ??
+    (updates.isRead ? ('read' as const) : undefined);
+  const resolvedInteractedAt =
+    updates.interactedAt ?? updates.readAt ?? (updates.outputType || resolvedInteractionType ? now : undefined);
+
   if (idx >= 0) {
     const existing = list[idx];
-    if (updates.isRead !== undefined) existing.isRead = updates.isRead;
-    if (updates.readAt !== undefined) existing.readAt = updates.readAt;
-    if (updates.interactedAt !== undefined)
-      existing.interactedAt = updates.interactedAt;
+    if (updates.interactionType !== undefined || updates.isRead !== undefined)
+      existing.interactionType = resolvedInteractionType;
+    if (resolvedInteractedAt !== undefined)
+      existing.interactedAt = resolvedInteractedAt;
     if (updates.outputType !== undefined)
       existing.outputType = updates.outputType;
     if (updates.comment !== undefined) existing.comment = updates.comment;
-    if (updates.dueDate !== undefined) existing.dueDate = updates.dueDate;
     if (updates.referenceEngagementId !== undefined)
       existing.referenceEngagementId = updates.referenceEngagementId;
     list[idx] = existing;
@@ -101,25 +118,28 @@ export function upsertInteraction(
     return existing;
   }
 
-  const now = new Date().toISOString();
   const newInteraction: EngagementInteraction = {
     id: ulid(),
     engagementId,
     userId,
-    isRead: updates.isRead ?? false,
-    readAt: updates.readAt,
-    dueDate: updates.dueDate,
-    interactedAt:
-      updates.interactedAt ?? (updates.outputType ? now : undefined),
+    interactionType: resolvedInteractionType,
+    interactedAt: resolvedInteractedAt,
     outputType: updates.outputType,
     comment: updates.comment,
     referenceEngagementId: updates.referenceEngagementId ?? undefined,
   };
-  if (updates.isRead && !newInteraction.readAt) newInteraction.readAt = now;
 
   list.push(newInteraction);
   saveEngagementInteractions(list);
   return newInteraction;
+}
+
+/** Derive isRead from interaction (interactionType read/acknowledge/mention = read) */
+export function isInteractionRead(
+  i: EngagementInteraction | null | undefined,
+): boolean {
+  if (!i) return false;
+  return i.interactionType === 'read' || i.interactionType === 'acknowledge' || i.interactionType === 'mention';
 }
 
 export function getInteractionById(
@@ -132,12 +152,10 @@ export function getInteractionById(
 export function updateInteraction(
   id: string,
   updates: Partial<{
-    isRead: boolean;
-    readAt: string;
+    interactionType: EngagementInteractionUserType;
     interactedAt: string;
     outputType: 'approved' | 'rejected';
     comment: string;
-    dueDate: string;
     referenceEngagementId: string | null;
   }>,
 ): EngagementInteraction | null {
@@ -146,12 +164,10 @@ export function updateInteraction(
   if (idx === -1) return null;
 
   const allowed = [
-    'isRead',
-    'readAt',
+    'interactionType',
     'interactedAt',
     'outputType',
     'comment',
-    'dueDate',
     'referenceEngagementId',
   ] as const;
   const updated = { ...list[idx] };

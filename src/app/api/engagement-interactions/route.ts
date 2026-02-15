@@ -113,12 +113,14 @@ export async function POST(request: NextRequest) {
     }
 
     const updates: Parameters<typeof upsertInteraction>[2] = {};
-    if (typeof bodyObj.isRead === 'boolean') updates.isRead = bodyObj.isRead;
-    if (bodyObj.readAt != null) updates.readAt = bodyObj.readAt as string;
+    if (bodyObj.interactionType != null)
+      updates.interactionType = bodyObj.interactionType as 'read' | 'acknowledge' | 'mention';
+    if (typeof bodyObj.isRead === 'boolean')
+      updates.interactionType = bodyObj.isRead ? 'read' : undefined;
+    if (bodyObj.readAt != null) updates.interactedAt = bodyObj.readAt as string;
     if (bodyObj.interactedAt != null) updates.interactedAt = bodyObj.interactedAt as string;
     if (bodyObj.outputType != null) updates.outputType = bodyObj.outputType as 'approved' | 'rejected';
     if (bodyObj.comment != null) updates.comment = bodyObj.comment as string;
-    if (bodyObj.dueDate != null) updates.dueDate = bodyObj.dueDate as string;
     if (bodyObj.referenceEngagementId !== undefined)
       updates.referenceEngagementId =
         bodyObj.referenceEngagementId === null || bodyObj.referenceEngagementId === ''

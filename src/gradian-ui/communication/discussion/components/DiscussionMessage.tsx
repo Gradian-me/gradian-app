@@ -62,11 +62,14 @@ export const DiscussionMessage: React.FC<DiscussionMessageProps> = ({
   const fallback = getInitials(displayName);
 
   const allInteractions = message.interactions ?? (message.interaction ? [message.interaction] : []);
+  const isReadInteraction = (i: { interactionType?: string; readAt?: string; isRead?: boolean; interactedAt?: string }) =>
+    i.interactionType === 'read' || i.interactionType === 'acknowledge' || i.interactionType === 'mention' ||
+    i.readAt || (i.isRead && i.interactedAt);
   const participants: DiscussionParticipant[] = allInteractions
-    .filter((i) => i.userId && i.userId !== creatorId && (i.readAt || (i.isRead && i.interactedAt)))
+    .filter((i) => i.userId && i.userId !== creatorId && isReadInteraction(i))
     .map((i) => {
       const info = userResolver?.(i.userId) ?? {};
-      const readAt = i.readAt ?? (i.isRead && i.interactedAt ? i.interactedAt : undefined);
+      const readAt = i.interactedAt ?? i.readAt ?? (i.isRead && i.interactedAt ? i.interactedAt : undefined);
       const avatarUrl = info.avatarUrl ?? undefined;
       const username = info.username ?? (i.userId?.includes('@') ? i.userId : undefined);
       const resolvedAvatarUrl =

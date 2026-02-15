@@ -111,12 +111,12 @@ export const PhoneInput = forwardRef<FormElementRef, TextInputProps>(
             disabled={disabled}
             autoComplete="tel"
             dir="ltr"
-            className={cn(inputClasses, hasValue && !canCopy && 'pe-10', hasValue && canCopy && 'pe-20')}
+            className={cn(inputClasses, hasValue && !canCopy && 'pr-10', hasValue && canCopy && 'pr-20')}
             {...props}
           />
-          <div className="absolute end-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
             {canCopy && hasValue && (
-              <CopyContent content={value} />
+              <CopyContent content={value} /> 
             )}
             {hasValue && (
               <Button

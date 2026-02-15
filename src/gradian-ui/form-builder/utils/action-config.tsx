@@ -31,15 +31,15 @@ export const getActionConfig = (
   const labelUpdate = t ? t(TRANSLATION_KEYS.LABEL_UPDATE, 'Update') : 'Update';
   const labelCancel = t ? t(TRANSLATION_KEYS.BUTTON_CANCEL, 'Cancel') : 'Cancel';
   const labelReset = t ? t(TRANSLATION_KEYS.BUTTON_RESET, 'Reset') : 'Reset';
-  const msgCreating = t ? t(TRANSLATION_KEYS.MESSAGE_CREATING, 'Creating...') : 'Creating...';
-  const msgUpdating = t ? t(TRANSLATION_KEYS.MESSAGE_UPDATING, 'Updating...') : 'Updating...';
+  const msgCreating = t ? t(TRANSLATION_KEYS.MESSAGE_CREATING, 'Creating') : 'Creating';
+  const msgUpdating = t ? t(TRANSLATION_KEYS.MESSAGE_UPDATING, 'Updating') : 'Updating';
 
   const configs: Record<string, ActionConfig> = {
     submit: {
       type: 'submit',
       label: isEditMode ? `${labelUpdate} ${singularName}` : `${labelCreate} ${singularName}`,
       variant: 'default',
-      loading: isEditMode ? `${msgUpdating} ${singularName}...` : `${msgCreating} ${singularName}...`,
+      loading: isEditMode ? msgUpdating : msgCreating,
       icon: <Save className="h-4 w-4" />
     },
     cancel: {

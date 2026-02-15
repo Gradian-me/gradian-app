@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { SearchInput } from '@/gradian-ui/form-builder/form-elements';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { NotificationGroup } from './NotificationGroup';
 import { useNotifications } from '../hooks/useNotifications';
 import { NotificationService } from '../services/notification.service';
@@ -27,6 +29,7 @@ import { HierarchyExpandCollapseControls } from '@/gradian-ui/data-display/compo
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
+import { FaviconBadge } from '@/gradian-ui/shared/components/FaviconBadge';
 
 const TYPE_TO_KEY: Record<string, string> = {
   success: TRANSLATION_KEYS.LABEL_SUCCESS,
@@ -45,6 +48,15 @@ const CATEGORY_TO_KEY: Record<string, string> = {
 };
 
 export function NotificationsPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const urlSearch = searchParams.get('search') ?? undefined;
+  const initialFilters = useMemo(
+    () => (urlSearch ? { search: urlSearch } : undefined),
+    [urlSearch],
+  );
+
   const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
   const defaultLang = getDefaultLanguage();
   const t = (key: string) => getT(key, language, defaultLang);
@@ -63,19 +75,27 @@ export function NotificationsPage() {
     markAsUnread,
     markAllAsRead,
     clearFilters
-  } = useNotifications();
+  } = useNotifications({ initialFilters });
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(filters.search ?? '');
   const [showFilters, setShowFilters] = useState(false);
   const [accordionValue, setAccordionValue] = useState<string[]>([]);
+
+  // Keep search term in sync with filters (e.g. when initialFilters from URL apply)
+  useEffect(() => {
+    setSearchTerm((prev) => (filters.search !== undefined ? filters.search : prev));
+  }, [filters.search]);
+
+  // Order by category A–Z (no read/unread reordering). Items within each group sorted by date desc in service.
+  const sortedGroupedNotifications = groupedNotifications;
 
   // Track if we've initialized the accordion
   const hasInitialized = useRef(false);
 
   // Initialize accordion with all groups open by default when groupedNotifications are loaded
   useEffect(() => {
-    if (groupedNotifications.length > 0) {
-      const allGroupValues = groupedNotifications.map((group) => `group-${group.category}`);
+    if (sortedGroupedNotifications.length > 0) {
+      const allGroupValues = sortedGroupedNotifications.map((group) => `group-${group.category}`);
       // Only initialize once when first loaded
       if (!hasInitialized.current) {
         setAccordionValue(allGroupValues);
@@ -90,22 +110,30 @@ export function NotificationsPage() {
         });
       }
     }
-  }, [groupedNotifications]);
+  }, [sortedGroupedNotifications]);
 
   const handleExpandAll = useCallback(() => {
-    if (groupedNotifications.length > 0) {
-      const allGroupValues = groupedNotifications.map((group) => `group-${group.category}`);
+    if (sortedGroupedNotifications.length > 0) {
+      const allGroupValues = sortedGroupedNotifications.map((group) => `group-${group.category}`);
       setAccordionValue(allGroupValues);
     }
-  }, [groupedNotifications]);
+  }, [sortedGroupedNotifications, setAccordionValue]);
 
   const handleCollapseAll = useCallback(() => {
     setAccordionValue([]);
-  }, []);
+  }, [setAccordionValue]);
 
   const handleSearch = (value: string) => {
     setSearchTerm(value);
     updateFilters({ search: value });
+    const next = new URLSearchParams(searchParams.toString());
+    if (value.trim()) {
+      next.set('search', value.trim());
+    } else {
+      next.delete('search');
+    }
+    const qs = next.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   };
 
   const handleFilterChange = (key: string, value: string) => {
@@ -191,10 +219,25 @@ export function NotificationsPage() {
     { id: 'status', label: t(TRANSLATION_KEYS.LABEL_BY_STATUS), icon: 'ListChecks' }
   ];
 
-  const cardClass = 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm';
+  const cardClass = 'bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-800 shadow-sm';
+
+  // Tab title and favicon badge: show unread count when > 0
+  useEffect(() => {
+    const baseTitle = document.title;
+    if (unreadCount > 0) {
+      document.title = `(${unreadCount}) ${t(TRANSLATION_KEYS.TITLE_NOTIFICATIONS)} | Gradian`;
+    } else {
+      document.title = `${t(TRANSLATION_KEYS.TITLE_NOTIFICATIONS)} | Gradian`;
+    }
+    return () => {
+      document.title = baseTitle;
+    };
+  }, [unreadCount, t]);
 
   return (
-    <MainLayout title={t(TRANSLATION_KEYS.TITLE_NOTIFICATIONS)} icon="Bell">
+    <>
+      <FaviconBadge count={unreadCount} />
+      <MainLayout title={t(TRANSLATION_KEYS.TITLE_NOTIFICATIONS)} icon="Bell">
       <div className="space-y-6">
         {/* Header Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -248,7 +291,7 @@ export function NotificationsPage() {
         </div>
 
         {/* Search and Filters */}
-        <Card className="bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
+        <Card className="bg-violet-50 dark:bg-violet-900/30 border border-violet-200 dark:border-violet-900 shadow-sm">
           <CardHeader>
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
@@ -391,9 +434,30 @@ export function NotificationsPage() {
 
         {/* Notifications */}
         {isLoading ? (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600 mx-auto"></div>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">{t(TRANSLATION_KEYS.MESSAGE_LOADING_NOTIFICATIONS)}</p>
+          <div className="space-y-4" data-testid="notifications-skeleton">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Card key={i} className={cardClass}>
+                <CardContent className="p-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:space-x-3">
+                    <Skeleton className="h-5 w-5 shrink-0 rounded mt-1 hidden sm:block" />
+                    <div className="flex-1 min-w-0 w-full space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Skeleton className="h-5 w-14 rounded-full" />
+                        <Skeleton className="h-5 w-16 rounded-full" />
+                        <Skeleton className="h-4 flex-1 min-w-[120px] max-w-[60%] rounded" />
+                      </div>
+                      <Skeleton className="h-3 w-full rounded" />
+                      <Skeleton className="h-3 w-[85%] rounded" />
+                      <div className="flex gap-4 pt-1">
+                        <Skeleton className="h-3 w-24 rounded" />
+                        <Skeleton className="h-3 w-20 rounded" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-6 w-16 shrink-0 rounded sm:ms-4" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         ) : error ? (
           <Card className={cardClass}>
@@ -403,7 +467,7 @@ export function NotificationsPage() {
               <p className="text-gray-600 dark:text-gray-400">{error}</p>
             </CardContent>
           </Card>
-        ) : groupedNotifications.length === 0 ? (
+        ) : sortedGroupedNotifications.length === 0 ? (
           <Card className={cardClass}>
             <CardContent className="p-6 text-center">
               <Bell className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -418,7 +482,7 @@ export function NotificationsPage() {
             onValueChange={setAccordionValue}
             className="space-y-6"
           >
-            {groupedNotifications.map((group) => (
+            {sortedGroupedNotifications.map((group) => (
               <NotificationGroup
                 key={group.category}
                 group={group}
@@ -433,5 +497,6 @@ export function NotificationsPage() {
         )}
       </div>
     </MainLayout>
+    </>
   );
 }

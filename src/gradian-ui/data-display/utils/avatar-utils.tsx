@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { useLanguageStore } from '@/stores/language.store';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/gradian-ui/shared/utils';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -252,10 +255,11 @@ export const RoleBasedAvatar: React.FC<RoleBasedAvatarProps> = ({
   showShadow = true,
   defaultColor = 'violet',
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? 'en';
   const resolved = resolveAvatarData(schema, data);
   const avatarColor = getAvatarColorClasses(resolved.colorValue, defaultColor);
   const sizeClasses = AVATAR_SIZE_MAP[size] || AVATAR_SIZE_MAP.md;
-  const initials = resolved.avatarLabel ? getInitials(resolved.avatarLabel) : 'A';
+  const initials = resolved.avatarLabel ? getInitials(resolved.avatarLabel, language) : 'A';
 
   // Render avatar with initials
   if (resolved.shouldShowAvatar) {

@@ -28,7 +28,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useLanguageStore } from '@/stores/language.store';
-import { resolveDisplayLabel, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { resolveDisplayLabel, getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface DynamicQuickActionsProps {
   actions: QuickAction[];
@@ -45,6 +46,8 @@ export interface DynamicQuickActionsProps {
    * to avoid double borders.
    */
   hideContainerCard?: boolean;
+  /** Optional language override for label translation (e.g. from parent that already resolved language) */
+  language?: string;
 }
 
 export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
@@ -56,11 +59,13 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
   schemaCache,
   onActionClick,
   hideContainerCard = false,
+  language: languageProp,
 }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const storeLang = useLanguageStore((s) => s.language);
   const defaultLang = getDefaultLanguage();
+  const language = languageProp ?? storeLang ?? defaultLang;
   
   // Debug: Log when component receives onActionClick
   React.useEffect(() => {
@@ -361,7 +366,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
         {hideContainerCard ? (
           <Card className="p-4 border-0 shadow-none bg-card">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-3">
-              Quick Actions
+              {getT(TRANSLATION_KEYS.SCHEMA_TITLE_QUICK_ACTIONS, language, defaultLang)}
             </h3>
             <div className="space-y-2">
               {buttonActions.map((action) => {
@@ -387,7 +392,7 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
           </Card>
         ) : (
           <Card className="p-4">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-3">Quick Actions</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200 mb-3">{getT(TRANSLATION_KEYS.SCHEMA_TITLE_QUICK_ACTIONS, language, defaultLang)}</h3>
             <div className="space-y-2">
               {buttonActions.map((action) => {
                 const isLoading = loadingActionId === action.id;

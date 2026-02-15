@@ -60,7 +60,7 @@ import { EntityMetadata } from './CreateUpdateDetail';
 import { normalizeCreateUpdateDates } from './CreateUpdateDetail';
 import { formatCreatedLabel, formatRelativeTime, formatFullDate, isLocaleRTL } from '@/gradian-ui/shared/utils/date-utils';
 import { useLanguageStore } from '@/stores/language.store';
-import { getT, getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, resolveDisplayLabel, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '../utils';
@@ -112,6 +112,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const labelBy = getT(TRANSLATION_KEYS.LABEL_BY, language, defaultLang);
   const labelAdd = getT(TRANSLATION_KEYS.BUTTON_ADD, language, defaultLang);
   const labelUserDetails = getT(TRANSLATION_KEYS.LABEL_USER_DETAILS, language, defaultLang);
+  const labelDetails = getT(TRANSLATION_KEYS.LABEL_DETAILS, language, defaultLang);
   const toastSelectCompanyToCreate = getT(TRANSLATION_KEYS.TOAST_SELECT_COMPANY_TO_CREATE, language, defaultLang);
   const toastSelectCompanyToCreateDescription = getT(TRANSLATION_KEYS.TOAST_SELECT_COMPANY_TO_CREATE_DESCRIPTION, language, defaultLang);
   const emptySelectUserToViewTasks = getT(TRANSLATION_KEYS.EMPTY_SELECT_USER_TO_VIEW_TASKS, language, defaultLang);
@@ -165,6 +166,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     entity: any | null;
   }>({ open: false, entity: null });
   const [isManualRefresh, setIsManualRefresh] = useState(false);
+  const manualRefreshToastIdRef = useRef<string | number | null>(null);
   const [fixedParentForCreate, setFixedParentForCreate] = useState<any | null>(null);
   const [hierarchyExpandToken, setHierarchyExpandToken] = useState(0);
   const [hierarchyCollapseToken, setHierarchyCollapseToken] = useState(0);
@@ -550,12 +552,14 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         await fetchEntities(undefined, { disableCache: true, page: currentPage, limit: pageSize, sortArray: sortConfig });
       }
 
-      toast.success('Parent updated successfully');
+      const lang = useLanguageStore.getState().language ?? 'en';
+      toast.success(getT(TRANSLATION_KEYS.TOAST_PARENT_UPDATED_SUCCESS, lang, getDefaultLanguage()));
       setChangeParentPickerOpen(false);
       setEntityForParentChange(null);
     } catch (error) {
       loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to change parent: ${error instanceof Error ? error.message : String(error)}`);
-      toast.error(error instanceof Error ? error.message : 'Failed to change parent');
+      const lang = useLanguageStore.getState().language ?? 'en';
+      toast.error(error instanceof Error ? error.message : getT(TRANSLATION_KEYS.TOAST_FAILED_TO_CHANGE_PARENT, lang, getDefaultLanguage()));
     } finally {
       setIsSubmitting(false);
     }
@@ -564,31 +568,50 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const handleManualRefresh = useCallback(async () => {
     const filters = buildFilters();
     if (!filters) {
-      toast.warning('Select a company to refresh', {
-        description: 'Choose a company context before refreshing the data.',
+      const lang = useLanguageStore.getState().language ?? 'en';
+      const defLang = getDefaultLanguage();
+      toast.warning(getT(TRANSLATION_KEYS.TOAST_SELECT_COMPANY_TO_REFRESH, lang, defLang), {
+        description: getT(TRANSLATION_KEYS.TOAST_SELECT_COMPANY_TO_REFRESH_DESCRIPTION, lang, defLang),
       });
       return;
     }
 
-    const toastId = toast.loading(`Refreshing ${pluralName.toLowerCase()}...`);
+    const lang = useLanguageStore.getState().language ?? 'en';
+    const defLang = getDefaultLanguage();
+    const loadingMsg = getT(TRANSLATION_KEYS.TOAST_REFRESHING_X, lang, defLang).replace('{name}', pluralName.toLowerCase());
+    const toastId = toast.loading(loadingMsg);
+    manualRefreshToastIdRef.current = toastId;
     setIsManualRefresh(true);
     try {
       const result = await fetchEntities(filters, { disableCache: true, page: currentPage, limit: pageSize, sortArray: sortConfig });
       if (result && result.success === false) {
-        throw new Error(result.error || 'Failed to refresh data');
+        throw new Error(result.error || getT(TRANSLATION_KEYS.TOAST_FAILED_TO_REFRESH, lang, defLang));
       }
-      toast.success(`${pluralName} updated`, { id: toastId });
+      const successLang = useLanguageStore.getState().language ?? 'en';
+      const successDefLang = getDefaultLanguage();
+      toast.success(getT(TRANSLATION_KEYS.TOAST_X_UPDATED, successLang, successDefLang).replace('{name}', pluralName), { id: toastId });
       // Also refresh assignment counts when manual refresh succeeds
       if (allowAssignmentSwitcher && assignmentSelectedUser?.id) {
         setAssignmentCountRefreshToken((prev) => prev + 1);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to refresh data';
+      const errLang = useLanguageStore.getState().language ?? 'en';
+      const errDefLang = getDefaultLanguage();
+      const errorMessage = error instanceof Error ? error.message : getT(TRANSLATION_KEYS.TOAST_FAILED_TO_REFRESH, errLang, errDefLang);
       toast.error(errorMessage, { id: toastId });
     } finally {
+      manualRefreshToastIdRef.current = null;
       setIsManualRefresh(false);
     }
   }, [buildFilters, fetchEntities, pluralName, currentPage, pageSize, sortConfig, allowAssignmentSwitcher, assignmentSelectedUser?.id]);
+
+  // Update loading toast message when language changes during manual refresh
+  useEffect(() => {
+    if (!isManualRefresh || manualRefreshToastIdRef.current == null) return;
+    const lang = language ?? 'en';
+    const msg = getT(TRANSLATION_KEYS.TOAST_REFRESHING_X, lang, defaultLang).replace('{name}', pluralName.toLowerCase());
+    toast.loading(msg, { id: manualRefreshToastIdRef.current });
+  }, [language, defaultLang, isManualRefresh, pluralName]);
 
   // Confirm and execute delete
   const confirmDelete = useCallback(async () => {
@@ -880,43 +903,60 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     };
 
     // Helper functions to extract user info
+    const normalizeUser = (user: any): any => {
+      if (user == null) return user;
+      if (Array.isArray(user) && user.length > 0) return user[0];
+      return user;
+    };
     const getUserName = (user: any): string | null => {
-      if (!user) return null;
-      if (typeof user === 'string') return user;
-      if (typeof user === 'object') {
-        const firstName = user.firstName || '';
-        const lastName = user.lastName || '';
+      const u = normalizeUser(user);
+      if (!u) return null;
+      if (typeof u === 'string') return u;
+      if (typeof u === 'object') {
+        const firstName = resolveDisplayLabel(u.firstName, language, defaultLang);
+        const lastName = resolveDisplayLabel(u.lastName, language, defaultLang);
         if (firstName || lastName) {
           return `${firstName} ${lastName}`.trim();
         }
-        if (user.username) return user.username;
-        if (user.email) return user.email;
-        if (user.label) return user.label;
+        const label = resolveDisplayLabel(u.label, language, defaultLang);
+        if (label) return label;
+        const name = resolveDisplayLabel(u.name, language, defaultLang);
+        if (name) return name;
+        const username = resolveDisplayLabel(u.username, language, defaultLang);
+        if (username) return username;
+        const email = resolveDisplayLabel(u.email, language, defaultLang);
+        if (email) return email;
       }
       return null;
     };
 
     const getUserAvatarUrl = (user: any): string | null => {
-      if (!user || typeof user !== 'object') return null;
-      if (user.avatarUrl) return String(user.avatarUrl);
+      const u = normalizeUser(user);
+      if (!u || typeof u !== 'object') return null;
+      if (u.avatarUrl) return String(u.avatarUrl);
       return null;
     };
 
     const getUserInitials = (user: any): string => {
-      if (!user) return '?';
-      if (typeof user === 'string') {
-        return getInitials(user);
+      const u = normalizeUser(user);
+      if (!u) return '?';
+      if (typeof u === 'string') {
+        return getInitials(u, language);
       }
-      if (typeof user === 'object') {
-        const firstName = user.firstName || '';
-        const lastName = user.lastName || '';
+      if (typeof u === 'object') {
+        const firstName = resolveDisplayLabel(u.firstName, language, defaultLang);
+        const lastName = resolveDisplayLabel(u.lastName, language, defaultLang);
         if (firstName || lastName) {
-          return getInitials(`${firstName} ${lastName}`.trim());
+          return getInitials(`${firstName} ${lastName}`.trim(), language);
         }
-        if (user.username) return getInitials(user.username);
-        if (user.email) return getInitials(user.email);
-        if (user.label) return getInitials(user.label);
-        if (user.name) return getInitials(user.name);
+        const label = resolveDisplayLabel(u.label, language, defaultLang);
+        if (label) return getInitials(label, language);
+        const name = resolveDisplayLabel(u.name, language, defaultLang);
+        if (name) return getInitials(name, language);
+        const username = resolveDisplayLabel(u.username, language, defaultLang);
+        if (username) return getInitials(username, language);
+        const email = resolveDisplayLabel(u.email, language, defaultLang);
+        if (email) return getInitials(email, language);
       }
       return '?';
     };
@@ -933,7 +973,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         render: (value: any, row: any) => {
           if (!value) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
           const createdLabel = formatCreatedLabel(value, localeCode);
-          const createdBy = row.createdBy;
+          const createdBy = normalizeUser(row.createdBy);
           const createdByName = getUserName(createdBy);
           const createdByAvatarUrl = getUserAvatarUrl(createdBy);
           const createdByInitials = getUserInitials(createdBy);
@@ -954,6 +994,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                     className="z-100"
                     avoidCollisions={true}
                     collisionPadding={8}
+                    dir={isLocaleRTL(localeCode) ? 'rtl' : undefined}
                   >
                     <span>
                       {labelCreated} {createdLabel.tooltip}
@@ -992,7 +1033,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         render: (value: any, row: any) => {
           // Always show updatedAt, or fall back to createdAt if updatedAt is missing
           const updatedAt = row.updatedAt || row.createdAt;
-          const updatedBy = row.updatedBy || row.createdBy;
+          const updatedBy = normalizeUser(row.updatedBy || row.createdBy);
           
           // If no date available, show dash
           if (!updatedAt) return <span className="text-gray-400 dark:text-gray-600 text-xs">—</span>;
@@ -1037,7 +1078,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                         {updatedByInitials}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="truncate">{updatedByName}</span>
+                    <span className="truncate" dir="auto">{updatedByName}</span>
                   </div>
                 )}
               </div>
@@ -1638,7 +1679,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         onClose={() => setIsDetailDialogOpen(false)}
         schema={asFormSchema(schema)}
         data={selectedEntityForDetail}
-        title={selectedEntityForDetail?.name || `${singularName} Details`}
+        title={selectedEntityForDetail?.name || (isRTL(language) ? `${labelDetails} ${singularName}` : `${singularName} ${labelDetails}`)}
         onView={handleViewEntity}
         onViewDetail={handleViewDetailPage}
         onEdit={handleEditEntity}

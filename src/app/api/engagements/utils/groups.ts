@@ -52,8 +52,29 @@ export function filterOutDeletedGroups(
 }
 
 /**
+ * Find engagement group by id.
+ */
+export function findGroupById(id: string): EngagementGroup | undefined {
+  const groups = loadEngagementGroups();
+  const active = filterOutDeletedGroups(groups);
+  return active.find((g) => g.id === id);
+}
+
+/** Match group by schema reference (referenceType=schema, referenceId=schemaId or legacy referenceSchemaId) */
+function matchesSchemaReference(
+  g: EngagementGroup,
+  schemaId: string,
+  instanceId: string,
+): boolean {
+  const schemaMatch =
+    (g.referenceType === 'schema' && g.referenceId === schemaId) ||
+    g.referenceSchemaId === schemaId;
+  return schemaMatch && g.referenceInstanceId === instanceId;
+}
+
+/**
  * Find engagement group by referenceSchemaId + referenceInstanceId.
- * Returns undefined if not found (or if deleted).
+ * Supports both referenceType/referenceId and legacy referenceSchemaId.
  */
 export function findGroupByReference(
   schemaId: string,
@@ -61,10 +82,7 @@ export function findGroupByReference(
 ): EngagementGroup | undefined {
   const groups = loadEngagementGroups();
   const active = filterOutDeletedGroups(groups);
-  return active.find(
-    (g) =>
-      g.referenceSchemaId === schemaId && g.referenceInstanceId === instanceId,
-  );
+  return active.find((g) => matchesSchemaReference(g, schemaId, instanceId));
 }
 
 /**
@@ -84,7 +102,8 @@ export function getOrCreateGroupForReference(
   const now = new Date().toISOString();
   const newGroup: EngagementGroup = {
     id: ulid(),
-    referenceSchemaId: schemaId,
+    referenceType: 'schema',
+    referenceId: schemaId,
     referenceInstanceId: instanceId,
     createdBy,
     createdAt: now,

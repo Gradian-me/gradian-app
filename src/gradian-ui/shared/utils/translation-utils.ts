@@ -90,17 +90,24 @@ export function getTranslationsArray(key: string): Array<Record<string, string>>
   return Object.entries(rec).map(([lang, value]) => ({ [lang]: value }));
 }
 
+/** Label as string or translation array [{en:"..."}, {fa:"..."}]. */
+type LabelInput = string | Array<Record<string, string>> | undefined;
+
 /**
  * Resolve field label from field.translations (label) or field.label.
+ * Accepts label as string or TranslatableString (translation array).
  */
 export function resolveSchemaFieldLabel(
-  field: { label?: string; translations?: Array<Record<string, string>> },
+  field: { label?: LabelInput; translations?: Array<Record<string, string>> },
   lang: string,
   defaultLang: string
 ): string {
   const resolved = resolveFromTranslationsArray(field.translations, lang, defaultLang);
   if (resolved) return resolved;
-  return typeof field.label === 'string' ? field.label : '';
+  if (field.label == null) return '';
+  if (typeof field.label === 'string') return field.label;
+  if (isTranslationArray(field.label)) return resolveFromTranslationsArray(field.label, lang, defaultLang);
+  return '';
 }
 
 /**

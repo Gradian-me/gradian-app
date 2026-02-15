@@ -71,12 +71,10 @@ export async function PUT(
     const { id } = await params;
     const bodyObj = body as Record<string, unknown>;
     const updated = updateInteraction(id, {
-      isRead: bodyObj.isRead as boolean | undefined,
-      readAt: bodyObj.readAt as string | undefined,
+      interactionType: bodyObj.interactionType as 'read' | 'acknowledge' | 'mention' | undefined,
       interactedAt: bodyObj.interactedAt as string | undefined,
       outputType: bodyObj.outputType as 'approved' | 'rejected' | undefined,
       comment: bodyObj.comment as string | undefined,
-      dueDate: bodyObj.dueDate as string | undefined,
     });
     if (!updated) {
       return NextResponse.json(

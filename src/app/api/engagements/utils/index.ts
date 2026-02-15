@@ -4,7 +4,16 @@
  */
 
 export * from './groups';
-export * from './interactions';
+export {
+  loadEngagementInteractions,
+  saveEngagementInteractions,
+  findInteractionByEngagementAndUser,
+  findInteractionsByEngagementIds,
+  upsertInteraction,
+  isInteractionRead,
+  getInteractionById,
+  updateInteraction,
+} from './interactions';
 export * from './engagements';
 export {
   getLocaleFromRequest,

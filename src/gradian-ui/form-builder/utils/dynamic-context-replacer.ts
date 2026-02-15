@@ -1,5 +1,7 @@
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { safeGetProperty, isPrototypePollutionKey } from '@/gradian-ui/shared/utils/security-utils';
+import { resolveDisplayLabel, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 /**
  * Get page data (URL, query parameters, etc.) from browser
@@ -110,11 +112,17 @@ export function extractValueFromContext(
   }
   
   // Convert to string (not URI-encoded)
-  // Handle objects by extracting 'id' property if it exists (common for picker/select values)
+  // Resolve translation arrays/label objects first (e.g. referenceData.firstName when it's [{en:"John"}, {fa:"جان"}])
   if (current !== null && current !== undefined) {
-    // Check if it's an array first (arrays are objects in JS)
+    const lang = useLanguageStore.getState?.()?.language ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
+    const resolvedFromTranslations = resolveDisplayLabel(current, lang, defaultLang);
+    if (resolvedFromTranslations) {
+      return resolvedFromTranslations;
+    }
+
+    // Handle arrays (e.g. picker/select values with id/value)
     if (Array.isArray(current)) {
-      // If it's an array, try to extract id from first element
       if (current.length > 0) {
         const first = current[0];
         if (typeof first === 'object' && first !== null) {
@@ -130,20 +138,17 @@ export function extractValueFromContext(
       }
       return '';
     }
-    
-    // If it's an object (but not an array), try to extract 'id' or 'value' property
+
+    // If it's an object, try to extract 'id' or 'value' property (picker/select pattern)
     if (typeof current === 'object') {
-      // Try to extract 'id' property (common pattern for picker/select values)
       if ('id' in current && current.id !== undefined && current.id !== null) {
         return String(current.id);
       }
-      // If no 'id' property, try 'value' property as fallback
       if ('value' in current && current.value !== undefined && current.value !== null) {
         return String(current.value);
       }
     }
-    
-    // Fallback to string conversion
+
     return String(current);
   }
   return '';

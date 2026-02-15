@@ -1,5 +1,7 @@
 // Dynamic Card Dialog Component
 
+'use client';
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
@@ -8,6 +10,9 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '../../shared/utils';
 import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
 import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface DynamicCardDialogProps {
   /**
@@ -31,8 +36,7 @@ export interface DynamicCardDialogProps {
   data: any;
   
   /**
-   * Title for the dialog
-   * @default "Details"
+   * Title for the dialog (when not provided, uses translated "Details")
    */
   title?: string;
   
@@ -70,13 +74,18 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
   onClose,
   schema,
   data,
-  title = 'Details',
+  title,
   className,
   onView,
   onViewDetail,
   onEdit,
   onDelete
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
+  const labelDetails = getT(TRANSLATION_KEYS.LABEL_DETAILS, language, defaultLang);
+  const displayTitle = title ?? labelDetails;
+
   // Register dialog for back button handling on mobile
   useDialogBackHandler(isOpen, onClose, 'dialog', 'dynamic-card-dialog');
 
@@ -104,7 +113,7 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
       >
         <DialogHeader className="px-0 sm:px-1 shrink-0">
           <DialogTitle className="text-base sm:text-lg font-semibold flex items-center gap-2 flex-wrap">
-            <span className="truncate">{title}</span>
+            <span className="truncate" dir="auto">{displayTitle}</span>
             {data?.id && (
               <>
                 <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-normal font-mono truncate">
@@ -137,6 +146,7 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
               className="shadow-none border-none"
               disableAnimation={true} // Disable card animation in dialog
               isInDialog={true}
+              showUserDetails={true}
             />
           </motion.div>
         </div>

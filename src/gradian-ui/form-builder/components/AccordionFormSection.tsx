@@ -32,7 +32,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DynamicCardRenderer } from '../../data-display/components/DynamicCardRenderer';
 import { toast } from 'sonner';
 import { useLanguageStore } from '@/stores/language.store';
-import { getT, getDefaultLanguage, getTranslationsArray } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, getTranslationsArray, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getSectionTranslatedTitle, getSectionTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
 
@@ -69,8 +69,9 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   } = section;
   const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
   const defaultLang = getDefaultLanguage();
-  const title = getSectionTranslatedTitle(section, language, sectionTitle ?? section.id);
-  const description = getSectionTranslatedDescription(section, language, sectionDescription ?? '');
+  const isRtl = isRTL(language);
+  const title = getSectionTranslatedTitle(section, language, typeof sectionTitle === 'string' ? sectionTitle : section.id);
+  const description = getSectionTranslatedDescription(section, language, typeof sectionDescription === 'string' ? (sectionDescription ?? '') : '');
   
   // Check if this is a relation-based repeating section
   const isRelationBased = isRepeatingSection && section.repeatingConfig?.targetSchema && section.repeatingConfig?.relationTypeId;
@@ -1211,7 +1212,9 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       
       return (
         <>
-      <Card className={cn(
+      <Card
+        dir={isRtl ? 'rtl' : undefined}
+        className={cn(
         // Match System Section background & border by default
         'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
@@ -1313,7 +1316,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               </div>
               <div className="flex items-center gap-2 flex-wrap mt-1">
               {description && (
-                  <p className="text-xs text-gray-600 dark:text-gray-400">{description}</p>
+                  <p dir="auto" className="text-xs text-gray-600 dark:text-gray-400">{description}</p>
               )}
                 {formattedRelationType && (
                   <Badge
@@ -1901,7 +1904,9 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     
     return (
       <>
-      <Card className={cn(
+      <Card
+        dir={isRtl ? 'rtl' : undefined}
+        className={cn(
         // Match System Section background & border by default
         'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
@@ -2147,7 +2152,9 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
 
   return (
     <>
-      <Card className={cn(
+      <Card
+        dir={isRtl ? 'rtl' : undefined}
+        className={cn(
         // Match System Section background & border by default
         'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',

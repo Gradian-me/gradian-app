@@ -97,8 +97,10 @@ export async function PUT(
       'owners',
       'members',
       'viewers',
-      'referenceSchemaId',
+      'referenceType',
+      'referenceId',
       'referenceInstanceId',
+      'referenceSchemaId',
     ] as const;
     const updated = { ...groups[index] };
     const bodyObj = body as Record<string, unknown>;

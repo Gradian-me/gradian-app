@@ -62,8 +62,8 @@ function TranslationViewCell({
     field ? resolveSchemaFieldLabel(field, language, defaultLang) : fieldLabel;
   const title = resolvedTitle || fieldLabel || '';
   return (
-    <span className="inline-flex items-center gap-1.5 min-w-0">
-      <span className="min-w-0 truncate" dir="auto" title={displayText}>
+    <span className="inline-flex items-center gap-1.5 min-w-0 leading-relaxed min-h-6">
+      <span className="min-w-0 truncate leading-relaxed py-0.5" dir="auto" title={displayText}>
         {displayText}
       </span>
       <button
@@ -1180,12 +1180,12 @@ export const formatFieldValue = (
             <div className="inline-flex items-center whitespace-nowrap w-full">
               <Badge variant={badgeVariant}>
                 {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
-                <span className="text-xs" dir="auto">{badgeLabel}</span>
+                <span className="text-xs leading-relaxed" dir="auto">{badgeLabel}</span>
               </Badge>
             </div>
           </TooltipTrigger>
           <TooltipContent side="top" className="max-w-sm">
-            <span dir="auto">{badgeLabel}</span>
+            <span className="leading-relaxed" dir="auto">{badgeLabel}</span>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>,
@@ -1252,12 +1252,12 @@ export const formatFieldValue = (
             <div className="inline-flex items-center whitespace-nowrap w-full">
               <Badge variant={badgeVariant}>
                 {badgeIcon && <IconRenderer iconName={badgeIcon} className="h-3 w-3" />}
-                <span className="text-xs" dir="auto">{badgeLabel}</span>
+                <span className="text-xs leading-relaxed" dir="auto">{badgeLabel}</span>
               </Badge>
             </div>
           </TooltipTrigger>
           <TooltipContent side="top" className="max-w-sm">
-            <span dir="auto">{badgeLabel}</span>
+            <span className="leading-relaxed" dir="auto">{badgeLabel}</span>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>,

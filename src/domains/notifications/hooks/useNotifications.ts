@@ -2,12 +2,18 @@ import { useState, useEffect, useCallback } from 'react';
 import { Notification, NotificationFilters, NotificationGroup, GroupByOption } from '../types';
 import { NotificationService } from '../services/notification.service';
 
-export function useNotifications() {
+export interface UseNotificationsOptions {
+  /** Initial filters (e.g. from URL search param). Used for first fetch and initial state. */
+  initialFilters?: NotificationFilters;
+}
+
+export function useNotifications(options: UseNotificationsOptions = {}) {
+  const { initialFilters } = options;
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [groupedNotifications, setGroupedNotifications] = useState<NotificationGroup[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<NotificationFilters>({});
+  const [filters, setFilters] = useState<NotificationFilters>(() => initialFilters ?? {});
   const [groupBy, setGroupBy] = useState<GroupByOption>('category');
   const [unreadCount, setUnreadCount] = useState(0);
 

@@ -7,11 +7,14 @@ import { useState, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
-import { asFormBuilderSchema } from '@/gradian-ui/schema-manager/utils/schema-utils';
+import { asFormBuilderSchema, getSchemaTranslatedSingularName } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import type { FormSchema as FormBuilderSchema, DataRelation } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useCompanyStore } from '@/stores/company.store';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { toast } from 'sonner';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { filterFormDataForSubmission } from '../utils/form-data-filter';
 import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.util';
 import { replaceDynamicContext } from '../utils/dynamic-context-replacer';
@@ -488,7 +491,8 @@ export function useFormModal(
             
             if (!isDuplicate) {
               lastToastRef.current = { schemaId, entityId: editEntityId, timestamp: now };
-              toast.error('Entity not found', {
+              const lang = useLanguageStore.getState().language ?? 'en';
+              toast.error(getT(TRANSLATION_KEYS.TOAST_ENTITY_NOT_FOUND, lang, getDefaultLanguage()), {
                 description: errorMessage,
                 duration: 5000,
               });
@@ -611,7 +615,9 @@ export function useFormModal(
       if (customActionSubmit) {
         try {
           await customActionSubmit(payloadData, targetSchema);
-          toast.success(`${targetSchema.name || targetSchema.singular_name || 'Action'} completed`);
+          const lang = useLanguageStore.getState().language ?? 'en';
+          const actionLabel = targetSchema.name || targetSchema.singular_name || 'Action';
+          toast.success(getT(TRANSLATION_KEYS.TOAST_ACTION_COMPLETED, lang, getDefaultLanguage()).replace('{name}', actionLabel));
           setIsSubmitting(false);
           closeFormModal();
           onSuccess?.(payloadData);
@@ -649,21 +655,22 @@ export function useFormModal(
       });
 
       if (result.success) {
-        const entityLabel =
-          targetSchema.singular_name ||
-          targetSchema.name ||
-          targetSchema.title ||
-          'Record';
+        const lang = useLanguageStore.getState().language ?? 'en';
+        const defLang = getDefaultLanguage();
+        const entityLabel = getSchemaTranslatedSingularName(
+          targetSchema,
+          lang,
+          targetSchema.singular_name || targetSchema.name || targetSchema.title || 'Record'
+        );
         // Check incomplete flag from enrichedData (submitted) or result.data (returned from API)
         const isIncomplete = enrichedData.incomplete === true || result.data?.incomplete === true;
         
         if (isIncomplete) {
           // Form is incomplete - don't close, show warning message
-          const incompleteTitle = mode === 'edit'
-            ? `${entityLabel} saved (incomplete)`
-            : `${entityLabel} created (incomplete)`;
-          const incompleteDescription = 'Form saved but incomplete. Please complete all required sections.';
-          
+          const incompleteKey = mode === 'edit' ? TRANSLATION_KEYS.TOAST_X_SAVED_INCOMPLETE : TRANSLATION_KEYS.TOAST_X_CREATED_INCOMPLETE;
+          const incompleteTitle = getT(incompleteKey, lang, defLang).replace('{name}', entityLabel);
+          const incompleteDescription = getT(TRANSLATION_KEYS.TOAST_FORM_SAVED_INCOMPLETE_DESC, lang, defLang);
+
           toast.warning(incompleteTitle, { description: incompleteDescription });
           setFormMessage(incompleteDescription);
           // Don't close the form - keep it open so user can add repeating items
@@ -724,14 +731,10 @@ export function useFormModal(
             setEntityData(result.data); // Update entity data with complete entity (incomplete flag cleared)
           }
           
-          const successTitle =
-            mode === 'edit'
-              ? `${entityLabel} updated`
-              : `${entityLabel} created`;
-          const successDescription =
-            mode === 'edit'
-              ? 'Changes saved successfully.'
-              : 'New record created successfully.';
+          const successTitleKey = mode === 'edit' ? TRANSLATION_KEYS.TOAST_X_UPDATED : TRANSLATION_KEYS.TOAST_X_CREATED;
+          const successTitle = getT(successTitleKey, lang, defLang).replace('{name}', entityLabel);
+          const successDescKey = mode === 'edit' ? TRANSLATION_KEYS.TOAST_CHANGES_SAVED : TRANSLATION_KEYS.TOAST_RECORD_CREATED_SUCCESS;
+          const successDescription = getT(successDescKey, lang, defLang);
 
           toast.success(successTitle, { description: successDescription });
           closeFormModal();

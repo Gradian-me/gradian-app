@@ -92,7 +92,8 @@
   }
 
   /**
-   * Open login in an in-page modal (iframe). On success the login page reloads window.parent (this page).
+   * Open login in an in-page modal (iframe). On success the login page sends 'login-success'
+   * postMessage; we listen and reload this page.
    */
   function openModal() {
     var url = buildLoginUrl(true);
@@ -114,6 +115,26 @@
 
     frame.src = url;
     overlay.style.display = 'flex';
+  }
+
+  /**
+   * Listen for login-success postMessage from login iframe/popup.
+   * When received, reload this page so it reflects the new auth state.
+   */
+  function setupLoginSuccessListener() {
+    if (typeof window === 'undefined') return;
+    function handleMessage(e) {
+      var d = e.data;
+      if (d && d.type === 'login-success' && typeof d.timestamp === 'number') {
+        var dom = ensureModalDOM();
+        if (dom.overlay && dom.overlay.style.display === 'flex') {
+          dom.overlay.style.display = 'none';
+          dom.frame.src = 'about:blank';
+        }
+        window.location.reload();
+      }
+    }
+    window.addEventListener('message', handleMessage);
   }
 
   var DEFAULT_MODAL_BTN_ID = 'nx_btnModal';
@@ -172,6 +193,7 @@
   }
   if (typeof window !== 'undefined') {
     window.GradianLoginEmbed = GradianLoginEmbed;
+    setupLoginSuccessListener();
     runAutoInit();
   }
 })(typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : this);

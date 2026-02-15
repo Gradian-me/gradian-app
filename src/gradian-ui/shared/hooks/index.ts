@@ -415,3 +415,9 @@ export type { UsePrintReturn } from './use-print';
 
 // RTL-aware back navigation icon
 export { useBackIcon } from './use-back-icon';
+
+// Favicon badge (reusable for notifications and other tabs)
+export { useFaviconBadge } from './use-favicon-badge';
+export type { UseFaviconBadgeOptions } from './use-favicon-badge';
+export { useCountFromUrl } from './use-count-from-url';
+export type { UseCountFromUrlOptions } from './use-count-from-url';

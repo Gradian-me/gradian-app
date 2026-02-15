@@ -1669,7 +1669,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                           <DynamicQuickActions
                             actions={safeSchema.detailPageMetadata?.quickActions ?? []}
                             schema={safeSchema}
-                            data={referenceEntityData || {}}
+                            data={referenceEntityData ?? state.values ?? {}}
                             disableAnimation
                             className="space-y-2"
                             hideContainerCard

@@ -92,7 +92,6 @@ export const EmailInput = forwardRef<FormElementRef, TextInputProps>(
         {fieldLabel && (
           <label
             htmlFor={fieldName}
-            dir="ltr"
             className={getLabelClasses({ error: Boolean(error), required })}
           >
             {fieldLabel}
@@ -115,10 +114,10 @@ export const EmailInput = forwardRef<FormElementRef, TextInputProps>(
             disabled={disabled}
             autoComplete="email"
             dir="ltr"
-            className={cn(inputClasses, hasValue && !canCopy && 'pe-10', hasValue && canCopy && 'pe-20')}
+            className={cn(inputClasses, hasValue && !canCopy && 'pr-10', hasValue && canCopy && 'pr-20')}
             {...props}
           />
-          <div className="absolute end-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
             {canCopy && hasValue && (
               <CopyContent content={value} />
             )}

@@ -247,15 +247,16 @@ export interface ListMetadata {
   };
 }
 
+/** String or translation array [{en:"..."}, {fa:"..."}] */
+export type TranslatableString = string | Array<Record<string, string>>;
+
 // Detail page types
 export interface DetailPageSection {
   id: string;
-  title: string;
-  description?: string;
-  /** Localized section title: [{"en": "..."}, {"fa": "..."}] */
-  titleTranslations?: Array<Record<string, string>>;
-  /** Localized section description; same format */
-  descriptionTranslations?: Array<Record<string, string>>;
+  /** Section title: string or [{en:"..."}, {fa:"..."}] */
+  title: TranslatableString;
+  /** Section description: string or translation array */
+  description?: TranslatableString;
   colSpan?: number; // Number of columns this section should span in the grid
   fieldIds: string[]; // Field IDs to display as key-value pairs
   columnArea?: 'main' | 'sidebar'; // Which area to place this section in (main or sidebar)
@@ -322,7 +323,8 @@ export interface RepeatingTableRendererConfig {
 
 export interface QuickAction {
   id: string;
-  label: string;
+  /** Action label: string or [{en:"..."}, {fa:"..."}] */
+  label: TranslatableString;
   variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'gradient';
   icon?: string; // Icon name to display before the label
   componentType?: 'button' | 'ai-agent-response'; // How the quick action is rendered (default: 'button')

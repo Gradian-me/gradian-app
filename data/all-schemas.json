@@ -3982,7 +3982,7 @@
     "cardMetadata": [
       {
         "id": "user-info",
-        "title": "User Information",
+        "title": {"en":"User Information", "fa":"اطلاعات کاربر"},
         "colSpan": 2,
         "fieldIds": [
           "username",
@@ -4060,6 +4060,72 @@
         },
         "colSpan": 1,
         "order": 1
+      },
+      {
+        "id": "email",
+        "name": "email",
+        "label": "Email",
+        "sectionId": "basic-information",
+        "component": "email",
+        "placeholder": "Enter email address",
+        "translations": [
+          {
+            "en": "Email"
+          },
+          {
+            "fa": "ایمیل"
+          },
+          {
+            "ar": "البريد الإلكتروني"
+          },
+          {
+            "es": "Correo electrónico"
+          },
+          {
+            "fr": "E-mail"
+          },
+          {
+            "de": "E-Mail"
+          },
+          {
+            "it": "Email"
+          },
+          {
+            "ru": "Эл. почта"
+          }
+        ],
+        "placeholderTranslations": [
+          {
+            "en": "Enter email address"
+          },
+          {
+            "fa": "آدرس ایمیل را وارد کنید"
+          },
+          {
+            "ar": "أدخل البريد الإلكتروني"
+          },
+          {
+            "es": "Ingrese el correo electrónico"
+          },
+          {
+            "fr": "Entrez l'adresse e-mail"
+          },
+          {
+            "de": "E-Mail-Adresse eingeben"
+          },
+          {
+            "it": "Inserisci indirizzo email"
+          },
+          {
+            "ru": "Введите адрес эл. почты"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+        },
+        "colSpan": 1,
+        "order": 4
       },
       {
         "id": "first-name",
@@ -4196,72 +4262,6 @@
         },
         "colSpan": 1,
         "order": 3
-      },
-      {
-        "id": "email",
-        "name": "email",
-        "label": "Email",
-        "sectionId": "basic-information",
-        "component": "email",
-        "placeholder": "Enter email address",
-        "translations": [
-          {
-            "en": "Email"
-          },
-          {
-            "fa": "ایمیل"
-          },
-          {
-            "ar": "البريد الإلكتروني"
-          },
-          {
-            "es": "Correo electrónico"
-          },
-          {
-            "fr": "E-mail"
-          },
-          {
-            "de": "E-Mail"
-          },
-          {
-            "it": "Email"
-          },
-          {
-            "ru": "Эл. почта"
-          }
-        ],
-        "placeholderTranslations": [
-          {
-            "en": "Enter email address"
-          },
-          {
-            "fa": "آدرس ایمیل را وارد کنید"
-          },
-          {
-            "ar": "أدخل البريد الإلكتروني"
-          },
-          {
-            "es": "Ingrese el correo electrónico"
-          },
-          {
-            "fr": "Entrez l'adresse e-mail"
-          },
-          {
-            "de": "E-Mail-Adresse eingeben"
-          },
-          {
-            "it": "Inserisci indirizzo email"
-          },
-          {
-            "ru": "Введите адрес эл. почты"
-          }
-        ],
-        "validation": {
-          "required": true,
-          "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
-        },
-        "colSpan": 1,
-        "order": 4
       },
       {
         "id": "post-title",
@@ -4512,7 +4512,12 @@
             "ru": "Выберите тип аутентификации"
           }
         ],
-        "defaultValue": "active-directory",
+        "defaultValue": [{
+          "id": "form-based",
+          "label": "Form-Based",
+          "icon": "User",
+          "color": "cyan"
+        }],
         "validation": {
           "required": true
         },
@@ -4599,8 +4604,26 @@
       "sections": [
         {
           "id": "user-overview",
-          "title": "User Overview",
-          "description": "Core user information",
+          "title": [
+            {"en": "User Overview"},
+            {"fa": "نمای کلی کاربر"},
+            {"ar": "نظرة عامة على المستخدم"},
+            {"es": "Resumen del usuario"},
+            {"fr": "Aperçu de l'utilisateur"},
+            {"de": "Benutzerübersicht"},
+            {"it": "Panoramica utente"},
+            {"ru": "Обзор пользователя"}
+          ],
+          "description": [
+            {"en": "Core user information"},
+            {"fa": "اطلاعات اصلی کاربر"},
+            {"ar": "معلومات المستخدم الأساسية"},
+            {"es": "Información principal del usuario"},
+            {"fr": "Informations principales de l'utilisateur"},
+            {"de": "Kernbenutzerinformationen"},
+            {"it": "Informazioni principali dell'utente"},
+            {"ru": "Основная информация о пользователе"}
+          ],
           "colSpan": 2,
           "fieldIds": [
             "first-name",
@@ -4615,7 +4638,16 @@
       "quickActions": [
         {
           "id": "reset-password",
-          "label": "Reset Password",
+          "label": [
+            {"en": "Reset Password"},
+            {"fa": "بازنشانی رمز عبور"},
+            {"ar": "إعادة تعيين كلمة المرور"},
+            {"es": "Restablecer contraseña"},
+            {"fr": "Réinitialiser le mot de passe"},
+            {"de": "Passwort zurücksetzen"},
+            {"it": "Reimposta password"},
+            {"ru": "Сбросить пароль"}
+          ],
           "icon": "Key",
           "variant": "default",
           "action": "openActionForm",

@@ -11,8 +11,12 @@ import { cn } from '@/gradian-ui/shared/utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
-import { getActionConfig, getSingularName, isEditMode } from '../utils/action-config';
+import { getActionConfig, isEditMode } from '../utils/action-config';
+import { getSchemaTranslatedSingularName } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import { toast } from 'sonner';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface FormDialogProps {
   isOpen: boolean;
@@ -55,7 +59,12 @@ export const FormDialog: React.FC<FormDialogProps> = ({
 
   // Get action configurations dynamically
   const editMode = isEditMode(initialValues);
-  const singularName = getSingularName(schema);
+  const lang = useLanguageStore((s) => s.language) ?? 'en';
+  const singularName = getSchemaTranslatedSingularName(
+    schema,
+    lang,
+    schema?.singular_name || schema?.name || 'Item'
+  );
   const actionConfigs = useMemo(() => {
     const defaultActions: Array<'submit' | 'cancel' | 'reset'> = ['cancel', 'reset', 'submit'];
     const actions = schema.actions || defaultActions;
@@ -73,9 +82,13 @@ export const FormDialog: React.FC<FormDialogProps> = ({
     setIsSubmitting(true);
     try {
       await onSubmit?.(data);
-      const entityLabel = singularName || schema?.singular_name || schema?.name || 'Record';
-      const successTitle = editMode ? `${entityLabel} updated` : `${entityLabel} created`;
-      const successDescription = editMode ? 'Changes saved successfully.' : 'New record created successfully.';
+      const toastLang = useLanguageStore.getState().language ?? 'en';
+      const defLang = getDefaultLanguage();
+      const entityLabel = getSchemaTranslatedSingularName(schema, toastLang, schema?.singular_name || schema?.name || 'Record');
+      const successTitleKey = editMode ? TRANSLATION_KEYS.TOAST_X_UPDATED : TRANSLATION_KEYS.TOAST_X_CREATED;
+      const successTitle = getT(successTitleKey, toastLang, defLang).replace('{name}', entityLabel);
+      const successDescKey = editMode ? TRANSLATION_KEYS.TOAST_CHANGES_SAVED : TRANSLATION_KEYS.TOAST_RECORD_CREATED_SUCCESS;
+      const successDescription = getT(successDescKey, toastLang, defLang);
       toast.success(successTitle, { description: successDescription });
       loggingCustom(LogType.FORM_DATA, 'info', 'Form dialog submitted successfully');
       onClose();

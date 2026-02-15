@@ -1,16 +1,25 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../../components/ui/avatar';
 
+const ZWNJ = '\u200C'; // Zero-width non-joiner (semi-space for fa/ar)
+
+/** fa/ar use ZWNJ between initials to prevent unwanted cursive joining */
+function addSemiSpaceIfRTL(initials: string, lang?: string): string {
+  if (!lang || (lang !== 'fa' && lang !== 'ar')) return initials;
+  return initials.split('').join(ZWNJ);
+}
+
 /**
  * Get initials from a name string (or value that will be coerced to string).
  * Safe for translation arrays/objects: only strings get trimmed/split; otherwise returns 'A'.
  * Maximum 3 characters: first two words + last word if more than 2 words
+ * When lang is fa or ar, inserts ZWNJ (semi-space) between initials for proper RTL rendering.
  * Examples:
  * - "Git Sync Environment Variables" -> "GSV" (G from Git, S from Sync, V from Variables)
  * - "John Doe" -> "JD" (J from John, D from Doe)
  * - "Single" -> "SI" (first two characters)
  */
-export const getInitials = (name: unknown): string => {
+export const getInitials = (name: unknown, lang?: string): string => {
   const str = typeof name === 'string' ? name : '';
   if (!str) return 'A';
   
@@ -18,18 +27,15 @@ export const getInitials = (name: unknown): string => {
   
   if (words.length === 0) return 'A';
   
+  let result: string;
   if (words.length === 1) {
-    // Single word: take first two characters
-    return words[0].substring(0, 2).toUpperCase();
+    result = words[0].substring(0, 2).toUpperCase();
+  } else if (words.length === 2) {
+    result = (words[0][0] + words[1][0]).toUpperCase();
+  } else {
+    result = (words[0][0] + words[1][0] + words[words.length - 1][0]).toUpperCase();
   }
-  
-  if (words.length === 2) {
-    // Two words: take first letter of each
-    return (words[0][0] + words[1][0]).toUpperCase();
-  }
-  
-  // More than 2 words: first letter of first two words + first letter of last word
-  return (words[0][0] + words[1][0] + words[words.length - 1][0]).toUpperCase();
+  return addSemiSpaceIfRTL(result, lang);
 };
 
 interface GetAvatarContentProps {

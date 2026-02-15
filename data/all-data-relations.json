@@ -1879,7 +1879,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "authentication-type",
     "createdAt": "2026-01-04T11:33:56.167Z",
-    "updatedAt": "2026-01-04T11:33:56.167Z"
+    "updatedAt": "2026-02-15T14:24:34.813Z"
   },
   {
     "id": "01KE4CJW8Q6P3AP23AZMERB03T",
@@ -3365,5 +3365,192 @@
     "createdAt": "2026-02-07T08:21:13.883Z",
     "updatedAt": "2026-02-07T08:21:16.771Z",
     "inactive": true
+  },
+  {
+    "id": "01KHFY4DA9GEJ7F17QJGFF9F1J",
+    "sourceSchema": "users",
+    "sourceId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "targetSchema": "external_nodes",
+    "targetId": "form-based",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T05:59:46.205Z",
+    "updatedAt": "2026-02-15T14:01:45.118Z"
+  },
+  {
+    "id": "01KHFY5GN02JE300403EAK2EPR",
+    "sourceSchema": "users",
+    "sourceId": "01KBF8N88CG4YPK6VDNQAE420Z",
+    "targetSchema": "external_nodes",
+    "targetId": "form-based",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T06:00:22.432Z",
+    "updatedAt": "2026-02-15T06:00:22.432Z"
+  },
+  {
+    "id": "01KHFY5XW6RJ664KKHJCEET4NP",
+    "sourceSchema": "users",
+    "sourceId": "01KC3F76QSDY5P2XVP3T2E0DAD",
+    "targetSchema": "external_nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T06:00:35.974Z",
+    "updatedAt": "2026-02-15T14:24:06.460Z"
+  },
+  {
+    "id": "01KHFY6F8Y57CN77AQGSYQZG9F",
+    "sourceSchema": "users",
+    "sourceId": "01KC3FBM8YXB7V70SQMEBN0151",
+    "targetSchema": "external_nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T06:00:53.789Z",
+    "updatedAt": "2026-02-15T13:53:21.369Z"
+  },
+  {
+    "id": "01KHGS0PGPD8VX3RT6JY2BAGBW",
+    "sourceSchema": "users",
+    "sourceId": "01KHGS0PBPHJXDNC9XX6613MVT",
+    "targetSchema": "external_nodes",
+    "targetId": "form-based",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T13:49:36.150Z",
+    "updatedAt": "2026-02-15T13:49:36.150Z"
+  },
+  {
+    "id": "01KHGSYBDSP3T3TAGKT0KWCZND",
+    "sourceSchema": "users",
+    "sourceId": "01KBSTVK8P6Y3P4MW060HNNKB1",
+    "targetSchema": "external_nodes",
+    "targetId": "form-based",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:05:47.819Z",
+    "updatedAt": "2026-02-15T14:05:47.819Z"
+  },
+  {
+    "id": "01KHGT37YBJ4PBFQ5XE5N63VYG",
+    "sourceSchema": "users",
+    "sourceId": "01KD06TGJVES5TDYR29FQ1S5JT",
+    "targetSchema": "external_nodes",
+    "targetId": "form-based",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:08:28.106Z",
+    "updatedAt": "2026-02-15T14:08:28.106Z"
+  },
+  {
+    "id": "01KHGT43JMB6RQ6WR6SBQFTRE8",
+    "sourceSchema": "users",
+    "sourceId": "01KBZ64EBC9SWWTCCYKEMGK21E",
+    "targetSchema": "external_nodes",
+    "targetId": "form-based",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:08:56.399Z",
+    "updatedAt": "2026-02-15T14:10:56.337Z"
+  },
+  {
+    "id": "01KHGT4ZW232Y6W6DMC766RY3R",
+    "sourceSchema": "users",
+    "sourceId": "01KBSMDRHJTDY7SFEY6VWK2HEK",
+    "targetSchema": "external_nodes",
+    "targetId": "form-based",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:09:25.377Z",
+    "updatedAt": "2026-02-15T14:09:25.377Z"
+  },
+  {
+    "id": "01KHGTFK02VQRNMP0VXSYG2ZAE",
+    "sourceSchema": "users",
+    "sourceId": "01KDFEH9R5NH6C1QXN7PE3HK43",
+    "targetSchema": "external_nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:15:12.642Z",
+    "updatedAt": "2026-02-15T14:15:12.642Z"
+  },
+  {
+    "id": "01KHGTH468CAGCJGGCJN2VAH0J",
+    "sourceSchema": "users",
+    "sourceId": "01KDFEG5Z10VPAMAG3E76KJMCG",
+    "targetSchema": "external_nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:16:03.016Z",
+    "updatedAt": "2026-02-15T14:16:03.016Z"
+  },
+  {
+    "id": "01KHGTJAD0AZDWWEJ32PPGPYYG",
+    "sourceSchema": "users",
+    "sourceId": "01KDK3V3153CFBWENVSF15E7RR",
+    "targetSchema": "external_nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:16:42.144Z",
+    "updatedAt": "2026-02-15T14:16:42.144Z"
+  },
+  {
+    "id": "01KHGTKBBNQC8YT8QWM5H4EF1P",
+    "sourceSchema": "users",
+    "sourceId": "01KDK3NM3EEJ7DJ81BJ0JDAWDT",
+    "targetSchema": "external_nodes",
+    "targetId": "form-based",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:17:15.889Z",
+    "updatedAt": "2026-02-15T14:17:15.889Z"
+  },
+  {
+    "id": "01KHGV1FB5JX7XTDPPTWY1S524",
+    "sourceSchema": "users",
+    "sourceId": "01KDG66XCHTD0GGQX3A2E69T85",
+    "targetSchema": "external_nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:24:58.724Z",
+    "updatedAt": "2026-02-15T14:24:58.724Z"
+  },
+  {
+    "id": "01KHGV1ZQGD03EZ6HQGPT65DCQ",
+    "sourceSchema": "users",
+    "sourceId": "01KCPC8YBMRYB3X846103R11MH",
+    "targetSchema": "external_nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:25:15.504Z",
+    "updatedAt": "2026-02-15T14:25:15.504Z"
+  },
+  {
+    "id": "01KHGV2D4CB203EDQJHNQQH0QG",
+    "sourceSchema": "users",
+    "sourceId": "01KHGS0PBPHJXDNC9XX6613MVX",
+    "targetSchema": "external_nodes",
+    "targetId": "form-based",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:25:29.228Z",
+    "updatedAt": "2026-02-15T14:25:29.228Z"
+  },
+  {
+    "id": "01KHGV2ZHBH4PVDFS9DTM00BWS",
+    "sourceSchema": "users",
+    "sourceId": "01KHGS0PBPHJXDNC9XX6613MVY",
+    "targetSchema": "external_nodes",
+    "targetId": "form-based",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-15T14:25:48.075Z",
+    "updatedAt": "2026-02-15T14:25:48.075Z"
   }
 ]

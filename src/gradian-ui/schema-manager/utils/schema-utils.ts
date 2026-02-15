@@ -1,5 +1,6 @@
 import { FormSchema as SharedFormSchema } from '../types/form-schema';
 import { FormSchema as FormBuilderFormSchema } from '../types/form-schema';
+import { resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 
 /** Schema with optional translation arrays for names and description */
 type SchemaWithNameTranslations = {
@@ -69,17 +70,19 @@ export function getSchemaTranslatedDescription(
   return resolveFromNameTranslations(schema.description_translations, lang, base);
 }
 
-/** Section with optional title/description translation arrays */
+/** Section with title/description as string or translation array */
 type SectionWithTranslations = {
-  title?: string;
-  description?: string;
+  title?: string | Array<Record<string, string>>;
+  description?: string | Array<Record<string, string>>;
+  /** @deprecated Use title as array instead */
   titleTranslations?: Array<Record<string, string>>;
+  /** @deprecated Use description as array instead */
   descriptionTranslations?: Array<Record<string, string>>;
 };
 
 /**
  * Get the section title in the given language.
- * Uses titleTranslations when present; otherwise returns section.title or fallback.
+ * Supports title as string, translation array [{en:"..."}, {fa:"..."}], or legacy titleTranslations.
  */
 export function getSectionTranslatedTitle(
   section: SectionWithTranslations | null | undefined,
@@ -87,13 +90,17 @@ export function getSectionTranslatedTitle(
   fallback = ''
 ): string {
   if (!section) return fallback;
-  const base = section.title ?? fallback;
-  return resolveFromNameTranslations(section.titleTranslations, lang, base);
+  // Prefer legacy titleTranslations when present (schema sections use this format)
+  const fromLegacy = resolveFromNameTranslations(section.titleTranslations, lang, '');
+  if (fromLegacy) return fromLegacy;
+  const resolved = resolveDisplayLabel(section.title, lang, 'en');
+  if (resolved) return resolved;
+  return typeof section.title === 'string' ? (section.title || fallback) : fallback;
 }
 
 /**
  * Get the section description in the given language.
- * Uses descriptionTranslations when present; otherwise returns section.description or fallback.
+ * Supports description as string, translation array, or legacy descriptionTranslations.
  */
 export function getSectionTranslatedDescription(
   section: SectionWithTranslations | null | undefined,
@@ -101,8 +108,11 @@ export function getSectionTranslatedDescription(
   fallback = ''
 ): string {
   if (!section) return fallback;
-  const base = section.description ?? fallback;
-  return resolveFromNameTranslations(section.descriptionTranslations, lang, base);
+  const fromLegacy = resolveFromNameTranslations(section.descriptionTranslations, lang, '');
+  if (fromLegacy) return fromLegacy;
+  const resolved = resolveDisplayLabel(section.description, lang, 'en');
+  if (resolved) return resolved;
+  return typeof section.description === 'string' ? (section.description ?? fallback) : fallback;
 }
 
 // Extended form schema with additional properties

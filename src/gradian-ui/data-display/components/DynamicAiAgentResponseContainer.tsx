@@ -29,7 +29,7 @@ import { Badge } from '@/components/ui/badge';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
-import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
 import { useLanguageStore } from '@/stores/language.store';
 import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
@@ -80,6 +80,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   const isCurrentlyLoadingRef = useRef(false);
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const defaultLang = getDefaultLanguage();
+  const actionLabel = resolveDisplayLabel(action.label, language, defaultLang);
 
   const {
     aiResponse,
@@ -850,7 +851,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         <CardWrapper
           config={{
             id: action.id,
-            name: action.label,
+            name: actionLabel,
             styling: {
               variant: 'default',
               size: 'md'
@@ -863,7 +864,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         >
           <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4 shrink-0">
             <div className="relative flex flex-col gap-1">
-              <CardTitle className="text-sm font-semibold text-white">{action.label}</CardTitle>
+              <CardTitle className="text-sm font-semibold text-white">{actionLabel}</CardTitle>
               <div className="flex items-center gap-2 text-xs text-white/80">
                 <Sparkles className="h-3 w-3" />
                 <span>Powered by Gradian AI</span>
@@ -921,7 +922,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         <CardWrapper
           config={{
             id: action.id,
-            name: action.label,
+            name: actionLabel,
             styling: {
               variant: 'default',
               size: 'md'
@@ -944,7 +945,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               />
             </div>
             <div className="relative flex flex-col gap-1">
-              <CardTitle className="text-sm font-semibold text-white">{action.label}</CardTitle>
+              <CardTitle className="text-sm font-semibold text-white">{actionLabel}</CardTitle>
               <div className="flex items-center gap-1.5 text-xs text-white/80">
                 <Sparkles className="h-3 w-3" />
                 <span>Powered by Gradian AI</span>
@@ -1001,7 +1002,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
       <CardWrapper
         config={{
           id: action.id,
-          name: action.label,
+          name: actionLabel,
           styling: {
             variant: 'default',
             size: 'md'
@@ -1029,7 +1030,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
                 {action.icon && (
                   <IconRenderer iconName={action.icon} className="h-4 w-4 text-white" />
                 )}
-                <CardTitle className="text-sm font-semibold text-white">{action.label}</CardTitle>
+                <CardTitle className="text-sm font-semibold text-white">{actionLabel}</CardTitle>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-white/80">
                 <Sparkles className="h-3 w-3" />
@@ -1100,7 +1101,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
                 {action.icon && (
                   <IconRenderer iconName={action.icon} className="h-5 w-5" />
                 )}
-                <DialogTitle className="text-lg font-semibold">{action.label}</DialogTitle>
+                <DialogTitle className="text-lg font-semibold">{actionLabel}</DialogTitle>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
                 <Sparkles className="h-3 w-3" />

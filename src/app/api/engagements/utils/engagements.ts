@@ -11,8 +11,11 @@ import type {
   EngagementWithInteraction,
 } from '@/domains/engagements/types';
 import { readSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
-import { findGroupByReference } from './groups';
-import { findInteractionsByEngagementIds } from './interactions';
+import { findGroupByReference, findGroupById } from './groups';
+import {
+  findInteractionsByEngagementIds,
+  isInteractionRead,
+} from './interactions';
 
 /** Build createdBy object from user record (users schema) */
 function toCreatedByUser(userId: string, user?: Record<string, unknown> | null): EngagementCreatedByUser {
@@ -79,7 +82,10 @@ export function filterOutDeletedEngagements(
 export interface ListEngagementsQuery {
   engagementType: EngagementType;
   engagementGroupId?: string;
+  /** @deprecated Use referenceType + referenceId. When referenceType=schema, referenceId=schemaId */
   referenceSchemaId?: string;
+  referenceType?: string;
+  referenceId?: string;
   referenceInstanceId?: string;
   search?: string;
   priority?: string;
@@ -98,9 +104,10 @@ export function listEngagements(query: ListEngagementsQuery): Engagement[] {
   if (query.engagementGroupId !== undefined)
     list = list.filter((e) => e.engagementGroupId === query.engagementGroupId);
 
-  if (query.referenceSchemaId && query.referenceInstanceId) {
+  const refSchemaId = query.referenceSchemaId ?? (query.referenceType === 'schema' ? query.referenceId : undefined);
+  if (refSchemaId && query.referenceInstanceId) {
     const group = findGroupByReference(
-      query.referenceSchemaId,
+      refSchemaId,
       query.referenceInstanceId,
     );
     if (group) list = list.filter((e) => e.engagementGroupId === group.id);
@@ -150,7 +157,7 @@ export function countEngagements(
   if (query.currentUserId != null && query.isRead !== undefined) {
     const enriched = enrichEngagementsWithInteractions(list, query.currentUserId);
     return enriched.filter(
-      (e) => (e.interaction?.isRead ?? false) === query.isRead,
+      (e) => isInteractionRead(e.interaction) === query.isRead,
     ).length;
   }
   return list.length;
@@ -218,6 +225,7 @@ export function createEngagement(
         : 'canRead',
     reactions: Array.isArray(body.reactions) ? body.reactions : undefined,
     hashtags: Array.isArray(body.hashtags) ? body.hashtags : undefined,
+    dueDate: typeof body.dueDate === 'string' ? body.dueDate : undefined,
     createdBy, // Never use body.createdBy; set by API from user store / JWT or fixed id for notifications
     createdAt: (body.createdAt as string) ?? now,
   };
@@ -247,6 +255,7 @@ export function updateEngagement(
     'hashtags',
     'engagementGroupId',
     'referenceEngagementId',
+    'dueDate',
   ] as const;
   const updated = { ...list[index] };
   for (const key of allowed) {
@@ -358,19 +367,28 @@ async function buildUserMap(): Promise<Map<string, Record<string, unknown>>> {
 
 /**
  * Replace createdBy (string userId) with full createdBy object for demo mode responses.
- * Uses /api/data/users for user lookup. Live mode enrichment is handled by backend.
+ * Uses /api/data/users for user lookup. When createdBy is missing, infers from engagement group.
+ * Live mode enrichment is handled by backend.
  * Matches backend format: { firstName, lastName, username, avatarUrl, userId }.
  */
-export async function enrichEngagementsWithCreatedBy<T extends { createdBy?: string | EngagementCreatedByUser }>(
-  items: T[],
-): Promise<T[]> {
+export async function enrichEngagementsWithCreatedBy<
+  T extends { createdBy?: string | EngagementCreatedByUser; engagementGroupId?: string | null },
+>(items: T[]): Promise<T[]> {
   if (items.length === 0) return [];
   const userMap = await buildUserMap();
   return items.map((e) => {
+    let userId: string | undefined;
     const cb = e.createdBy;
-    if (cb == null) return e;
-    if (typeof cb === 'object' && 'userId' in cb) return e;
-    const userId = String(cb);
+    if (cb != null) {
+      if (typeof cb === 'object' && 'userId' in cb) return e;
+      userId = String(cb);
+    } else if (e.engagementGroupId) {
+      const group = findGroupById(e.engagementGroupId);
+      userId = group?.createdBy ?? undefined;
+    }
+    if (!userId) {
+      return { ...e, createdBy: toCreatedByUser('unknown', null) };
+    }
     const createdByObj = toCreatedByUser(userId, userMap.get(userId) ?? null);
     return { ...e, createdBy: createdByObj };
   });

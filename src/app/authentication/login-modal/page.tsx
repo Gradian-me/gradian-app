@@ -110,22 +110,22 @@ function LoginModalContent() {
     const hasOpener = typeof window.opener !== 'undefined' && window.opener !== null && window.opener !== window;
     const isPopup = hasOpener && !modalMode;
 
-    // No returnOrigin: close popup and reload opener, or reload parent (iframe modal)
+    // No returnOrigin: use postMessage so parent/opener can refresh (works cross-origin)
     if (!returnOrigin) {
       if (isPopup && window.opener) {
         try {
-          window.opener.location.reload();
+          window.opener.postMessage(createLoginSuccessMessage(), '*');
         } catch (e) {
-          loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN-MODAL] Opener reload failed: ${e instanceof Error ? e.message : String(e)}`);
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN-MODAL] Opener postMessage failed: ${e instanceof Error ? e.message : String(e)}`);
         }
         window.close();
         return;
       }
       if (modalMode) {
         try {
-          window.parent.location.reload();
+          window.parent.postMessage(createLoginSuccessMessage(), '*');
         } catch (e) {
-          loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN-MODAL] Parent reload failed: ${e instanceof Error ? e.message : String(e)}`);
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGIN-MODAL] Parent postMessage failed: ${e instanceof Error ? e.message : String(e)}`);
         }
         return;
       }

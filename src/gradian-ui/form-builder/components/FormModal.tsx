@@ -18,7 +18,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { FormDialogErrorBoundary } from './FormDialogErrorBoundary';
 import { Button } from '@/components/ui/button';
 import { useLanguageStore } from '@/stores/language.store';
-import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getSchemaTranslatedSingularName } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import { Maximize2, Minimize2 } from 'lucide-react';
@@ -599,7 +599,7 @@ export const FormModal: React.FC<FormModalProps> = ({
               onClick={() => submitForm?.()}
               disabled={isSubmitting}
             >
-              {actionFormQuickAction?.label || title || 'Submit'}
+              {resolveDisplayLabel(actionFormQuickAction?.label, language, defaultLang) || title || 'Submit'}
             </Button>
           </div>
         )}

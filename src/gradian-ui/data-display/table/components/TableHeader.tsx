@@ -106,7 +106,7 @@ export function TableHeader<T = any>({
               {column.headerRender ? (
                 column.headerRender()
               ) : (
-                <span className="w-full block" dir="auto">{column.label}</span>
+                <span className="w-full block leading-relaxed" dir="auto">{column.label}</span>
               )}
               {column.sortable && onSort && column.align !== 'right' && (
                 <span className="shrink-0">

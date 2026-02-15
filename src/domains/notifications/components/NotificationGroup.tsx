@@ -68,12 +68,11 @@ export function NotificationGroup({ group, groupBy = 'category', onMarkAsRead, o
     <AccordionItem 
       value={groupValue} 
       className={cn(
-        "mb-6 rounded-xl border border-violet-200 dark:border-violet-800/40 bg-violet-50/30 dark:bg-violet-900/20 shadow-sm overflow-hidden",
-        "data-[state=open]:border-violet-300 dark:data-[state=open]:border-violet-700/60",
-        "!border-b-0"
+        "mb-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shadow-sm overflow-hidden",
+        "data-[state=open]:border-gray-300 dark:data-[state=open]:border-gray-700/60"
       )}
     >
-      <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]]:border-b border-violet-200 dark:border-violet-800/40">
+      <AccordionTrigger className="px-4 py-3 hover:no-underline [&[data-state=open]]:border-b bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between w-full pr-4">
           <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">
             {getGroupLabel(group.category, groupBy)}

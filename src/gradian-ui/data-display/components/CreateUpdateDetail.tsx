@@ -9,7 +9,7 @@ import { formatCreatedLabel, formatRelativeTime, formatFullDate, isLocaleRTL } f
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useLanguageStore } from '@/stores/language.store';
 import { cn } from '@/gradian-ui/shared/utils';
-import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -17,7 +17,7 @@ import { getInitials } from '../utils';
 import { AvatarUser, UserData } from './AvatarUser';
 
 // User object type (can be enriched with full user data in demo mode)
-type UserValue =
+type UserObject =
   | string
   | { id: string; label?: string }
   | {
@@ -31,6 +31,14 @@ type UserValue =
   }
   | null
   | undefined;
+type UserValue = UserObject | UserObject[];
+
+/** Normalize user value - if array (from relation), use first element to avoid [object Object] display */
+const normalizeUserValue = (user: UserValue): UserObject => {
+  if (user == null) return user;
+  if (Array.isArray(user) && user.length > 0) return user[0];
+  return user as UserObject;
+};
 
 export interface CreateUpdateDetailProps {
   createdAt?: string | Date | null;
@@ -100,28 +108,33 @@ export const useCreateUpdateDetail = ({
 };
 
 /**
- * Formats a user value to display name
+ * Formats a user value to display name, resolving translations by language
  */
-const formatUserName = (user: UserValue): string | null => {
+const formatUserName = (user: UserObject, lang?: string, defaultLang?: string): string | null => {
   if (!user) return null;
   if (typeof user === 'string') return user;
+  const l = lang ?? getDefaultLanguage();
+  const d = defaultLang ?? getDefaultLanguage();
 
-  // Check if it's a full user object with firstName/lastName
-  if (typeof user === 'object' && 'firstName' in user) {
-    const firstName = user.firstName || '';
-    const lastName = ('lastName' in user ? user.lastName : '') || '';
+  // Check if it's a full user object with firstName/lastName (may have translations)
+  if (typeof user === 'object' && ('firstName' in user || 'lastName' in user)) {
+    const firstName = resolveDisplayLabel((user as any).firstName, l, d);
+    const lastName = resolveDisplayLabel((user as any).lastName, l, d);
     if (firstName || lastName) {
       return `${firstName} ${lastName}`.trim();
     }
-    // Fallback to other fields - check if property exists before accessing
-    if ('username' in user && user.username) return String(user.username);
-    if ('email' in user && user.email) return String(user.email);
-    if ('label' in user && user.label) return String(user.label);
   }
 
-  // Check if it's a simple object with label
-  if (typeof user === 'object' && 'label' in user) {
-    return user.label || null;
+  // Resolve label/name/username/email - may be translation arrays
+  if (typeof user === 'object') {
+    const label = resolveDisplayLabel((user as any).label, l, d);
+    if (label) return label;
+    const name = resolveDisplayLabel((user as any).name, l, d);
+    if (name) return name;
+    const username = resolveDisplayLabel((user as any).username, l, d);
+    if (username) return username;
+    const email = resolveDisplayLabel((user as any).email, l, d);
+    if (email) return email;
   }
 
   return null;
@@ -139,54 +152,65 @@ const getUserAvatarUrl = (user: UserValue): string | null => {
 };
 
 /**
- * Gets initials from user object
+ * Gets initials from user object (resolves translations for display)
  */
-const getUserInitials = (user: UserValue): string => {
+const getUserInitials = (user: UserObject, lang?: string, defaultLang?: string): string => {
   if (!user) return '?';
+  const l = lang ?? getDefaultLanguage();
+  const d = defaultLang ?? getDefaultLanguage();
 
   if (typeof user === 'string') {
-    return getInitials(user);
+    return getInitials(user, l);
   }
 
   if (typeof user === 'object') {
-    // Try firstName + lastName
     if ('firstName' in user || 'lastName' in user) {
-      const firstName = ('firstName' in user ? user.firstName : '') || '';
-      const lastName = ('lastName' in user ? user.lastName : '') || '';
-      if (firstName || lastName) {
-        return getInitials(`${firstName} ${lastName}`.trim());
-      }
+      const firstName = resolveDisplayLabel((user as any).firstName, l, d);
+      const lastName = resolveDisplayLabel((user as any).lastName, l, d);
+      if (firstName || lastName) return getInitials(`${firstName} ${lastName}`.trim(), l);
     }
-
-    // Fallback to other fields - check if property exists before accessing
-    if ('username' in user && user.username) return getInitials(String(user.username));
-    if ('email' in user && user.email) return getInitials(String(user.email));
-    if ('label' in user && user.label) return getInitials(String(user.label));
-    if ('name' in user && user.name) return getInitials(String(user.name));
+    const label = resolveDisplayLabel((user as any).label, l, d);
+    if (label) return getInitials(label, l);
+    const name = resolveDisplayLabel((user as any).name, l, d);
+    if (name) return getInitials(name, l);
+    const username = resolveDisplayLabel((user as any).username, l, d);
+    if (username) return getInitials(username, l);
+    const email = resolveDisplayLabel((user as any).email, l, d);
+    if (email) return getInitials(email, l);
   }
 
   return '?';
 };
 
 /**
- * Converts UserValue to UserData format for AvatarUser
+ * Converts UserValue to UserData format for AvatarUser.
+ * Resolves translation arrays/objects to strings so initials and display names are correct.
  */
-const convertToUserData = (user: UserValue): UserData | null => {
+const convertToUserData = (
+  user: UserValue,
+  language?: string,
+  defaultLang?: string
+): UserData | null => {
   if (!user) return null;
+  const lang = language ?? 'en';
+  const defaultL = defaultLang ?? getDefaultLanguage();
+  const resolve = (v: unknown) =>
+    typeof v === 'string' ? v : resolveDisplayLabel(v, lang, defaultL) ?? '';
+
   if (typeof user === 'string') {
     return { username: user, email: user };
   }
   if (typeof user === 'object') {
     return {
-      ...user,
       id: 'id' in user ? user.id : undefined,
-      firstName: 'firstName' in user ? user.firstName : undefined,
-      lastName: 'lastName' in user ? user.lastName : undefined,
-      username: 'username' in user ? user.username : undefined,
-      email: 'email' in user ? user.email : undefined,
-      company: 'company' in user ? user.company : undefined,
-      postTitle: 'postTitle' in user ? user.postTitle : undefined,
       avatarUrl: 'avatarUrl' in user ? user.avatarUrl : undefined,
+      firstName: resolve('firstName' in user ? user.firstName : undefined),
+      lastName: resolve('lastName' in user ? user.lastName : undefined),
+      username: resolve('username' in user ? user.username : undefined),
+      email: resolve('email' in user ? user.email : undefined),
+      company: resolve('company' in user ? user.company : undefined),
+      postTitle: resolve('postTitle' in user ? user.postTitle : undefined),
+      label: resolve('label' in user ? user.label : undefined),
     };
   }
   return null;
@@ -227,14 +251,16 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
 
   const createdLabel = normalizedCreatedAt ? formatCreatedLabel(normalizedCreatedAt, localeCode) : null;
   const createdFullDate = normalizedCreatedAt ? formatFullDate(normalizedCreatedAt, localeCode) : null;
-  const createdByName = formatUserName(createdBy);
-  const createdByAvatarUrl = getUserAvatarUrl(createdBy);
-  const createdByInitials = getUserInitials(createdBy);
+  const normalizedCreatedBy = normalizeUserValue(createdBy);
+  const createdByName = formatUserName(normalizedCreatedBy, language, defaultLang);
+  const createdByAvatarUrl = getUserAvatarUrl(normalizedCreatedBy);
+  const createdByInitials = getUserInitials(normalizedCreatedBy, language, defaultLang);
   const updatedLabel = normalizedUpdatedAt ? formatRelativeTime(normalizedUpdatedAt, { addSuffix: true, localeCode }) : null;
   const updatedFullDate = normalizedUpdatedAt ? formatFullDate(normalizedUpdatedAt, localeCode) : null;
-  const updatedByName = formatUserName(updatedBy);
-  const updatedByAvatarUrl = getUserAvatarUrl(updatedBy);
-  const updatedByInitials = getUserInitials(updatedBy);
+  const normalizedUpdatedBy = normalizeUserValue(updatedBy);
+  const updatedByName = formatUserName(normalizedUpdatedBy, language, defaultLang);
+  const updatedByAvatarUrl = getUserAvatarUrl(normalizedUpdatedBy);
+  const updatedByInitials = getUserInitials(normalizedUpdatedBy, language, defaultLang);
 
   if (variant === 'minimal') {
     return (
@@ -251,7 +277,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                       <span className="h-1 w-1 rounded-full bg-gray-400 dark:bg-gray-500" />
                       <div className="flex items-center gap-1.5">
                         <AvatarUser
-                          user={convertToUserData(createdBy)}
+                          user={convertToUserData(normalizedCreatedBy, language, defaultLang)}
                           avatarType={avatarType}
                           size="sm"
                           showDialog={avatarType === 'user'}
@@ -288,7 +314,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                       <span className="h-1 w-1 rounded-full bg-gray-400 dark:bg-gray-500" />
                       <div className="flex items-center gap-1.5">
                         <AvatarUser
-                          user={convertToUserData(updatedBy)}
+                          user={convertToUserData(normalizedUpdatedBy, language, defaultLang)}
                           avatarType={avatarType}
                           size="sm"
                           showDialog={avatarType === 'user'}
@@ -356,7 +382,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                   <span className="h-1 w-1 rounded-full bg-gray-400 dark:bg-gray-500 shrink-0" />
                   <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 truncate">
                     <AvatarUser
-                      user={convertToUserData(createdBy)}
+                      user={convertToUserData(normalizedCreatedBy, language, defaultLang)}
                       avatarType={avatarType}
                       size="md"
                       showDialog={avatarType === 'user'}
@@ -400,7 +426,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                   <span className="h-1 w-1 rounded-full bg-gray-400 dark:bg-gray-500 shrink-0" />
                   <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 truncate">
                     <AvatarUser
-                      user={convertToUserData(updatedBy)}
+                      user={convertToUserData(normalizedUpdatedBy, language, defaultLang)}
                       avatarType={avatarType}
                       size="md"
                       showDialog={avatarType === 'user'}
@@ -433,7 +459,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                     <span className="h-1 w-1 rounded-full bg-gray-400 dark:bg-gray-500" />
                     <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
                       <AvatarUser
-                        user={convertToUserData(createdBy)}
+                        user={convertToUserData(normalizedCreatedBy, language, defaultLang)}
                         avatarType={avatarType}
                         size="md"
                         showDialog={avatarType === 'user'}
@@ -472,7 +498,7 @@ export const CreateUpdateDetail: React.FC<CreateUpdateDetailProps> = ({
                     <span className="h-1 w-1 rounded-full bg-gray-400 dark:bg-gray-500" />
                     <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400">
                       <AvatarUser
-                        user={convertToUserData(updatedBy)}
+                        user={convertToUserData(normalizedUpdatedBy, language, defaultLang)}
                         avatarType={avatarType}
                         size="md"
                         showDialog={avatarType === 'user'}

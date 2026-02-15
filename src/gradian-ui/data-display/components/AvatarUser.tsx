@@ -11,6 +11,7 @@ import { Mail, Building2, User, Briefcase, AtSign } from 'lucide-react';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/gradian-ui/shared/utils';
 import { getInitials } from '../utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 export interface UserData {
   company?: string;
@@ -52,20 +53,20 @@ const formatUserName = (user: UserData | null | undefined): string => {
 };
 
 /**
- * Gets user initials
+ * Gets user initials (pass lang for fa/ar semi-space between initials)
  */
-const getUserInitials = (user: UserData | null | undefined): string => {
+const getUserInitials = (user: UserData | null | undefined, lang?: string): string => {
   if (!user) return '?';
-  if (typeof user === 'string') return getInitials(user);
+  if (typeof user === 'string') return getInitials(user, lang);
 
   const firstName = user.firstName || '';
   const lastName = user.lastName || '';
   if (firstName || lastName) {
-    return getInitials(`${firstName} ${lastName}`.trim());
+    return getInitials(`${firstName} ${lastName}`.trim(), lang);
   }
-  if (user.username) return getInitials(user.username);
-  if (user.email) return getInitials(user.email);
-  if (user.label) return getInitials(user.label);
+  if (user.username) return getInitials(user.username, lang);
+  if (user.email) return getInitials(user.email, lang);
+  if (user.label) return getInitials(user.label, lang);
   return '?';
 };
 
@@ -78,11 +79,12 @@ export const AvatarUser: React.FC<AvatarUserProps> = ({
   children,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const language = useLanguageStore((s) => s.language) ?? 'en';
 
   if (!user) return null;
 
   const displayName = formatUserName(user);
-  const initials = getUserInitials(user);
+  const initials = getUserInitials(user, language);
   const avatarUrl = user.avatarUrl;
   const email = user.email;
   const company = user.company;

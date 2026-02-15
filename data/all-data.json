@@ -568,19 +568,16 @@
       "postTitle": "Admin",
       "authenticationType": [
         {
-          "id": "form-based",
-          "label": "Form-Based",
-          "icon": "User",
-          "color": "cyan"
+          "id": "form-based"
         }
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBF8N88CG4YPK6VDNQAE420Z",
       "createdAt": "2025-01-01T10:10:10.000Z",
-      "updatedAt": "2025-01-01T10:10:10.000Z",
+      "updatedAt": "2026-02-15T06:00:22.493Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "relatedTenants": [
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
@@ -593,6 +590,14 @@
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
           "label": "Supply Chain Management"
+        },
+        {
+          "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+          "label": "Local Development"
+        },
+        {
+          "id": "01KH39DYCW17SXF2APAV1KZZQT",
+          "label": "Gradian App"
         }
       ],
       "entityType": [
@@ -623,20 +628,38 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "createdAt": "2025-11-05T15:49:06.366Z",
-      "updatedAt": "2025-11-05T15:49:06.366Z",
+      "updatedAt": "2026-02-15T14:01:45.203Z",
       "avatarUrl": "https://media.licdn.com/dms/image/v2/D4D03AQFqEf1NfTjObg/profile-displayphoto-crop_800_800/B4DZlbvgWeJMAM-/0/1758180806291?e=1764201600&v=beta&t=9qdjZhqjahZqjMh_oT9QKsjgz6bbTb5Bw0BvmXu9Rag",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$lJUuCAnQyRK7q2GbUEpgQg$yoNrrPCRDTJNwVj9aDDDZ0c4reiBNGcfSHEZ6Hennqg",
       "hashType": "argon2",
-      "firstName": "Mahyar",
-      "lastName": "Abidi",
-      "postTitle": "CAO",
+      "firstName": [
+        {
+          "en": "Mahyar"
+        },
+        {
+          "fa": "مهیار"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Abidi"
+        },
+        {
+          "fa": "عبیدی"
+        }
+      ],
+      "postTitle": [
+        {
+          "en": "CAO"
+        },
+        {
+          "fa": "معاون تحلیل کسب و کار"
+        }
+      ],
       "company": "CinnaGen",
       "authenticationType": [
         {
-          "id": "form-based",
-          "label": "Form-Based",
-          "icon": "User",
-          "color": "cyan"
+          "id": "form-based"
         }
       ],
       "status": [
@@ -649,7 +672,7 @@
       ],
       "incomplete": false,
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "relatedTenants": [
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
@@ -662,6 +685,14 @@
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
           "label": "Supply Chain Management"
+        },
+        {
+          "id": "01KH39DYCW17SXF2APAV1KZZQT",
+          "label": "Gradian App"
+        },
+        {
+          "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+          "label": "Local Development"
         }
       ],
       "entityType": [
@@ -681,7 +712,8 @@
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
           "label": "CinnaGen"
         }
-      ]
+      ],
+      "employeeCode": "841"
     },
     {
       "company": "AryoGen",
@@ -694,23 +726,41 @@
         }
       ],
       "username": "goudarziar",
-      "firstName": "Arman",
-      "lastName": "Goudarzi",
+      "firstName": [
+        {
+          "en": "Arman"
+        },
+        {
+          "fa": "آرمان"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Goudarzi"
+        },
+        {
+          "fa": "گودرزی"
+        }
+      ],
       "email": "goudarziar@aryogen.com",
-      "postTitle": "Quality Assurance Manager",
+      "postTitle": [
+        {
+          "en": "Quality Assurance Manager"
+        },
+        {
+          "fa": "مدیر مهندسی کیفیت"
+        }
+      ],
       "authenticationType": [
         {
-          "id": "form-based",
-          "label": "Form-Based",
-          "icon": "User",
-          "color": "cyan"
+          "id": "form-based"
         }
       ],
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSMDRHJTDY7SFEY6VWK2HEK",
       "createdAt": "2025-12-06T10:48:20.285Z",
-      "updatedAt": "2025-12-06T10:48:20.285Z",
+      "updatedAt": "2026-02-15T14:09:25.613Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$6FMxlYRqKjO7dE6Pd6LUFA$QrrLBt+KmmX7Oc7SjDxSRAF9IZJ81XQexsv3ZUBFmqA",
       "hashType": "argon2",
       "relatedTenants": [
@@ -719,7 +769,7 @@
           "label": "AryoGen"
         }
       ],
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "entityType": [
         {
           "id": "01KCXDMZE231SQFZZ57W3H8497",
@@ -747,22 +797,33 @@
         }
       ],
       "username": "aminimehra",
-      "firstName": "Ali",
-      "lastName": "Aminimehr",
+      "firstName": [
+        {
+          "en": "Ali"
+        },
+        {
+          "fa": "علی"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Aminimehr"
+        },
+        {
+          "fa": "امینی مهر"
+        }
+      ],
       "email": "aminimehra@aryogen.com",
       "authenticationType": [
         {
-          "id": "form-based",
-          "label": "Form-Based",
-          "icon": "User",
-          "color": "cyan"
+          "id": "form-based"
         }
       ],
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KBSTVK8P6Y3P4MW060HNNKB1",
       "createdAt": "2025-12-06T12:40:45.079Z",
-      "updatedAt": "2025-12-06T12:40:45.079Z",
+      "updatedAt": "2026-02-15T14:05:47.653Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$bAwGvyQyORW6Acrt3OcPuQ$h8/UhXDl2FBP55sdXjeAP846VlsKIxQa+SepjJ+43IM",
       "hashType": "argon2",
       "relatedTenants": [
@@ -771,7 +832,7 @@
           "label": "AryoGen"
         }
       ],
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "entityType": [
         {
           "id": "01KCXDMZE231SQFZZ57W3H8497",
@@ -780,7 +841,14 @@
           "color": "violet"
         }
       ],
-      "postTitle": "Change Management Supervisor",
+      "postTitle": [
+        {
+          "en": "Quality Engineering Supervisor"
+        },
+        {
+          "fa": "سرپرست مهندسی کیفیت"
+        }
+      ],
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
@@ -791,24 +859,42 @@
     },
     {
       "username": "vaziril",
-      "firstName": "Laleh",
-      "lastName": "Vaziri",
+      "firstName": [
+        {
+          "en": "Laleh"
+        },
+        {
+          "fa": "لاله"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Vaziri"
+        },
+        {
+          "fa": "وزیری"
+        }
+      ],
       "email": "vaziril@aryogen.com",
-      "postTitle": "QA Deputy",
+      "postTitle": [
+        {
+          "en": "Quality Assurance Deputy"
+        },
+        {
+          "fa": "معاون تضمین کیفیت"
+        }
+      ],
       "company": "AryoGen",
       "authenticationType": [
         {
-          "id": "form-based",
-          "label": "Form-Based",
-          "icon": "User",
-          "color": "cyan"
+          "id": "form-based"
         }
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KBZ64EBC9SWWTCCYKEMGK21E",
       "createdAt": "2025-12-08T14:34:01.460Z",
-      "updatedAt": "2025-12-08T14:34:01.460Z",
+      "updatedAt": "2026-02-15T14:10:56.460Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$gGbYpp66WV8vRbM6uoX56g$Vw83f/KKDMndrgUwFY+wl6PAQuSwFqFohNkyua4Tbqo",
       "hashType": "argon2",
       "status": [
@@ -825,7 +911,7 @@
           "label": "AryoGen"
         }
       ],
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "entityType": [
         {
           "id": "01KCXDMZE231SQFZZ57W3H8497",
@@ -853,23 +939,41 @@
         }
       ],
       "username": "rezaeifardh",
-      "firstName": "Hossein",
-      "lastName": "Rezaeifard",
+      "firstName": [
+        {
+          "en": "Hossein"
+        },
+        {
+          "fa": "حسین"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Rezaeifard"
+        },
+        {
+          "fa": "رضایی فرد"
+        }
+      ],
       "email": "rezaeifardh@cinnagen.com",
-      "postTitle": "Backend Developer",
+      "postTitle": [
+        {
+          "en": "Backend Developer"
+        },
+        {
+          "fa": "کارشناس بک اند"
+        }
+      ],
       "authenticationType": [
         {
-          "id": "active-directory",
-          "label": "Active Directory",
-          "icon": "Server",
-          "color": "success"
+          "id": "active-directory"
         }
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KC3F76QSDY5P2XVP3T2E0DAD",
       "createdAt": "2025-12-10T06:29:46.883Z",
-      "updatedAt": "2025-12-10T06:29:46.883Z",
+      "updatedAt": "2026-02-15T14:24:06.561Z",
       "relatedTenants": [
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
@@ -882,9 +986,17 @@
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
           "label": "Supply Chain Management"
+        },
+        {
+          "id": "01KH39DYCW17SXF2APAV1KZZQT",
+          "label": "Gradian App"
+        },
+        {
+          "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+          "label": "Local Development"
         }
       ],
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "entityType": [
         {
           "id": "01KCXDKF6JJ392P4HMGC8T19TC",
@@ -916,23 +1028,41 @@
         }
       ],
       "username": "ghasemimas",
-      "firstName": "Masoud",
-      "lastName": "Mirghasemi",
+      "firstName": [
+        {
+          "en": "Masoud"
+        },
+        {
+          "fa": "مسعود"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Mirghasemi"
+        },
+        {
+          "fa": "میرقاسمی"
+        }
+      ],
       "email": "ghasemimas@cinnagen.com",
-      "postTitle": "Backend Developer",
+      "postTitle": [
+        {
+          "en": "Backend Developer"
+        },
+        {
+          "fa": "کارشناس بک اند"
+        }
+      ],
       "authenticationType": [
         {
-          "id": "active-directory",
-          "label": "Active Directory",
-          "icon": "Server",
-          "color": "success"
+          "id": "active-directory"
         }
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KC3FBM8YXB7V70SQMEBN0151",
       "createdAt": "2025-12-10T06:32:11.814Z",
-      "updatedAt": "2025-12-10T06:32:11.814Z",
+      "updatedAt": "2026-02-15T13:53:21.459Z",
       "relatedTenants": [
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
@@ -945,9 +1075,17 @@
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
           "label": "Development Environment"
+        },
+        {
+          "id": "01KH39DYCW17SXF2APAV1KZZQT",
+          "label": "Gradian App"
+        },
+        {
+          "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+          "label": "Local Development"
         }
       ],
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "entityType": [
         {
           "id": "01KCXDKF6JJ392P4HMGC8T19TC",
@@ -972,10 +1110,7 @@
       "company": "CinnaGen",
       "authenticationType": [
         {
-          "id": "active-directory",
-          "label": "Active Directory",
-          "icon": "Server",
-          "color": "success"
+          "id": "active-directory"
         }
       ],
       "status": [
@@ -987,22 +1122,36 @@
         }
       ],
       "username": "nourish",
-      "firstName": "Shafigh",
-      "lastName": "Nouri",
+      "firstName": [
+        {
+          "en": "Shafigh"
+        },
+        {
+          "fa": "شفیق"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Nouri"
+        },
+        {
+          "fa": "نوری"
+        }
+      ],
       "email": "nourish@cinnagen.com",
       "postTitle": "QC Analyst",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KCPC8YBMRYB3X846103R11MH",
       "createdAt": "2025-12-17T14:43:52.319Z",
-      "updatedAt": "2025-12-17T14:43:52.319Z",
+      "updatedAt": "2026-02-15T14:25:15.888Z",
       "relatedTenants": [
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
           "label": "Development Environment"
         }
       ],
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "entityType": [
         {
           "id": "01KCXDMZE231SQFZZ57W3H8497",
@@ -1076,10 +1225,7 @@
       "company": "AryoGen",
       "authenticationType": [
         {
-          "id": "form-based",
-          "label": "Form-Based",
-          "icon": "User",
-          "color": "cyan"
+          "id": "form-based"
         }
       ],
       "status": [
@@ -1116,16 +1262,37 @@
       ],
       "username": "saffariounm@aryogen.com",
       "email": "saffariounm@aryogen.com",
-      "firstName": "Mohammad",
-      "lastName": "Saffarioun",
-      "postTitle": "CEO",
+      "firstName": [
+        {
+          "en": "Mohammad"
+        },
+        {
+          "fa": "محمد"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Saffarioun"
+        },
+        {
+          "fa": "صفاریون"
+        }
+      ],
+      "postTitle": [
+        {
+          "en": "CEO"
+        },
+        {
+          "fa": "مدیر عامل"
+        }
+      ],
       "password": "$argon2id$v=19$m=32768,t=3,p=4$gGbYpp66WV8vRbM6uoX56g$Vw83f/KKDMndrgUwFY+wl6PAQuSwFqFohNkyua4Tbqo",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KD06TGJVES5TDYR29FQ1S5JT",
       "createdAt": "2025-12-21T10:21:00.902Z",
-      "updatedAt": "2025-12-21T10:21:00.902Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+      "updatedAt": "2026-02-15T14:08:28.238Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "company": "CinnaGen",
@@ -1163,15 +1330,37 @@
         }
       ],
       "username": "sabzim@cinnagen.com",
-      "firstName": "Mahboubeh",
-      "lastName": "Sabzi",
+      "firstName": [
+        {
+          "en": "Mahboubeh"
+        },
+        {
+          "fa": "محبوبه"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Sabzi"
+        },
+        {
+          "fa": "سبزی"
+        }
+      ],
       "email": "sabzim@cinnagen.com",
-      "postTitle": "Foreign Commercial Supervisor",
+      "postTitle": [
+        {
+          "en": "Foreign Commercial Supervisor"
+        },
+        {
+          "fa": "سرپرست بازرگانی خارجی"
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KDFEG5Z10VPAMAG3E76KJMCG",
       "createdAt": "2025-12-27T08:23:47.429Z",
-      "updatedAt": "2025-12-27T08:23:47.793Z"
+      "updatedAt": "2026-02-15T14:16:03.218Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "company": "CinnaGen",
@@ -1209,15 +1398,37 @@
         }
       ],
       "username": "cheshmehkhavarb@cinnagen.com",
-      "firstName": "Bahareh",
-      "lastName": "Chesmehkhavar",
+      "firstName": [
+        {
+          "en": "Bahareh"
+        },
+        {
+          "fa": "بهاره"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Chesmehkhavar"
+        },
+        {
+          "fa": "چشمه خاور"
+        }
+      ],
       "email": "cheshmehkhavarb@cinnagen.com",
-      "postTitle": "Commercial Deputy",
+      "postTitle": [
+        {
+          "en": "Commercial Deputy"
+        },
+        {
+          "fa": "معاون بازرگانی"
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KDFEH9R5NH6C1QXN7PE3HK43",
       "createdAt": "2025-12-27T08:24:24.071Z",
-      "updatedAt": "2025-12-27T08:24:24.367Z"
+      "updatedAt": "2026-02-15T14:15:12.756Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "company": "CinnaGen",
@@ -1255,14 +1466,28 @@
         }
       ],
       "username": "heydarzadehn@cinnagen.com",
-      "firstName": "Nima",
-      "lastName": "Heydarzadeh",
+      "firstName": [
+        {
+          "en": "Nima"
+        },
+        {
+          "fa": "نیما"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Heydarzadeh"
+        },
+        {
+          "fa": "حیدرزاده"
+        }
+      ],
       "email": "heydarzadehn@cinnagen.com",
       "postTitle": "AI / DevOps / Digital Twin Engineer",
       "incomplete": false,
       "id": "01KDG66XCHTD0GGQX3A2E69T85",
       "createdAt": "2025-12-27T15:18:09.558Z",
-      "updatedAt": "2025-12-30T13:25:34.255Z",
+      "updatedAt": "2026-02-15T14:24:58.805Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
@@ -1301,17 +1526,39 @@
         }
       ],
       "username": "bastamin@aryogen.com",
-      "firstName": "Nima",
-      "lastName": "Bastami",
+      "firstName": [
+        {
+          "en": "Nima"
+        },
+        {
+          "fa": "نیما"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Bastami"
+        },
+        {
+          "fa": "بسطامی"
+        }
+      ],
       "email": "bastamin@aryogen.com",
-      "postTitle": "Commercial Deputy",
+      "postTitle": [
+        {
+          "en": "Commercial Deputy"
+        },
+        {
+          "fa": "معاون بازرگانی"
+        }
+      ],
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KDK3NM3EEJ7DJ81BJ0JDAWDT",
       "createdAt": "2025-12-28T18:31:29.171Z",
-      "updatedAt": "2026-01-04T10:56:49.992Z",
+      "updatedAt": "2026-02-15T14:17:16.279Z",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$3eGoHL+ko+09K7BK9cjrxg$ghwgqGONz+WvBBxfgiv2SrM9keCVzuYu/qPvcveo0q0",
-      "hashType": "argon2"
+      "hashType": "argon2",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "company": "CinnaGen",
@@ -1349,15 +1596,37 @@
         }
       ],
       "username": "montajabim@cinnagen.com",
-      "firstName": "Mehran",
-      "lastName": "Montajabi",
+      "firstName": [
+        {
+          "en": "Mehran"
+        },
+        {
+          "fa": "مهران"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Montajabi"
+        },
+        {
+          "fa": "منتجبی"
+        }
+      ],
       "email": "montajabim@cinnagen.com",
-      "postTitle": "CEO",
+      "postTitle": [
+        {
+          "en": "CEO"
+        },
+        {
+          "fa": "مدیر عامل"
+        }
+      ],
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KDK3V3153CFBWENVSF15E7RR",
       "createdAt": "2025-12-28T18:34:28.278Z",
-      "updatedAt": "2025-12-28T18:34:28.740Z"
+      "updatedAt": "2026-02-15T14:16:42.266Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "company": "CinnaGen",
@@ -1395,15 +1664,37 @@
         }
       ],
       "username": "montajabim@cinnagen.com",
-      "firstName": "Mehran",
-      "lastName": "Montajabi",
+      "firstName": [
+        {
+          "en": "Mehran"
+        },
+        {
+          "fa": "مهران"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Montajabi"
+        },
+        {
+          "fa": "منتجبی"
+        }
+      ],
       "email": "montajabim@cinnagen.com",
-      "postTitle": "CEO",
+      "postTitle": [
+        {
+          "en": "CEO"
+        },
+        {
+          "fa": "مدیر عامل"
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KE4CJ37WKF60JWQGQ0BD0WF4",
       "createdAt": "2026-01-04T11:33:56.096Z",
-      "updatedAt": "2026-01-04T11:33:56.219Z"
+      "updatedAt": "2026-02-15T14:24:34.900Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "company": "CinnaGen",
@@ -1473,6 +1764,209 @@
       "updatedAt": "2026-02-10T10:56:48.436Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "employeeCode": "1676"
+    },
+    {
+      "company": "AryoGen",
+      "authenticationType": [
+        {
+          "id": "form-based"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        }
+      ],
+      "username": "sadeghiyans",
+      "email": "sadeghiyans@aryogen.com",
+      "firstName": [
+        {
+          "en": "Sobhan"
+        },
+        {
+          "fa": "سبحان"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Sadeghian"
+        },
+        {
+          "fa": "صادقیان"
+        }
+      ],
+      "postTitle": [
+        {
+          "en": "Quality Engineering Expert"
+        },
+        {
+          "fa": "کارشناس مهندسی کیفیت"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KHGS0PBPHJXDNC9XX6613MVT",
+      "createdAt": "2026-02-15T13:49:35.997Z",
+      "updatedAt": "2026-02-15T13:49:36.230Z"
+    },
+    {
+      "company": "AryoGen",
+      "authenticationType": [
+        {
+          "id": "form-based"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        }
+      ],
+      "username": "amidzadehz",
+      "email": "amidzadehz@aryogen.com",
+      "firstName": [
+        {
+          "en": "Zahra"
+        },
+        {
+          "fa": "زهرا"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Amidzadeh"
+        },
+        {
+          "fa": "عمیدزاده"
+        }
+      ],
+      "postTitle": [
+        {
+          "en": "Quality Engineering Expert"
+        },
+        {
+          "fa": "کارشناس مهندسی کیفیت"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KHGS0PBPHJXDNC9XX6613MVX",
+      "createdAt": "2026-02-15T13:49:35.997Z",
+      "updatedAt": "2026-02-15T14:25:29.372Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "company": "AryoGen",
+      "authenticationType": [
+        {
+          "id": "form-based"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": "AryoGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        }
+      ],
+      "username": "amidzadehz",
+      "email": "amidzadehz@aryogen.com",
+      "firstName": [
+        {
+          "en": "Mehrnoush"
+        },
+        {
+          "fa": "مهرنوش"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Samadbeigi"
+        },
+        {
+          "fa": "صمدبیگی"
+        }
+      ],
+      "postTitle": [
+        {
+          "en": "Quality Engineering Expert"
+        },
+        {
+          "fa": "کارشناس مهندسی کیفیت"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KHGS0PBPHJXDNC9XX6613MVY",
+      "createdAt": "2026-02-15T13:49:35.997Z",
+      "updatedAt": "2026-02-15T14:25:48.162Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "purchaseOrders": [],
@@ -2761,8 +3255,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-02-09T14:37:57.175Z",
-      "lastSynced": "2026-02-09T14:37:57.175Z",
+      "updatedAt": "2026-02-15T06:02:09.128Z",
+      "lastSynced": "2026-02-15T06:02:09.128Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -2774,7 +3268,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 43 schemas: 43 succeeded, 0 failed (0 created, 43 updated)"
+      "lastSyncMessage": "Processed 34 schemas: 34 succeeded, 0 failed (0 created, 34 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -2802,7 +3296,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-02-09T07:41:52.652Z",
+      "updatedAt": "2026-02-15T06:02:15.908Z",
       "isTenantBased": true,
       "category": [
         {
@@ -2812,8 +3306,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-02-09T07:41:52.652Z",
-      "lastSyncMessage": "Generated relations for 45 out of 45 schemas",
+      "lastSynced": "2026-02-15T06:02:15.908Z",
+      "lastSyncMessage": "Generated relations for 34 out of 34 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -2863,7 +3357,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2026-01-06T14:07:16.139Z",
+      "updatedAt": "2026-02-15T06:02:29.300Z",
       "category": [
         {
           "id": "production-integration",
@@ -2872,8 +3366,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-01-06T14:07:16.139Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 14, nodes updated: 269, edges created: 128, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2026-02-15T06:02:29.300Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 3, nodes updated: 214, edges created: 74, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -19975,9 +20469,9 @@
     {
       "id": "form-based",
       "label": "Form-Based",
+      "sourceUrl": "field-options:users:authentication-type",
       "icon": "User",
-      "color": "cyan",
-      "sourceUrl": "field-options:users:authentication-type"
+      "color": "cyan"
     },
     {
       "id": "active-directory",

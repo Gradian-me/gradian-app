@@ -6874,5 +6874,39 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000005",
+    "timestamp": "2026-02-15T00:00:00.000Z",
+    "version": "1.51.007",
+    "changes": [
+      {
+        "changeType": "update",
+        "description": "UPDATE: Enhanced engagement management by adding new engagement entries in engagements.json for discussion types, improving tracking capabilities.",
+        "priority": "High",
+        "affectedDomains": [
+          "engagements",
+          "data"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "REFACTOR: Updated engagement routes to support new reference structure, ensuring consistent user identification and interaction handling.",
+        "priority": "High",
+        "affectedDomains": [
+          "engagements",
+          "api"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "ADD: Introduced email field in schemas with multilingual support, enhancing user experience. This update significantly improves data integrity and user interaction across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schemas",
+          "form-builder"
+        ]
+      }
+    ]
   }
 ]

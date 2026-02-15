@@ -26,6 +26,7 @@ import {
 import { useLanguageStore } from '@/stores/language.store';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Languages } from 'lucide-react';
+import 'flag-icons/css/flag-icons.min.css';
 import { baseInputClasses } from '../utils/field-styles';
 import { cn } from '@/gradian-ui/shared/utils';
 
@@ -90,16 +91,28 @@ export function TranslationDialog({
     setRecord((prev) => ({ ...prev, [code]: text }));
   };
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     if (!onChange) return;
     const arr = recordToTranslationArray(record);
     onChange(arr);
     onOpenChange(false);
-  };
+  }, [record, onChange, onOpenChange]);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     onOpenChange(false);
-  };
+  }, [onOpenChange]);
+
+  useEffect(() => {
+    if (!open || viewMode || !onChange) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open, viewMode, onChange, handleSave]);
 
   const saveLabel = getT(TRANSLATION_KEYS.BUTTON_SAVE, language, defaultLang);
   const cancelLabel = getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang);
@@ -110,7 +123,7 @@ export function TranslationDialog({
 
   const inputClasses = cn(
     baseInputClasses,
-    isTextarea ? 'min-h-[80px] resize-y' : 'min-h-10'
+    isTextarea ? 'min-h-[80px] resize-y leading-relaxed' : 'min-h-11'
   );
 
   // In view mode only show languages that have a value
@@ -133,22 +146,29 @@ export function TranslationDialog({
         </DialogHeader>
         <div className="flex-1 overflow-y-auto py-2" onClick={(e) => e.stopPropagation()} onMouseDown={(e) => e.stopPropagation()}>
           <div className="grid gap-0" style={{ gridTemplateColumns: 'auto 1fr' }}>
-            <div className="text-xs font-medium text-gray-600 dark:text-gray-400 px-1 pb-2 border-b border-gray-200 dark:border-gray-700 text-center">{labelLanguage}</div>
-            <div className="text-xs font-medium text-gray-600 dark:text-gray-400 px-1 pb-2 border-b border-gray-200 dark:border-gray-700 text-center">{labelValue}</div>
-            {localesToShow.map(({ code, label }) => (
+            <div className="text-xs font-medium leading-relaxed text-gray-600 dark:text-gray-400 px-1 pb-2 pt-1 border-b border-gray-200 dark:border-gray-700 text-center">{labelLanguage}</div>
+            <div className="text-xs font-medium leading-relaxed text-gray-600 dark:text-gray-400 px-1 pb-2 pt-1 border-b border-gray-200 dark:border-gray-700 text-center">{labelValue}</div>
+            {localesToShow.map(({ code, label, flag }) => (
               <React.Fragment key={code}>
                 <label
                   className={cn(
-                    'text-xs text-gray-700 dark:text-gray-300 p-2 flex items-center',
+                    'text-xs leading-relaxed text-gray-700 dark:text-gray-300 p-2 flex items-center gap-2 min-h-11',
                     viewMode && 'border-t border-gray-200 dark:border-gray-700'
                   )}
                 >
+                  {flag ? (
+                    <span
+                      className={cn('fi', `fi-${flag.toLowerCase()}`, 'inline-block overflow-hidden rounded shrink-0')}
+                      style={{ width: '1.25rem', height: '0.9375rem' }}
+                      aria-hidden
+                    />
+                  ) : null}
                   {label}
                 </label>
                 {viewMode ? (
                   <div
                     className={cn(
-                      'min-h-10 p-2 text-xs text-gray-900 dark:text-gray-100 bg-transparent border-t border-gray-200 dark:border-gray-700',
+                      'min-h-11 p-2.5 text-xs leading-relaxed text-gray-900 dark:text-gray-100 bg-transparent border-t border-gray-200 dark:border-gray-700',
                       isTextarea && 'min-h-[80px] whitespace-pre-wrap'
                     )}
                     dir="auto"
@@ -156,7 +176,7 @@ export function TranslationDialog({
                     {(record[code] ?? '').trim()}
                   </div>
                 ) : isTextarea ? (
-                  <div className="p-1">
+                  <div className="p-1.5">
                     <textarea
                       className={inputClasses}
                       value={record[code] ?? ''}
@@ -165,7 +185,7 @@ export function TranslationDialog({
                     />
                   </div>
                 ) : (
-                  <div className="p-1">
+                  <div className="p-1.5">
                     <input
                       type="text"
                       className={inputClasses}

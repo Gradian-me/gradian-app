@@ -22,10 +22,18 @@ export interface EngagementCreatedByUser {
   userId: string;
 }
 
+/** Reference type for engagement groups and bookmarks */
+export type ReferenceType = 'schema' | 'engagement' | 'engagement-group' | string;
+
 export interface EngagementGroup {
   id: string;
-  referenceSchemaId?: string;
+  /** Reference type: schema, engagement, engagement-group, etc. */
+  referenceType?: ReferenceType;
+  /** ID of the referenced entity (e.g. schemaId when referenceType= schema) */
+  referenceId?: string;
   referenceInstanceId?: string;
+  /** @deprecated Use referenceType='schema' + referenceId instead */
+  referenceSchemaId?: string;
   title?: string;
   description?: string;
   createdBy?: string;
@@ -51,6 +59,8 @@ export interface Engagement {
   interactionType: EngagementInteractionType;
   reactions?: unknown[];
   hashtags?: string[];
+  /** Due date for todo/action items */
+  dueDate?: string;
   /** Created by: string (userId) or full user object from backend */
   createdBy?: string | EngagementCreatedByUser;
   createdAt: string;
@@ -60,6 +70,9 @@ export interface Engagement {
   deletedAt?: string;
 }
 
+/** User interaction type: read, acknowledge, or mention */
+export type EngagementInteractionUserType = 'read' | 'acknowledge' | 'mention';
+
 export interface EngagementInteraction {
   id: string;
   /** Backend may return interactionId; treat as id alias */
@@ -68,13 +81,16 @@ export interface EngagementInteraction {
   /** Optional reference to another engagement (e.g. in response to, linked). */
   referenceEngagementId?: string | null;
   userId: string;
-  isRead: boolean;
-  readAt?: string;
-  /** Backend uses interactedAt; can represent read/interaction time */
+  /** Type of interaction: read, acknowledge, or mention */
+  interactionType?: EngagementInteractionUserType;
+  /** When the user performed the interaction */
   interactedAt?: string;
-  dueDate?: string;
   outputType?: EngagementOutputType;
   comment?: string;
+  /** @deprecated Use interaction.interactionType to derive read state. Kept for API compatibility. */
+  isRead?: boolean;
+  /** @deprecated Use interaction.interactedAt. Kept for API compatibility. */
+  readAt?: string;
 }
 
 /** Engagement + interaction(s) for API responses. Backend returns interactions array. */

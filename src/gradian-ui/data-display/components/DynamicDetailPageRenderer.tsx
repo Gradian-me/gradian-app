@@ -15,7 +15,7 @@ import { DynamicAiAgentResponseContainer } from './DynamicAiAgentResponseContain
 import { ComponentRenderer } from './ComponentRenderer';
 import { DynamicRepeatingTableViewer } from './DynamicRepeatingTableViewer';
 import { resolveFieldById } from '../../form-builder/form-elements/utils/field-resolver';
-import { getValueByRole, getSingleValueByRole, extractLabels, getArrayValuesByRole } from '../utils';
+import { getValueByRole, getSingleValueByRole, extractLabels, getArrayValuesByRole, getInitials } from '../utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { getBadgeConfig, getValidBadgeVariant } from '../utils';
 import { cn } from '../../shared/utils';
@@ -374,31 +374,6 @@ const getHeaderInfo = (schema: FormSchema, data: any) => {
   };
 };
 
-/**
- * Get initials from name or avatar field
- * Maximum 3 characters: first two words + last word if more than 2 words
- */
-const getInitials = (name: string): string => {
-  if (!name) return '?';
-  
-  const words = name.trim().split(/\s+/).filter(word => word.length > 0);
-  
-  if (words.length === 0) return '?';
-  
-  if (words.length === 1) {
-    // Single word: take first two characters
-    return words[0].substring(0, 2).toUpperCase();
-  }
-  
-  if (words.length === 2) {
-    // Two words: take first letter of each
-    return (words[0][0] + words[1][0]).toUpperCase();
-  }
-  
-  // More than 2 words: first letter of first two words + first letter of last word
-  return (words[0][0] + words[1][0] + words[words.length - 1][0]).toUpperCase();
-};
-
 const skeletonCardClass =
   'bg-white border border-gray-200 dark:bg-gray-900/50 dark:border-gray-800 rounded-lg shadow-sm';
 const skeletonSubtleSectionClass =
@@ -430,6 +405,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   const labelRefreshing = getT(TRANSLATION_KEYS.MESSAGE_REFRESHING, language ?? undefined, defaultLang);
   const labelEdit = getT(TRANSLATION_KEYS.BUTTON_EDIT, language ?? undefined, defaultLang);
   const labelDelete = getT(TRANSLATION_KEYS.BUTTON_DELETE, language ?? undefined, defaultLang);
+  const labelTags = getT(TRANSLATION_KEYS.LABEL_TAGS, language ?? undefined, defaultLang);
   const translatedPluralName = getSchemaTranslatedPluralName(schema, language ?? defaultLang, schema?.plural_name || schema?.title || schema?.name || 'Schema');
   const translatedSingularName = getSchemaTranslatedSingularName(schema, language ?? defaultLang, schema?.singular_name || schema?.name || 'Entity');
 
@@ -1109,15 +1085,19 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
       fieldsBySection.get(sectionId)!.push(field);
     });
 
-    // Create sections from grouped fields
+    // Create sections from grouped fields (title/description: resolved for current language)
+    const labelInformation = getT(TRANSLATION_KEYS.LABEL_INFORMATION, language ?? undefined, defaultLang);
+    const lang = language ?? defaultLang;
     fieldsBySection.forEach((fields, sectionId) => {
-      // Get section title from schema or use default
       const schemaSection = schema.sections?.find(s => s.id === sectionId);
-      const sectionTitle = schemaSection?.title || 'Information';
-      
+      const titleFallback = typeof schemaSection?.title === 'string' ? schemaSection.title : labelInformation;
+      const descFallback = typeof schemaSection?.description === 'string' ? (schemaSection.description ?? '') : '';
+      const title = getSectionTranslatedTitle(schemaSection, lang, titleFallback);
+      const description = getSectionTranslatedDescription(schemaSection, lang, descFallback);
       sections.push({
         id: sectionId,
-        title: sectionTitle,
+        title,
+        description,
         colSpan: 1,
         fieldIds: fields.map(f => f.id).filter(Boolean)
       });
@@ -1133,8 +1113,14 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
       });
     }
   } else {
-    // Use existing sections (default + metadata)
-    sections = [...filteredDefaultSections, ...metadataSections];
+    // Use existing sections (default + metadata); resolve translatable title/description for current language
+    const lang = language ?? defaultLang;
+    const resolvedMetadataSections = metadataSections.map((sec) => ({
+      ...sec,
+      title: getSectionTranslatedTitle(sec, lang, typeof sec.title === 'string' ? sec.title : sec.id),
+      description: getSectionTranslatedDescription(sec, lang, typeof sec.description === 'string' ? (sec.description ?? '') : ''),
+    }));
+    sections = [...filteredDefaultSections, ...resolvedMetadataSections];
   }
 
   // Group component renderers by whether they should be in the main area or sidebar
@@ -1242,7 +1228,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       <AvatarImage src={`/avatars/${headerInfo.avatar.toLowerCase().replace(/\s+/g, '-')}.jpg`} alt={headerInfo.title || 'Avatar'} />
                     )
                   ) : null}
-                  <AvatarFallback>{getInitials(headerInfo.title || headerInfo.avatar || '?')}</AvatarFallback>
+                  <AvatarFallback>{getInitials(headerInfo.title || headerInfo.avatar || '?', language ?? undefined)}</AvatarFallback>
                 </Avatar>
                 )}
                 <div>
@@ -1424,7 +1410,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
               <CardWrapper
                 config={{
                   id: 'tags',
-                  name: 'Tags',
+                  name: labelTags,
                   styling: {
                     variant: 'default',
                     size: 'md'
@@ -1433,7 +1419,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                 className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
               >
                 <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
-                  <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">Tags</CardTitle>
+                  <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{labelTags}</CardTitle>
                 </CardHeader>
                 <CardContent>
                 <div className="flex items-center gap-2 flex-wrap">
@@ -1605,6 +1591,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       disableAnimation={disableAnimation}
                       schemaCache={targetSchemaCache}
                       onActionClick={customQuickActionHandler}
+                      language={language ?? undefined}
                     />
                   </div>
                 )}
@@ -1615,7 +1602,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                     <CardWrapper
                       config={{
                         id: 'tags',
-                        name: 'Tags',
+                        name: labelTags,
                         styling: {
                           variant: 'default',
                           size: 'md'
@@ -1624,7 +1611,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       className="h-auto bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm"
                     >
                       <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
-                        <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">Tags</CardTitle>
+                        <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">{labelTags}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex items-center gap-2 flex-wrap">

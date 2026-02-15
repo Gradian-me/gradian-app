@@ -16,6 +16,7 @@ import {
   renderSection as renderSectionContent,
   getStatusColor
 } from '../utils';
+import { useLanguageStore } from '@/stores/language.store';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import type { BadgeOption } from '../../form-builder/form-elements/utils/badge-utils';
 
@@ -76,6 +77,9 @@ export const DynamicCard: React.FC<DynamicCardProps> = ({
   index = 0,
   animationDelay = 0.1
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const getInitialsWithLang = (name: string) => getInitials(name, language);
+
   // Get status field options from schema
   const statusOptions = findStatusFieldOptions(formSchema);
   
@@ -128,7 +132,7 @@ export const DynamicCard: React.FC<DynamicCardProps> = ({
               metadata,
               formSchema,
               data,
-              getInitials
+              getInitials: getInitialsWithLang
             })}
             <div>
               <h3 className="text-lg font-semibold text-gray-900">

@@ -19,10 +19,13 @@ import {
   CheckCircle2,
   Circle
 } from 'lucide-react';
-import { formatRelativeTime, formatFullDate, formatDateTime } from '@/gradian-ui/shared/utils/date-utils';
+import { formatRelativeTime, formatFullDate } from '@/gradian-ui/shared/utils/date-utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { resolveCreatedBy } from '@/gradian-ui/communication/discussion/utils/user-utils';
+
+const NOTIFICATION_SYSTEM_USER_ID = '01KBF8N88CG4YPK6VDNQAE420Z';
 
 interface NotificationItemProps {
   notification: Notification;
@@ -37,6 +40,12 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
   const defaultLang = getDefaultLanguage();
   const localeCode = language || undefined;
   const t = (key: string) => getT(key, language, defaultLang);
+  const resolvedCreator = resolveCreatedBy(notification.createdBy, language, defaultLang);
+  const createdByUserId = resolvedCreator?.userId ?? (typeof notification.createdBy === 'string' ? notification.createdBy : notification.createdBy?.userId);
+  const createdByDisplay =
+    createdByUserId === NOTIFICATION_SYSTEM_USER_ID
+      ? t(TRANSLATION_KEYS.LABEL_SYSTEM)
+      : (resolvedCreator?.displayName ?? createdByUserId);
 
   // Determine if this notification needs acknowledgment
   const needsAcknowledgement = notification.interactionType === 'needsAcknowledgement';
@@ -93,8 +102,8 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
       <Card
         className={`hover:shadow-md transition-all duration-200 cursor-pointer ${
           !notification.isRead
-            ? 'bg-violet-50/30 dark:bg-violet-500/10 border-2 border-violet-300 dark:border-violet-400'
-            : 'bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-800'
+            ? 'bg-violet-50/30 dark:bg-violet-800/10 border-2 border-violet-300 dark:border-violet-500'
+            : 'bg-gray-50 dark:bg-gray-800/50 border border-violet-200 dark:border-violet-900'
         }`}
         onClick={() => {
           setIsDialogOpen(true);
@@ -149,10 +158,10 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
               {/* Creator, Assigned To, and Date Info - Full Width */}
               <div className="w-full mt-2 space-y-1">
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-500 dark:text-gray-400">
-                  {notification.createdBy && (
+                  {(createdByDisplay || notification.createdBy) && (
                     <div className="flex items-center gap-1.5">
                       <User className="h-3 w-3" />
-                      <span>{t(TRANSLATION_KEYS.LABEL_CREATED_BY)}: <span className="text-gray-700 dark:text-gray-200 font-medium">{notification.createdBy}</span></span>
+                      <span>{t(TRANSLATION_KEYS.LABEL_CREATED_BY)}: <span className="text-gray-700 dark:text-gray-200 font-medium">{createdByDisplay}</span></span>
                     </div>
                   )}
                   {notification.assignedTo && notification.assignedTo.length > 0 && (
@@ -170,13 +179,13 @@ export function NotificationItem({ notification, onMarkAsRead, onAcknowledge, on
                   {notification.readAt && (
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-3 w-3" />
-                      <span>{t(TRANSLATION_KEYS.LABEL_READ)}: <span className="text-gray-700 dark:text-gray-200 font-medium" dir="ltr">{formatDateTime(notification.readAt, localeCode)}</span></span>
+                      <span>{t(TRANSLATION_KEYS.LABEL_READ)}: <span className="text-gray-700 dark:text-gray-200 font-medium" dir="ltr" title={formatFullDate(notification.readAt, localeCode)}>• {formatRelativeTime(notification.readAt, { addSuffix: true, localeCode })}</span></span>
                     </div>
                   )}
                   {notification.acknowledgedAt && (
                     <div className="flex items-center gap-1.5">
                       <Clock className="h-3 w-3" />
-                      <span>{t(TRANSLATION_KEYS.LABEL_ACKNOWLEDGED)}: <span className="text-gray-700 dark:text-gray-200 font-medium" dir="ltr">{formatDateTime(notification.acknowledgedAt, localeCode)}</span></span>
+                      <span>{t(TRANSLATION_KEYS.LABEL_ACKNOWLEDGED)}: <span className="text-gray-700 dark:text-gray-200 font-medium" dir="ltr" title={formatFullDate(notification.acknowledgedAt, localeCode)}>• {formatRelativeTime(notification.acknowledgedAt, { addSuffix: true, localeCode })}</span></span>
                     </div>
                   )}
                 </div>

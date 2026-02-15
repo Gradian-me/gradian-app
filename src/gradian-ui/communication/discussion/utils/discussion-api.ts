@@ -4,6 +4,7 @@
  */
 
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { fetchEngagements } from '@/domains/engagements/api';
 import type { Engagement, EngagementWithInteraction, EngagementInteraction } from '../types';
 
 export interface FetchDiscussionsParams {
@@ -12,28 +13,14 @@ export interface FetchDiscussionsParams {
   currentUserId?: string | null;
 }
 
-export async function fetchDiscussions({
-  schemaId,
-  instanceId,
-  currentUserId,
-}: FetchDiscussionsParams): Promise<EngagementWithInteraction[]> {
-  const params = new URLSearchParams({
-    referenceSchemaId: schemaId,
-    referenceInstanceId: instanceId,
+/** Fetch discussions for a record. Convenience wrapper around fetchEngagements. */
+export async function fetchDiscussions(
+  params: FetchDiscussionsParams,
+): Promise<EngagementWithInteraction[]> {
+  return fetchEngagements({
+    ...params,
+    engagementType: 'discussion',
   });
-  if (currentUserId) {
-    params.set('currentUserId', currentUserId);
-  }
-  const url = `/api/engagements/discussion?${params}`;
-
-  const res = await apiRequest<{ success: boolean; data: EngagementWithInteraction[] }>(url, {
-    method: 'GET',
-  });
-
-  if (!res.success || !Array.isArray(res.data)) {
-    return [];
-  }
-  return res.data;
 }
 
 export interface FetchInteractionsParams {

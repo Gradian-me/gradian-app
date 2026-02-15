@@ -345,5 +345,24 @@
     "interactionType": "canRead",
     "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
     "createdAt": "2026-02-15T05:36:18.953Z"
+  },
+  {
+    "id": "01KHG442G2FS7NVGGQQ8PEDK1C",
+    "engagementGroupId": "01KHG442FV840D11KS1TM62AHR",
+    "engagementType": "discussion",
+    "message": "test 1",
+    "priority": "medium",
+    "interactionType": "canRead",
+    "createdAt": "2026-02-15T07:44:26.626Z"
+  },
+  {
+    "id": "01KHG468544KJS76FWD39D6JZR",
+    "engagementGroupId": "01KHG442FV840D11KS1TM62AHR",
+    "referenceEngagementId": "01KHG442G2FS7NVGGQQ8PEDK1C",
+    "engagementType": "discussion",
+    "message": "test 2",
+    "priority": "high",
+    "interactionType": "canRead",
+    "createdAt": "2026-02-15T07:45:37.956Z"
   }
 ]

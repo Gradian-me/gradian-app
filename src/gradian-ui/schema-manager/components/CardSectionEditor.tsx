@@ -6,7 +6,11 @@ import { TextInput, NameInput, Slider, SortableSelector } from '@/gradian-ui/for
 import type { SortableSelectorItem } from '@/gradian-ui/form-builder/form-elements';
 import { CardSection } from '../types/form-schema';
 import { Pencil } from 'lucide-react';
-import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import {
+  getT,
+  getDefaultLanguage,
+  recordToTranslationArray,
+} from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
@@ -14,7 +18,7 @@ interface CardSectionEditorProps {
   section: CardSection;
   availableFields: SortableSelectorItem[];
   selectedFields: SortableSelectorItem[];
-  onTitleChange: (value: string) => void;
+  onTitleChange: (value: string | Array<Record<string, string>>) => void;
   onIdChange: (value: string) => void;
   isCustomId: boolean;
   onCustomModeChange: (isCustom: boolean) => void;
@@ -45,6 +49,17 @@ export function CardSectionEditor({
   const defaultLang = getDefaultLanguage();
   const msgIdAutoCustomize = getT(TRANSLATION_KEYS.CARD_MSG_ID_AUTO_CUSTOMIZE, language, defaultLang);
 
+  const titleValue: string | Array<Record<string, string>> =
+    section.titleTranslations && section.titleTranslations.length > 0
+      ? section.titleTranslations
+      : typeof section.title === 'object' && section.title !== null && !Array.isArray(section.title)
+        ? recordToTranslationArray(section.title as Record<string, string>)
+        : recordToTranslationArray({ [defaultLang]: section.title || '' });
+
+  const handleTitleChange = (value: string | Array<Record<string, string>>) => {
+    onTitleChange(value);
+  };
+
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="rounded-2xl max-w-3xl w-[95vw]">
@@ -59,8 +74,9 @@ export function CardSectionEditor({
           <div className="grid gap-4">
             <TextInput
               config={{ name: 'section-title', label: 'Card Section Title' }}
-              value={section.title || ''}
-              onChange={onTitleChange}
+              value={titleValue}
+              onChange={handleTitleChange}
+              allowTranslation
             />
             <NameInput
               config={{
