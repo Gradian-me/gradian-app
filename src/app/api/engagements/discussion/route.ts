@@ -97,10 +97,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const bodyObj = body as Record<string, unknown>;
-    const bodyCreatedBy = bodyObj.createdBy as string | undefined;
     const authUserId = authResult.userId?.trim();
     const tokenUserId = !authUserId ? getUserIdFromRequest(request) : null;
-    const createdBy = bodyCreatedBy?.trim() || authUserId || (tokenUserId ?? undefined);
+    // Do not use body.createdBy: use user store / JWT (live mode).
+    const createdBy = authUserId || (tokenUserId ?? undefined);
     const engagementGroupId = bodyObj.engagementGroupId ?? null;
     const created = createEngagement(bodyObj, ENGAGEMENT_TYPE, engagementGroupId as string | null, createdBy);
     const data = await enrichEngagementWithCreatedBy(created);

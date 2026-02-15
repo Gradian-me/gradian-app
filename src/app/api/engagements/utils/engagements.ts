@@ -218,7 +218,7 @@ export function createEngagement(
         : 'canRead',
     reactions: Array.isArray(body.reactions) ? body.reactions : undefined,
     hashtags: Array.isArray(body.hashtags) ? body.hashtags : undefined,
-    createdBy: createdBy ?? (body.createdBy as string),
+    createdBy, // Never use body.createdBy; set by API from user store / JWT or fixed id for notifications
     createdAt: (body.createdAt as string) ?? now,
   };
 

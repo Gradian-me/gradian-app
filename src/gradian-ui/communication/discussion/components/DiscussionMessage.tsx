@@ -105,9 +105,9 @@ export const DiscussionMessage: React.FC<DiscussionMessageProps> = ({
           </AvatarFallback>
         </Avatar>
       )}
-      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+      <div className="flex-1 min-w-0 flex flex-col gap-0.5 justify-between">
         {/* Row 1: Message */}
-        <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words leading-snug">
+        <p dir="auto" className="text-base text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words leading-snug">
           {message.message || '—'}
         </p>
         {/* Row 2: createdBy • friendly date */}

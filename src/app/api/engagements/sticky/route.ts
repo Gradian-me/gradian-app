@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
+import { getUserIdFromRequest } from '@/domains/chat/utils/auth-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { isDemoModeEnabled, proxyEngagementRequest } from '@/app/api/data/utils';
@@ -96,8 +97,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const bodyObj = body as Record<string, unknown>;
+    const authUserId = authResult.userId?.trim();
+    const tokenUserId = !authUserId ? getUserIdFromRequest(request) : null;
+    const createdBy = authUserId || (tokenUserId ?? undefined);
     const engagementGroupId = bodyObj.engagementGroupId ?? null;
-    const created = createEngagement(bodyObj, ENGAGEMENT_TYPE, engagementGroupId as string | null);
+    const created = createEngagement(
+      bodyObj,
+      ENGAGEMENT_TYPE,
+      engagementGroupId as string | null,
+      createdBy,
+    );
     const data = await enrichEngagementWithCreatedBy(created);
     return NextResponse.json(
       {

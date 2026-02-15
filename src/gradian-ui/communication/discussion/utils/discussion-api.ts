@@ -67,7 +67,6 @@ export interface CreateDiscussionParams {
   instanceId: string;
   message: string;
   priority?: 'low' | 'medium' | 'high' | 'urgent';
-  createdBy?: string;
   referenceEngagementId?: string;
 }
 
@@ -76,7 +75,6 @@ export async function createDiscussion({
   instanceId,
   message,
   priority,
-  createdBy,
   referenceEngagementId,
 }: CreateDiscussionParams): Promise<Engagement> {
   const url = `/api/data/${encodeURIComponent(schemaId)}/${encodeURIComponent(instanceId)}/engagements/discussion`;
@@ -85,9 +83,7 @@ export async function createDiscussion({
     message: String(message || '').trim(),
     priority: priority ?? 'medium',
   };
-  if (createdBy) {
-    body.createdBy = createdBy;
-  }
+  // Do not send createdBy: API uses user store / JWT (live mode).
   if (referenceEngagementId) {
     body.referenceEngagementId = referenceEngagementId;
   }

@@ -158,10 +158,14 @@ export async function POST(
 
   try {
     const bodyObj = body as Record<string, unknown>;
-    const bodyCreatedBy = bodyObj.createdBy as string | undefined;
     const authUserId = authResult.userId?.trim();
     const tokenUserId = !authUserId ? getUserIdFromRequest(request) : null;
-    const createdBy = bodyCreatedBy?.trim() || authUserId || (tokenUserId ?? undefined);
+    // Do not use body.createdBy: use user store / JWT (live mode). Notifications use fixed system user.
+    const NOTIFICATION_CREATED_BY = '01KBF8N88CG4YPK6VDNQAE420Z';
+    const createdBy =
+      engagementType === 'notification'
+        ? NOTIFICATION_CREATED_BY
+        : authUserId || (tokenUserId ?? undefined);
     const group = getOrCreateGroupForReference(schemaId, instanceId, createdBy);
     const created = createEngagement(bodyObj, engagementType, group.id, createdBy);
     const data = await enrichEngagementWithCreatedBy(created);

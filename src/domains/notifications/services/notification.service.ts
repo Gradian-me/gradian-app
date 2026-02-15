@@ -287,7 +287,7 @@ export class NotificationService {
       priority: notification.priority,
       type: notification.type,
       interactionType: notification.interactionType ?? 'canRead',
-      createdBy: notification.createdBy,
+      // Do not send createdBy: API sets fixed system user (01KBF8N88CG4YPK6VDNQAE420Z) for notifications.
     };
     const response = await apiRequest<EngagementWithInteraction>(
       '/api/engagements/notifications',

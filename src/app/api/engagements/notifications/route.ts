@@ -93,7 +93,14 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const created = createEngagement(body as Record<string, unknown>, ENGAGEMENT_TYPE, null);
+    // Notifications always use fixed system user for createdBy (not from body or JWT).
+    const NOTIFICATION_CREATED_BY = '01KBF8N88CG4YPK6VDNQAE420Z';
+    const created = createEngagement(
+      body as Record<string, unknown>,
+      ENGAGEMENT_TYPE,
+      null,
+      NOTIFICATION_CREATED_BY,
+    );
     const data = await enrichEngagementWithCreatedBy(created);
     return NextResponse.json(
       {

@@ -72,7 +72,6 @@ export const DiscussionInputDialog: React.FC<DiscussionInputDialogProps> = ({
         instanceId: config.instanceId,
         message: trimmed,
         priority: priority || 'medium',
-        createdBy: config.currentUserId,
         referenceEngagementId: config.referenceEngagementId,
       });
       setMessage('');

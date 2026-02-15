@@ -873,12 +873,14 @@ export async function apiRequest<T>(
 
   const requestHeaders = headersWithCaller ? { headers: headersWithCaller } : undefined;
 
-  // Enrich request body with user ID for POST/PUT/PATCH requests to /api/data/* endpoints
+  // Enrich request body with user ID for POST/PUT/PATCH requests to /api/data/* endpoints.
+  // Skip engagement endpoints: createdBy is set by API from user store / JWT (or fixed id for notifications).
   let enrichedBody = options?.body;
   const isDataEndpoint = normalizedEndpoint.startsWith('/api/data/') || normalizedEndpoint.includes('/api/data/');
+  const isEngagementEndpoint = /\/engagements(\/|$)/.test(normalizedEndpoint);
   const isMutationMethod = method === 'POST' || method === 'PUT' || method === 'PATCH';
-  
-  if (isDataEndpoint && isMutationMethod && enrichedBody !== undefined) {
+
+  if (isDataEndpoint && !isEngagementEndpoint && isMutationMethod && enrichedBody !== undefined) {
     try {
       const userId = await getUserId();
       if (userId) {
