@@ -9,6 +9,7 @@ import { IdleTimeoutProvider } from "@/gradian-ui/shared/providers/IdleTimeoutPr
 import { AuthEventListener } from "@/gradian-ui/shared/components/AuthEventListener";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { LayoutDirLang } from "@/components/layout/LayoutDirLang";
+import { SquircleProvider } from "@/components/squircle-provider";
 
 export const metadata: Metadata = {
   title: "Gradian",
@@ -54,6 +55,7 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <QueryProvider>
+          <SquircleProvider>
           <SecurityProvider>
             <LayoutDirLang />
             <DialogProvider>
@@ -73,6 +75,7 @@ export default function RootLayout({
               </ThemeProvider>
             </DialogProvider>
           </SecurityProvider>
+          </SquircleProvider>
         </QueryProvider>
       </body>
     </html>

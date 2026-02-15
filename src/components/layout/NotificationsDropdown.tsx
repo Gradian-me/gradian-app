@@ -60,9 +60,9 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
     setIsMounted(true);
   }, []);
 
-  // Fetch notifications from API when dropdown opens; refresh badge count when opening
+  // Fetch notifications list only when dropdown is open (badge count uses /count API via useNotificationCount)
   useEffect(() => {
-    if (!isMounted) return;
+    if (!isMounted || !isOpen) return;
 
     const fetchNotifications = async () => {
       setIsLoading(true);
@@ -70,7 +70,7 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
         const allNotifications = await NotificationService.getNotifications({});
         const top10 = allNotifications.slice(0, 10);
         setNotifications(top10);
-        if (isOpen) void refetchCount();
+        void refetchCount();
       } catch (error) {
         loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching notifications: ${error instanceof Error ? error.message : String(error)}`);
         setNotifications([]);

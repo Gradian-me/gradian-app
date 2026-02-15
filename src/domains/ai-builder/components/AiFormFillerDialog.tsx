@@ -70,8 +70,11 @@ export function AiFormFillerDialog({
 
   const aiResponse = latestResponse?.content || '';
 
-  // Fetch form-filler agent
-  const { agents, loading: isLoadingAgent } = useAiAgents({ agentId: 'form-filler' });
+  // Fetch form-filler agent only when dialog is open (not on every form/modal open)
+  const { agents, loading: isLoadingAgent } = useAiAgents({
+    agentId: 'form-filler',
+    enabled: isOpen,
+  });
 
   useEffect(() => {
     if (agents && agents.length > 0) {

@@ -77,7 +77,7 @@ function TranslationViewCell({
           e.preventDefault();
           e.stopPropagation();
         }}
-        className="shrink-0 p-1 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-100/70 dark:hover:bg-gray-700/50 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border-0"
+        className="shrink-0 p-1 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-100/70 dark:hover:bg-gray-700/50 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 border border-gray-200 dark:border-gray-600"
         title="View translations"
         aria-label="View translations"
       >

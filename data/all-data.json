@@ -1830,7 +1830,9 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KHGS0PBPHJXDNC9XX6613MVT",
       "createdAt": "2026-02-15T13:49:35.997Z",
-      "updatedAt": "2026-02-15T13:49:36.230Z"
+      "updatedAt": "2026-02-15T21:04:54.916Z",
+      "password": "$argon2id$v=19$m=32768,t=3,p=4$FRCsfsq0wurkZTffE+QHRg$+f4fIcQe4tfrm0b0b6+0ucESrWd4vkNrs1UeS/CzuEA",
+      "hashType": "argon2"
     },
     {
       "company": "AryoGen",
@@ -1897,8 +1899,10 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KHGS0PBPHJXDNC9XX6613MVX",
       "createdAt": "2026-02-15T13:49:35.997Z",
-      "updatedAt": "2026-02-15T14:25:29.372Z",
-      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+      "updatedAt": "2026-02-15T21:05:45.449Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "password": "$argon2id$v=19$m=32768,t=3,p=4$s44ELzA7iVf7QYsCG3SmOQ$j0X2w7BOguSFuYgV2jMtnOa/XMrYPuUY8u4cPn9/9Us",
+      "hashType": "argon2"
     },
     {
       "company": "AryoGen",
@@ -1935,8 +1939,8 @@
           "label": "AryoGen"
         }
       ],
-      "username": "amidzadehz",
-      "email": "amidzadehz@aryogen.com",
+      "username": "samadbeygim",
+      "email": "samadbeygim@aryogen.com",
       "firstName": [
         {
           "en": "Mehrnoush"
@@ -1965,8 +1969,10 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KHGS0PBPHJXDNC9XX6613MVY",
       "createdAt": "2026-02-15T13:49:35.997Z",
-      "updatedAt": "2026-02-15T14:25:48.162Z",
-      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+      "updatedAt": "2026-02-15T21:06:30.462Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "password": "$argon2id$v=19$m=32768,t=3,p=4$b/BcMx/GSEeBHn3E9u7BdQ$jar54P4WwvP0Yu/29+4D0HAxt+X9d0RAhHbfB/MX3yA",
+      "hashType": "argon2"
     }
   ],
   "purchaseOrders": [],

@@ -21,7 +21,7 @@ import { extractFirstId, normalizeOptionArray, NormalizedOption } from '../utils
 import { ChevronDown, Search } from 'lucide-react';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { useOptionsFromSchemaOrUrl } from '../hooks/useOptionsFromSchemaOrUrl';
-import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { getLabelClasses, errorTextClasses, selectTriggerBaseClasses } from '../utils/field-styles';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
 import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
@@ -358,22 +358,21 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const resolvedOptions = (effectiveSchemaId || schemaId || effectiveSourceUrl) ? fetchedOptions : options;
   const sizeClasses = {
     sm: 'h-8',
-    md: 'h-10',
+    md: 'min-h-11',
     lg: 'h-12',
   };
 
-  // Base classes from SelectTrigger - we'll merge with size and error
-  const baseSelectClasses = 'rounded-lg border border-gray-300 dark:border-gray-600 bg-white text-xs dark:bg-gray-900/60 dark:text-gray-300 dark:placeholder:text-gray-400 shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 ring-offset-background dark:ring-offset-gray-900 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:ring-offset-1 focus:border-violet-400 dark:focus:border-violet-500 data-[state=open]:outline-none data-[state=open]:ring-1 data-[state=open]:ring-violet-300 dark:data-[state=open]:ring-violet-500 data-[state=open]:ring-offset-1 data-[state=open]:border-violet-400 dark:data-[state=open]:border-violet-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-gray-800/30 disabled:text-gray-500 dark:disabled:text-gray-300 transition-colors';
-  
   const selectClasses = cn(
-    baseSelectClasses,
+    selectTriggerBaseClasses,
     sizeClasses[size],
     error && 'border-red-500 dark:border-red-500 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-300 dark:focus:ring-red-400 data-[state=open]:border-red-500 dark:data-[state=open]:border-red-500 data-[state=open]:ring-red-300 dark:data-[state=open]:ring-red-400',
     className
   );
 
   const fieldName = config?.name || 'unknown';
-  const fieldLabel = config?.label;
+  const selectLang = useLanguageStore((s) => s.getLanguage?.()) ?? getDefaultLanguage();
+  const selectDefaultLang = getDefaultLanguage();
+  const fieldLabel = resolveDisplayLabel(config?.label, selectLang, selectDefaultLang);
   const fieldPlaceholder = placeholder || config?.placeholder || 'Select an option...';
 
   const renderFieldLabel = () =>
@@ -437,7 +436,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     // If sortAtoZ is false and sortType is null, keep original order (no sorting)
     
     return sorted;
-  }, [resolvedOptions, schemaId, effectiveSourceUrl, fetchedOptions, isLoadingOptions, optionsError, sortType, sortAtoZ]);
+  }, [resolvedOptions, schemaId, effectiveSourceUrl, fetchedOptions, isLoadingOptions, optionsError, sortType, sortAtoZ, selectLang]);
 
   const normalizedOptionsLookup = useMemo(() => {
     const map = new Map<string, NormalizedOption>();
@@ -454,9 +453,6 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     return map;
   }, [normalizedOptions, normalizedValueArray]);
   const hasNormalizedOptions = normalizedOptions.length > 0;
-
-  const selectLang = useLanguageStore((s) => s.getLanguage?.()) ?? getDefaultLanguage();
-  const selectDefaultLang = getDefaultLanguage();
 
   // Filter options based on search value (resolve labels so translation arrays never get .toLowerCase)
   const filteredOptions = useMemo(() => {
@@ -548,10 +544,15 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
            /^[a-z]+-[a-z0-9-]+/.test(color); // Matches Tailwind class patterns like bg-red-400
   };
 
+  // Resolve option label (handles translation arrays [{en: 'x'}, {fa: 'y'}])
+  const optionLabel = (option: NormalizedOption) =>
+    resolveDisplayLabel(option.label ?? option.id ?? '', selectLang, selectDefaultLang);
+
   // Render badge or custom colored badge
   const renderBadgeContent = (option: NormalizedOption) => {
     // Add pointer-events-none to nested elements to ensure clicks propagate to SelectItem
     const pointerEventsNone = 'pointer-events-none';
+    const label = optionLabel(option);
     const flagCode = option.flagCode as string | undefined;
     const iconEl = flagCode ? (
       <span
@@ -575,7 +576,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
           ) : option.icon ? (
             <IconRenderer iconName={option.icon} className="h-5 w-5" />
           ) : null}
-          {option.label}
+          {label}
         </div>
       );
     }
@@ -585,7 +586,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       return (
         <Badge variant={option.color as any} className={`flex items-center gap-1.5 px-2 py-0.5 ${pointerEventsNone}`}>
           {iconEl}
-          {option.label}
+          {label}
         </Badge>
       );
     }
@@ -599,7 +600,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       return (
         <div className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium border ${defaultTextColor} ${option.color} ${pointerEventsNone}`}>
           {iconEl}
-          {option.label}
+          {label}
         </div>
       );
     }
@@ -612,7 +613,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
           style={{ backgroundColor: option.color, color: '#fff', border: 'none' }}
         >
           {iconEl}
-          {option.label}
+          {label}
         </div>
       );
     }
@@ -621,7 +622,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     return (
       <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 ${option.color} ${pointerEventsNone}`}>
         {iconEl}
-        {option.label}
+        {label}
       </div>
     );
   };

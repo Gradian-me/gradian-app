@@ -8,13 +8,16 @@ import { NormalizedOption, normalizeOptionArray } from '../utils/option-normaliz
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
-import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { getLabelClasses, errorTextClasses, fieldDisabledClasses } from '../utils/field-styles';
+import { FORM_CONTAINER_ALT_BG_CLASSES } from '@/gradian-ui/shared/configs/ui-config';
 import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { replaceDynamicContext } from '../../utils/dynamic-context-replacer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 
 const isBadgeVariant = (color?: string): color is keyof typeof BADGE_SELECTED_VARIANT_CLASSES => {
   if (!color) return false;
@@ -78,6 +81,9 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
       allowMultiselectSetting === undefined
         ? undefined
         : Boolean(allowMultiselectSetting);
+
+    const language = useLanguageStore((s) => s.getLanguage?.()) ?? undefined;
+    const defaultLang = getDefaultLanguage();
 
     // Get dynamic context for reference-based filtering
     // Use selector to ensure reactivity when formSchema or formData changes
@@ -334,15 +340,10 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
     };
 
     const rootClasses = cn(
-      'flex flex-wrap gap-2 rounded-xl border p-2 shadow-sm transition-all duration-200',
-      // Light mode
-      'border-gray-200 bg-white/80 backdrop-blur-sm',
-      // Dark mode
-      'dark:border-gray-700 dark:bg-gray-800/60 dark:backdrop-blur-sm',
-      // Orientation
+      'flex flex-wrap gap-1.5 p-2',
+      FORM_CONTAINER_ALT_BG_CLASSES,
       resolvedOrientation === 'vertical' && 'flex-col',
-      // States
-      disabled && 'opacity-60 pointer-events-none cursor-not-allowed',
+      disabled && fieldDisabledClasses,
       error && 'border-red-500 dark:border-red-600',
       className
     );
@@ -373,19 +374,17 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
           value={option.id}
           disabled={disabled || option.disabled}
           className={cn(
-            'gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-200',
+            'gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
             // Light mode - default
-            'text-gray-700 border-gray-200 bg-white shadow-sm',
-            'hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md',
+            'text-gray-600 border border-gray-200 bg-white',
+            'hover:border-violet-300 hover:bg-violet-50/80 hover:text-violet-700',
             // Light mode - selected
-            'data-[state=on]:bg-gradient-to-r data-[state=on]:from-violet-500 data-[state=on]:to-purple-600 data-[state=on]:border-violet-400 data-[state=on]:text-white data-[state=on]:shadow-md data-[state=on]:font-semibold',
+            'data-[state=on]:border-violet-400 data-[state=on]:bg-violet-500 data-[state=on]:text-white data-[state=on]:font-medium',
             // Dark mode - default
-            'dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50',
-            'dark:hover:border-violet-500 dark:hover:bg-gray-700 dark:hover:text-violet-300 dark:hover:shadow-lg',
+            'dark:text-gray-400 dark:border-gray-600 dark:bg-gray-800/40',
+            'dark:hover:border-violet-500 dark:hover:bg-gray-700/80 dark:hover:text-violet-300',
             // Dark mode - selected
-            'dark:data-[state=on]:bg-gradient-to-r dark:data-[state=on]:from-violet-600 dark:data-[state=on]:to-purple-700 dark:data-[state=on]:border-violet-500 dark:data-[state=on]:text-white dark:data-[state=on]:shadow-lg',
-            // Active press effect
-            'active:scale-[0.98]',
+            'dark:data-[state=on]:border-violet-500 dark:data-[state=on]:bg-violet-600 dark:data-[state=on]:text-white',
             sizeClasses[size],
             customClasses,
             error && 'ring-1 ring-red-200 dark:ring-red-600'
@@ -394,8 +393,8 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
           onFocus={onFocus}
           onBlur={onBlur}
         >
-          {option.icon && <IconRenderer iconName={option.icon} className="h-4 w-4" />}
-          <span>{option.label ?? option.id}</span>
+          {option.icon && <IconRenderer iconName={option.icon} className="h-3.5 w-3.5 shrink-0" />}
+          <span>{resolveDisplayLabel(option.label ?? option.id, language ?? undefined, defaultLang)}</span>
         </ToggleGroupItem>
       );
     };
@@ -420,7 +419,7 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
     const fieldName = config?.name || 'toggle-group';
     
     return (
-      <div className="w-full space-y-2">
+      <div className="w-full">
         {hasLabel && (
           <div className="flex items-center justify-between gap-2">
             <label
@@ -428,7 +427,7 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
               dir="auto"
               className={getLabelClasses({ error: Boolean(error), required, disabled })}
             >
-              {config?.label}
+              {resolveDisplayLabel(config?.label, language ?? undefined, defaultLang)}
             </label>
             {config?.helper && (
               <span className="text-xs font-normal text-gray-500 dark:text-gray-400">{config.helper}</span>
@@ -436,9 +435,9 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
           </div>
         )}
         {isLoadingOptions ? (
-          <div className="text-sm text-gray-500 py-2">Loading options...</div>
+          <div className="text-xs text-gray-500 py-2">Loading options...</div>
         ) : optionsError ? (
-          <div className="text-sm text-red-600 py-2">{optionsError}</div>
+          <div className="text-xs text-red-600 py-2">{optionsError}</div>
         ) : (
           <ToggleGroupRoot
             ref={groupRef}
@@ -457,7 +456,7 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
             {normalizedOptions.length > 0 ? (
               normalizedOptions.map(renderOption)
             ) : (
-              <div className="text-sm text-gray-500">No options available</div>
+              <div className="text-xs text-gray-500">No options available</div>
             )}
           </ToggleGroupRoot>
         )}

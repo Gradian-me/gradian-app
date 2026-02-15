@@ -13,6 +13,8 @@ import { getIconComponent } from '@/gradian-ui/shared/utils/icon-renderer';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 
 export interface MultiSelectFormOption {
   id?: string;
@@ -88,6 +90,8 @@ export const MultiSelect: React.FC<MultiSelectWithBadgesProps> = ({
   variant = 'default',
   ...props
 }) => {
+  const language = useLanguageStore((s) => s.getLanguage?.()) ?? getDefaultLanguage();
+
   // Fetch options from schemaId or sourceUrl if provided
   const {
     options: fetchedOptions,
@@ -151,7 +155,7 @@ export const MultiSelect: React.FC<MultiSelectWithBadgesProps> = ({
         color: opt.color,
       };
     });
-  }, [resolvedOptions, fetchedOptions, schemaId, sourceUrl, config, sortType]);
+  }, [resolvedOptions, fetchedOptions, schemaId, sourceUrl, config, sortType, language]);
 
   // Handle value conversion - support both array and single value
   // Also handle normalized option format

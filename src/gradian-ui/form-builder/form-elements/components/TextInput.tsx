@@ -94,6 +94,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',
       (canCopy || allowTranslation) && 'pe-10',
+      allowTranslation && 'read-only:bg-white read-only:border-gray-300 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-gray-600 read-only:dark:text-gray-300 read-only:cursor-default',
       className
     );
 
@@ -101,7 +102,6 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
     const fieldLabel = (config as any).label;
     const fieldPlaceholder = (config as any).placeholder;
     const fieldReadOnly = (config as any).readonly ?? (config as any).readOnly ?? false;
-    const isTranslatableDisabled = allowTranslation;
 
     if (!config) {
       loggingCustom(LogType.CLIENT_LOG, 'error', 'TextInput: config is required');
@@ -133,8 +133,8 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
             minLength={minLength || (config as any).validation?.minLength}
             pattern={pattern}
             required={required ?? (config as any).validation?.required ?? false}
-            disabled={disabled || isTranslatableDisabled}
-            readOnly={fieldReadOnly || isTranslatableDisabled}
+            disabled={disabled}
+            readOnly={fieldReadOnly || (allowTranslation && !disabled)}
             autoComplete="off"
             className={inputClasses}
             {...props}

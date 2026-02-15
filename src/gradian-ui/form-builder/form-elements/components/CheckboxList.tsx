@@ -17,6 +17,8 @@ import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { replaceDynamicContext } from '../../utils/dynamic-context-replacer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 
 export interface CheckboxListProps extends FormElementProps {
   options?: Array<{ id?: string; label: string; value?: string; disabled?: boolean; icon?: string; color?: string }>;
@@ -364,11 +366,13 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
       }
     };
 
+    const language = useLanguageStore((s) => s.language);
+    const defaultLang = getDefaultLanguage();
     const fieldName = config.name || 'checkbox-list';
-    const fieldLabel = config.label;
+    const fieldLabel = resolveDisplayLabel(config.label, language ?? undefined, defaultLang);
 
     return (
-      <div className={cn('w-full space-y-2 border border-gray-300 dark:border-gray-700 rounded-lg p-2', className)}>
+      <div className={cn('w-full border border-gray-300 dark:border-gray-700 rounded-lg p-2', className)}>
         {fieldLabel && (
           <label htmlFor={fieldName} dir="auto" className={getLabelClasses({ error: Boolean(error), required })}>
             {fieldLabel}
@@ -433,7 +437,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
                     (disabled || option.disabled) && 'opacity-50 cursor-not-allowed'
                   )}
                 >
-                  {option.label}
+                  {resolveDisplayLabel(option.label ?? option.id, language ?? undefined, defaultLang)}
                 </Label>
               </div>
             );

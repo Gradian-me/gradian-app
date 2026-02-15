@@ -292,13 +292,13 @@ export const GoToTopForm: React.FC<GoToTopFormProps> = ({
             variant="outline"
             className={cn(
               'h-9 w-9 rounded-full',
-              'bg-white/95 backdrop-blur-sm',
-              'border-gray-300 hover:border-violet-400',
+              'bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm',
+              'border border-violet-300 dark:border-violet-700 hover:border-violet-400',
               'shadow-md hover:shadow-lg',
-              'text-gray-600 hover:text-violet-600',
+              'text-violet-700 dark:text-violet-300 hover:text-violet-600',
               'transition-all duration-200',
               'hover:scale-105 active:scale-95',
-              'hover:bg-white'
+              'hover:bg-white dark:hover:bg-gray-900'
             )}
             aria-label="Scroll to top"
           >

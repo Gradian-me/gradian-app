@@ -3,9 +3,11 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { ToggleProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
-import { getLabelClasses } from '../utils/field-styles';
+import { getLabelClasses, fieldDisabledClasses } from '../utils/field-styles';
 import { Toggle as UIToggle } from '@/components/ui/toggle';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 
 export const Toggle = forwardRef<FormElementRef, ToggleProps>(
   (
@@ -28,6 +30,8 @@ export const Toggle = forwardRef<FormElementRef, ToggleProps>(
   ) => {
     const toggleRef = useRef<React.ElementRef<typeof UIToggle>>(null);
     const currentValue = pressed ?? value ?? false;
+    const language = useLanguageStore((s) => s.getLanguage?.()) ?? undefined;
+    const defaultLang = getDefaultLanguage();
 
     const trueLabel = onLabel ?? config?.onLabel ?? 'On';
     const falseLabel = offLabel ?? config?.offLabel ?? 'Off';
@@ -64,7 +68,7 @@ export const Toggle = forwardRef<FormElementRef, ToggleProps>(
     };
 
     return (
-      <div className="w-full space-y-2">
+      <div className="w-full">
         {config?.label && (
           <label
             htmlFor={config?.name}
@@ -76,7 +80,7 @@ export const Toggle = forwardRef<FormElementRef, ToggleProps>(
               className: 'flex items-center justify-between gap-2 mb-0!',
             })}
           >
-            <span>{config.label}</span>
+            <span>{resolveDisplayLabel(config.label, language ?? undefined, defaultLang)}</span>
             {typeof config.helper === 'string' && (
               <span className="text-xs font-normal text-gray-500">{config.helper}</span>
             )}
@@ -95,7 +99,7 @@ export const Toggle = forwardRef<FormElementRef, ToggleProps>(
           className={cn(
             'min-w-[4.5rem] gap-2',
             error && 'border-red-500 focus-visible:ring-red-500 data-[state=on]:border-red-500',
-            disabled && 'pointer-events-none opacity-60 cursor-not-allowed',
+            disabled && fieldDisabledClasses,
             className
           )}
           {...props}

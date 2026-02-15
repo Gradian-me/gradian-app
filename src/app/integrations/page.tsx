@@ -14,6 +14,8 @@ import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
 import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { extractDomainFromRoute } from '@/gradian-ui/shared/utils/url-utils';
@@ -413,7 +415,7 @@ export default function IntegrationsPage() {
           window.localStorage.removeItem('react-query-cache-cleared');
         }
         
-        toast.success('Cache cleared successfully!', { id: toastId });
+        toast.success(getT(TRANSLATION_KEYS.TOAST_CACHE_CLEARED_SUCCESS, language ?? undefined, getDefaultLanguage()), { id: toastId });
       } else {
         toast.error(data.error || 'Failed to clear cache', { id: toastId });
       }

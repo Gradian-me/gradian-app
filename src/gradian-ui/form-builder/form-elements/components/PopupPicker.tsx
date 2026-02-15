@@ -11,7 +11,7 @@ import {
 import { getInitials } from '@/gradian-ui/form-builder/form-elements/utils/avatar-utils';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '@/gradian-ui/shared/utils';
-import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
+import { UI_PARAMS, FORM_CONTAINER_ALT_BG_CLASSES } from '@/gradian-ui/shared/configs/ui-config';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronLeft, ChevronRight, List, Loader2, RefreshCw } from 'lucide-react';
@@ -2229,7 +2229,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         </div>
 
         {/* Items Grid / Hierarchy */}
-        <div ref={listContainerRef} className="flex-1 overflow-y-auto min-h-0 px-2 py-1">
+        <div
+          ref={listContainerRef}
+          className={cn('flex-1 overflow-y-auto min-h-0 p-3', FORM_CONTAINER_ALT_BG_CLASSES)}
+        >
           {isLoading && filteredItems.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-6 w-6 animate-spin text-gray-400" />

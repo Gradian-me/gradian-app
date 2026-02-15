@@ -4,7 +4,7 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { TextInputProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
-import { getLabelClasses } from '../utils/field-styles';
+import { baseInputClasses, getLabelClasses } from '../utils/field-styles';
 import { Eye, EyeOff } from 'lucide-react';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -59,10 +59,8 @@ export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
     };
 
     const inputClasses = cn(
-      'w-full direction-auto px-3 py-2 pe-10 border rounded-lg border-gray-300 bg-white text-sm text-gray-900 ring-offset-background placeholder:text-gray-400 transition-colors',
-      'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-violet-300 focus-visible:ring-offset-1 focus-visible:border-violet-400',
-      'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 disabled:text-gray-500',
-      'dark:border-gray-600 dark:bg-gray-800/50 dark:text-gray-100 dark:placeholder:text-gray-400 dark:ring-offset-gray-900 dark:focus-visible:ring-violet-500 dark:focus-visible:border-violet-500 dark:disabled:bg-gray-800/30 dark:disabled:text-gray-300',
+      baseInputClasses,
+      'pe-10',
       error
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',

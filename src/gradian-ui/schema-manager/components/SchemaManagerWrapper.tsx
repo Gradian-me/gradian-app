@@ -28,10 +28,15 @@ import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher'
 import { DynamicPagination } from '@/gradian-ui/data-display/components/DynamicPagination';
 import { useSchemaManagerPage } from '../hooks/useSchemaManagerPage';
 import { FormSchema } from '../types';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export function SchemaManagerWrapper() {
   const router = useRouter();
   const BackIcon = useBackIcon();
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
   const [isClearingCache, setIsClearingCache] = useState(false);
   const {
     loading,
@@ -109,7 +114,7 @@ export function SchemaManagerWrapper() {
           window.localStorage.removeItem('react-query-cache-cleared');
         }
         
-        toast.success('Cache cleared successfully!', { id: toastId });
+        toast.success(getT(TRANSLATION_KEYS.TOAST_CACHE_CLEARED_SUCCESS, language ?? undefined, defaultLang), { id: toastId });
       } else {
         toast.error(data.error || 'Failed to clear cache', { id: toastId });
       }

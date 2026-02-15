@@ -3,7 +3,7 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { TextareaProps, FormElementRef } from '../types';
 import { cn, validateField } from '../../../shared/utils';
-import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { getLabelClasses, errorTextClasses, textareaBaseClasses } from '../utils/field-styles';
 import { CopyContent } from './CopyContent';
 import { TranslationDialog } from './TranslationDialog';
 import { ProfessionalWritingModal } from '@/gradian-ui/communication/professional-writing';
@@ -62,7 +62,6 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
           ? value
           : '';
     const valueForValidation = allowTranslation ? displayValue : (typeof value === 'string' ? value : '');
-    const isTranslatableDisabled = allowTranslation;
 
     useImperativeHandle(ref, () => ({
       focus: () => textareaRef.current?.focus(),
@@ -113,10 +112,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
     };
 
     const textareaClasses = cn(
-      'w-full direction-auto px-3 py-2 border rounded-lg border-gray-300 bg-white text-sm text-gray-900 ring-offset-background placeholder:text-gray-400 transition-colors',
-      'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-violet-300 focus-visible:ring-offset-1 focus-visible:border-violet-400',
-      'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 disabled:text-gray-500',
-      'dark:border-gray-600 dark:bg-gray-900/60 dark:text-gray-300 dark:placeholder:text-gray-400 dark:ring-offset-gray-900 dark:focus-visible:ring-violet-500 dark:focus-visible:border-violet-500 dark:disabled:bg-gray-800/30 dark:disabled:text-gray-300',
+      textareaBaseClasses,
       error
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',
@@ -126,6 +122,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       resize === 'both' && 'resize',
       (aiAgentId || enableVoiceInput) && !allowTranslation && 'pe-12',
       allowTranslation && 'pe-10',
+      allowTranslation && 'read-only:bg-white read-only:border-gray-300 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-gray-600 read-only:dark:text-gray-300 read-only:cursor-default',
       className
     );
 
@@ -154,7 +151,8 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
             maxLength={allowTranslation ? undefined : (maxLength || config.validation?.maxLength)}
             minLength={config.validation?.minLength}
             required={required ?? config.validation?.required ?? false}
-            disabled={disabled || isTranslatableDisabled}
+            disabled={disabled}
+            readOnly={allowTranslation && !disabled}
             className={textareaClasses}
             style={(aiAgentId || enableVoiceInput) && !allowTranslation ? { paddingInlineEnd: '3rem' } : undefined}
             {...props}

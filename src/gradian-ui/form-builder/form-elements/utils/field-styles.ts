@@ -1,4 +1,10 @@
 import { cn } from '../../../shared/utils';
+import {
+  FORM_INPUT_BASE_CLASSES,
+  FORM_TEXTAREA_BASE_CLASSES,
+  FORM_SELECT_TRIGGER_BASE_CLASSES,
+  FORM_FIELD_DISABLED_CLASSES,
+} from '@/gradian-ui/shared/configs/ui-config';
 
 export interface LabelStyleOptions {
   error?: boolean;
@@ -7,8 +13,17 @@ export interface LabelStyleOptions {
   className?: string;
 }
 
-export const baseInputClasses =
-  'w-full min-h-11 direction-auto leading-relaxed px-3 py-2.5 border rounded-lg border-gray-300 bg-white text-xs text-gray-900 ring-offset-background placeholder:text-gray-400 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-violet-300 focus-visible:ring-offset-1 focus-visible:border-violet-400 disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-100 disabled:text-gray-500 dark:border-gray-600 dark:bg-gray-900/60 dark:text-gray-300 dark:placeholder:text-gray-400 dark:ring-offset-gray-900 dark:focus-visible:ring-violet-500 dark:focus-visible:border-violet-500 dark:disabled:bg-gray-800/30 dark:disabled:text-gray-300';
+/** Unified input styling (height, bg, border, disabled, focus) from ui-config. */
+export const baseInputClasses = FORM_INPUT_BASE_CLASSES;
+
+/** Unified textarea styling (same border/bg/disabled/focus as inputs). */
+export const textareaBaseClasses = FORM_TEXTAREA_BASE_CLASSES;
+
+/** Unified select/combobox trigger styling (same border/bg/disabled as inputs). */
+export const selectTriggerBaseClasses = FORM_SELECT_TRIGGER_BASE_CLASSES;
+
+/** Shared disabled state for form controls (Toggle, ToggleGroup). */
+export const fieldDisabledClasses = FORM_FIELD_DISABLED_CLASSES;
 
 export const getLabelClasses = ({
   error,

@@ -53,28 +53,114 @@ export async function OPTIONS(request: NextRequest) {
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
-// Cache for loaded schemas
-let cachedSchemas: any[] | null = null;
-let cacheTimestamp: number | null = null;
-let cachedFileMtime: number | null = null;
 // Get cache TTL from configuration (this route handles /api/schemas/:id)
-// Use a placeholder ID for pattern matching - the config will match 'schemas/:id' pattern
 const CACHE_CONFIG = getCacheConfigByPath('/api/schemas/placeholder-id');
 const CACHE_TTL_MS = CACHE_CONFIG.ttl;
 
+/** Bounded per-schema cache to avoid holding the full all-schemas.json array in memory. */
+const MAX_SCHEMA_CACHE_ENTRIES = 100;
+interface SchemaCacheEntry {
+  schema: any;
+  fileMtime: number;
+  timestamp: number;
+}
+const schemaCacheById = new Map<string, SchemaCacheEntry>();
+/** LRU order: first key is oldest. */
+const schemaCacheOrder: string[] = [];
+
+/** Full-array cache (used by write paths and getRelatedApplications when loading all schemas). */
+let cachedSchemas: any[] | null = null;
+let cacheTimestamp: number | null = null;
+let cachedFileMtime: number | null = null;
+
 /**
- * Clear schema cache (useful for development)
- * Note: Not exported to avoid Next.js route handler type conflicts
+ * Clear schema cache (useful for development and after PUT/DELETE).
+ * Not exported to avoid Next.js route handler type conflicts.
  */
 function clearSchemaCache() {
   cachedSchemas = null;
   cacheTimestamp = null;
   cachedFileMtime = null;
+  schemaCacheById.clear();
+  schemaCacheOrder.length = 0;
 }
 
 /**
- * Load schemas with caching
- * Cache is invalidated if file modification time changes or TTL expires.
+ * Load a single schema by ID with a bounded per-schema cache (max 100 entries).
+ * On cache miss reads the file once and caches the requested schema plus optional alsoCacheIds.
+ * Avoids keeping the full all-schemas.json array in memory.
+ * @param id - Schema ID to load
+ * @param alsoCacheIds - Optional schema IDs to also cache from the same read (e.g. ['applications'])
+ * @param bypassCache - If true, read from file and refresh cache
+ */
+function loadSchemaById(id: string, alsoCacheIds: string[] = [], bypassCache?: boolean): any | null {
+  if (!fs.existsSync(SCHEMA_FILE_PATH)) {
+    return null;
+  }
+
+  let currentMtime: number | null = null;
+  try {
+    const stats = fs.statSync(SCHEMA_FILE_PATH);
+    if (stats.size > MAX_SCHEMA_FILE_BYTES) {
+      throw new Error('Schemas file exceeds safe size limit');
+    }
+    currentMtime = stats.mtimeMs;
+  } catch {
+    return null;
+  }
+
+  const now = Date.now();
+
+  if (!bypassCache) {
+    const entry = schemaCacheById.get(id);
+    if (entry && entry.fileMtime === currentMtime && now - entry.timestamp < CACHE_TTL_MS) {
+      return entry.schema;
+    }
+  }
+
+  const fileContents = fs.readFileSync(SCHEMA_FILE_PATH, 'utf8');
+  if (!fileContents || fileContents.trim().length === 0) {
+    return null;
+  }
+
+  const parsed = JSON.parse(fileContents);
+  let normalizedSchemas: any[] = [];
+  if (Array.isArray(parsed)) {
+    normalizedSchemas = parsed;
+  } else if (typeof parsed === 'object' && parsed !== null) {
+    if (Array.isArray(parsed.data)) {
+      normalizedSchemas = parsed.data;
+    } else if (Object.keys(parsed).length > 0) {
+      normalizedSchemas = Object.values(parsed);
+    }
+  }
+
+  let requested: any = null;
+
+  // Fill per-schema cache from this parse (up to MAX_SCHEMA_CACHE_ENTRIES); evict oldest when full
+  for (const schema of normalizedSchemas) {
+    if (!schema || typeof schema.id !== 'string') continue;
+    const sid = String(schema.id);
+    if (sid === id) requested = schema;
+
+    while (schemaCacheById.size >= MAX_SCHEMA_CACHE_ENTRIES && schemaCacheOrder.length > 0) {
+      const oldest = schemaCacheOrder.shift()!;
+      schemaCacheById.delete(oldest);
+    }
+    if (schemaCacheById.size >= MAX_SCHEMA_CACHE_ENTRIES) continue;
+    if (schemaCacheById.has(sid)) {
+      const idx = schemaCacheOrder.indexOf(sid);
+      if (idx !== -1) schemaCacheOrder.splice(idx, 1);
+    }
+    schemaCacheById.set(sid, { schema, fileMtime: currentMtime!, timestamp: now });
+    schemaCacheOrder.push(sid);
+  }
+
+  return requested;
+}
+
+/**
+ * Load all schemas with full-array caching (used by write paths and when full list is needed).
  * When bypassCache is true (e.g. client sent cacheBust), always read from file.
  */
 function loadSchemas(bypassCache?: boolean): any[] {
@@ -87,8 +173,7 @@ function loadSchemas(bypassCache?: boolean): any[] {
     cacheTimestamp = null;
     cachedFileMtime = null;
   }
-  
-  // Check file modification time
+
   let currentMtime: number | null = null;
   try {
     const stats = fs.statSync(SCHEMA_FILE_PATH);
@@ -97,37 +182,27 @@ function loadSchemas(bypassCache?: boolean): any[] {
     }
     currentMtime = stats.mtimeMs;
   } catch {
-    // If we can't get file stats, invalidate cache and reload
     cachedFileMtime = null;
+    return [];
   }
-  
+
   const now = Date.now();
-  
-  // Check if cache is valid:
-  // 1. Cache exists
-  // 2. File modification time hasn't changed
-  // 3. Cache hasn't expired (TTL check)
   const fileUnchanged = cachedFileMtime !== null && currentMtime === cachedFileMtime;
   const cacheNotExpired = cacheTimestamp !== null && (now - cacheTimestamp) < CACHE_TTL_MS;
-  
+
   if (cachedSchemas !== null && fileUnchanged && cacheNotExpired) {
     return cachedSchemas;
   }
-  
-  // Cache miss, expired, or file changed - read from file and update cache
+
   const fileContents = fs.readFileSync(SCHEMA_FILE_PATH, 'utf8');
-  
-  // Check if file is empty or just whitespace
   if (!fileContents || fileContents.trim().length === 0) {
     cachedSchemas = [];
     cacheTimestamp = now;
     cachedFileMtime = currentMtime;
     return [];
   }
-  
+
   const parsed = JSON.parse(fileContents);
-  
-  // Normalize to array format
   let normalizedSchemas: any[] = [];
   if (Array.isArray(parsed)) {
     normalizedSchemas = parsed;
@@ -138,11 +213,10 @@ function loadSchemas(bypassCache?: boolean): any[] {
       normalizedSchemas = Object.values(parsed);
     }
   }
-  
+
   cachedSchemas = normalizedSchemas;
   cacheTimestamp = now;
   cachedFileMtime = currentMtime;
-  
   return cachedSchemas;
 }
 
@@ -202,9 +276,8 @@ function getRelatedApplications(
       filteredRelations.map((r) => r.sourceId).filter((id): id is string => Boolean(id))
     );
 
-    // Get application schema to resolve name and icon fields
-    const schemas = loadSchemas();
-    const applicationSchema = schemas.find((s: any) => s.id === 'applications');
+    // Get application schema to resolve name and icon fields (use per-schema cache)
+    const applicationSchema = loadSchemaById('applications');
 
     // Build result array with id, name, and icon
     const result: Array<{
@@ -402,17 +475,7 @@ export async function GET(
     // Bypass in-memory cache when client sends cache-bust (e.g. builder refresh)
     const searchParams = request.nextUrl.searchParams;
     const hasCacheBust = searchParams.has('cacheBust') || searchParams.has('_t');
-    const schemas = loadSchemas(hasCacheBust);
-    
-    if (!schemas || schemas.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Schemas file not found or empty' },
-        { status: 404 }
-      );
-    }
-
-    // Find the specific schema
-    const schema = schemas.find((s: any) => s.id === schemaId);
+    const schema = loadSchemaById(schemaId, ['applications'], hasCacheBust);
     
     if (!schema) {
       return NextResponse.json(
@@ -529,9 +592,7 @@ export async function PUT(
     writeSchemasAtomically(schemas);
     
     // Clear caches to force reload on next request
-    cachedSchemas = null;
-    cacheTimestamp = null;
-    cachedFileMtime = null;
+    clearSchemaCache();
     clearSharedSchemaCache('schemas');
 
     return NextResponse.json({
@@ -655,9 +716,7 @@ export async function DELETE(
     writeSchemasAtomically(schemas);
     
     // Clear caches to force reload on next request
-    cachedSchemas = null;
-    cacheTimestamp = null;
-    cachedFileMtime = null;
+    clearSchemaCache();
     clearSharedSchemaCache('schemas');
 
     // Clear all schema-related caches directly

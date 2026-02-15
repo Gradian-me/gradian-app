@@ -825,7 +825,7 @@ export const FormulaField: React.FC<FormulaFieldProps> = ({
 
   if (showEditor && isEditing) {
     return (
-      <div className={cn('w-full space-y-2', className)}>
+      <div className={cn('w-full', className)}>
         <FormulaInput
           value={localFormula}
           onChange={(newFormula) => {
@@ -874,7 +874,7 @@ export const FormulaField: React.FC<FormulaFieldProps> = ({
     ) : null;
 
   return (
-    <div className={cn('w-full space-y-1', className)}>
+    <div className={cn('w-full', className)}>
       {renderFieldLabel()}
       <div className="relative">
         <Input

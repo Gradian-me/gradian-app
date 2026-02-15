@@ -30,6 +30,9 @@ import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { ENABLE_BUILDER } from '@/gradian-ui/shared/configs/env-config';
 import { AccessDenied } from '@/gradian-ui/schema-manager/components/AccessDenied';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 // Icon mapping
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
@@ -129,6 +132,8 @@ export default function BuilderPage() {
   const [isClearingCache, setIsClearingCache] = useState(false);
   const [builderOptions, setBuilderOptions] = useState<BuilderOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const language = useLanguageStore((s) => s.getLanguage?.()) ?? undefined;
+  const defaultLang = getDefaultLanguage();
 
   useEffect(() => {
     setMounted(true);
@@ -188,7 +193,7 @@ export default function BuilderPage() {
           window.localStorage.removeItem('react-query-cache-cleared');
         }
         
-        toast.success('Cache cleared successfully!', { id: toastId });
+        toast.success(getT(TRANSLATION_KEYS.TOAST_CACHE_CLEARED_SUCCESS, language ?? undefined, defaultLang), { id: toastId });
       } else {
         toast.error(data.error || 'Failed to clear cache', { id: toastId });
       }

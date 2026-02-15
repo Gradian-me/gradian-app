@@ -707,7 +707,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
 
   return (
     <TooltipProvider delayDuration={300}>
-    <div className={cn('w-full space-y-2', className)}>
+    <div className={cn('w-full', className)}>
       {fieldLabel && (
         <label
           htmlFor={fieldName}

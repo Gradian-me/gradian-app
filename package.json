@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.51.007",
+  "version": "1.51.008",
   "private": true,
   "scripts": {
     "dev": "npm run clean:relations && next dev --turbopack",
@@ -49,6 +49,9 @@
     "@radix-ui/react-toggle": "^1.1.10",
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@squircle/core": "^1.0.6",
+    "@squircle/paint-polyfill": "^1.0.6",
+    "@squircle/tailwindcss": "^1.0.6",
     "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-table": "^8.21.3",
     "@types/react-syntax-highlighter": "^15.5.13",

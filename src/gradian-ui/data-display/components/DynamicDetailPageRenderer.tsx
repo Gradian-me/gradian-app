@@ -438,23 +438,26 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   const [isRefreshing, setIsRefreshing] = useState(false);
   const refreshLabel = translatedSingularName;
 
+  const toastRefreshingMessage = getT(TRANSLATION_KEYS.TOAST_REFRESHING_X, language ?? undefined, defaultLang).replace('{name}', refreshLabel.toLowerCase());
+  const toastUpdatedMessage = getT(TRANSLATION_KEYS.TOAST_X_UPDATED, language ?? undefined, defaultLang).replace('{name}', refreshLabel);
+
   const handleRefreshAction = useCallback(async () => {
     if (!onRefreshData) {
       return;
     }
 
-    const toastId = toast.loading(`Refreshing ${refreshLabel.toLowerCase()}...`);
+    const toastId = toast.loading(toastRefreshingMessage);
     setIsRefreshing(true);
     try {
       await Promise.resolve(onRefreshData());
-      toast.success(`${refreshLabel} updated`, { id: toastId });
+      toast.success(toastUpdatedMessage, { id: toastId });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to refresh data';
       toast.error(errorMessage, { id: toastId });
     } finally {
       setIsRefreshing(false);
     }
-  }, [onRefreshData, refreshLabel]);
+  }, [onRefreshData, toastRefreshingMessage, toastUpdatedMessage]);
 
   useEffect(() => {
     if (!preloadedSchemas.length) {
@@ -1437,7 +1440,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                         badgeVariant="outline"
                         enforceVariant={false}
                         animate={!disableAnimation}
-                        maxBadges={3}
+                        maxBadges={0}
                       />
                     </div>
                   )}
@@ -1455,7 +1458,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                         badgeVariant="outline"
                         enforceVariant={false}
                         animate={!disableAnimation}
-                        maxBadges={3}
+                        maxBadges={0}
                       />
                     </div>
                   )}
@@ -1629,7 +1632,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                               badgeVariant="outline"
                               enforceVariant={false}
                               animate={!disableAnimation}
-                              maxBadges={3}
+                              maxBadges={0}
                             />
                           </div>
                         )}
@@ -1647,7 +1650,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                               badgeVariant="outline"
                               enforceVariant={false}
                               animate={!disableAnimation}
-                              maxBadges={3}
+                              maxBadges={0}
                             />
                           </div>
                         )}
@@ -1841,7 +1844,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
       {/* Go to Top Button */}
       <GoToTop threshold={100} />
 
-      {/* Edit Modal - using unified FormModal */}
+      {/* Edit Modal - using unified FormModal. No getInitialEntityData so the modal always fetches GET /api/data/[schema-id]/[id] for the latest data. */}
       {editEntityId && schema?.id && data?.id && (
         <FormModal
           key={`edit-${editEntityId}-${schema.id}`}
@@ -1849,10 +1852,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
           entityId={editEntityId}
           mode="edit"
           getInitialSchema={(requestedId) => (requestedId === schema.id ? schema : null)}
-        getInitialEntityData={(requestedSchemaId, requestedEntityId) =>
-          requestedSchemaId === schema.id && requestedEntityId === pageData?.id ? pageData : null
-        }
-        onSuccess={async () => {
+          onSuccess={async () => {
             // Reset edit state and refresh the page to get updated data
             setEditEntityId(null);
           if (onRefreshData) {

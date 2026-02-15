@@ -9,7 +9,7 @@ import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData, ensurePassw
 import { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '@/gradian-ui/shared/configs/general-config';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { calculateSchemaStatistics } from '@/gradian-ui/schema-manager/utils/schema-statistics-utils';
+import { calculateSchemaStatistics, calculateSchemaStatisticsFromData } from '@/gradian-ui/schema-manager/utils/schema-statistics-utils';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
 import { readAllRelations } from '@/gradian-ui/shared/domain/utils/relations-storage.util';
 import { readAllData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
@@ -21,7 +21,11 @@ const MAX_SCHEMA_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap
 const SCHEMA_FILE_PATH = path.join(process.cwd(), 'data', 'all-schemas.json');
 const SCHEMA_FILE_TMP_PATH = path.join(process.cwd(), 'data', 'all-schemas.tmp.json');
 
-function buildSchemaSummary<T extends Record<string, any>>(schema: T, includeStatistics: boolean = false): T {
+function buildSchemaSummary<T extends Record<string, any>>(
+  schema: T,
+  includeStatistics: boolean = false,
+  allData?: Record<string, any[]>
+): T {
   if (!schema || typeof schema !== 'object' || Array.isArray(schema)) {
     return schema;
   }
@@ -57,16 +61,18 @@ function buildSchemaSummary<T extends Record<string, any>>(schema: T, includeSta
     const schemaId = schema.id as string;
     if (schemaId) {
       try {
-        // Calculate records and size from all-data.json
-        const calculatedStats = calculateSchemaStatistics(schemaId);
-        
-        // Merge with existing statistics (preserve hasPartition and isIndexed from schema if available)
+        // Use pre-loaded allData when provided to avoid N×3 full file reads per request
+        const calculatedStats =
+          allData != null
+            ? calculateSchemaStatisticsFromData(schemaId, allData)
+            : calculateSchemaStatistics(schemaId);
+
         summary.statistics = {
           hasPartition: schema.statistics?.hasPartition ?? false,
           isIndexed: schema.statistics?.isIndexed ?? false,
           records: calculatedStats.records,
-          size: calculatedStats.size, // in megabytes
-          maxUpdatedAt: calculatedStats.maxUpdatedAt, // ISO date string or null
+          size: calculatedStats.size,
+          maxUpdatedAt: calculatedStats.maxUpdatedAt,
         };
       } catch (error) {
         loggingCustom(
@@ -74,22 +80,20 @@ function buildSchemaSummary<T extends Record<string, any>>(schema: T, includeSta
           'warn',
           `[API] Failed to calculate statistics for schema "${schemaId}": ${error instanceof Error ? error.message : String(error)}`,
         );
-        // Fallback to defaults if calculation fails
         summary.statistics = schema.statistics || {
           hasPartition: false,
           isIndexed: false,
           records: 0,
-          size: 0, // in megabytes
+          size: 0,
           maxUpdatedAt: null,
         };
       }
     } else {
-      // Fallback if no schema ID
       summary.statistics = schema.statistics || {
         hasPartition: false,
         isIndexed: false,
         records: 0,
-        size: 0, // in megabytes
+        size: 0,
         maxUpdatedAt: null,
       };
     }
@@ -498,6 +502,16 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Read all-data once when including statistics to avoid 3×N full file reads per request
+    let allData: Record<string, any[]> | undefined;
+    if (includeStatistics) {
+      try {
+        allData = readAllData();
+      } catch {
+        allData = undefined; // buildSchemaSummary will fall back to per-schema read
+      }
+    }
+
     // If multiple schema IDs requested, return only those schemas
     if (schemaIdsParam) {
       const schemaIds = schemaIdsParam
@@ -510,7 +524,7 @@ export async function GET(request: NextRequest) {
         .map((id) => schemas.find((s: any) => s.id === id))
         .filter((schema): schema is any => Boolean(schema) && matchesTenantFilter(schema));
       const responseData = isSummaryRequested
-        ? matchedSchemas.map((schema) => buildSchemaSummary(schema, includeStatistics))
+        ? matchedSchemas.map((schema) => buildSchemaSummary(schema, includeStatistics, allData))
         : matchedSchemas;
 
       // Add applications to each schema
@@ -549,7 +563,7 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const responseSchema = isSummaryRequested ? buildSchemaSummary(schema, includeStatistics) : schema;
+      const responseSchema = isSummaryRequested ? buildSchemaSummary(schema, includeStatistics, allData) : schema;
 
       // Get related applications for this schema
       const relatedApplications = getRelatedApplications(schemaId, tenantIds);
@@ -575,7 +589,7 @@ export async function GET(request: NextRequest) {
     // Return all schemas with cache-busting headers
     const filteredSchemas = hasTenantFilter ? schemas.filter(matchesTenantFilter) : schemas;
     const responseSchemas = isSummaryRequested
-      ? filteredSchemas.map((schema) => buildSchemaSummary(schema, includeStatistics))
+      ? filteredSchemas.map((schema) => buildSchemaSummary(schema, includeStatistics, allData))
       : filteredSchemas;
 
     // Add applications to each schema

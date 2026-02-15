@@ -145,6 +145,71 @@ export function calculateSchemaStatistics(schemaId: string): {
 }
 
 /**
+ * Statistics result shape (shared by calculateSchemaStatistics and calculateSchemaStatisticsFromData).
+ */
+export type SchemaStatisticsResult = {
+  records: number;
+  size: number;
+  maxUpdatedAt: string | null;
+};
+
+/**
+ * Calculate statistics for a schema from a pre-loaded allData object.
+ * Use this when you already have readAllData() in memory to avoid N repeated file reads/parses.
+ * @param schemaId - The ID of the schema
+ * @param allData - Pre-loaded data from readAllData() (Record<schemaId, array of records>)
+ * @returns Statistics object with records, size, and maxUpdatedAt
+ */
+export function calculateSchemaStatisticsFromData(
+  schemaId: string,
+  allData: Record<string, any[]>
+): SchemaStatisticsResult {
+  const data = Array.isArray(allData[schemaId]) ? allData[schemaId] : [];
+  const records = data.length;
+
+  let size = 0;
+  if (data.length > 0) {
+    try {
+      const jsonString = JSON.stringify(data);
+      size = Buffer.byteLength(jsonString, 'utf8') / (1024 * 1024);
+      size = Math.round(size * 100) / 100;
+    } catch {
+      size = 0;
+    }
+  }
+
+  let maxUpdatedAt: string | null = null;
+  let maxTimestamp: number | null = null;
+  for (const record of data) {
+    if (!record || typeof record !== 'object') continue;
+    const updatedAt = record.updatedAt ?? record.updated_at ?? record.updated;
+    if (updatedAt == null) continue;
+    let timestamp: number | null = null;
+    let dateString: string | null = null;
+    if (typeof updatedAt === 'string') {
+      const date = new Date(updatedAt);
+      if (!isNaN(date.getTime())) {
+        timestamp = date.getTime();
+        dateString = updatedAt;
+      }
+    } else if (typeof updatedAt === 'number') {
+      timestamp = updatedAt;
+      const date = new Date(timestamp);
+      dateString = !isNaN(date.getTime()) ? date.toISOString() : null;
+    } else if (updatedAt instanceof Date) {
+      timestamp = updatedAt.getTime();
+      dateString = updatedAt.toISOString();
+    }
+    if (timestamp != null && dateString && (maxTimestamp === null || timestamp > maxTimestamp)) {
+      maxTimestamp = timestamp;
+      maxUpdatedAt = dateString;
+    }
+  }
+
+  return { records, size, maxUpdatedAt };
+}
+
+/**
  * Calculate statistics for multiple schemas
  * @param schemaIds - Array of schema IDs
  * @returns Map of schema ID to statistics
