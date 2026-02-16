@@ -49,14 +49,16 @@ export function useSchemas(options?: UseSchemasOptions) {
     }
   }
   const apiPath = '/api/schemas';
-  
+  // Resolve cache config with query so summary=true uses schemas-summary (avoids refetch on every mobile sidebar open)
+  const cachePath = isSummary ? `${apiPath}?summary=true` : apiPath;
+  const cacheConfig = getCacheConfigByPath(cachePath);
+
   // Include tenantIds in query key to ensure different tenant filters get separate cache entries
   const queryKey = isSummary 
     ? includeStats 
       ? [...SCHEMAS_SUMMARY_QUERY_KEY, 'with-statistics', tenantIdsKey] 
       : [...SCHEMAS_SUMMARY_QUERY_KEY, tenantIdsKey]
     : [...SCHEMAS_QUERY_KEY, tenantIdsKey];
-  const cacheConfig = getCacheConfigByPath(apiPath);
   
   const { data, isLoading, error, refetch } = useQuery({
     queryKey,
@@ -86,9 +88,9 @@ export function useSchemas(options?: UseSchemasOptions) {
     },
     enabled: enabled !== false,
     initialData,
-    staleTime: 0, // always stale so a network fetch occurs (visible in DevTools)
+    staleTime: cacheConfig.staleTime ?? 10 * 60 * 1000,
     gcTime: cacheConfig.gcTime ?? 30 * 60 * 1000,
-    refetchOnMount: true, // ensure network call on mount
+    refetchOnMount: true,
     refetchOnWindowFocus: false, // Don't refetch on window focus
     refetchOnReconnect: false, // Don't refetch on reconnect
     retry: 1, // Only retry once on failure

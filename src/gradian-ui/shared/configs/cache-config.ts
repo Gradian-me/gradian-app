@@ -37,12 +37,12 @@ export const CACHE_CONFIG: Record<string, RouteCacheConfig> = {
   },
   'schemas-summary': {
     ttl: 0, // No server-side cache
-    staleTime: 0, // Always treat as stale - refetch on mount
-    gcTime: 0, // Don't keep in cache
+    staleTime: 2 * 60 * 1000, // 2 min - reuse cache when e.g. mobile sidebar opens (avoids refetch every open)
+    gcTime: 30 * 60 * 1000, // Keep in React Query cache so multiple consumers share data
     reactQueryKeys: ['schemas-summary'],
     indexedDbKey: 'schemas-summary',
     disableServerCache: true, // Disable server-side in-memory cache
-    description: 'Schema summaries list (no caching)',
+    description: 'Schema summaries list (sidebar/navigation)',
   },
   'schemas/:id': {
     ttl: 10 * 60 * 1000, // 10 minutes - server-side cache

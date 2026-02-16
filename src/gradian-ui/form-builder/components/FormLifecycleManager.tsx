@@ -720,6 +720,20 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       }
     }
 
+    // Custom validation: entity type is required when entityTypeGroup is configured
+    const hasEntityTypeGroup = Array.isArray(schema.entityTypeGroup) && schema.entityTypeGroup.length > 0;
+    if (hasEntityTypeGroup) {
+      const entityType = state.values['entityType'];
+      const hasEntityType =
+        Array.isArray(entityType) ? entityType.length > 0 : Boolean(entityType);
+
+      if (!hasEntityType) {
+        const errorMessage = t(TRANSLATION_KEYS.MESSAGE_ENTITY_TYPE_REQUIRED, 'Entity type is required.');
+        newErrors['entityType'] = errorMessage;
+        isValid = false;
+      }
+    }
+
     // Update errors in state immediately and mark fields as touched
     Object.entries(newErrors).forEach(([fieldName, error]) => {
       dispatch({ type: 'SET_ERROR', fieldName, error });

@@ -727,7 +727,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       {/* Show badges for multiselect mode */}
       {allowMultiselect && normalizedSelection.length > 0 && (
         <div className={cn(
-          'flex flex-wrap items-center gap-2 p-2 min-h-10 border rounded-md bg-white dark:bg-gray-800',
+          'flex flex-wrap items-center gap-2 p-2 min-h-10 border rounded-xl bg-white dark:bg-gray-900/60',
           error ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700'
         )}>
           <div className="flex flex-wrap gap-2 flex-1">
@@ -841,7 +841,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
           {/* Show badge if selected item has icon or color */}
           {normalizedSelection.length > 0 && (normalizedSelection[0]?.icon || normalizedSelection[0]?.color) ? (
             <div className={cn(
-              'flex-1 flex items-center gap-2 p-2 min-h-10 border rounded-md bg-white dark:bg-gray-800',
+              'flex-1 flex items-center gap-2 p-2 min-h-10 border rounded-xl bg-white dark:bg-gray-900/60',
               error ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700'
             )}>
               <div className="flex-1">
