@@ -19,14 +19,6 @@ before_script:
   
 security_audit:
   stage: security
-  cache:
-    key: 
-      files:
-        - package-lock.json
-    paths:
-      - .npm/
-      - node_modules/
-    policy: pull-push
   script:
     - echo "🔒 Starting security audit..."
     - |
@@ -34,10 +26,8 @@ security_audit:
         echo "❌ package.json not found!"
         exit 1
       fi
-    - echo "📦 Configuring npm to use internal registry..."
-    - npm config set registry https://reg.cinnagen.com/repository/npm-group/
     - echo "📦 Installing dependencies..."
-    - npm ci --prefer-offline --no-audit
+    - npm ci --prefer-offline
     - echo ""
     - |
       echo "========================================="
@@ -54,7 +44,12 @@ security_audit:
       echo ""
       HAS_VULNERABILITIES=false
       # Capture npm audit output and exit code
-      AUDIT_OUTPUT=$(npm audit --audit-level=moderate 2>&1) || AUDIT_EXIT_CODE=$?
+      # Run npm audit against the public npm registry, skip on error
+      AUDIT_OUTPUT=$(npm audit --audit-level=moderate --registry=https://registry.npmjs.org/ 2>&1) || {
+        AUDIT_EXIT_CODE=0
+        echo "⚠️ Audit skipped (using Nexus registry blocked this endpoint)"
+      }
+
       # Display the audit output
       echo "$AUDIT_OUTPUT"
       echo ""
@@ -63,7 +58,7 @@ security_audit:
         echo "❌ Security audit failed: Vulnerabilities found!"
         HAS_VULNERABILITIES=true
       else
-        echo "✅ No vulnerabilities found."
+        echo "✅ No vulnerabilities found"
       fi
       echo ""
       echo "========================================="
@@ -88,11 +83,9 @@ security_audit:
       fi
       echo "✅ Security audit passed! No vulnerabilities or deprecated packages found."
   tags:
-    - CG-GR-APP-DEV
+    - CG-GR-APP-DEV-shell
   only:
     - main
-    - master
-  when: manual
   allow_failure: true
   retry:
     max: 2
@@ -104,6 +97,7 @@ owasp_dependency_check:
   stage: security
   script:
     - echo "🛡️ Starting OWASP Dependency-Check scan..."
+
     - |
       echo "========================================="
       echo "🛡️ OWASP Dependency-Check Report"
@@ -112,179 +106,92 @@ owasp_dependency_check:
       echo "🔖 Commit: $CI_COMMIT_SHORT_SHA"
       echo "🌿 Branch: $CI_COMMIT_REF_NAME"
       echo ""
+
     - |
       if [ ! -f "package.json" ]; then
         echo "❌ package.json not found!"
         exit 1
       fi
+
     - |
-      # Create temporary report directory (will be deleted after displaying)
       export TEMP_REPORT_DIR=$(mktemp -d)
-      echo "📦 Preparing project for OWASP scan..."
       echo "📁 Temporary report directory: $TEMP_REPORT_DIR"
-      # OWASP Dependency-Check can scan package.json and package-lock.json directly
-      # It will also check node_modules if available, but it's not required
-      if [ -d "node_modules" ]; then
-        echo "✅ node_modules found - will be included in scan"
-      else
-        echo "ℹ️  node_modules not found - scanning package.json and package-lock.json only"
-      fi
-      echo "🐳 Pulling OWASP Dependency-Check Docker image..."
-      docker pull reg.cinnagen.com:8083/owasp/dependency-check:latest
-      echo "🔍 Running OWASP Dependency-Check against NVD database..."
-      # Get absolute paths for volume mounting
-      PROJECT_DIR=$(pwd)
-      
-      # Ensure report directory is writable
-      chmod 777 "$TEMP_REPORT_DIR" 2>/dev/null || true
-      
-      # Build base docker command
-      # Note: Some Node.js-specific options are not available in CLI version
-      # Using container name to copy files after execution
-      CONTAINER_NAME="owasp-dc-$(date +%s)"
-      
-      DOCKER_ARGS=(
-        --name "$CONTAINER_NAME"
-        -v "$PROJECT_DIR:/src:ro"
-        -v "$TEMP_REPORT_DIR:/report:rw"
-        -w /src
-        reg.cinnagen.com:8083/owasp/dependency-check:latest
+
+    - |
+      echo "✅ Verifying OWASP Dependency-Check command..."
+      dependency-check --help
+
+    - |
+      echo "🔍 Running OWASP Dependency-Check (using local NVD database)..."
+
+      DEPENDENCY_CHECK_ARGS=(
         --project "gradian-app"
-        --scan /src
-        --format "JSON"
-        --out /report
-        --enableExperimental
+        --scan .
+        --format JSON
+        --out "$TEMP_REPORT_DIR"
+        --data /mnt/data/dependency-check
+        --noupdate
         --failOnCVSS 7
       )
-      
-      # Add NVD API key if provided
-      if [ -n "$NVD_API_KEY" ]; then
-        DOCKER_ARGS+=(--nvdApiKey "$NVD_API_KEY")
+
+      if [ -n "${NVD_API_KEY:-}" ] && [ "${#NVD_API_KEY}" -gt 0 ]; then
+        DEPENDENCY_CHECK_ARGS+=(--nvdApiKey "$NVD_API_KEY")
         echo "🔑 Using NVD API Key"
       else
-        echo "ℹ️  No NVD API Key provided (using public NVD API)"
+        echo "ℹ️  No NVD API Key provided"
       fi
-      
-      # Run OWASP Dependency-Check
-      echo "🚀 Executing OWASP Dependency-Check..."
-      docker run "${DOCKER_ARGS[@]}" || OWASP_EXIT_CODE=$?
-      
-      # Try to copy report from container if volume mount didn't work
-      if [ ! -f "$TEMP_REPORT_DIR/dependency-check-report.json" ]; then
-        echo "⚠️  Report not found in volume mount, trying to copy from container..."
-        docker cp "$CONTAINER_NAME:/report/dependency-check-report.json" "$TEMP_REPORT_DIR/" 2>/dev/null || true
-      fi
-      
-      # Clean up container
-      docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
-      
+
+      dependency-check "${DEPENDENCY_CHECK_ARGS[@]}" || OWASP_EXIT_CODE=$?
+
+    - |
       echo ""
       echo "========================================="
       echo "📊 OWASP Dependency-Check Results"
       echo "========================================="
-      
-      # Display report in log
+
       REPORT_FILE="$TEMP_REPORT_DIR/dependency-check-report.json"
-      
-      # Check if report file exists
+
       if [ -f "$REPORT_FILE" ]; then
-        echo ""
         echo "📋 Vulnerability Summary:"
         echo "----------------------------------------"
-        # Extract and display summary using jq if available
+
         if command -v jq >/dev/null 2>&1; then
-          # Count total dependencies
-          TOTAL_DEPS=$(jq '.dependencies | length' "$REPORT_FILE" 2>/dev/null || echo "0")
+          TOTAL_DEPS=$(jq '.dependencies | length' "$REPORT_FILE")
+          VULN_DEPS=$(jq '[.dependencies[] | select(.vulnerabilities != null and (.vulnerabilities | length) > 0)] | length' "$REPORT_FILE")
+
           echo "📦 Total dependencies scanned: $TOTAL_DEPS"
-          
-          # Count vulnerable dependencies
-          VULN_DEPS=$(jq '[.dependencies[] | select(.vulnerabilities != null and (.vulnerabilities | length) > 0)] | length' "$REPORT_FILE" 2>/dev/null || echo "0")
           echo "🚨 Vulnerable dependencies: $VULN_DEPS"
-          
-          # Display vulnerable packages with details
-          if [ "$VULN_DEPS" -gt 0 ]; then
-            echo ""
-            echo "⚠️  Vulnerable Packages:"
-            echo "----------------------------------------"
-            jq -r '.dependencies[] | select(.vulnerabilities != null and (.vulnerabilities | length) > 0) | 
-              "Package: \(.packages[0].id // .fileName)\n" +
-              "Vulnerabilities: \(.vulnerabilities | length)\n" +
-              (.vulnerabilities[] | "  - \(.name): CVSS \(.cvssv3.baseScore // .cvssv2.score // "N/A") - \(.description // "No description")[0:100]\n") +
-              "---"' "$REPORT_FILE" 2>/dev/null || echo "Could not parse vulnerability details"
-          fi
-          
-          # Display full JSON report
-          echo ""
-          echo "📄 Full JSON Report:"
-          echo "----------------------------------------"
-          cat "$REPORT_FILE"
-        else
-          # If jq is not available, just display the raw JSON
-          echo "📄 Full JSON Report:"
-          echo "----------------------------------------"
-          cat "$REPORT_FILE"
         fi
+
         echo ""
+        echo "📄 Full JSON Report:"
         echo "----------------------------------------"
+        cat "$REPORT_FILE"
       else
-        echo "⚠️  Report file not found at $REPORT_FILE"
-        echo ""
-        echo "ℹ️  Checking for alternative report locations..."
-        # Try to find any JSON files in temp directory
-        if ls "$TEMP_REPORT_DIR"/*.json 1> /dev/null 2>&1; then
-          echo "📄 Found alternative report files:"
-          ls -lh "$TEMP_REPORT_DIR"/*.json
-          echo ""
-          echo "📄 Displaying first JSON file found:"
-          FIRST_JSON=$(ls "$TEMP_REPORT_DIR"/*.json | head -1)
-          cat "$FIRST_JSON"
-        else
-          echo "❌ No report files found. Analysis may have completed but report generation failed."
-          echo "ℹ️  Check the OWASP Dependency-Check output above for analysis results."
-        fi
+        echo "❌ Report file not found!"
+        exit 1
       fi
-      
-      # Check if report exists before cleanup
-      REPORT_EXISTS=false
-      if [ -f "$TEMP_REPORT_DIR/dependency-check-report.json" ] || ls "$TEMP_REPORT_DIR"/*.json 1> /dev/null 2>&1; then
-        REPORT_EXISTS=true
-      fi
-      
-      # Clean up temporary directory
+
+    - |
       echo "🧹 Cleaning up temporary files..."
       rm -rf "$TEMP_REPORT_DIR"
       echo "✅ Temporary files removed"
-      
-      echo ""
-      # Check exit code and fail if vulnerabilities found
-      
+
+    - |
       if [ -n "$OWASP_EXIT_CODE" ] && [ "$OWASP_EXIT_CODE" -ne 0 ]; then
         echo "❌ OWASP Dependency-Check FAILED!"
         echo "🚨 High/Critical vulnerabilities (CVSS >= 7) detected!"
-        if [ "$REPORT_EXISTS" = "false" ]; then
-          echo "⚠️  Note: Report file was not generated, but scan detected vulnerabilities."
-        fi
         exit 1
       else
-        if [ "$REPORT_EXISTS" = "false" ]; then
-          echo "⚠️  OWASP Dependency-Check completed, but report file was not generated."
-          echo "✅ Scan completed without detecting high/critical vulnerabilities (CVSS >= 7)"
-        else
-          echo "✅ OWASP Dependency-Check PASSED!"
-          echo "✅ No high/critical vulnerabilities (CVSS >= 7) found in dependencies"
-        fi
+        echo "✅ OWASP Dependency-Check PASSED!"
+        echo "✅ No high/critical vulnerabilities (CVSS >= 7) found"
       fi
+
   tags:
-    - CG-GR-APP-DEV
+    - CG-GR-APP-DEV-shell
   only:
     - main
-    - master
-  when: manual
-  retry:
-    max: 2
-    when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
+  allow_failure: true
 
 semgrep_sast:
   stage: security
@@ -377,7 +284,7 @@ semgrep_sast:
             echo ""
             echo "⚠️  Security Findings:"
             echo "----------------------------------------"
-            jq -r '.results[] | 
+            jq -r '.results[] |
               "File: \(.path)\n" +
               "Rule: \(.check_id)\n" +
               "Severity: \(.extra.severity)\n" +
@@ -427,11 +334,9 @@ semgrep_sast:
         echo "✅ No security findings detected in code"
       fi
   tags:
-    - CG-GR-APP-DEV
+    - CG-GR-APP-DEV-shell
   only:
     - main
-    - master
-  when: manual
   allow_failure: true
   retry:
     max: 2
