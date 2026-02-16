@@ -3432,7 +3432,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2026-02-16T08:26:34.509Z",
+      "updatedAt": "2026-02-16T12:33:39.500Z",
       "category": [
         {
           "id": "production-integration",
@@ -3441,8 +3441,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-02-16T08:26:34.509Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 227, edges created: 102, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2026-02-16T12:33:39.500Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 435, nodes updated: 219, edges created: 76, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },

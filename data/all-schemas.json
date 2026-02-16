@@ -24761,12 +24761,12 @@
     ],
     "relatedTenants": [
       {
-        "id": "01KBFBD109G6CYRT7RA04TMMXC",
-        "label": "AryoGen"
-      },
-      {
         "id": "01KH39DYCW17SXF2APAV1KZZQT",
         "label": "Gradian App"
+      },
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
       }
     ],
     "syncStrategy": "schema-only",

@@ -1280,6 +1280,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       transition={{ duration: 0.15 }}
                     >
                       <motion.h1
+                        dir="auto"
                         className="text-xl font-bold text-gray-900 dark:text-gray-100 text-wrap wrap-break-words line-clamp-3 leading-relaxed"
                         whileHover={{ x: 2 }}
                         transition={{ duration: 0.15 }}
