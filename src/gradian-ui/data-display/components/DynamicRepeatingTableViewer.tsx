@@ -149,52 +149,57 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
   const alwaysShowPagination = tableProps.alwaysShowPagination ?? false;
   const isLoading = isLoadingRelations || (isRelationBased && isLoadingTargetSchema);
 
-  const emptyStateName = config.title
-    || (isRelationBased ? targetSchemaData?.plural_name : section?.title)
-    || getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang);
-  const emptyStateMessage = getT(TRANSLATION_KEYS.EMPTY_NO_X_FOUND, language, defaultLang).replace('{name}', emptyStateName);
-
   const tableConfig: TableConfig = useMemo(
-    () => ({
-      id: `table-${config.sectionId}`,
-      columns,
-      data: sectionData,
-      pagination: {
-        enabled: paginationEnabled,
-        pageSize: paginationPageSize,
-        showPageSizeSelector: true,
-        pageSizeOptions: [5, 10, 25, 50],
-        alwaysShow: alwaysShowPagination,
-      },
-      sorting: {
-        enabled: sortingEnabled,
-      },
-      filtering: {
-        enabled: false,
-      },
-      selection: {
-        enabled: false,
-      },
-      emptyState: {
-        message: emptyStateMessage,
-      },
-      loading: isLoading,
-      striped: true,
-      hoverable: true,
-      bordered: true,
-    }),
+    () => {
+      const emptyStateNameRaw = config.title
+        || (isRelationBased ? targetSchemaData?.plural_name : section?.title)
+        || getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang);
+      const emptyStateName = typeof emptyStateNameRaw === 'string' ? emptyStateNameRaw : resolveDisplayLabel(emptyStateNameRaw, language, defaultLang) || getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang);
+      const emptyStateMessage = getT(TRANSLATION_KEYS.EMPTY_NO_X_FOUND, language, defaultLang).replace('{name}', emptyStateName);
+      return {
+        id: `table-${config.sectionId}`,
+        columns,
+        data: sectionData,
+        pagination: {
+          enabled: paginationEnabled,
+          pageSize: paginationPageSize,
+          showPageSizeSelector: true,
+          pageSizeOptions: [5, 10, 25, 50],
+          alwaysShow: alwaysShowPagination,
+        },
+        sorting: {
+          enabled: sortingEnabled,
+        },
+        filtering: {
+          enabled: false,
+        },
+        selection: {
+          enabled: false,
+        },
+        emptyState: {
+          message: emptyStateMessage,
+        },
+        loading: isLoading,
+        striped: true,
+        hoverable: true,
+        bordered: true,
+      };
+    },
     [
       alwaysShowPagination,
       columns,
       config.sectionId,
       config.title,
-      emptyStateMessage,
       isLoading,
       isRelationBased,
       paginationEnabled,
       paginationPageSize,
       sectionData,
       sortingEnabled,
+      language,
+      defaultLang,
+      section?.title,
+      targetSchemaData?.plural_name,
     ]
   );
 
