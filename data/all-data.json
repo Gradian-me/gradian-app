@@ -1663,74 +1663,6 @@
           "label": "Supply Chain Management"
         }
       ],
-      "username": "montajabim@cinnagen.com",
-      "firstName": [
-        {
-          "en": "Mehran"
-        },
-        {
-          "fa": "مهران"
-        }
-      ],
-      "lastName": [
-        {
-          "en": "Montajabi"
-        },
-        {
-          "fa": "منتجبی"
-        }
-      ],
-      "email": "montajabim@cinnagen.com",
-      "postTitle": [
-        {
-          "en": "CEO"
-        },
-        {
-          "fa": "مدیر عامل"
-        }
-      ],
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KE4CJ37WKF60JWQGQ0BD0WF4",
-      "createdAt": "2026-01-04T11:33:56.096Z",
-      "updatedAt": "2026-02-15T14:24:34.900Z",
-      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
-    },
-    {
-      "company": "CinnaGen",
-      "authenticationType": [
-        {
-          "id": "active-directory"
-        }
-      ],
-      "status": [
-        {
-          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
-          "label": "Active",
-          "icon": "CheckCheck",
-          "color": "emerald"
-        }
-      ],
-      "entityType": [
-        {
-          "id": "01KCXDMZE231SQFZZ57W3H8497",
-          "label": "General User",
-          "icon": "User",
-          "color": "violet"
-        }
-      ],
-      "relatedCompanies": [
-        {
-          "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": "CinnaGen"
-        }
-      ],
-      "relatedTenants": [
-        {
-          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
-          "label": "Supply Chain Management"
-        }
-      ],
       "username": "taghipouram@cinnagen.com",
       "firstName": [
         {
@@ -1973,6 +1905,143 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "password": "$argon2id$v=19$m=32768,t=3,p=4$b/BcMx/GSEeBHn3E9u7BdQ$jar54P4WwvP0Yu/29+4D0HAxt+X9d0RAhHbfB/MX3yA",
       "hashType": "argon2"
+    },
+    {
+      "company": "CinnaGen",
+      "authenticationType": [
+        {
+          "id": "active-directory"
+        }
+      ],
+      "username": "mohammadikhanim",
+      "email": "mohammadikhanim@cinnagen.com",
+      "firstName": [
+        {
+          "en": "Mohsen"
+        },
+        {
+          "fa": "محسن"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Mohammadikhani"
+        },
+        {
+          "fa": "محمدی خانی"
+        }
+      ],
+      "postTitle": [
+        {
+          "en": "Business Process Manager"
+        },
+        {
+          "fa": "مدیر فرآیندهای کسب و کار"
+        }
+      ],
+      "employeeCode": "637",
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KH39DYCW17SXF2APAV1KZZQT",
+          "label": "Gradian App"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KHJQ1RA3C0SHT5HXYV2MY455",
+      "createdAt": "2026-02-16T07:53:42.473Z",
+      "updatedAt": "2026-02-16T07:53:42.613Z"
+    },
+    {
+      "company": "CinnaGen",
+      "authenticationType": [
+        {
+          "id": "active-directory"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+          "label": "Active",
+          "icon": "CheckCheck",
+          "color": "emerald"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCXDMZE231SQFZZ57W3H8497",
+          "label": "General User",
+          "icon": "User",
+          "color": "violet"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "relatedTenants": [
+        {
+          "id": "01KH39DYCW17SXF2APAV1KZZQT",
+          "label": "Gradian App"
+        }
+      ],
+      "username": "cheraghia",
+      "firstName": [
+        {
+          "en": "Amir"
+        },
+        {
+          "fa": "امیر"
+        }
+      ],
+      "lastName": [
+        {
+          "en": "Cheraghi"
+        },
+        {
+          "fa": "چراغی"
+        }
+      ],
+      "email": "cheraghia@cinnagen.com",
+      "postTitle": [
+        {
+          "en": "Business Process Expert"
+        },
+        {
+          "fa": "کارشناس فرآیندهای کسب و کار"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KHJQ5X7AY4MP284WY0YDD416",
+      "createdAt": "2026-02-16T07:55:58.575Z",
+      "updatedAt": "2026-02-16T07:55:58.727Z"
     }
   ],
   "purchaseOrders": [],

@@ -483,15 +483,28 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
           return;
         }
 
-        let result: unknown;
+        type ProxyResult = { success: boolean; error?: string; data?: HealthCheckResponse };
+        type ParsedResult = ProxyResult | HealthCheckResponse;
+
+        let result: ParsedResult;
         const text = await response.text();
         try {
-          result = text ? JSON.parse(text) : {};
+          result = (text ? JSON.parse(text) : {}) as ParsedResult;
         } catch {
           // Handle plain text "healthy" (or similar) responses
           const trimmed = text?.trim().toLowerCase() ?? '';
           if (trimmed === 'healthy' || trimmed === 'ok') {
-            result = { status: 'healthy', timestamp: new Date().toISOString(), message: trimmed };
+            result = {
+              status: 'healthy',
+              timestamp: new Date().toISOString(),
+              service: service.serviceTitle,
+              version: 'unknown',
+              environment: 'unknown',
+              dataSource: 'health-check',
+              uptime: 0,
+              checks: { raw: { status: 'healthy' as const, message: trimmed } },
+              responseTime: 0,
+            } as HealthCheckResponse;
           } else {
             throw new Error(`Invalid health response: expected JSON or "healthy"/"ok", got "${(text ?? '').slice(0, 50)}${(text?.length ?? 0) > 50 ? '...' : ''}"`);
           }
@@ -499,9 +512,9 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
 
         // Handle proxy response format
         let data: HealthCheckResponse;
-        if (isExternalUrl && result.success === false) {
+        if (isExternalUrl && 'success' in result && result.success === false) {
           // Proxy returned an error - mark as unhealthy
-          const errorMsg = result.error || 'Failed to check health';
+          const errorMsg = (result as ProxyResult).error || 'Failed to check health';
           const unhealthyData: HealthCheckResponse = {
             status: 'unhealthy',
             timestamp: new Date().toISOString(),
@@ -541,12 +554,12 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
             toast.error(`Health check failed for ${service.serviceTitle}: ${errorMsg}`);
           }
           return;
-        } else if (isExternalUrl && result.success === true) {
+        } else if (isExternalUrl && 'success' in result && result.success === true && (result as ProxyResult).data) {
           // Proxy returned success
-          data = result.data;
+          data = (result as ProxyResult).data!;
         } else {
           // Direct response (relative URL)
-          data = result;
+          data = result as HealthCheckResponse;
         }
         
         // Determine if service is unhealthy (including degraded as unhealthy for tracking)

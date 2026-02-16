@@ -3696,5 +3696,27 @@
     "id": "01KHJGYQGW3E47BNT2Q0JTD1SY",
     "createdAt": "2026-02-16T06:07:11.900Z",
     "updatedAt": "2026-02-16T06:07:11.900Z"
+  },
+  {
+    "id": "01KHJQ1RCM2TE6W18Q5VPAE7M7",
+    "sourceSchema": "users",
+    "sourceId": "01KHJQ1RA3C0SHT5HXYV2MY455",
+    "targetSchema": "external_nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-16T07:53:42.548Z",
+    "updatedAt": "2026-02-16T07:53:42.548Z"
+  },
+  {
+    "id": "01KHJQ5XA7XD1QC1X05V3AA4J7",
+    "sourceSchema": "users",
+    "sourceId": "01KHJQ5X7AY4MP284WY0YDD416",
+    "targetSchema": "external_nodes",
+    "targetId": "active-directory",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "authentication-type",
+    "createdAt": "2026-02-16T07:55:58.663Z",
+    "updatedAt": "2026-02-16T07:55:58.663Z"
   }
 ]
