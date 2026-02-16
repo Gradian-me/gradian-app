@@ -197,7 +197,7 @@ export const HeaderMobileMenu: React.FC<HeaderMobileMenuProps> = ({
                 </button>
                 <button
                   onClick={() => handleUserAction('logout')}
-                  className="block w-full text-start px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+                  className="block w-full text-start px-3 py-2 text-xs text-red-600 hover:bg-red-50 rounded-md"
                 >
                   Sign out
                 </button>

@@ -88,7 +88,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter company name"
               />
               {errors.name && (
-                <p className="text-sm text-red-600 mt-1">{errors.name.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.name.message}</p>
               )}
             </div>
             <div>
@@ -100,7 +100,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter email address"
               />
               {errors.email && (
-                <p className="text-sm text-red-600 mt-1">{errors.email.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.email.message}</p>
               )}
             </div>
             <div>
@@ -111,7 +111,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter phone number"
               />
               {errors.phone && (
-                <p className="text-sm text-red-600 mt-1">{errors.phone.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.phone.message}</p>
               )}
             </div>
             <div>
@@ -122,7 +122,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter registration number"
               />
               {errors.registrationNumber && (
-                <p className="text-sm text-red-600 mt-1">{errors.registrationNumber.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.registrationNumber.message}</p>
               )}
             </div>
             <div>
@@ -133,7 +133,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter tax ID"
               />
               {errors.taxId && (
-                <p className="text-sm text-red-600 mt-1">{errors.taxId.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.taxId.message}</p>
               )}
             </div>
             <div>
@@ -170,7 +170,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
               rows={3}
             />
             {errors.address && (
-              <p className="text-sm text-red-600 mt-1">{errors.address.message}</p>
+              <p className="text-xs text-red-600 mt-1">{errors.address.message}</p>
             )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -182,7 +182,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter city"
               />
               {errors.city && (
-                <p className="text-sm text-red-600 mt-1">{errors.city.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.city.message}</p>
               )}
             </div>
             <div>
@@ -193,7 +193,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter state"
               />
               {errors.state && (
-                <p className="text-sm text-red-600 mt-1">{errors.state.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.state.message}</p>
               )}
             </div>
             <div>
@@ -204,7 +204,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter ZIP code"
               />
               {errors.zipCode && (
-                <p className="text-sm text-red-600 mt-1">{errors.zipCode.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.zipCode.message}</p>
               )}
             </div>
           </div>
@@ -268,7 +268,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter contact name"
               />
               {errors.primaryContact?.name && (
-                <p className="text-sm text-red-600 mt-1">{errors.primaryContact.name.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.primaryContact.name.message}</p>
               )}
             </div>
             <div>
@@ -280,7 +280,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter contact email"
               />
               {errors.primaryContact?.email && (
-                <p className="text-sm text-red-600 mt-1">{errors.primaryContact.email.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.primaryContact.email.message}</p>
               )}
             </div>
             <div>
@@ -291,7 +291,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter contact phone"
               />
               {errors.primaryContact?.phone && (
-                <p className="text-sm text-red-600 mt-1">{errors.primaryContact.phone.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.primaryContact.phone.message}</p>
               )}
             </div>
             <div>
@@ -302,7 +302,7 @@ export function VendorForm({ onSubmit, onCancel, isLoading = false }: VendorForm
                 placeholder="Enter position"
               />
               {errors.primaryContact?.position && (
-                <p className="text-sm text-red-600 mt-1">{errors.primaryContact.position.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.primaryContact.position.message}</p>
               )}
             </div>
           </div>

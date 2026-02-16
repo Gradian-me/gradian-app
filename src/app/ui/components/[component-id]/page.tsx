@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ALL_COMPONENTS } from '@/gradian-ui/shared/components/component-registry';
+import { IconBox, resolveIconBoxColor } from '@/gradian-ui/form-builder/form-elements';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 
@@ -63,9 +64,15 @@ export default async function ComponentDetailPage({ params }: PageProps) {
     <div className="container mx-auto px-4 py-6 space-y-8">
       <header className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className={`h-12 w-12 rounded-lg flex items-center justify-center shrink-0 text-white ${meta.color ? `bg-${meta.color}-600` : 'bg-gray-800'}`}>
-            {meta.icon ? <IconRenderer iconName={meta.icon} className="h-6 w-6" /> : null}
-          </div>
+          {meta.icon ? (
+            <IconBox
+              name={meta.icon}
+              variant="filled"
+              size="lg"
+              color={resolveIconBoxColor(meta.color || 'gray')}
+              className={!meta.color ? '!bg-gray-800' : undefined}
+            />
+          ) : null}
           <div>
             <h1 className="text-2xl font-semibold">{meta.label}</h1>
             <div className="text-sm text-gray-600 dark:text-gray-400">

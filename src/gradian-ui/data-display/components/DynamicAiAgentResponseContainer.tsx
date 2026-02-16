@@ -640,7 +640,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
             <RefreshCw className="h-4 w-4 me-2" />
             Try Again
           </Button>
-          <div className="text-sm text-red-600 dark:text-red-400 font-medium">
+          <div className="text-xs text-red-600 dark:text-red-400 font-medium">
             Error occurred while generating response
           </div>
           <div className="text-xs text-red-500 dark:text-red-500/80 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 max-w-2xl w-full">
@@ -671,7 +671,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
                 <div className="max-w-[85%] text-center">
                   <TextSwitcher
                     texts={agent.loadingTextSwitches}
-                    className="text-violet-900 dark:text-white font-medium text-sm md:text-base px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
+                    className="text-violet-900 dark:text-white font-medium text-xs px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
                     switchInterval={3000}
                     transitionDuration={0.5}
                   />
@@ -968,8 +968,8 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4" dir="ltr">
                 <div className="max-w-[85%] text-center">
                   <TextSwitcher
-                    texts={['Loading agent...', 'Preparing AI...']}
-                    className="text-violet-900 dark:text-white font-medium text-sm md:text-base px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
+                    texts={['Loading agent...', 'Preparing AI...']} 
+                    className="text-violet-900 dark:text-white font-medium text-xs px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
                     switchInterval={3000}
                     transitionDuration={0.5}
                   />

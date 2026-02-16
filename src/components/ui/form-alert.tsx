@@ -62,7 +62,7 @@ export const FormAlert: React.FC<FormAlertProps> = ({
   return (
     <div
       className={cn(
-        'flex items-start gap-3 px-4 py-3 rounded-lg border',
+        'flex items-center gap-3 px-4 py-3 rounded-xl border',
         styles[type],
         className
       )}

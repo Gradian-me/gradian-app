@@ -31773,60 +31773,60 @@
       {
         "id": "lean-brief-waste-description",
         "name": "briefWasteDescription",
-        "label": "Brief Waste Description",
+        "label": "Brief Waste or Defect Description",
         "sectionId": "basic-context",
         "component": "textarea",
-        "placeholder": "Enter brief waste description",
+        "placeholder": "Enter brief waste or defect description",
         "translations": [
           {
-            "en": "Brief Waste Description"
+            "en": "Brief Waste or Defect Description"
           },
           {
-            "fa": "شرح مختصر ضایعات"
+            "fa": "شرح مختصر ضایعات یا نقص"
           },
           {
-            "ar": "وصف مختصر للنفايات"
+            "ar": "وصف مختصر للهدر أو العيب"
           },
           {
-            "es": "Descripción breve del desperdicio"
+            "es": "Descripción breve del desperdicio o defecto"
           },
           {
-            "fr": "Description brève du gaspillage"
+            "fr": "Description brève du gaspillage ou du défaut"
           },
           {
-            "de": "Kurze Verschwendungsbeschreibung"
+            "de": "Kurze Beschreibung von Verschwendung oder Fehler"
           },
           {
-            "it": "Descrizione breve dello spreco"
+            "it": "Descrizione breve dello spreco o difetto"
           },
           {
-            "ru": "Краткое описание потерь"
+            "ru": "Краткое описание потерь или дефектов"
           }
         ],
         "placeholderTranslations": [
           {
-            "en": "Enter brief waste description"
+            "en": "Enter brief waste or defect description"
           },
           {
-            "fa": "شرح مختصر ضایعات را وارد کنید"
+            "fa": "شرح مختصر ضایعات یا نقص را وارد کنید"
           },
           {
-            "ar": "أدخل وصف مختصر للنفايات"
+            "ar": "أدخل وصف مختصر للهدر أو العيب"
           },
           {
-            "es": "Ingrese descripción breve del desperdicio"
+            "es": "Ingrese descripción breve del desperdicio o defecto"
           },
           {
-            "fr": "Entrez la description brève du gaspillage"
+            "fr": "Entrez la description brève du gaspillage ou du défaut"
           },
           {
-            "de": "Kurze Verschwendungsbeschreibung eingeben"
+            "de": "Kurze Beschreibung von Verschwendung oder Fehler eingeben"
           },
           {
-            "it": "Inserisci descrizione breve dello spreco"
+            "it": "Inserisci descrizione breve dello spreco o difetto"
           },
           {
-            "ru": "Введите краткое описание потерь"
+            "ru": "Введите краткое описание потерь или дефектов"
           }
         ],
         "validation": {
@@ -33357,58 +33357,58 @@
       },
       {
         "id": "waste-analysis",
-        "title": "Waste Analysis",
+        "title": "Waste or Defect Analysis",
         "titleTranslations": [
           {
-            "en": "Waste Analysis"
+            "en": "Waste or Defect Analysis"
           },
           {
-            "fa": "تحلیل ضایعات"
+            "fa": "تحلیل ضایعات یا نقص"
           },
           {
-            "ar": "تحليل الهدر"
+            "ar": "تحليل الهدر أو العيب"
           },
           {
-            "es": "Análisis de desperdicios"
+            "es": "Análisis de desperdicios o defectos"
           },
           {
-            "fr": "Analyse des gaspillages"
+            "fr": "Analyse des gaspillages ou défauts"
           },
           {
-            "de": "Verschwendungsanalyse"
+            "de": "Verschwendungs- oder Fehleranalyse"
           },
           {
-            "it": "Analisi degli sprechi"
+            "it": "Analisi di sprechi o difetti"
           },
           {
-            "ru": "Анализ потерь"
+            "ru": "Анализ потерь и дефектов"
           }
         ],
-        "description": "Analysis of different types of waste using rating components",
+        "description": "Analysis of different types of waste or defect using rating components",
         "descriptionTranslations": [
           {
-            "en": "Analysis of different types of waste using rating components"
+            "en": "Analysis of different types of waste or defect using rating components"
           },
           {
-            "fa": "تحلیل انواع ضایعات با استفاده از اجزای امتیازدهی"
+            "fa": "تحلیل انواع ضایعات یا نقص با استفاده از اجزای امتیازدهی"
           },
           {
-            "ar": "تحليل أنواع الهدر باستخدام مكونات التقييم"
+            "ar": "تحليل أنواع الهدر أو العيب باستخدام مكونات التقييم"
           },
           {
-            "es": "Análisis de distintos tipos de desperdicio mediante componentes de valoración"
+            "es": "Análisis de distintos tipos de desperdicio o defecto mediante componentes de valoración"
           },
           {
-            "fr": "Analyse des différents types de gaspillage à l'aide de composants d'évaluation"
+            "fr": "Analyse des différents types de gaspillage ou défaut à l'aide de composants d'évaluation"
           },
           {
-            "de": "Analyse verschiedener Verschwendungsarten mittels Bewertungskomponenten"
+            "de": "Analyse verschiedener Verschwendungs- oder Fehlerarten mittels Bewertungskomponenten"
           },
           {
-            "it": "Analisi dei diversi tipi di spreco tramite componenti di valutazione"
+            "it": "Analisi dei diversi tipi di spreco o difetto tramite componenti di valutazione"
           },
           {
-            "ru": "Анализ различных видов потерь с использованием рейтинговых компонентов"
+            "ru": "Анализ различных видов потерь и дефектов с использованием рейтинговых компонентов"
           }
         ],
         "initialState": "expanded",

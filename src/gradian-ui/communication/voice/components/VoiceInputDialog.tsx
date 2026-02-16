@@ -484,7 +484,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
                   <div className="max-w-[85%]">
                     <TextSwitcher
                       texts={loadingTextSwitches}
-                      className="text-white dark:text-white font-medium text-sm md:text-base px-4 py-2 rounded-lg bg-black/20 dark:bg-white/10 backdrop-blur-sm"
+                      className="text-white dark:text-white font-medium text-xs px-4 py-2 rounded-lg bg-black/20 dark:bg-white/10 backdrop-blur-sm"
                       switchInterval={3000}
                       transitionDuration={0.5}
                       shimmerDuration={1}
@@ -528,7 +528,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
           {(error || visualizerError) && (
             <div className="w-full p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
               <div className="flex flex-col gap-3">
-                <div className="text-sm text-red-600 dark:text-red-400 whitespace-pre-line">
+                <div className="text-xs text-red-600 dark:text-red-400 whitespace-pre-line">
                   {error 
                     ? (typeof error === 'string' ? error : (typeof error === 'object' && 'message' in error ? (error as Error).message : String(error)))
                     : (visualizerError && typeof visualizerError === 'object' && 'message' in visualizerError
@@ -572,7 +572,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
           {transcriptionError && (
             <div className="w-full p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
               <div className="flex flex-col gap-3">
-                <div className="text-sm text-red-600 dark:text-red-400 whitespace-pre-line">
+                <div className="text-xs text-red-600 dark:text-red-400 whitespace-pre-line">
                   {transcriptionError}
                 </div>
                 {transcriptionError.toLowerCase().includes('permanently denied') && (

@@ -430,7 +430,7 @@ const SortableListItem: React.FC<{
                 </>
               ) : (
                 <span
-                  className="text-sm text-gray-800 dark:text-gray-200 cursor-text py-0.5 rounded hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors"
+                  className="text-xs text-gray-800 dark:text-gray-200 cursor-text py-0.5 rounded hover:bg-gray-200/50 dark:hover:bg-gray-700/50 transition-colors"
                   onClick={handleStartEdit}
                 >
                   {item.label}
@@ -867,7 +867,10 @@ export const ListInput: React.FC<ListInputProps> = ({
           listContent
         )
       ) : (
-        <div className="text-xs text-gray-500 dark:text-gray-400 text-center py-6 px-4 border border-dashed border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50/50 dark:bg-gray-800/30">
+        <div className={cn(
+          'text-xs text-gray-500 dark:text-gray-400 text-center py-6 px-4 border border-dashed rounded-xl bg-gray-50/50 dark:bg-gray-800/30',
+          error ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700'
+        )}>
           {emptyClickToAddOne}
         </div>
       )}

@@ -49,6 +49,14 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
     });
   }, [schema, values, t, language, defaultLang]);
 
+  // Check if any system field has a validation error (must be before early return - hooks rule)
+  const hasAnyError = useMemo(() => {
+    return systemFields.some((f) => {
+      const name = f.field.name || f.field.id || '';
+      return Boolean(errors?.[name]);
+    });
+  }, [systemFields, errors]);
+
   // Hide system section if no fields are available
   if (systemFields.length === 0) {
     return null;
@@ -65,10 +73,10 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
 
   return (
     <Card className={cn(
-      'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
+      'border rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
       'overflow-visible',
-      // When placed inside a grid layout (e.g. 2-column forms), make the system section span 2 columns
-      'md:col-span-2'
+      'md:col-span-2',
+      hasAnyError ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700'
     )}>
       
       <CardContent className="p-6 overflow-visible">

@@ -72,14 +72,14 @@ export const SignInPage: React.FC<SignInPageProps> = ({
           <h1
             className={
               embed
-                ? 'animate-element animate-delay-100 font-semibold leading-tight text-lg sm:text-xl md:text-2xl whitespace-normal wrap-break-word'
-                : 'animate-element animate-delay-100 font-semibold leading-tight whitespace-nowrap overflow-hidden'
+                ? 'animate-element animate-delay-100 font-semibold leading-normal text-lg sm:text-xl md:text-2xl whitespace-normal wrap-break-word'
+                : 'animate-element animate-delay-100 font-semibold leading-normal whitespace-normal overflow-visible'
             }
             style={embed ? undefined : { fontSize: 'clamp(1.5rem, 3vw + 0.5rem, 3rem)' }}
           >
             {title !== undefined && title !== null ? title : t(TRANSLATION_KEYS.AUTH_LOGIN_TITLE)}
           </h1>
-          <p className={`animate-element animate-delay-200 text-muted-foreground ${embed ? 'text-xs sm:text-sm' : ''}`}>
+          <p className={`animate-element animate-delay-200 text-muted-foreground leading-relaxed ${embed ? 'text-xs sm:text-sm' : ''}`}>
             {description !== undefined && description !== null ? description : t(TRANSLATION_KEYS.AUTH_LOGIN_DESCRIPTION)}
           </p>
 
@@ -98,7 +98,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
           <form className={embed ? 'space-y-3 sm:space-y-5' : 'space-y-5'} onSubmit={onSignIn}>
             <div className="animate-element animate-delay-300 flex flex-col gap-2">
-              <label className="hidden md:block text-sm font-medium text-muted-foreground">{t(TRANSLATION_KEYS.AUTH_LABEL_EMAIL_OR_USERNAME)}</label>
+              <label className="hidden md:block text-sm font-medium text-muted-foreground leading-normal pb-0.5">{t(TRANSLATION_KEYS.AUTH_LABEL_EMAIL_OR_USERNAME)}</label>
               <GlassInputWrapper>
                 <UserIcon className="w-5 h-5 text-muted-foreground ms-2 shrink-0" />
                 <input
@@ -114,7 +114,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             </div>
 
             <div className="animate-element animate-delay-400 flex flex-col gap-2">
-              <label className="hidden md:block text-sm font-medium text-muted-foreground">{t(TRANSLATION_KEYS.AUTH_LABEL_PASSWORD)}</label>
+              <label className="hidden md:block text-sm font-medium text-muted-foreground leading-normal pb-0.5">{t(TRANSLATION_KEYS.AUTH_LABEL_PASSWORD)}</label>
               <GlassInputWrapper>
                 <LockIcon className="w-5 h-5 text-muted-foreground ms-2 shrink-0" /> 
                   <input

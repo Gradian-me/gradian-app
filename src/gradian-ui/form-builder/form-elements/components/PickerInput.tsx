@@ -14,7 +14,7 @@ import { NormalizedOption, normalizeOptionArray, extractFirstId } from '../utils
 import { Search, X } from 'lucide-react';
 import { cn } from '@/gradian-ui/shared/utils';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
-import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { getLabelClasses, errorTextClasses, inputErrorBorderClasses } from '../utils/field-styles';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -726,7 +726,10 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       
       {/* Show badges for multiselect mode */}
       {allowMultiselect && normalizedSelection.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 p-2 min-h-10 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
+        <div className={cn(
+          'flex flex-wrap items-center gap-2 p-2 min-h-10 border rounded-md bg-white dark:bg-gray-800',
+          error ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700'
+        )}>
           <div className="flex flex-wrap gap-2 flex-1">
             {normalizedSelection.map((option) => {
               const optionId = String(option.id || '');
@@ -837,7 +840,10 @@ export const PickerInput: React.FC<PickerInputProps> = ({
         <div className="flex gap-2">
           {/* Show badge if selected item has icon or color */}
           {normalizedSelection.length > 0 && (normalizedSelection[0]?.icon || normalizedSelection[0]?.color) ? (
-            <div className="flex-1 flex items-center gap-2 p-2 min-h-10 border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
+            <div className={cn(
+              'flex-1 flex items-center gap-2 p-2 min-h-10 border rounded-md bg-white dark:bg-gray-800',
+              error ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700'
+            )}>
               <div className="flex-1">
                 {normalizedSelection.map((option) => {
                   const optionId = String(option.id || '');
@@ -979,9 +985,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                 disabled={disabled}
                 className={cn(
                   'cursor-pointer text-xs',
-                  error
-                    ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500'
-                    : ''
+                  error && inputErrorBorderClasses
                 )}
               />
               <Button

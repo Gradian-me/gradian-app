@@ -105,7 +105,7 @@ export function PurchaseOrderForm({ onSubmit, onCancel, isLoading = false, vendo
               </SelectContent>
             </Select>
             {errors.vendorId && (
-              <p className="text-sm text-red-600 mt-1">{errors.vendorId.message}</p>
+              <p className="text-xs text-red-600 mt-1">{errors.vendorId.message}</p>
             )}
           </div>
           {selectedVendor && (
@@ -144,7 +144,7 @@ export function PurchaseOrderForm({ onSubmit, onCancel, isLoading = false, vendo
                 </SelectContent>
               </Select>
               {errors.paymentTerms && (
-                <p className="text-sm text-red-600 mt-1">{errors.paymentTerms.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.paymentTerms.message}</p>
               )}
             </div>
             <div>
@@ -161,7 +161,7 @@ export function PurchaseOrderForm({ onSubmit, onCancel, isLoading = false, vendo
                 </SelectContent>
               </Select>
               {errors.deliveryTerms && (
-                <p className="text-sm text-red-600 mt-1">{errors.deliveryTerms.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.deliveryTerms.message}</p>
               )}
             </div>
           </div>
@@ -173,7 +173,7 @@ export function PurchaseOrderForm({ onSubmit, onCancel, isLoading = false, vendo
               {...register('expectedDeliveryDate')}
             />
             {errors.expectedDeliveryDate && (
-              <p className="text-sm text-red-600 mt-1">{errors.expectedDeliveryDate.message}</p>
+              <p className="text-xs text-red-600 mt-1">{errors.expectedDeliveryDate.message}</p>
             )}
           </div>
         </CardContent>
@@ -196,7 +196,7 @@ export function PurchaseOrderForm({ onSubmit, onCancel, isLoading = false, vendo
                   placeholder="Enter product name"
                 />
                 {errors.items?.[index]?.productName && (
-                  <p className="text-sm text-red-600 mt-1">
+                  <p className="text-xs text-red-600 mt-1">
                     {errors.items[index]?.productName?.message}
                   </p>
                 )}
@@ -209,7 +209,7 @@ export function PurchaseOrderForm({ onSubmit, onCancel, isLoading = false, vendo
                   placeholder="Enter quantity"
                 />
                 {errors.items?.[index]?.quantity && (
-                  <p className="text-sm text-red-600 mt-1">
+                  <p className="text-xs text-red-600 mt-1">
                     {errors.items[index]?.quantity?.message}
                   </p>
                 )}
@@ -229,7 +229,7 @@ export function PurchaseOrderForm({ onSubmit, onCancel, isLoading = false, vendo
                   </SelectContent>
                 </Select>
                 {errors.items?.[index]?.unit && (
-                  <p className="text-sm text-red-600 mt-1">
+                  <p className="text-xs text-red-600 mt-1">
                     {errors.items[index]?.unit?.message}
                   </p>
                 )}
@@ -243,7 +243,7 @@ export function PurchaseOrderForm({ onSubmit, onCancel, isLoading = false, vendo
                   placeholder="Enter unit price"
                 />
                 {errors.items?.[index]?.unitPrice && (
-                  <p className="text-sm text-red-600 mt-1">
+                  <p className="text-xs text-red-600 mt-1">
                     {errors.items[index]?.unitPrice?.message}
                   </p>
                 )}
@@ -257,7 +257,7 @@ export function PurchaseOrderForm({ onSubmit, onCancel, isLoading = false, vendo
                 rows={2}
               />
               {errors.items?.[index]?.description && (
-                <p className="text-sm text-red-600 mt-1">
+                <p className="text-xs text-red-600 mt-1">
                   {errors.items[index]?.description?.message}
                 </p>
               )}

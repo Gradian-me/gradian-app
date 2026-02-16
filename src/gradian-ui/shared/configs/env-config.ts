@@ -54,6 +54,16 @@ export const DEMO_MODE: boolean = (() => {
   return toBoolean(value, false);
 })();
 
+/**
+ * Default tenant domain when demo mode is on and no tenant is selected.
+ * Set via NEXT_PUBLIC_DEFAULT_TENANT (e.g. app1.cinnagen.com).
+ */
+export const DEFAULT_TENANT: string | undefined = (() => {
+  if (typeof process === 'undefined') return undefined;
+  const value = getEnvVar('DEFAULT_TENANT');
+  return value && String(value).trim() ? String(value).trim() : undefined;
+})();
+
 // ===========================================
 // Authentication Configuration
 // ===========================================

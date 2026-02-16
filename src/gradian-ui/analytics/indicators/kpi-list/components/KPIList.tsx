@@ -86,7 +86,7 @@ const KPIListItemComponent = ({
       )}
     >
       <div className="flex-1 min-w-0">
-        <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">
+        <h4 className="font-medium text-xs text-gray-900 dark:text-gray-100 truncate">
           {item.title}
         </h4>
         {item.subtitle && (
@@ -175,7 +175,7 @@ export function KPIList({
             <span>{title}</span>
           </CardTitle>
           {subtitle && (
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-xs text-gray-600 dark:text-gray-400">
               {subtitle}
             </p>
           )}
@@ -190,7 +190,7 @@ export function KPIList({
               />
             ))
           ) : (
-            <div className="text-center py-8 text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-center py-8 text-xs text-gray-500 dark:text-gray-400">
               No items to display
             </div>
           )}

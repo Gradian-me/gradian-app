@@ -32,7 +32,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { IconBox, resolveIconBoxColor } from './IconBox';
 import { AddButtonFull } from './AddButtonFull';
+import { PopupViewSwitcher, type PopupViewMode } from './PopupViewSwitcher';
 import { EndLine } from '@/gradian-ui/layout';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -52,22 +54,22 @@ import { getSchemaTranslatedSingularName, getSchemaTranslatedPluralName } from '
 import type { FormAlertMessage } from '@/components/ui/form-alert';
 
 const cardVariants = {
-  hidden: { opacity: 0, y: 8, scale: 0.99 },
+  hidden: { opacity: 0, y: 4 },
   visible: (index: number) => ({
     opacity: 1,
     y: 0,
-    scale: 1,
     transition: {
-      duration: 0.22,
-      delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP * 0.7, UI_PARAMS.CARD_INDEX_DELAY.MAX * 0.7),
+      duration: 0.28,
+      ease: 'easeOut' as const,
+      delay: Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP * 0.4, UI_PARAMS.CARD_INDEX_DELAY.MAX * 0.5),
     },
   }),
   exit: {
     opacity: 0,
-    y: -8,
-    scale: 0.99,
+    y: -4,
     transition: {
-      duration: 0.18,
+      duration: 0.2,
+      ease: 'easeOut' as const,
     },
   },
 };
@@ -206,7 +208,7 @@ const getAvatarColorClasses = (color?: string) => {
       border: 'border-zinc-100 dark:border-zinc-500/40',
     },
   };
-  
+
   const key = color && colorMap[color.toLowerCase()] ? color.toLowerCase() : 'violet';
   return colorMap[key];
 };
@@ -486,6 +488,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   const hasInitialLoadRef = useRef<boolean>(false);
   const isRefreshingRef = useRef<boolean>(false);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [viewMode, setViewMode] = useState<PopupViewMode>('grid');
 
   useEffect(() => {
     setPageMeta((prev) => ({
@@ -1354,7 +1357,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   const renderItemCard = (item: any, index: number) => {
     const isSelected = isItemSelected(item);
 
-    const baseCardClasses = "relative p-3 rounded-xl border cursor-pointer transition-all duration-200 group";
+    const baseCardClasses = "relative p-3 h-full rounded-xl border cursor-pointer transition-all duration-200 group";
     const selectedCardClasses = "border-violet-500 dark:border-violet-400 bg-gradient-to-br from-gray-100 via-white to-violet-100 dark:from-gray-900 dark:via-gray-800 dark:to-violet-900 shadow-lg ring-1 ring-violet-200 dark:ring-violet-800";
     const defaultCardClasses = "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-700/50";
 
@@ -1365,6 +1368,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       animate: 'visible',
       exit: 'exit',
       custom: index,
+      transition: { layout: { duration: 0.24, ease: 'easeOut' } },
     } as const;
 
     const highlightQuery = searchQuery.trim();
@@ -1391,8 +1395,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         ? getValueByRoleFromSourceColumns(item, 'color', effectiveSourceColumnRoles) || item.color
         : item.color;
       const resolvedColorId = typeof itemColor === 'string' ? itemColor.toLowerCase() : undefined;
-      const iconColorClasses = getAvatarColorClasses(resolvedColorId);
-      
+
       return (
         <motion.div key={item.id || index} {...motionProps}>
           <div
@@ -1408,19 +1411,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           >
             <div className="flex items-center gap-3">
               {iconName && (
-                <div className={cn(
-                  "h-10 w-10 rounded-lg flex items-center justify-center border",
-                  iconColorClasses.bg,
-                  iconColorClasses.text,
-                  iconColorClasses.border
-                )}>
-                  <IconRenderer iconName={iconName} className="h-5 w-5" />
-                </div>
+                <IconBox name={iconName} color={resolveIconBoxColor(resolvedColorId)} iconClassName="h-5 w-5" />
               )}
             <div className="flex-1 min-w-0">
               <div
                 className={cn(
-                  "font-medium text-sm",
+                  "font-medium text-xs",
                   isSelected ? "text-violet-900 dark:text-violet-100" : "text-gray-900 dark:text-gray-100"
                 )}
               >
@@ -1499,6 +1495,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const entityTypeFieldDef = effectiveSchema?.fields?.find(f => f.role === 'entityType' || f.name === 'entityType');
     const hasCodeField = effectiveSchema?.fields?.some(f => f.role === 'code') || false;
     const codeField = getSingleValueByRole(effectiveSchema, item, 'code');
+    const hasAvatarOrImageField = effectiveSchema?.fields?.some(f => f.role === 'avatar' || f.role === 'image') || false;
     // Use getSingleValueByRole like AccordionFormSection does for status
     const statusFieldValue = getSingleValueByRole(effectiveSchema, item, 'status') || item.status || null;
     const ratingFieldValue = ratingFieldDef ? getFieldValue(ratingFieldDef, item) : null;
@@ -1580,32 +1577,39 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           )}
         >
           <div className="flex items-start gap-3">
-            {/* Avatar */}
-            <Avatar
-              fallback={getInitials(avatarField, lang)}
-              size="md"
-              variant="primary"
-              className={cn(
-                "border shrink-0 transition-colors",
-                avatarColorClasses.bg,
-                avatarColorClasses.text,
-                avatarColorClasses.border,
-                isSelected
-                  ? "ring-1 ring-violet-400"
-                  : ""
-              )}
-            >
-              {getInitials(avatarField, lang)}
-            </Avatar>
+            {hasAvatarOrImageField && (
+              <Avatar
+                fallback={getInitials(avatarField, lang)}
+                size="md"
+                variant="primary"
+                className={cn(
+                  "border shrink-0 transition-colors",
+                  avatarColorClasses.bg,
+                  avatarColorClasses.text,
+                  avatarColorClasses.border,
+                  isSelected
+                    ? "ring-1 ring-violet-400"
+                    : ""
+                )}
+              >
+                {getInitials(avatarField, lang)}
+              </Avatar>
+            )}
 
             {/* Content */}
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-1.5 flex-wrap">
+                  <div className="flex flex-col gap-1">
+                    {/* Code above title for better scan - w-fit so badge fits content */}
+                    {hasCodeField && codeField && (
+                      <span className="w-fit">
+                        <CodeBadge code={codeField} />
+                      </span>
+                    )}
                     <h4
                       className={cn(
-                        "text-xs font-semibold text-wrap wrap-break-words line-clamp-3 transition-colors flex-1 min-w-0",
+                        "text-xs font-semibold text-wrap wrap-break-words line-clamp-3 leading-relaxed transition-colors flex-1 min-w-0",
                         isSelected
                           ? "text-violet-900 dark:text-violet-100"
                           : "text-gray-900 dark:text-gray-100 group-hover:text-violet-700 dark:group-hover:text-violet-300"
@@ -1613,10 +1617,6 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                     >
                       {renderHighlightedText(title, highlightQuery)}
                     </h4>
-                    {/* Code Badge */}
-                    {hasCodeField && codeField && (
-                      <CodeBadge code={codeField} />
-                    )}
                   </div>
                   {subtitle.trim() && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 text-wrap wrap-break-words line-clamp-2 mt-0.5">
@@ -1797,6 +1797,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       animate: 'visible',
       exit: 'exit',
       custom: index,
+      transition: { layout: { duration: 0.24, ease: 'easeOut' } },
     } as const;
 
     const hasChildren = node.children.length > 0;
@@ -1824,8 +1825,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         ? getValueByRoleFromSourceColumns(item, 'color', effectiveSourceColumnRoles) || item.color
         : item.color;
       const resolvedColorId = typeof itemColor === 'string' ? itemColor.toLowerCase() : undefined;
-      const iconColorClasses = getAvatarColorClasses(resolvedColorId);
-      
+
       return (
         <motion.div key={item.id || index} {...motionProps} style={{ marginInlineStart: depth * 16 }}>
           <div
@@ -1863,19 +1863,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 )}
               </button>
               {iconName && (
-                <div className={cn(
-                  "h-10 w-10 rounded-lg flex items-center justify-center border",
-                  iconColorClasses.bg,
-                  iconColorClasses.text,
-                  iconColorClasses.border
-                )}>
-                  <IconRenderer iconName={iconName} className="h-5 w-5" />
-                </div>
+                <IconBox name={iconName} color={resolveIconBoxColor(resolvedColorId)} iconClassName="h-5 w-5" />
               )}
               <div className="flex-1 min-w-0">
                 <div
                   className={cn(
-                    'font-medium text-sm',
+                    'font-medium text-xs',
                     isSelected ? 'text-violet-900 dark:text-violet-100' : 'text-gray-900 dark:text-gray-100'
                   )}
                 >
@@ -1926,6 +1919,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
 
     const hasCodeField = effectiveSchema?.fields?.some((f) => f.role === 'code') || false;
     const codeField = getSingleValueByRole(effectiveSchema, item, 'code');
+    const hasAvatarOrImageField = effectiveSchema?.fields?.some(f => f.role === 'avatar' || f.role === 'image') || false;
     
     // Extract status and entityType for badges
     const statusFieldDef = effectiveSchema?.fields?.find(f => f.role === 'status' || f.name === 'status');
@@ -2025,28 +2019,35 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   <span className="h-1 w-1 rounded-full bg-gray-400" />
                 )}
               </button>
-              <Avatar
-                fallback={getInitials(avatarField, langNode)}
-                size="md"
-                variant="primary"
-                className={cn(
-                  'border shrink-0 transition-colors',
-                  avatarColorClasses.bg,
-                  avatarColorClasses.text,
-                  avatarColorClasses.border,
-                  isSelected ? 'ring-1 ring-violet-400' : ''
-                )}
-              >
-                {getInitials(avatarField, langNode)}
-              </Avatar>
+              {hasAvatarOrImageField && (
+                <Avatar
+                  fallback={getInitials(avatarField, langNode)}
+                  size="md"
+                  variant="primary"
+                  className={cn(
+                    'border shrink-0 transition-colors',
+                    avatarColorClasses.bg,
+                    avatarColorClasses.text,
+                    avatarColorClasses.border,
+                    isSelected ? 'ring-1 ring-violet-400' : ''
+                  )}
+                >
+                  {getInitials(avatarField, langNode)}
+                </Avatar>
+              )}
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
+                    <div className="flex flex-col gap-1">
+                      {hasCodeField && codeField && (
+                        <span className="w-fit">
+                          <CodeBadge code={codeField} />
+                        </span>
+                      )}
                       <h4
                         className={cn(
-                          'text-xs font-semibold text-wrap wrap-break-words transition-colors flex-1 min-w-0',
+                          'text-xs font-semibold text-wrap wrap-break-words leading-relaxed transition-colors flex-1 min-w-0',
                             isSelected
                             ? 'text-violet-900 dark:text-violet-100'
                             : 'text-gray-900 dark:text-gray-100 group-hover:text-violet-700 dark:group-hover:text-violet-300'
@@ -2054,7 +2055,6 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       >
                         {renderHighlightedText(title, highlightQuery)}
                       </h4>
-                      {hasCodeField && codeField && <CodeBadge code={codeField} />}
                     </div>
                     {subtitle.trim() && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
@@ -2150,6 +2150,13 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               <DialogTitle>{resolvedTitle}</DialogTitle>
             </div>
             <div className="flex items-center gap-2 me-8">
+              {!isHierarchical && (
+                <PopupViewSwitcher
+                  value={viewMode}
+                  onChange={setViewMode}
+                  disabled={isLoading || isSubmitting}
+                />
+              )}
               <Button
                 type="button"
                 variant="ghost"
@@ -2211,7 +2218,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         {/* Search */}
         <div className="mb-4">
           <SearchInput
-            config={{ name: 'picker-search', placeholder: `${getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH).replace('...', '')} ${schemaName}...` }}
+            config={{ name: 'picker-search', placeholder: getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH, language, defaultLang) }}
             value={searchQuery}
             onChange={(value) => setSearchQuery(value)}
             onClear={() => setSearchQuery('')}
@@ -2232,7 +2239,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
             <div className="flex flex-col items-center justify-center py-12 gap-4 px-4">
               <div className="text-center text-red-500 text-sm">
                 {error === COMPANY_REQUIRED_ERROR_KEY
-                  ? getT(TRANSLATION_KEYS.MESSAGE_COMPANY_REQUIRED_PICKER)
+                  ? getT(TRANSLATION_KEYS.MESSAGE_COMPANY_REQUIRED_PICKER, language, defaultLang)
                   : error}
               </div>
               {error === COMPANY_REQUIRED_ERROR_KEY && (
@@ -2247,8 +2254,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           ) : filteredItems.length === 0 && !isLoading ? (
             <div className="text-center py-12 text-gray-500 text-sm">
               {searchQuery
-                ? getT(TRANSLATION_KEYS.MESSAGE_NO_ITEMS_FOUND_MATCHING).replace('{0}', searchQuery)
-                : getT(TRANSLATION_KEYS.MESSAGE_NO_ITEMS_AVAILABLE)}
+                ? getT(TRANSLATION_KEYS.MESSAGE_NO_ITEMS_FOUND_MATCHING, language, defaultLang).replace('{0}', searchQuery)
+                : getT(TRANSLATION_KEYS.MESSAGE_NO_ITEMS_AVAILABLE, language, defaultLang)}
             </div>
           ) : (
             <div className="relative">
@@ -2263,7 +2270,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   {hierarchyRoots.map((node, index) => renderHierarchyNode(node, 0, index))}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className={cn(
+                  'grid gap-2',
+                  viewMode === 'list' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'
+                )}>
                   <AnimatePresence mode="sync">
                     {filteredItems.map((item, index) => renderItemCard(item, index))}
                   </AnimatePresence>
@@ -2300,7 +2310,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end items-center gap-2 pt-4 border-t">
+        <div className="flex justify-end items-center gap-2 pt-4">
           <Button 
             type="button"
             variant="outline" 

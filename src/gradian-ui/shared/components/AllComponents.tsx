@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { cn } from '@/gradian-ui/shared/utils';
 import { ALL_COMPONENTS, ComponentMeta } from '@/gradian-ui/shared/components/component-registry';
+import { IconBox, resolveIconBoxColor } from '@/gradian-ui/form-builder/form-elements';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { SearchInput } from '@/gradian-ui/form-builder/form-elements/components/SearchInput';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
@@ -184,12 +185,15 @@ export const AllComponents: React.FC = () => {
                   {comps.map((comp) => (
                   <div key={comp.id} className="rounded-xl border p-3 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                       <div className="flex items-start gap-3">
-                        <div className={cn(
-                          'h-10 w-10 rounded-lg flex items-center justify-center shrink-0 text-white',
-                          comp.color ? `bg-${comp.color}-600` : 'bg-gray-800'
-                        )}>
-                          {comp.icon ? <IconRenderer iconName={comp.icon} className="h-5 w-5" /> : null}
-                        </div>
+                        {comp.icon ? (
+                          <IconBox
+                            name={comp.icon}
+                            variant="filled"
+                            size="md"
+                            color={resolveIconBoxColor(comp.color || 'gray')}
+                            className={!comp.color ? '!bg-gray-800' : undefined}
+                          />
+                        ) : null}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
                             <div className="min-w-0">

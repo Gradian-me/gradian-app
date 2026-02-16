@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card/components/MetricCard';
 import { PingOnChange } from '@/gradian-ui/layout/ping-on-change';
 import { RefreshCw, Settings, AlertCircle, CheckCircle } from 'lucide-react';
-import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { IconBox } from '@/gradian-ui/form-builder/form-elements';
 import { HealthService, ServiceHealthStatus } from '../types';
 import type { MetricItem } from '@/gradian-ui/analytics/indicators/metric-card/types';
 import { getStatusColor, getStatusText, getStatusIcon } from '../utils';
@@ -132,21 +132,18 @@ export function ServiceCardsList({
                 <CardContent className="p-4">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-start gap-3 min-w-0">
-                      <div
-                        className="h-12 w-12 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ backgroundColor: `${serviceStatus === 'healthy' ? '#10b981' : serviceStatus === 'unhealthy' ? '#ef4444' : '#f59e0b'}20` }}
-                      >
-                        <IconRenderer
-                          iconName={service.icon}
-                          className={`h-6 w-6 ${
-                            serviceStatus === 'healthy'
-                              ? 'text-green-500'
-                              : serviceStatus === 'unhealthy'
-                              ? 'text-red-500'
-                              : 'text-yellow-500'
-                          }`}
-                        />
-                      </div>
+                      <IconBox
+                        name={service.icon}
+                        color={
+                          serviceStatus === 'healthy'
+                            ? 'green'
+                            : serviceStatus === 'unhealthy'
+                              ? 'red'
+                              : 'amber'
+                        }
+                        variant="flat"
+                        size="lg"
+                      />
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <p className="text-lg font-bold text-gray-900 dark:text-gray-100 truncate">{service.serviceTitle}</p>
@@ -277,21 +274,18 @@ export function ServiceCardsList({
                 <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-3">
                   <div className="flex-1 min-w-0 w-full">
                     <div className="flex items-center gap-2 mb-1.5">
-                      <div 
-                        className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
-                        style={{ backgroundColor: `${serviceStatus === 'healthy' ? '#10b981' : serviceStatus === 'unhealthy' ? '#ef4444' : '#f59e0b'}20` }}
-                      >
-                        <IconRenderer 
-                          iconName={service.icon} 
-                          className={`h-6 w-6 ${
-                            serviceStatus === 'healthy' 
-                              ? 'text-green-500' 
-                              : serviceStatus === 'unhealthy' 
-                              ? 'text-red-500' 
-                              : 'text-yellow-500'
-                          }`}
-                        />
-                      </div>
+                      <IconBox
+                        name={service.icon}
+                        color={
+                          serviceStatus === 'healthy'
+                            ? 'green'
+                            : serviceStatus === 'unhealthy'
+                              ? 'red'
+                              : 'amber'
+                        }
+                        variant="flat"
+                        size="md"
+                      />
                       <h3 className="text-xl sm:text-2xl font-bold truncate min-w-0 flex-1">
                         {service.serviceTitle}
                       </h3>

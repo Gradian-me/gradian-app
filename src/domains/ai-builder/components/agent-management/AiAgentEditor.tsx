@@ -226,7 +226,7 @@ export function AiAgentEditor({
               <div className="flex items-center justify-between">
                 <Label htmlFor="agent-json">JSON Configuration</Label>
                 {jsonError && (
-                  <span className="text-sm text-red-600 dark:text-red-400">{jsonError}</span>
+                  <span className="text-xs text-red-600 dark:text-red-400">{jsonError}</span>
                 )}
               </div>
               <Textarea

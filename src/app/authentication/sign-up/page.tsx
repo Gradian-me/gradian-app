@@ -325,14 +325,14 @@ export default function SignUpPage() {
         <div className="w-full max-w-md pt-10 md:pt-4">
           <div className="flex flex-col gap-6">
             <h1 
-              className="animate-element animate-delay-100 font-semibold leading-tight whitespace-nowrap overflow-hidden"
+              className="animate-element animate-delay-100 font-semibold leading-normal whitespace-normal overflow-visible"
               style={{
                 fontSize: "clamp(1.5rem, 3vw + 0.5rem, 3rem)"
               }}
             >
               Create account
             </h1>
-            <p className="animate-element animate-delay-200 text-muted-foreground">
+            <p className="animate-element animate-delay-200 text-muted-foreground leading-relaxed">
               The password link would be sent to your email address after the account is activated by administrator.
             </p>
 

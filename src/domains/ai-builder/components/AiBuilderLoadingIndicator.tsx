@@ -45,7 +45,7 @@ export function AiBuilderLoadingIndicator({
             <div className="max-w-[85%]">
               <TextSwitcher
                 texts={agent.loadingTextSwitches}
-                className="text-vilet-900 dark:text-white font-medium text-sm md:text-base px-4 py-2"
+                className="text-vilet-900 dark:text-white font-medium text-xs px-4 py-2"
                 switchInterval={3000}
                 transitionDuration={0.5}
                 shimmerDuration={1}

@@ -647,6 +647,18 @@ export interface FormSectionProps {
   addItemError?: string | Array<Record<string, string>> | null; // Error message to display under the Add button (string or translation array)
   refreshRelationsTrigger?: number; // Trigger to refresh relations (increments when relations change)
   isAddingItem?: boolean; // Whether the add item modal is currently open (for loading state)
+  /** Pending relation IDs from picker selection (deferred until form save) */
+  pendingSelectedIds?: string[];
+  /** Entity data for pending selected items (id -> entity) */
+  pendingSelectedEntities?: Record<string, any>;
+  /** Pending relation IDs from add flow (deferred until form save) */
+  pendingAddedIds?: string[];
+  /** Entity data for pending added items (id -> entity) */
+  pendingAddedEntities?: Record<string, any>;
+  /** Called when user selects from picker - stores IDs for deferred relation creation */
+  onAddPendingSelected?: (sectionId: string, ids: string[], entities?: any[]) => void;
+  /** Called when user removes a pending item - if wasAdded, also deletes the orphan entity */
+  onRemovePending?: (sectionId: string, targetId: string, wasAdded: boolean) => void;
 }
 
 export interface RepeatingSectionProps {

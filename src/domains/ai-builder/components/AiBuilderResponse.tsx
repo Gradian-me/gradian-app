@@ -1007,7 +1007,7 @@ export function AiBuilderResponse({
                   <p className="text-xs font-medium text-red-700 dark:text-red-300 mb-1">
                     Image Generation Warning
                   </p>
-                  <p className="text-sm text-red-600 dark:text-red-400">
+                  <p className="text-xs text-red-600 dark:text-red-400">
                     {imageError}
                   </p>
                 </div>

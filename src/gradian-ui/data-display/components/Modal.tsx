@@ -94,7 +94,7 @@ export const Modal: React.FC<ModalProps> = ({
             {actions}
           </div>
         )}
-        <div className={cn("flex-1 overflow-y-auto", hideDialogHeader ? "sm:px-2 px-4 pb-4 pt-0" : "sm:px-2 px-4 pb-4")}>
+        <div className={cn("flex-1 overflow-y-auto", hideDialogHeader ? "px-1 md:px-2 pb-4 pt-0" : "px-1 md:px-2 pb-4")}>
           {children}
         </div>
         {showCloseButton && (

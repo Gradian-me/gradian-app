@@ -5,13 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { SyncButton } from '@/gradian-ui/form-builder/form-elements';
+import { SyncButton, IconBox } from '@/gradian-ui/form-builder/form-elements';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { CheckCircle, AlertCircle, MessageCircle } from 'lucide-react';
 import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { motion } from 'framer-motion';
-import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { LoadingSpinner } from '@/gradian-ui/layout/components';
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
 import { useTenantStore } from '@/stores/tenant.store';
@@ -261,12 +260,12 @@ function SyncIntegrationPageContent() {
           <Card>
             <CardHeader>
               <div className="flex items-center space-x-3">
-                <div 
-                  className="h-10 w-10 rounded-lg flex items-center justify-center"
+                <IconBox
+                  name={integration.icon}
+                  variant="flat"
+                  size="md"
                   style={{ backgroundColor: `${integration.color}20`, color: integration.color }}
-                >
-                  <IconRenderer iconName={integration.icon} className="h-6 w-6" />
-                </div>
+                />
                 <div>
                   <CardTitle>{integration.title}</CardTitle>
                   <p className="text-sm text-gray-500 mt-1">{integration.description}</p>
@@ -341,7 +340,7 @@ function SyncIntegrationPageContent() {
                 <div className="grid grid-cols-2 gap-4 pt-2 border-t">
                   <div>
                     <p className="text-sm text-gray-500">Source Route</p>
-                    <p className="font-medium text-sm break-all">{integration.sourceRoute}</p>
+                    <p className="font-medium text-xs break-all">{integration.sourceRoute}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Source Method</p>

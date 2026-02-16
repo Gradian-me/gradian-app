@@ -167,10 +167,10 @@ export default function ChangePasswordPage() {
     >
       <div className="w-full max-w-md">
         <div className="flex flex-col gap-6">
-          <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-tight">
+          <h1 className="animate-element animate-delay-100 text-4xl md:text-5xl font-semibold leading-normal">
             {t(TRANSLATION_KEYS.AUTH_CHANGE_PASSWORD_TITLE)}
           </h1>
-          <p className="animate-element animate-delay-200 text-muted-foreground">
+          <p className="animate-element animate-delay-200 text-muted-foreground leading-relaxed">
             {t(TRANSLATION_KEYS.AUTH_CHANGE_PASSWORD_DESCRIPTION)}
           </p>
 
@@ -182,7 +182,7 @@ export default function ChangePasswordPage() {
 
           <form className="space-y-5" onSubmit={handleSubmit} noValidate>
             <div className="animate-element animate-delay-300 flex flex-col gap-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <label className="text-sm font-medium text-muted-foreground leading-normal pb-0.5 flex items-center gap-2">
                 <UserIcon className="h-4 w-4" />
                 {t(TRANSLATION_KEYS.AUTH_LABEL_EMAIL_OR_USERNAME_CHANGE)}
               </label>
@@ -200,7 +200,7 @@ export default function ChangePasswordPage() {
             </div>
 
             <div className="animate-element animate-delay-350 flex flex-col gap-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <label className="text-sm font-medium text-muted-foreground leading-normal pb-0.5 flex items-center gap-2">
                 <LockIcon className="h-4 w-4" />
                 Current password
               </label>
@@ -230,7 +230,7 @@ export default function ChangePasswordPage() {
             </div>
 
             <div className="animate-element animate-delay-400 flex flex-col gap-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <label className="text-sm font-medium text-muted-foreground leading-normal pb-0.5 flex items-center gap-2">
                 <LockIcon className="h-4 w-4" />
                 {t(TRANSLATION_KEYS.AUTH_LABEL_NEW_PASSWORD)}
               </label>
@@ -260,7 +260,7 @@ export default function ChangePasswordPage() {
             </div>
 
             <div className="animate-element animate-delay-450 flex flex-col gap-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <label className="text-sm font-medium text-muted-foreground leading-normal pb-0.5 flex items-center gap-2">
                 <LockIcon className="h-4 w-4" />
                 Confirm new password
               </label>

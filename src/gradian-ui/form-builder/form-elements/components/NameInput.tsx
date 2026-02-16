@@ -183,7 +183,7 @@ export const NameInput = forwardRef<FormElementRef, NameInputProps>(
         </div>
 
         {error ? (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+          <p className="mt-1 text-xs text-red-600 dark:text-red-400" role="alert">
             {error}
           </p>
         ) : showHelperText ? (

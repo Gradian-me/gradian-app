@@ -268,7 +268,7 @@ export function AiFormFillerDialog({
           aiResponse && aiResponse.trim() ? (
             <div className="flex items-center gap-2 w-full">
               {validationErrors.length > 0 && (
-                <div className="flex-1 text-sm text-red-600 dark:text-red-400">
+                <div className="flex-1 text-xs text-red-600 dark:text-red-400">
                   {validationErrors[0]}
                 </div>
               )}

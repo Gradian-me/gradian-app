@@ -96,7 +96,7 @@ export function TenderForm({ onSubmit, onCancel, isLoading = false }: TenderForm
               placeholder="Enter tender title"
             />
             {errors.title && (
-              <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>
+              <p className="text-xs text-red-600 mt-1">{errors.title.message}</p>
             )}
           </div>
           <div>
@@ -108,7 +108,7 @@ export function TenderForm({ onSubmit, onCancel, isLoading = false }: TenderForm
               rows={4}
             />
             {errors.description && (
-              <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>
+              <p className="text-xs text-red-600 mt-1">{errors.description.message}</p>
             )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -127,7 +127,7 @@ export function TenderForm({ onSubmit, onCancel, isLoading = false }: TenderForm
                 </SelectContent>
               </Select>
               {errors.category && (
-                <p className="text-sm text-red-600 mt-1">{errors.category.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.category.message}</p>
               )}
             </div>
             <div>
@@ -139,7 +139,7 @@ export function TenderForm({ onSubmit, onCancel, isLoading = false }: TenderForm
                 placeholder="Enter estimated value"
               />
               {errors.estimatedValue && (
-                <p className="text-sm text-red-600 mt-1">{errors.estimatedValue.message}</p>
+                <p className="text-xs text-red-600 mt-1">{errors.estimatedValue.message}</p>
               )}
             </div>
             <div>
@@ -165,7 +165,7 @@ export function TenderForm({ onSubmit, onCancel, isLoading = false }: TenderForm
               {...register('closingDate')}
             />
             {errors.closingDate && (
-              <p className="text-sm text-red-600 mt-1">{errors.closingDate.message}</p>
+              <p className="text-xs text-red-600 mt-1">{errors.closingDate.message}</p>
             )}
           </div>
         </CardContent>
@@ -259,7 +259,7 @@ export function TenderForm({ onSubmit, onCancel, isLoading = false }: TenderForm
                     placeholder="Enter product name"
                   />
                   {errors.items?.[index]?.productName && (
-                    <p className="text-sm text-red-600 mt-1">
+                    <p className="text-xs text-red-600 mt-1">
                       {errors.items[index]?.productName?.message}
                     </p>
                   )}
@@ -272,7 +272,7 @@ export function TenderForm({ onSubmit, onCancel, isLoading = false }: TenderForm
                     placeholder="Enter quantity"
                   />
                   {errors.items?.[index]?.quantity && (
-                    <p className="text-sm text-red-600 mt-1">
+                    <p className="text-xs text-red-600 mt-1">
                       {errors.items[index]?.quantity?.message}
                     </p>
                   )}
@@ -292,7 +292,7 @@ export function TenderForm({ onSubmit, onCancel, isLoading = false }: TenderForm
                     </SelectContent>
                   </Select>
                   {errors.items?.[index]?.unit && (
-                    <p className="text-sm text-red-600 mt-1">
+                    <p className="text-xs text-red-600 mt-1">
                       {errors.items[index]?.unit?.message}
                     </p>
                   )}
@@ -306,7 +306,7 @@ export function TenderForm({ onSubmit, onCancel, isLoading = false }: TenderForm
                     placeholder="Enter unit price"
                   />
                   {errors.items?.[index]?.estimatedUnitPrice && (
-                    <p className="text-sm text-red-600 mt-1">
+                    <p className="text-xs text-red-600 mt-1">
                       {errors.items[index]?.estimatedUnitPrice?.message}
                     </p>
                   )}
@@ -320,7 +320,7 @@ export function TenderForm({ onSubmit, onCancel, isLoading = false }: TenderForm
                   rows={2}
                 />
                 {errors.items?.[index]?.description && (
-                  <p className="text-sm text-red-600 mt-1">
+                  <p className="text-xs text-red-600 mt-1">
                     {errors.items[index]?.description?.message}
                   </p>
                 )}
@@ -333,7 +333,7 @@ export function TenderForm({ onSubmit, onCancel, isLoading = false }: TenderForm
                   rows={2}
                 />
                 {errors.items?.[index]?.specifications && (
-                  <p className="text-sm text-red-600 mt-1">
+                  <p className="text-xs text-red-600 mt-1">
                     {errors.items[index]?.specifications?.message}
                   </p>
                 )}

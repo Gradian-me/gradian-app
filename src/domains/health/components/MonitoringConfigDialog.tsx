@@ -3,7 +3,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { IconBox, isHexColor, resolveIconBoxColor } from '@/gradian-ui/form-builder/form-elements';
 import { HealthService } from '../types';
 
 interface MonitoringConfigDialogProps {
@@ -35,15 +35,14 @@ export function MonitoringConfigDialog({
               className="flex items-center justify-between p-4 border rounded-lg"
             >
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div 
-                  className="h-10 w-10 rounded-lg flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: `${service.color || 'blue'}20` }}
-                >
-                  <IconRenderer 
-                    iconName={service.icon} 
-                    className={`h-6 w-6 text-${service.color || 'blue'}-500`}
-                  />
-                </div>
+                <IconBox
+                  name={service.icon}
+                  variant="flat"
+                  size="md"
+                  {...(isHexColor(service.color)
+                    ? { style: { backgroundColor: `${service.color}20`, color: service.color } }
+                    : { color: resolveIconBoxColor(service.color || 'blue') })}
+                />
                 <div className="flex-1 min-w-0">
                   <div className="font-medium text-gray-900 dark:text-gray-100 truncate">
                     {service.serviceTitle}

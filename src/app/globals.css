@@ -225,6 +225,13 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* RTL/Farsi: prevent descender clipping - ensure labels and headings have enough line-height */
+[dir="rtl"] label,
+[lang="fa"] label,
+[lang="ar"] label {
+  line-height: 1.5;
+}
+
 label {
   font-size: 0.8rem;
   margin-bottom: 0.6rem;

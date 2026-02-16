@@ -261,8 +261,8 @@ export const GoToTopForm: React.FC<GoToTopFormProps> = ({
      document.getElementById('form-dialog-form') !== null);
 
   const dialogPositionClasses: Record<typeof position, string> = {
-    'bottom-right': 'bottom-5 end-10',
-    'bottom-left': 'bottom-5 start-10',
+    'bottom-right': 'bottom-5 end-5 md:end-10',
+    'bottom-left': 'bottom-5 start-5 md:start-10',
     'bottom-center': 'bottom-8 start-1/2 -translate-x-1/2'
   };
 
@@ -289,14 +289,14 @@ export const GoToTopForm: React.FC<GoToTopFormProps> = ({
           <Button
             onClick={scrollToTop}
             size="icon"
-            variant="outline"
+            variant="ghost"
             className={cn(
               'h-9 w-9 rounded-full',
               'bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm',
-              'border border-violet-300 dark:border-violet-700 hover:border-violet-400',
-              'shadow-md hover:shadow-lg',
+              'border-2 border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-400',
+              'shadow-xl hover:shadow-2xl',
               'text-violet-700 dark:text-violet-300 hover:text-violet-600',
-              'transition-all duration-200',
+              'transition-all duration-100',
               'hover:scale-105 active:scale-95',
               'hover:bg-white dark:hover:bg-gray-900'
             )}

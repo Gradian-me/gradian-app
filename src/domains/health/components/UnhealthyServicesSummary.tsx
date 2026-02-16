@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle } from 'lucide-react';
-import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { IconBox } from '@/gradian-ui/form-builder/form-elements';
 import { HealthService, ServiceHealthStatus } from '../types';
 import { scrollToService } from '../utils';
 
@@ -55,15 +55,12 @@ export function UnhealthyServicesSummary({
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <div 
-                          className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: isUnhealthy ? '#ef444420' : '#f59e0b20' }}
-                        >
-                          <IconRenderer 
-                            iconName={service.icon} 
-                            className={`h-5 w-5 ${isUnhealthy ? 'text-red-500' : 'text-yellow-500'}`}
-                          />
-                        </div>
+                        <IconBox
+                          name={service.icon}
+                          color={isUnhealthy ? 'red' : 'amber'}
+                          variant="flat"
+                          size="sm"
+                        />
                         <h4 className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">
                           {service.serviceTitle}
                         </h4>

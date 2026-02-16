@@ -197,7 +197,7 @@ export function PromptPreviewSheet({
                                 <div className="max-w-[85%]">
                                   <TextSwitcher
                                     texts={['Summarizing prompt...', 'Preparing summary...', 'Analyzing content...']}
-                                    className="text-violet-900 dark:text-white font-medium text-sm md:text-base px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
+                                    className="text-violet-900 dark:text-white font-medium text-xs px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
                                     switchInterval={2000}
                                     transitionDuration={0.5}
                                     shimmerDuration={1}

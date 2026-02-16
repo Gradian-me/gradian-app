@@ -56,6 +56,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   addItemError, // Error message to display under the Add button
   refreshRelationsTrigger, // Trigger to refresh relations
   isAddingItem = false, // Whether the add item modal is currently open (for loading state)
+  pendingSelectedIds = [],
+  pendingSelectedEntities = {},
+  pendingAddedIds = [],
+  pendingAddedEntities = {},
+  onAddPendingSelected,
+  onRemovePending,
 }) => {
   // Get fields for this section from the schema
   const fields = getFieldsForSection(schema, section.id);
@@ -251,12 +257,20 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     fetchRelations();
   }, [fetchRelations, refreshRelationsTrigger]); // Also refresh when trigger changes
 
+  const pendingSelectedEntitiesList = React.useMemo(() => {
+    return (pendingSelectedIds || []).map(id => (pendingSelectedEntities || {})[id] ?? { id });
+  }, [pendingSelectedIds, pendingSelectedEntities]);
+  const pendingAddedEntitiesList = React.useMemo(() => {
+    return (pendingAddedIds || []).map(id => (pendingAddedEntities || {})[id] ?? { id });
+  }, [pendingAddedIds, pendingAddedEntities]);
+
   useEffect(() => {
     if (!isRelationBased || !onChange) {
       return;
     }
 
-    const normalized = relatedEntities.map((entity) => {
+    const allItems = [...relatedEntities, ...pendingSelectedEntitiesList, ...pendingAddedEntitiesList];
+    const normalized = allItems.map((entity) => {
       const label = targetSchemaData
         ? (getValueByRole(targetSchemaData, entity, 'title') || entity.name || entity.title || String(entity.id))
         : (entity.name || entity.title || String(entity.id));
@@ -273,7 +287,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     if (currentSerialized !== normalizedSerialized) {
       onChange(section.id, normalized);
     }
-  }, [isRelationBased, relatedEntities, onChange, section.id, targetSchemaData, values]);
+  }, [isRelationBased, relatedEntities, pendingSelectedEntitiesList, pendingAddedEntitiesList, onChange, section.id, targetSchemaData, values]);
   
   
   // Check if sections are collapsible (default to true for backward compatibility)
@@ -294,9 +308,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
 
   const relatedValueArray = Array.isArray(values?.[section.id]) ? values[section.id] : [];
 
-  // If relation-based repeating section already has related entities, suppress min-item validation message
+  // If relation-based repeating section already has related or pending entities, suppress min-item validation message
   if (section.isRepeatingSection && section.repeatingConfig?.targetSchema && sectionError) {
-    if (relatedEntities.length > 0 || relatedValueArray.length > 0) {
+    const totalItems = (relatedEntities?.length ?? 0) + (pendingSelectedIds?.length ?? 0) + (pendingAddedIds?.length ?? 0);
+    if (totalItems > 0 || relatedValueArray.length > 0) {
       displaySectionError = undefined;
     }
   }
@@ -522,7 +537,6 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
 
   // Handler for selecting an item from popup picker
   const handleSelectFromPicker = async (selectedItems: NormalizedOption[], rawItems: any[]) => {
-    // Validate required parameters
     if (!currentEntityId) {
       toast.error('Cannot create relation', {
         description: 'Source entity ID is missing. Please save the form first.',
@@ -530,69 +544,54 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       setIsPickerOpen(false);
       return;
     }
-
-    if (!relationTypeId) {
+    if (!relationTypeId || !targetSchema) {
       toast.error('Cannot create relation', {
-        description: 'Relation type is not configured for this section.',
+        description: 'Relation type or target schema is not configured for this section.',
       });
       setIsPickerOpen(false);
       return;
     }
 
-    if (!targetSchema) {
-      toast.error('Cannot create relation', {
-        description: 'Target schema is not configured for this section.',
+    const normalizedSelections = Array.isArray(selectedItems) ? selectedItems : [];
+    const selectionIds = normalizedSelections.map((s) => s?.id).filter((id): id is string => Boolean(id));
+    const rawItemIds = Array.isArray(rawItems) ? rawItems.map((item) => item?.id).filter((id): id is string => Boolean(id)) : [];
+    const allCandidateIds = Array.from(new Set([...selectionIds, ...rawItemIds]));
+
+    const existingRelationKeys = new Set(
+      relations.map((r) => `${r.sourceSchema}:${r.sourceId}:${r.targetSchema}:${r.targetId}:${r.relationTypeId}`)
+    );
+    const inPendingSelected = new Set([...(pendingSelectedIds || [])]);
+    const toCreateIds = allCandidateIds.filter((targetId) => {
+      const relationKey = `${sourceSchemaId}:${currentEntityId}:${targetSchema}:${targetId}:${relationTypeId}`;
+      return !existingRelationKeys.has(relationKey) && !inPendingSelected.has(targetId);
+    });
+
+    const skippedCount = allCandidateIds.length - toCreateIds.length;
+    if (toCreateIds.length === 0) {
+      toast.info('Relations already exist', {
+        description: skippedCount === 1
+          ? 'This item is already linked or pending.'
+          : `All ${skippedCount} selected items are already linked or pending.`,
+      });
+      setIsPickerOpen(false);
+      return;
+    }
+
+    if (onAddPendingSelected) {
+      const rawById: Record<string, any> = {};
+      (Array.isArray(rawItems) ? rawItems : []).forEach((r) => {
+        if (r?.id != null) rawById[String(r.id)] = r;
+      });
+      const entities = toCreateIds.map((id) => rawById[id] ?? { id });
+      onAddPendingSelected(section.id, toCreateIds, entities);
+      toast.success('Items added', {
+        description: `${toCreateIds.length} item(s) will be linked when you save the form.`,
       });
       setIsPickerOpen(false);
       return;
     }
 
     try {
-      const normalizedSelections = Array.isArray(selectedItems) ? selectedItems : [];
-      
-      // Extract IDs from normalized selections
-      const selectionIds = normalizedSelections
-        .map((selection) => selection?.id)
-        .filter((id): id is string => Boolean(id));
-      
-      // Also check rawItems for fallback
-      const rawItemIds = Array.isArray(rawItems)
-        ? rawItems.map((item) => item?.id).filter((id): id is string => Boolean(id))
-        : [];
-      
-      // Combine and deduplicate IDs
-      const allCandidateIds = Array.from(new Set([...selectionIds, ...rawItemIds]));
-      
-      // Check for existing relations with same relationTypeId
-      // A relation is considered duplicate if it has the same:
-      // sourceSchema, sourceId, targetSchema, targetId, and relationTypeId
-      const existingRelationKeys = new Set(
-        relations.map((r) => 
-          `${r.sourceSchema}:${r.sourceId}:${r.targetSchema}:${r.targetId}:${r.relationTypeId}`
-        )
-      );
-      
-      // Filter out IDs that already have a relation with the same relationTypeId
-      const toCreateIds = allCandidateIds.filter((targetId) => {
-        const relationKey = `${sourceSchemaId}:${currentEntityId}:${targetSchema}:${targetId}:${relationTypeId}`;
-        return !existingRelationKeys.has(relationKey);
-      });
-
-      // Track skipped items for user feedback
-      const skippedCount = allCandidateIds.length - toCreateIds.length;
-      
-      if (toCreateIds.length === 0) {
-        // All items already have relations with this type
-        toast.info('Relations already exist', {
-          description: skippedCount === 1 
-            ? 'This item is already linked to the current record with this relation type.'
-            : `All ${skippedCount} selected items are already linked with this relation type.`,
-        });
-        setIsPickerOpen(false);
-        return;
-      }
-
-      // Create relation operations
       const operations = toCreateIds.map((targetId) =>
         apiRequest('/api/relations', {
           method: 'POST',
@@ -606,91 +605,45 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           callerName: 'AccordionFormSection.createRelationsFromPicker',
         })
       );
-
-      // Execute all operations
       const results = await Promise.all(operations);
-      
-      // Separate results into successes, duplicates, and failures
-      // Note: Duplicates should be rare since we filter them client-side, but handle them in case of race conditions
-      const successResults = results.filter((response) => response?.success);
-      const duplicateResults = results.filter((response) => 
-        !response?.success && 
-        response?.error &&
-        (response.error.toLowerCase().includes('already exists') || 
-         response.error.toLowerCase().includes('duplicate') ||
-         response.error.toLowerCase().includes('relation already') ||
-         response.error.toLowerCase().includes('not allowed'))
-      );
-      const failedResults = results.filter((response) => 
-        !response?.success && 
-        !duplicateResults.includes(response)
-      );
-      
-      const successCount = successResults.length;
-      const apiDuplicateCount = duplicateResults.length;
-      const failureCount = failedResults.length;
-      const totalSkipped = skippedCount + apiDuplicateCount;
-
-      // Build user-friendly messages
+      const successCount = results.filter((r) => r?.success).length;
+      const failureCount = results.filter((r) => !r?.success).length;
       if (failureCount > 0) {
-        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create one or more relations from picker: ${JSON.stringify(failedResults)}`);
-        const errorMessages = failedResults
-          .map((r) => r.error || 'Unknown error')
-          .join(', ');
-        
-        const parts: string[] = [];
-        if (successCount > 0) parts.push(`${successCount} created`);
-        if (totalSkipped > 0) parts.push(`${totalSkipped} skipped (already exist)`);
-        
-        if (parts.length > 0) {
-          toast.warning('Partial success', {
-            description: `${parts.join(', ')}, but ${failureCount} failed: ${errorMessages}`,
-          });
-        } else {
-          toast.error('Failed to create relation', {
-            description: errorMessages || 'An error occurred while creating the relation.',
-          });
-        }
-      } else if (totalSkipped > 0 && successCount > 0) {
-        // Some created, some skipped
-        toast.success('Relations processed', {
-          description: `Created ${successCount} relation(s), ${totalSkipped} already existed and were skipped.`,
-        });
-      } else if (totalSkipped > 0 && successCount === 0) {
-        // All skipped (shouldn't happen due to client-side check, but handle API duplicates)
-        toast.info('Relations already exist', {
-          description: `All ${totalSkipped} relation(s) already exist.`,
+        toast.warning('Partial success', {
+          description: `Created ${successCount}, ${failureCount} failed.`,
         });
       } else {
-        // All successful
         toast.success('Relations created', {
           description: `Successfully linked ${successCount} item(s).`,
         });
       }
-
-      // Refresh relations to show updated data
-        await fetchRelations();
+      await fetchRelations();
     } catch (error) {
       loggingCustom(LogType.CLIENT_LOG, 'error', `Error creating relation from picker: ${error instanceof Error ? error.message : String(error)}`);
       toast.error('Error creating relation', {
         description: error instanceof Error ? error.message : 'An unexpected error occurred.',
       });
     } finally {
-    setIsPickerOpen(false);
+      setIsPickerOpen(false);
     }
   };
 
-  // Get already selected IDs to exclude from picker
-  // If isUnique is set in repeatingConfig, exclude all IDs that are already related to the source entity
-  // to ensure each item can only be selected once
-  const selectedIds = relations.map(r => r.targetId);
+  // Get already selected IDs to exclude from picker (includes pending)
+  const selectedIds = React.useMemo(() => {
+    const fromRels = relations.map(r => r.targetId);
+    const fromPending = [...(pendingSelectedIds || []), ...(pendingAddedIds || [])];
+    return Array.from(new Set([...fromRels, ...fromPending]));
+  }, [relations, pendingSelectedIds, pendingAddedIds]);
   const shouldExcludeIds = section.repeatingConfig?.isUnique === true;
+
+  const itemsToDisplayMerged = React.useMemo(() => {
+    return [...relatedEntities, ...pendingSelectedEntitiesList, ...pendingAddedEntitiesList];
+  }, [relatedEntities, pendingSelectedEntitiesList, pendingAddedEntitiesList]);
 
   // Helper function to check if section has any items/values
   const hasSectionItems = (): boolean => {
-    // For relation-based sections, check if there are any related entities
     if (isRelationBased) {
-      return relatedEntities.length > 0;
+      return itemsToDisplayMerged.length > 0;
     }
     
     // For non-relation-based repeating sections, check if there are any items
@@ -1204,7 +1157,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   if (isRepeatingSection) {
     // For relation-based sections
     if (isRelationBased) {
-      const itemsToDisplay = relatedEntities;
+      const itemsToDisplay = itemsToDisplayMerged;
       const itemsCount = itemsToDisplay.length;
       const headerSectionMessage = displaySectionError;
       const maxItems = section.repeatingConfig?.maxItems;
@@ -1239,7 +1192,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                     {itemsCount}
                   </span>
                   {headerSectionMessage && (
-                    <span className="text-sm text-red-600 dark:text-red-400 mt-0.5" role="alert">
+                    <span className="text-xs text-red-600 dark:text-red-400 mt-0.5" role="alert">
                       • {headerSectionMessage}
                     </span>
                   )}
@@ -1342,7 +1295,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                   className="overflow-hidden"
                 >
-                  <CardContent className="px-6 pb-6 overflow-visible">
+                  <CardContent className="px-2 md:px-6 pb-6 overflow-visible">
                     <div className="space-y-4">
                       <AnimatePresence mode="wait">
                         {isLoadingRelations ? (
@@ -1431,7 +1384,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                           }}
                         >
                           {itemsToDisplay.map((entity, index) => {
-                            const relation = relations.find(r => r.targetId === (entity as any).id);
+                            const entityId = (entity as any).id;
+                            const relation = relations.find(r => r.targetId === entityId);
+                            const isPending = !relation;
+                            const isPendingAdded = isPending && (pendingAddedIds || []).includes(String(entityId));
                             
                             // Ensure entity has a title - if no title role value exists, use singular name + index
                             let entityWithTitle = entity;
@@ -1487,17 +1443,19 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                     index={0}
                                     viewMode="list"
                                     onView={(data) => {
-                                      // Open view dialog if needed
-                                      if (relation) handleEditEntity((data as any).id, relation.id);
+                                      const id = (data as any).id;
+                                      if (relation) handleEditEntity(id, relation.id);
+                                      else if (onRemovePending && id) { /* pending: no view */ }
                                     }}
                                     onEdit={(data) => {
-                                      // Stop propagation to prevent form from closing
-                                      if (relation) {
-                                        handleEditEntity((data as any).id, relation.id);
-                                      }
+                                      const id = (data as any).id;
+                                      if (relation) handleEditEntity(id, relation.id);
+                                      else if (id) handleEditEntity(id, '');
                                     }}
                                     onDelete={(data) => {
+                                      const id = (data as any).id;
                                       if (relation) handleDeleteClick(relation.id, {} as React.MouseEvent);
+                                      else if (onRemovePending && id) onRemovePending(section.id, String(id), isPendingAdded);
                                     }}
                                     disableAnimation={true}
                                     isInDialog={false}
@@ -1518,7 +1476,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                           onClick={(e) => {
                                             e.preventDefault();
                                             e.stopPropagation();
-                                            if (relation) handleEditEntity((entity as any).id, relation.id);
+                                            if (relation) handleEditEntity(entityId, relation.id);
+                                            else if (entityId) handleEditEntity(entityId, '');
                                           }}
                                           className="h-7 w-7"
                                           title={editTitle}
@@ -1526,12 +1485,17 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                         >
                                           <Edit className="h-3.5 w-3.5" />
                                         </Button>
-                                        {relation && (
+                                        {(relation || (onRemovePending && isPending)) && (
                                           <Button
                                             type="button"
                                             variant="ghost"
                                             size="icon"
-                                            onClick={(e) => handleDeleteClick(relation.id, e)}
+                                            onClick={(e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              if (relation) handleDeleteClick(relation.id, e);
+                                              else if (onRemovePending && entityId) onRemovePending(section.id, String(entityId), isPendingAdded);
+                                            }}
                                             className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
                                             title={deleteTitle}
                                             disabled={disabled}
@@ -1583,14 +1547,14 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               )}
             </AnimatePresence>
           ) : (
-            <CardContent className="px-6 pb-6 overflow-visible">
+            <CardContent className="px-2 md:px-6 pb-6 overflow-visible">
               <div className="space-y-4">
                 <AnimatePresence mode="wait">
                   {isLoadingRelations ? (
                     <motion.div 
                       key="skeletons"
                       className="space-y-3"
-                      initial="hidden"
+                      initial="hidden"  
                       animate="visible"
                       exit="hidden"
                       variants={{
@@ -1656,7 +1620,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                     }}
                   >
                     {itemsToDisplay.map((entity, index) => {
-                      const relation = relations.find(r => r.targetId === (entity as any).id);
+                      const entityId = (entity as any).id;
+                      const relation = relations.find(r => r.targetId === entityId);
+                      const isPending = !relation;
+                      const isPendingAdded = isPending && (pendingAddedIds || []).includes(String(entityId));
                       
                       // Ensure entity has a title - if no title role value exists, use singular name + index
                       let entityWithTitle = entity;
@@ -1712,16 +1679,18 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                               index={0}
                               viewMode="list"
                               onView={(data) => {
-                                if (relation) handleEditEntity((data as any).id, relation.id);
+                                const id = (data as any).id;
+                                if (relation) handleEditEntity(id, relation.id);
                               }}
                               onEdit={(data) => {
-                                // Stop propagation to prevent form from closing
-                                if (relation) {
-                                  handleEditEntity((data as any).id, relation.id);
-                                }
+                                const id = (data as any).id;
+                                if (relation) handleEditEntity(id, relation.id);
+                                else if (id) handleEditEntity(id, '');
                               }}
                               onDelete={(data) => {
+                                const id = (data as any).id;
                                 if (relation) handleDeleteClick(relation.id, {} as React.MouseEvent);
+                                else if (onRemovePending && id) onRemovePending(section.id, String(id), isPendingAdded);
                               }}
                               disableAnimation={true}
                               isInDialog={false}
@@ -1742,7 +1711,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                     onClick={(e) => {
                                       e.preventDefault();
                                       e.stopPropagation();
-                                      if (relation) handleEditEntity((entity as any).id, relation.id);
+                                      if (relation) handleEditEntity(entityId, relation.id);
+                                      else if (entityId) handleEditEntity(entityId, '');
                                     }}
                                     className="h-7 w-7"
                                     title={editTitle}
@@ -1750,12 +1720,17 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                   >
                                     <Edit className="h-3.5 w-3.5" />
                                   </Button>
-                                  {relation && (
+                                  {(relation || (onRemovePending && isPending)) && (
                                     <Button
                                       type="button"
                                       variant="ghost"
                                       size="icon"
-                                      onClick={(e) => handleDeleteClick(relation.id, e)}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        if (relation) handleDeleteClick(relation.id, e);
+                                        else if (onRemovePending && entityId) onRemovePending(section.id, String(entityId), isPendingAdded);
+                                      }}
                                       className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
                                       title={deleteTitle}
                                       disabled={disabled}
@@ -1929,7 +1904,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   {(repeatingItems || []).length}
                 </span>
                 {displaySectionError && (
-                  <span className="text-sm text-red-600 dark:text-red-400" role="alert">
+                  <span className="text-xs text-red-600 dark:text-red-400" role="alert">
                     • {displaySectionError}
                   </span>
                 )}
@@ -1991,7 +1966,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
                 className="overflow-hidden"
               >
-                <CardContent className="px-6 pb-6 overflow-visible">
+                <CardContent className="px-2 md:px-6 pb-6 overflow-visible">
                 <div className="space-y-4">
                   {(repeatingItems || []).length === 0 ? (
                     <div className="text-center py-8 text-gray-500 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
@@ -2059,7 +2034,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           )}
         </AnimatePresence>
       ) : (
-        <CardContent className="px-6 pb-6 overflow-visible">
+        <CardContent className="px-2 md:px-6 pb-6 overflow-visible">
           <div className="space-y-4">
             {(repeatingItems || []).length === 0 ? (
               <div className="text-center py-8 text-gray-500 bg-white dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
@@ -2177,7 +2152,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   isNotApplicable && "opacity-50"
                 )}>{title}</CardTitle>
                 {displaySectionError && (
-                  <span className="text-sm text-red-600 dark:text-red-400" role="alert">
+                  <span className="text-xs text-red-600 dark:text-red-400" role="alert">
                     • {displaySectionError}
                   </span>
                 )}
@@ -2239,7 +2214,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className="overflow-hidden"
             >
-              <CardContent className="px-6 pb-6 overflow-visible">
+              <CardContent className="px-2 md:px-6 pb-6 overflow-visible">
                 <div className={sectionClasses}>
                   <div className={gridClasses}>
                     {renderFields(fields)}
@@ -2250,7 +2225,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           )}
         </AnimatePresence>
       ) : (
-        <CardContent className="px-6 pb-6 overflow-visible">
+        <CardContent className="px-2 md:px-6 pb-6 overflow-visible">
           <div className={sectionClasses}>
             <div className={gridClasses}>
               {renderFields(fields)}

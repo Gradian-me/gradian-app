@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Power } from 'lucide-react';
-import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { IconBox } from '@/gradian-ui/form-builder/form-elements';
 import { HealthService } from '../types';
 import { scrollToService } from '../utils';
 
@@ -42,14 +42,12 @@ export function InactiveServicesSummary({ services }: InactiveServicesSummaryPro
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <div 
-                        className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0 bg-gray-200 dark:bg-gray-700"
-                      >
-                        <IconRenderer 
-                          iconName={service.icon} 
-                          className="h-5 w-5 text-gray-400"
-                        />
-                      </div>
+                      <IconBox
+                        name={service.icon}
+                        color="gray"
+                        variant="flat"
+                        size="sm"
+                      />
                       <h4 className="font-semibold text-sm text-gray-500 dark:text-gray-400 truncate">
                         {service.serviceTitle}
                       </h4>

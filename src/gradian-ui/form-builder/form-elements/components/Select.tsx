@@ -21,7 +21,7 @@ import { extractFirstId, normalizeOptionArray, NormalizedOption } from '../utils
 import { ChevronDown, Search } from 'lucide-react';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { useOptionsFromSchemaOrUrl } from '../hooks/useOptionsFromSchemaOrUrl';
-import { getLabelClasses, errorTextClasses, selectTriggerBaseClasses } from '../utils/field-styles';
+import { getLabelClasses, errorTextClasses, selectTriggerBaseClasses, selectErrorBorderClasses } from '../utils/field-styles';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
 import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
@@ -365,7 +365,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const selectClasses = cn(
     selectTriggerBaseClasses,
     sizeClasses[size],
-    error && 'border-red-500 dark:border-red-500 focus:border-red-500 dark:focus:border-red-500 focus:ring-red-300 dark:focus:ring-red-400 data-[state=open]:border-red-500 dark:data-[state=open]:border-red-500 data-[state=open]:ring-red-300 dark:data-[state=open]:ring-red-400',
+    error && selectErrorBorderClasses,
     className
   );
 

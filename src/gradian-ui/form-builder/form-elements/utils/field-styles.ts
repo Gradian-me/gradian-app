@@ -39,5 +39,13 @@ export const getLabelClasses = ({
     className,
   );
 
-export const errorTextClasses = 'mt-1 text-sm text-red-600 dark:text-red-400';
+export const errorTextClasses = 'mt-1 text-xs text-red-600 dark:text-red-400';
+
+/** Error border/ring for text-like inputs - use when error is present */
+export const inputErrorBorderClasses =
+  'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500';
+
+/** Error border for select/picker trigger (uses focus: and data-[state=open]:) */
+export const selectErrorBorderClasses =
+  '!border-red-500 dark:!border-red-500 focus:!border-red-500 dark:focus:!border-red-500 focus:ring-red-300 dark:focus:ring-red-400 data-[state=open]:!border-red-500 dark:data-[state=open]:!border-red-500 data-[state=open]:ring-red-300 dark:data-[state=open]:ring-red-400';
 

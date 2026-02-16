@@ -258,14 +258,14 @@ function ResetPasswordContent() {
         <div className="w-full max-w-md pt-10 md:pt-4">
           <div className="flex flex-col gap-6">
             <h1 
-              className="animate-element animate-delay-100 font-semibold leading-tight whitespace-nowrap overflow-hidden"
+              className="animate-element animate-delay-100 font-semibold leading-normal whitespace-normal overflow-visible"
               style={{
                 fontSize: "clamp(1.5rem, 3vw + 0.5rem, 3rem)"
               }}
             >
               {t(TRANSLATION_KEYS.AUTH_RESET_PASSWORD_TITLE)}
             </h1>
-            <p className="animate-element animate-delay-200 text-muted-foreground">
+            <p className="animate-element animate-delay-200 text-muted-foreground leading-relaxed">
               {t(TRANSLATION_KEYS.AUTH_RESET_PASSWORD_DESCRIPTION)}
             </p>
 
@@ -277,7 +277,7 @@ function ResetPasswordContent() {
 
           <form className="space-y-5" onSubmit={handleSubmit} noValidate>
             <div className="animate-element animate-delay-300 flex flex-col gap-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <label className="text-sm font-medium text-muted-foreground leading-normal pb-0.5 flex items-center gap-2">
                 <UserIcon className="h-4 w-4" />
                 {t(TRANSLATION_KEYS.AUTH_LABEL_USERNAME_OR_EMAIL)}
               </label>
@@ -298,7 +298,7 @@ function ResetPasswordContent() {
             </div>
 
             <div className="animate-element animate-delay-350 flex flex-col gap-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <label className="text-sm font-medium text-muted-foreground leading-normal pb-0.5 flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4" />
                 {t(TRANSLATION_KEYS.AUTH_LABEL_VERIFICATION_CODE)}
               </label>
@@ -334,7 +334,7 @@ function ResetPasswordContent() {
             </div>
 
             <div className="animate-element animate-delay-400 flex flex-col gap-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <label className="text-sm font-medium text-muted-foreground leading-normal pb-0.5 flex items-center gap-2">
                 <LockIcon className="h-4 w-4" />
                 {t(TRANSLATION_KEYS.AUTH_LABEL_NEW_PASSWORD)}
               </label>
@@ -364,7 +364,7 @@ function ResetPasswordContent() {
             </div>
 
             <div className="animate-element animate-delay-450 flex flex-col gap-2">
-              <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+              <label className="text-sm font-medium text-muted-foreground leading-normal pb-0.5 flex items-center gap-2">
                 <LockIcon className="h-4 w-4" />
                 {t(TRANSLATION_KEYS.AUTH_LABEL_CONFIRM_PASSWORD)}
               </label>

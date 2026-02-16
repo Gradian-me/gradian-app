@@ -104,8 +104,8 @@ export function NeonOrbs({
         </div>
       </div>
 
-      {/* Center text */}
-      <div className="relative z-10 text-center text-indigo-900 dark:text-white transition-colors duration-500 w-full max-w-full px-4">
+      {/* Center text - dir="ltr" ensures English "BEYOND LIMITS" / "by Gradian.me" display correctly in RTL */}
+      <div dir="ltr" className="relative z-10 text-center text-indigo-900 dark:text-white transition-colors duration-500 w-full max-w-full px-4">
         <div className="w-full max-w-full overflow-hidden flex justify-center">
           <h1 
             className={`font-extralight tracking-[0.2em] mb-4 transition-all duration-1000 ease-out whitespace-nowrap ${

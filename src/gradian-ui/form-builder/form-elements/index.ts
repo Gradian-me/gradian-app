@@ -16,6 +16,7 @@ export * from './components/Button';
 export * from './components/Input';
 export * from './components/Select';
 export * from './components/Avatar';
+export * from './components/IconBox';
 export * from './components/PopupPicker';
 export * from './components/ColorPicker';
 export * from './components/Rating';

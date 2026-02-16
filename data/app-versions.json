@@ -6991,5 +6991,63 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000009",
+    "timestamp": "2026-02-16T00:00:00.000Z",
+    "version": "1.52.001",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "FEATURE MAJOR: UPDATE OR ADD RELATIONS ON UPDATE OF THE FORM NOT JUST SELECTING",
+        "priority": "High",
+        "affectedDomains": [
+          "form-builder",
+          "data"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "ADD: Introduced new lean management entries in all-data.json, enhancing tracking of waste analysis and related tasks.",
+        "priority": "High",
+        "affectedDomains": [
+          "data"
+        ]
+      },
+      {
+        "changeType": "refactor",
+        "description": "REFACTOR: Updated all-data-relations.json to remove obsolete relations, improving data integrity.",
+        "priority": "High",
+        "affectedDomains": [
+          "data"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "ENHANCE: Modified schema titles and descriptions in all-schemas.json for better clarity and consistency.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "schemas"
+        ]
+      },
+      {
+        "changeType": "update",
+        "description": "UPDATE: Improved styling in globals.css for better RTL support.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui",
+          "i18n"
+        ]
+      },
+      {
+        "changeType": "enhance",
+        "description": "This update significantly enhances data management and user experience across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "data",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

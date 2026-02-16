@@ -18,7 +18,7 @@ import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import React, { useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import { ulid } from 'ulid';
-import { GoToTopForm } from '../form-elements/go-to-top-form';
+import { GoToTopForm, scrollFormToTop } from '../form-elements/go-to-top-form';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { useUserStore } from '@/stores/user.store';
 import { getActionConfig, getSingularName, isEditMode } from '../utils/action-config';
@@ -32,8 +32,9 @@ import { FormSystemSection } from './FormSystemSection';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { replaceDynamicContext } from '../utils/dynamic-context-replacer';
 import { AiFormFillerDialog } from '@/domains/ai-builder/components/AiFormFillerDialog';
-import { Sparkles, MoreVertical, MessageCircle } from 'lucide-react';
+import { Sparkles, MoreVertical, MessageCircle, Loader2 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DynamicQuickActions } from '@/gradian-ui/data-display/components/DynamicQuickActions';
 import { DiscussionsDialog } from '@/gradian-ui/communication';
 
@@ -699,7 +700,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         Array.isArray(relatedCompanies) ? relatedCompanies.length > 0 : Boolean(relatedCompanies);
 
       if (!hasRelated) {
-        const errorMessage = 'Please select at least one related company.';
+        const errorMessage = t(TRANSLATION_KEYS.MESSAGE_RELATED_COMPANIES_REQUIRED, 'Please select at least one related company.');
         newErrors['relatedCompanies'] = errorMessage;
         isValid = false;
       }
@@ -713,7 +714,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         Array.isArray(status) ? status.length > 0 : Boolean(status);
 
       if (!hasStatus) {
-        const errorMessage = 'Status is required.';
+        const errorMessage = t(TRANSLATION_KEYS.MESSAGE_STATUS_REQUIRED, 'Status is required.');
         newErrors['status'] = errorMessage;
         isValid = false;
       }
@@ -886,7 +887,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     }
 
     return { isValid, isIncomplete };
-  }, [schema, state.values, state.errors, initialValues]);
+  }, [schema, state.values, state.errors, initialValues, t]);
 
   // Check incomplete status (minItems) without full validation
   // This only checks for incomplete status, not required field validation
@@ -974,7 +975,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     return isIncomplete;
   }, [schema, state.values]);
 
-  const reset = useCallback(() => {
+  const resetBase = useCallback(() => {
     dispatch({ type: 'RESET', initialValues, schema, referenceEntityData: referenceEntityDataRef.current });
     onReset?.();
   }, [initialValues, onReset, schema]);
@@ -989,6 +990,109 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
   // Trigger to refresh relation-based sections (increments when relations are created)
   const [refreshRelationsTrigger, setRefreshRelationsTrigger] = React.useState(0);
+
+  // Pending relations (deferred until form save): selected from picker or added via FormModal
+  type PendingSectionState = {
+    selectedIds: string[];
+    selectedEntities: Record<string, any>;
+    addedIds: string[];
+    addedEntities: Record<string, any>;
+  };
+  const [pendingRelations, setPendingRelations] = React.useState<Record<string, PendingSectionState>>({});
+
+  const addPendingSelected = useCallback((sectionId: string, ids: string[], entities?: any[]) => {
+    setPendingRelations(prev => {
+      const current = prev[sectionId] || { selectedIds: [], selectedEntities: {}, addedIds: [], addedEntities: {} };
+      const entityMap: Record<string, any> = { ...current.selectedEntities };
+      (entities || []).forEach(e => { if (e?.id != null) entityMap[String(e.id)] = e; });
+      const mergedIds = Array.from(new Set([...current.selectedIds, ...ids]));
+      return {
+        ...prev,
+        [sectionId]: { ...current, selectedIds: mergedIds, selectedEntities: entityMap },
+      };
+    });
+  }, []);
+
+  const addPendingAdded = useCallback((sectionId: string, id: string, entity: any) => {
+    setPendingRelations(prev => {
+      const current = prev[sectionId] || { selectedIds: [], selectedEntities: {}, addedIds: [], addedEntities: {} };
+      if (current.addedIds.includes(id)) return prev;
+      return {
+        ...prev,
+        [sectionId]: {
+          ...current,
+          addedIds: [...current.addedIds, id],
+          addedEntities: { ...current.addedEntities, [id]: entity ?? { id } },
+        },
+      };
+    });
+  }, []);
+
+  const removePending = useCallback(async (sectionId: string, targetId: string, wasAdded: boolean) => {
+    const section = safeSchema.sections.find(s => s.id === sectionId);
+    const targetSchema = section?.repeatingConfig?.targetSchema;
+    if (wasAdded && targetSchema) {
+      try {
+        await apiRequest(`/api/data/${targetSchema}/${targetId}`, { method: 'DELETE' });
+      } catch (err) {
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to delete orphan entity ${targetSchema}/${targetId}: ${err instanceof Error ? err.message : String(err)}`);
+      }
+    }
+    setPendingRelations(prev => {
+      const current = prev[sectionId];
+      if (!current) return prev;
+      const next = { ...current };
+      if (wasAdded) {
+        next.addedIds = current.addedIds.filter(x => x !== targetId);
+        const { [targetId]: _, ...rest } = next.addedEntities;
+        next.addedEntities = rest;
+      } else {
+        next.selectedIds = current.selectedIds.filter(x => x !== targetId);
+        const { [targetId]: __, ...rest } = next.selectedEntities;
+        next.selectedEntities = rest;
+      }
+      const isEmpty = next.selectedIds.length === 0 && next.addedIds.length === 0;
+      if (isEmpty) {
+        const { [sectionId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [sectionId]: next };
+    });
+  }, [safeSchema.sections]);
+
+  const handleCancel = useCallback(async () => {
+    for (const [sectionId, pending] of Object.entries(pendingRelations)) {
+      if (pending.addedIds.length === 0) continue;
+      const section = safeSchema.sections.find(s => s.id === sectionId);
+      const targetSchema = section?.repeatingConfig?.targetSchema;
+      if (!targetSchema) continue;
+      for (const id of pending.addedIds) {
+        try {
+          await apiRequest(`/api/data/${targetSchema}/${id}`, { method: 'DELETE' });
+        } catch (err) {
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to delete orphan entity ${targetSchema}/${id}: ${err instanceof Error ? err.message : String(err)}`);
+        }
+      }
+    }
+    setPendingRelations({});
+    onCancel?.();
+  }, [pendingRelations, safeSchema.sections, onCancel]);
+
+  const reset = useCallback(() => {
+    for (const [sectionId, pending] of Object.entries(pendingRelations)) {
+      if (pending.addedIds.length === 0) continue;
+      const section = safeSchema.sections.find(s => s.id === sectionId);
+      const targetSchema = section?.repeatingConfig?.targetSchema;
+      if (!targetSchema) continue;
+      pending.addedIds.forEach(id => {
+        apiRequest(`/api/data/${targetSchema}/${id}`, { method: 'DELETE' }).catch(err =>
+          loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to delete orphan on reset: ${err instanceof Error ? err.message : String(err)}`)
+        );
+      });
+    }
+    setPendingRelations({});
+    resetBase();
+  }, [pendingRelations, safeSchema.sections, resetBase]);
 
   // Dynamic form context (Zustand) - expose formSchema, formData, userData, and referenceData
   const setFormSchemaInContext = useDynamicFormContextStore((s) => s.setFormSchema);
@@ -1068,26 +1172,16 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     // 1. We have an error
     // 2. Status code is 400
     // 3. This is a new error (status code changed from previous value)
-    // 4. Error alert ref is available
     if (
       error &&
       errorStatusCode === 400 &&
-      errorStatusCode !== lastErrorStatusCodeRef.current &&
-      errorAlertRef.current
+      errorStatusCode !== lastErrorStatusCodeRef.current
     ) {
       // Update the ref to track this error
       lastErrorStatusCodeRef.current = errorStatusCode;
 
-      // Small delay to ensure DOM is updated
-      setTimeout(() => {
-        if (errorAlertRef.current) {
-          errorAlertRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-            inline: 'nearest',
-          });
-        }
-      }, 100);
+      // Small delay to ensure DOM is updated, scroll within form container
+      setTimeout(() => scrollFormToTop(), 100);
     } else if (!error) {
       // Reset the ref when error is cleared
       lastErrorStatusCodeRef.current = undefined;
@@ -1313,6 +1407,40 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         await onSubmit(submissionData, { isIncomplete });
         loggingCustom(LogType.FORM_DATA, 'info', `Form submitted successfully${isIncomplete ? ' (with incomplete flag)' : ' (complete)'}`);
 
+        // Flush pending relations (deferred until form save)
+        const sourceId = state.values?.id ?? (state.values as any)?.[schema.id]?.id;
+        if (sourceId && Object.keys(pendingRelations).length > 0) {
+          for (const [sectionId, pending] of Object.entries(pendingRelations)) {
+            const section = safeSchema.sections.find(s => s.id === sectionId);
+            const targetSchema = section?.repeatingConfig?.targetSchema;
+            const relationTypeId = section?.repeatingConfig?.relationTypeId;
+            if (!targetSchema || !relationTypeId) continue;
+            const allTargetIds = [...pending.selectedIds, ...pending.addedIds];
+            for (const targetId of allTargetIds) {
+              try {
+                const res = await apiRequest('/api/relations', {
+                  method: 'POST',
+                  body: {
+                    sourceSchema: schema.id,
+                    sourceId,
+                    targetSchema,
+                    targetId,
+                    relationTypeId,
+                  },
+                  callerName: 'FormLifecycleManager.flushPendingRelations',
+                });
+                if (!res.success) {
+                  loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create relation: ${res.error}`);
+                }
+              } catch (err) {
+                loggingCustom(LogType.CLIENT_LOG, 'error', `Error creating relation: ${err instanceof Error ? err.message : String(err)}`);
+              }
+            }
+          }
+          setPendingRelations({});
+          setRefreshRelationsTrigger(prev => prev + 1);
+        }
+
         // Update incomplete status based on validation result
         setIsIncomplete(isIncomplete);
 
@@ -1330,13 +1458,15 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     } else {
       // Form has validation errors - don't save
       loggingCustom(LogType.FORM_DATA, 'warn', 'Form submission blocked due to validation errors');
+      // Scroll to top of form (within scroll container) so user sees validation feedback
+      setTimeout(() => scrollFormToTop(), 100);
     }
 
     loggingCustom(LogType.FORM_DATA, 'info', '=== FORM SUBMISSION ENDED ===');
 
     dispatch({ type: 'SET_SUBMITTING', isSubmitting: false });
     return { isValid, isIncomplete };
-  }, [disabled, validateForm, onSubmit, state.values, state.errors, schema]);
+  }, [disabled, validateForm, onSubmit, state.values, state.errors, schema, pendingRelations, safeSchema.sections]);
 
   // Get action configurations dynamically
   const editMode = isEditMode(initialValues);
@@ -1421,6 +1551,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
   const renderSections = () => {
     return safeSchema.sections.map((section) => {
+      const isRelationBased = section.isRepeatingSection && section.repeatingConfig?.targetSchema;
+      const pending = isRelationBased ? pendingRelations[section.id] : undefined;
       return (
         <AccordionFormSection
           key={section.id}
@@ -1441,6 +1573,12 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           addItemError={section.isRepeatingSection ? addItemErrors[section.id] : undefined}
           refreshRelationsTrigger={section.isRepeatingSection && section.repeatingConfig?.targetSchema ? refreshRelationsTrigger : undefined}
           isAddingItem={section.isRepeatingSection && relationModalState.isOpen && relationModalState.sectionId === section.id}
+          pendingSelectedIds={pending?.selectedIds}
+          pendingSelectedEntities={pending?.selectedEntities}
+          pendingAddedIds={pending?.addedIds}
+          pendingAddedEntities={pending?.addedEntities}
+          onAddPendingSelected={isRelationBased ? (sid, ids, entities) => addPendingSelected(sid, ids, entities) : undefined}
+          onRemovePending={isRelationBased ? removePending : undefined}
         />
       );
     });
@@ -1560,101 +1698,193 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
           {!hideActions && (
             <div className="space-y-3 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-900 z-10">
-              <div className="flex items-center justify-between py-1 gap-3">
+              <div className="flex items-center justify-between py-1 gap-2">
                 {/* Fill With AI Button - Only show in create mode */}
-                <div className="flex items-center gap-2">
-                  {discussionConfig && (
-                    <Button
-                      type="button"
-                      variant="link"
-                      onClick={() => setIsDiscussionsOpen(true)}
-                      disabled={disabled}
-                      className="flex items-center gap-2 text-xs"
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      <span className="hidden md:inline">Discussions</span>
-                    </Button>
-                  )}
-                  {!editMode && (
-                    <Button
-                      type="button"
-                      variant="link"
-                      onClick={() => setIsFormFillerOpen(true)}
-                      disabled={disabled}
-                      className="flex items-center gap-2 text-xs"
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      <span className="hidden md:inline">{getT(TRANSLATION_KEYS.BUTTON_FILL_WITH_AI, language, defaultLang)}</span>
-                    </Button>
-                  )}
-                </div>
+                <TooltipProvider>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {discussionConfig && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex">
+                            <Button
+                              type="button"
+                              variant="square"
+                              size="icon"
+                              onClick={() => setIsDiscussionsOpen(true)}
+                              disabled={disabled}
+                              className="md:hidden"
+                            >
+                              <MessageCircle className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="link"
+                              onClick={() => setIsDiscussionsOpen(true)}
+                              disabled={disabled}
+                              className="hidden md:inline-flex gap-2 text-xs"
+                            >
+                              <MessageCircle className="h-4 w-4" />
+                              <span>Discussions</span>
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          <span>Discussions</span>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                    {!editMode && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex">
+                            <Button
+                              type="button"
+                              variant="square"
+                              size="icon"
+                              onClick={() => setIsFormFillerOpen(true)}
+                              disabled={disabled}
+                              className="md:hidden"
+                            >
+                              <Sparkles className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="link"
+                              onClick={() => setIsFormFillerOpen(true)}
+                              disabled={disabled}
+                              className="hidden md:inline-flex gap-2 text-xs"
+                            >
+                              <Sparkles className="h-4 w-4" />
+                              <span>{getT(TRANSLATION_KEYS.BUTTON_FILL_WITH_AI, language, defaultLang)}</span>
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          <span>{getT(TRANSLATION_KEYS.BUTTON_FILL_WITH_AI, language, defaultLang)}</span>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                </TooltipProvider>
 
-                <div className="flex items-center gap-3">
-                  {actionConfigs.length > 0 && actionConfigs.map((config) => {
-                    if (config.type === 'submit') {
-                      return (
-                        <Button
-                          key={config.type}
-                          type="button"
-                          variant="gradient"
-                          disabled={disabled || state.isSubmitting}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            submit();
-                          }}
-                        >
-                          <div className="flex items-center gap-2 text-xs">
-                            {!state.isSubmitting && config.icon}
-                            {state.isSubmitting ? (
-                              config.loading || 'Submitting...'
-                            ) : (
-                              <span className="hidden md:inline">
-                                {resolveDisplayLabel(config.label, language, defaultLang)}
+                <TooltipProvider>
+                  <div className="flex items-center gap-2">
+                    {actionConfigs.length > 0 && actionConfigs.map((config) => {
+                      if (config.type === 'submit') {
+                        const submitLabel = resolveDisplayLabel(config.label, language, defaultLang);
+                        const submitTooltip = state.isSubmitting ? (config.loading || 'Submitting...') : submitLabel;
+                        return (
+                          <Tooltip key={config.type}>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex">
+                                <Button
+                                  type="button"
+                                  variant="squareGradient"
+                                  size="icon"
+                                  disabled={disabled || state.isSubmitting}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    submit();
+                                  }}
+                                  className="md:hidden"
+                                >
+                                  {!state.isSubmitting ? config.icon : <Loader2 className="h-4 w-4 animate-spin" />}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="gradient"
+                                  disabled={disabled || state.isSubmitting}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    submit();
+                                  }}
+                                  className="hidden md:inline-flex gap-2 text-xs"
+                                >
+                                  {!state.isSubmitting && config.icon}
+                                  {state.isSubmitting ? (config.loading || 'Submitting...') : submitLabel}
+                                </Button>
                               </span>
-                            )}
-                          </div>
-                        </Button>
-                      );
-                    } else if (config.type === 'cancel') {
-                      return (
-                        <Button
-                          key={config.type}
-                          type="button"
-                          variant={config.variant}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            onCancel?.();
-                          }}
-                          disabled={disabled}
-                        >
-                          <div className="flex items-center gap-2 text-xs">
-                            {config.icon}
-                            <span className="hidden md:inline">
-                              {resolveDisplayLabel(config.label, language, defaultLang)}
-                            </span>
-                          </div>
-                        </Button>
-                      );
-                    } else if (config.type === 'reset') {
-                      return (
-                        <Button
-                          key={config.type}
-                          type="button"
-                          variant={config.variant}
-                          onClick={reset}
-                          disabled={disabled}
-                        >
-                          <div className="flex items-center gap-2 text-xs">
-                            {config.icon}
-                            <span className="hidden md:inline">
-                              {resolveDisplayLabel(config.label, language, defaultLang)}
-                            </span>
-                          </div>
-                        </Button>
-                      );
-                    }
-                    return null;
-                  })}
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              <span>{submitTooltip}</span>
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      } else if (config.type === 'cancel') {
+                        const cancelLabel = resolveDisplayLabel(config.label, language, defaultLang);
+                        return (
+                          <Tooltip key={config.type}>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex">
+                                <Button
+                                  type="button"
+                                  variant="square"
+                                  size="icon"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleCancel();
+                                  }}
+                                  disabled={disabled}
+                                  className="md:hidden"
+                                >
+                                  {config.icon}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant={config.variant}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleCancel();
+                                  }}
+                                  disabled={disabled}
+                                  className="hidden md:inline-flex gap-2 text-xs"
+                                >
+                                  {config.icon}
+                                  <span>{cancelLabel}</span>
+                                </Button>
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              <span>{cancelLabel}</span>
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      } else if (config.type === 'reset') {
+                        const resetLabel = resolveDisplayLabel(config.label, language, defaultLang);
+                        return (
+                          <Tooltip key={config.type}>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex">
+                                <Button
+                                  type="button"
+                                  variant="square"
+                                  size="icon"
+                                  onClick={reset}
+                                  disabled={disabled}
+                                  className="md:hidden"
+                                >
+                                  {config.icon}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant={config.variant}
+                                  onClick={reset}
+                                  disabled={disabled}
+                                  className="hidden md:inline-flex gap-2 text-xs"
+                                >
+                                  {config.icon}
+                                  <span>{resetLabel}</span>
+                                </Button>
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              <span>{resetLabel}</span>
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      }
+                      return null;
+                    })}
 
                   {/* Quick Actions Popover (Ellipsis) - Inline with buttons */}
                   {(Array.isArray(safeSchema.detailPageMetadata?.quickActions) && safeSchema.detailPageMetadata.quickActions.length > 0) ? (
@@ -1678,7 +1908,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                       </PopoverContent>
                     </Popover>
                   ) : null}
-                </div>
+                  </div>
+                </TooltipProvider>
 
               </div>
             </div>
@@ -1694,17 +1925,19 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
           {/* Collapse/Expand All Buttons */}
           {(safeSchema.sections.length > 0) && schema?.isCollapsibleSections !== false && !hideCollapseExpandButtons && (
-            <div className="flex justify-end mb-4">
-              <ExpandCollapseControls
-                onExpandAll={expandAll}
-                onCollapseAll={collapseAll}
-                expandDisabled={allExpanded || disabled}
-                collapseDisabled={allCollapsed || disabled}
-                variant="outline"
-                size="sm"
-                showLabels={true}
-              />
-            </div>
+            <TooltipProvider>
+              <div className="flex justify-end mb-4">
+                <ExpandCollapseControls
+                  onExpandAll={expandAll}
+                  onCollapseAll={collapseAll}
+                  expandDisabled={allExpanded || disabled}
+                  collapseDisabled={allCollapsed || disabled}
+                  variant="outline"
+                  size="sm"
+                  showLabels={true}
+                />
+              </div>
+            </TooltipProvider>
           )}
 
           <div className="space-y-4">
@@ -1732,75 +1965,22 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             return formData;
           }}
           onSuccess={async (createdEntity) => {
-            // After successful entity creation, create the relation
-            const currentEntityId = state.values?.id;
             const targetEntityId = createdEntity?.id || (createdEntity as any)?.data?.id;
-
-            if (currentEntityId && relationModalState.relationTypeId && targetEntityId && relationModalState.targetSchema) {
-              try {
-                // Check if the created entity is incomplete
-                const isTargetIncomplete = createdEntity?.incomplete === true || (createdEntity as any)?.data?.incomplete === true;
-
-                const relationResponse = await apiRequest('/api/relations', {
-                  method: 'POST',
-                  body: {
-                    sourceSchema: schema.id,
-                    sourceId: currentEntityId,
-                    targetSchema: relationModalState.targetSchema,
-                    targetId: targetEntityId,
-                    relationTypeId: relationModalState.relationTypeId,
-                    incomplete: isTargetIncomplete || undefined, // Only include if true
-                  },
-                  callerName: 'FormLifecycleManager.createRelationFromModal',
-                });
-
-                if (!relationResponse.success) {
-                  loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create relation: ${relationResponse.error}`);
-                  // Could show an error message here
-                } else {
-                  loggingCustom(LogType.FORM_DATA, 'info', 'Relation created successfully');
-                  // Trigger refresh of relation-based sections
-                  setRefreshRelationsTrigger(prev => prev + 1);
-                }
-              } catch (error) {
-                loggingCustom(LogType.CLIENT_LOG, 'error', `Error creating relation: ${error instanceof Error ? error.message : String(error)}`);
-              }
+            const sectionId = relationModalState.sectionId;
+            if (sectionId && targetEntityId) {
+              const entityData = (createdEntity as any)?.data ?? createdEntity;
+              addPendingAdded(sectionId, targetEntityId, entityData);
+              setRefreshRelationsTrigger(prev => prev + 1);
             }
-
-            // Close modal and clear state
             setRelationModalState({ isOpen: false, sectionId: '' });
           }}
           onIncompleteSave={async (createdEntity) => {
-            // When form is saved as incomplete, still create the relation
-            const currentEntityId = state.values?.id;
             const targetEntityId = createdEntity?.id || (createdEntity as any)?.data?.id;
-
-            if (currentEntityId && relationModalState.relationTypeId && targetEntityId && relationModalState.targetSchema) {
-              try {
-                // Target entity is incomplete, so relation should also be marked as incomplete
-                const relationResponse = await apiRequest('/api/relations', {
-                  method: 'POST',
-                  body: {
-                    sourceSchema: schema.id,
-                    sourceId: currentEntityId,
-                    targetSchema: relationModalState.targetSchema,
-                    targetId: targetEntityId,
-                    relationTypeId: relationModalState.relationTypeId,
-                    incomplete: true, // Mark relation as incomplete since target is incomplete
-                  },
-                  callerName: 'FormLifecycleManager.createRelationFromModal.incomplete',
-                });
-
-                if (!relationResponse.success) {
-                  loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to create relation for incomplete entity: ${relationResponse.error}`);
-                } else {
-                  loggingCustom(LogType.FORM_DATA, 'info', 'Relation created successfully for incomplete entity');
-                  // Trigger refresh of relation-based sections
-                  setRefreshRelationsTrigger(prev => prev + 1);
-                }
-              } catch (error) {
-                loggingCustom(LogType.CLIENT_LOG, 'error', `Error creating relation for incomplete entity: ${error instanceof Error ? error.message : String(error)}`);
-              }
+            const sectionId = relationModalState.sectionId;
+            if (sectionId && targetEntityId) {
+              const entityData = (createdEntity as any)?.data ?? createdEntity;
+              addPendingAdded(sectionId, targetEntityId, entityData);
+              setRefreshRelationsTrigger(prev => prev + 1);
             }
             // Don't close modal - keep it open for incomplete saves
           }}

@@ -405,7 +405,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
         {isLoadingOptions ? (
           <div className="text-sm text-gray-500 py-2">Loading options...</div>
         ) : optionsError ? (
-          <div className="text-sm text-red-600 py-2">{optionsError}</div>
+          <div className="text-xs text-red-600 py-2">{optionsError}</div>
         ) : (
           <div className={cn(
             "grid gap-2",

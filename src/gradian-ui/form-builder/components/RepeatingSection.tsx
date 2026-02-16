@@ -51,7 +51,7 @@ export const RepeatingSection: React.FC<RepeatingSectionProps> = ({
             {items.length}
           </span>
           {headerSectionMessage && (
-            <span className="text-sm text-red-600 mt-0.5" role="alert">
+            <span className="text-xs text-red-600 mt-0.5" role="alert">
               • {headerSectionMessage}
             </span>
           )}

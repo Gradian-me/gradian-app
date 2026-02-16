@@ -120,7 +120,7 @@ export const DiscussionsDialog: React.FC<DiscussionsDialogProps> = ({
           </DialogHeader>
           <div className="flex-1 overflow-y-auto min-h-0 py-2 -mx-1 px-1">
             {error ? (
-              <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+              <p className="text-xs text-red-600 dark:text-red-400" role="alert">
                 {error}
               </p>
             ) : (

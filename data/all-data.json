@@ -7004,6 +7004,38 @@
       "id": "01KECBRJJ18CMXVYHACBYWVM86",
       "createdAt": "2026-01-07T13:53:55.291Z",
       "updatedAt": "2026-01-07T13:53:55.606Z"
+    },
+    {
+      "taskTitle": "خرید تجهیز فایروال",
+      "taskDescription": "اقدام جهت خرید و تامین تجهیزات فایروال برای امنیت شبکه",
+      "entityType": [
+        {
+          "id": "01KCDZTASK001WORK000000000001",
+          "label": "Work",
+          "icon": "Briefcase",
+          "color": "blue"
+        }
+      ],
+      "dueDate": "2026-03-02",
+      "assignedTo": [
+        {
+          "id": "01KDFEG5Z10VPAMAG3E76KJMCG"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBSVYXHRWPMBAACHKSBQ1E4R",
+          "label": "Not Started",
+          "icon": "Circle",
+          "color": "slate"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KHJGYKSJH06ZNCD867SG7S47",
+      "createdAt": "2026-02-16T06:07:08.085Z",
+      "updatedAt": "2026-02-16T06:07:08.210Z"
     }
   ],
   "change-procedure": [
@@ -20718,6 +20750,12 @@
       "icon": "ArrowUp",
       "color": "orange",
       "sourceUrl": "field-options:change-management-records:impact-regulatory-compliance"
+    },
+    {
+      "id": "AUTOMATION_DIGITAL",
+      "label": "Automation / Digital",
+      "icon": "Zap",
+      "sourceUrl": "field-options:lean-management:lean-method-suggested"
     }
   ],
   "deviation-management": [
@@ -20982,7 +21020,72 @@
       ]
     }
   ],
-  "lean-management": [],
+  "lean-management": [
+    {
+      "follow-ups": [],
+      "briefWasteDescription": "بهینه‌سازی امنیت و زیرساخت در فرآیندهای فناوری اطلاعات به منظور کاهش آسیب‌پذیری‌ها و اتلاف‌های ناشی از خرابی سیستم.",
+      "date": "2026-02-16",
+      "observer": [
+        {
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+        }
+      ],
+      "category": [
+        {
+          "id": "01KD0683FH15YPPE28ZXRTP6J1"
+        }
+      ],
+      "location": "مرکز داده و واحد زیرساخت IT",
+      "wasteDefects": 4,
+      "wasteOverproduction": 2,
+      "wasteWaiting": 5,
+      "wasteNonUtilizedTalent": 3,
+      "wasteTransportation": 1,
+      "wasteInventory": 2,
+      "wasteMotion": 2,
+      "wasteExtraProcessing": 4,
+      "wasteAssessmentJustification": "زمان‌های طولانی انتظار (Waiting) برای پاسخگویی سرور و پردازش‌های اضافی (Extra Processing) در لایه‌های امنیتی غیربهینه شناسایی شده است.",
+      "impactTime": 5,
+      "impactCost": 4,
+      "impactQuality": 5,
+      "impactSafety": 5,
+      "impactCompliance": 5,
+      "impactAnalysisJustification": "اختلال در زیرساخت مستقیماً بر روی زمان تحویل سرویس و امنیت داده‌های حساس سازمان تأثیر منفی می‌گذارد.",
+      "rootCauses": [
+        "تجهیزات قدیمی زیرساختی",
+        "فقدان پروتکل‌های اتوماسیون امنیتی",
+        "پیکربندی‌های دستی و غیر استاندارد"
+      ],
+      "improvementIdea": "پیاده‌سازی اتوماسیون امنیتی و به‌روزرسانی سخت‌افزارهای شبکه به منظور کاهش تأخیر و افزایش پایداری سیستم.",
+      "leanMethodSuggested": [
+        {
+          "id": "AUTOMATION_DIGITAL"
+        }
+      ],
+      "needsChangeManagement": true,
+      "timeSaved": 120,
+      "costAvoided": 500000000,
+      "overallEffectiveness": 4,
+      "overallAssessmentDescription": "با اجرای این پروژه، پایداری زیرساخت بهبود یافته و ریسک‌های امنیتی به حداقل رسیده است.",
+      "status": [
+        {
+          "id": "01KBSSG0C215GPQFKAXWK54DTQ",
+          "label": "Submitted",
+          "icon": "Send",
+          "color": "sky"
+        }
+      ],
+      "dueDate": "2026-03-09",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "relatedChangeManagement": [],
+      "id": "01KHJGM53JJ848SC2PEAFK4FJR",
+      "createdAt": "2026-02-16T06:01:25.365Z",
+      "updatedAt": "2026-02-16T06:07:11.838Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    }
+  ],
   "project-proposal": [
     {
       "competitiveAdvantage": 3,

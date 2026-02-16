@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useUserStore } from '@/stores/user.store';
 import { cn } from '@/lib/utils';
 import { Plus, BotMessageSquare, Clock, RefreshCw, Trash2 } from 'lucide-react';
+import { IconBox } from '@/gradian-ui/form-builder/form-elements';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
 import { useLanguageStore } from '@/stores/language.store';
@@ -173,14 +174,13 @@ const ChatListComponent: React.FC<ChatListProps> = ({
                       )}
                     >
                       <div className="flex items-start gap-3">
-                        <div className={cn(
-                          'shrink-0 w-10 h-10 rounded-lg flex items-center justify-center transition-colors',
-                          isSelected
-                            ? 'bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
-                        )}>
-                          <BotMessageSquare className="w-5 h-5" />
-                        </div>
+                        <IconBox
+                          name="BotMessageSquare"
+                          color={isSelected ? 'violet' : 'gray'}
+                          variant="flat"
+                          size="md"
+                          iconClassName="w-5 h-5"
+                        />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
                             <h3 className={cn(

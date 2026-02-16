@@ -428,7 +428,7 @@ export const JsonInput = forwardRef<FormElementRef, JsonInputProps>(
         {displayError && (
           <div className="mt-1 flex items-start gap-1.5">
             <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400 mt-0.5 shrink-0" />
-            <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+            <p className="text-xs text-red-600 dark:text-red-400" role="alert">
               {displayError}
             </p>
           </div>

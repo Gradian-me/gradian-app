@@ -9,7 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
-import { PopupPicker, SearchInput, Select, ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements';
+import { PopupPicker, SearchInput, Select, ConfirmationMessage, IconBox, resolveIconBoxColor } from '@/gradian-ui/form-builder/form-elements';
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
@@ -18,7 +18,6 @@ import { useTenantStore } from '@/stores/tenant.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
-import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { extractDomainFromRoute } from '@/gradian-ui/shared/utils/url-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -218,70 +217,6 @@ const CardTenantSelector: React.FC<CardTenantSelectorProps> = ({ integrationId, 
       />
     </div>
   );
-};
-
-// Helper to get icon background and text color classes from Tailwind color name
-const getIconColorClasses = (color?: string | null): { bg: string; text: string } => {
-  const colorMap: Record<string, { bg: string; text: string }> = {
-    violet: {
-      bg: 'bg-violet-50 dark:bg-violet-500/15',
-      text: 'text-violet-700 dark:text-violet-100',
-    },
-    emerald: {
-      bg: 'bg-emerald-50 dark:bg-emerald-500/15',
-      text: 'text-emerald-700 dark:text-emerald-100',
-    },
-    indigo: {
-      bg: 'bg-indigo-50 dark:bg-indigo-500/15',
-      text: 'text-indigo-700 dark:text-indigo-100',
-    },
-    blue: {
-      bg: 'bg-blue-50 dark:bg-blue-500/15',
-      text: 'text-blue-700 dark:text-blue-100',
-    },
-    green: {
-      bg: 'bg-green-50 dark:bg-green-500/15',
-      text: 'text-green-700 dark:text-green-100',
-    },
-    red: {
-      bg: 'bg-red-50 dark:bg-red-500/15',
-      text: 'text-red-700 dark:text-red-100',
-    },
-    orange: {
-      bg: 'bg-orange-50 dark:bg-orange-500/15',
-      text: 'text-orange-700 dark:text-orange-100',
-    },
-    amber: {
-      bg: 'bg-amber-50 dark:bg-amber-500/15',
-      text: 'text-amber-700 dark:text-amber-100',
-    },
-    yellow: {
-      bg: 'bg-yellow-50 dark:bg-yellow-500/15',
-      text: 'text-yellow-700 dark:text-yellow-100',
-    },
-    pink: {
-      bg: 'bg-pink-50 dark:bg-pink-500/15',
-      text: 'text-pink-700 dark:text-pink-100',
-    },
-    purple: {
-      bg: 'bg-purple-50 dark:bg-purple-500/15',
-      text: 'text-purple-700 dark:text-purple-100',
-    },
-    teal: {
-      bg: 'bg-teal-50 dark:bg-teal-500/15',
-      text: 'text-teal-700 dark:text-teal-100',
-    },
-    cyan: {
-      bg: 'bg-cyan-50 dark:bg-cyan-500/15',
-      text: 'text-cyan-700 dark:text-cyan-100',
-    },
-  };
-  
-  if (!color || typeof color !== 'string') {
-    return colorMap.violet;
-  }
-  
-  return colorMap[color.toLowerCase()] || colorMap.violet;
 };
 
 interface Integration {
@@ -1287,17 +1222,17 @@ export default function IntegrationsPage() {
                   ? getCategoryIconAndColor(category, categoryIntegrations[0])
                   : getCategoryIconAndColor(category);
                 
-                // Get icon color classes
-                const iconColors = categoryColor ? getIconColorClasses(categoryColor) : getIconColorClasses('violet');
-                
                 return (
                   <AccordionItem key={category} value={category} className="border border-gray-200 dark:border-gray-800 rounded-xl px-4 bg-white dark:bg-gray-900/50">
                     <AccordionTrigger className="hover:no-underline py-4">
                       <div className="flex items-center gap-3">
                         {categoryIcon && (
-                          <div className={`h-8 w-8 rounded-lg flex items-center justify-center shrink-0 ${iconColors.bg}`}>
-                            <IconRenderer iconName={categoryIcon} className={`h-4 w-4 ${iconColors.text}`} />
-                          </div>
+                          <IconBox
+                            name={categoryIcon}
+                            color={resolveIconBoxColor(categoryColor || 'violet')}
+                            variant="flat"
+                            size="sm"
+                          />
                         )}
                         <span className="text-base font-semibold text-gray-900 dark:text-gray-100">
                           {displayName}
@@ -1321,20 +1256,20 @@ export default function IntegrationsPage() {
                   <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                     <div className="flex-1 min-w-0 w-full">
                       <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
-                        {(() => {
-                          const iconColors = getIconColorClasses(integration.color);
-                          return (
-                            <div className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 relative ${iconColors.bg}`}>
-                              <IconRenderer iconName={integration.icon} className={`h-6 w-6 ${iconColors.text}`} />
-                              {syncing.has(integration.id) && (
-                                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
-                                </span>
-                              )}
-                            </div>
-                          );
-                        })()}
+                        <div className="relative shrink-0">
+                          <IconBox
+                            name={integration.icon}
+                            color={resolveIconBoxColor(integration.color)}
+                            variant="flat"
+                            size="md"
+                          />
+                          {syncing.has(integration.id) && (
+                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-yellow-500 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-3 w-3 bg-yellow-500"></span>
+                            </span>
+                          )}
+                        </div>
                         <h3 className="text-base sm:text-lg font-semibold truncate min-w-0 flex-1">
                           {renderHighlightedText(integration.title || '', searchQuery)}
                         </h3>
@@ -1467,7 +1402,7 @@ export default function IntegrationsPage() {
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
                           {typeof syncResponse[integration.id] === 'string' ? (
-                            <div className="text-xs sm:text-sm text-red-600 dark:text-red-400">
+                            <div className="text-xs sm:text-xs text-red-600 dark:text-red-400">
                               <strong>Error:</strong> {syncResponse[integration.id] as string}
                             </div>
                           ) : (

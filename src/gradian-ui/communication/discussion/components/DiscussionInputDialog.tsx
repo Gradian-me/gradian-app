@@ -190,7 +190,7 @@ export const DiscussionInputDialog: React.FC<DiscussionInputDialogProps> = ({
             </ToggleGroup>
           </div>
           {error && (
-            <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+            <p className="text-xs text-red-600 dark:text-red-400" role="alert">
               {error}
             </p>
           )}

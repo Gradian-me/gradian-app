@@ -8,7 +8,7 @@ import { normalizeUsernameToEmail } from '@/domains/auth/utils/username-email.ut
 import { useUserStore } from '@/stores/user.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { clearMenuItemsCache } from '@/stores/menu-items.store';
-import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
+import { DEMO_MODE, DEFAULT_TENANT } from '@/gradian-ui/shared/configs/env-config';
 import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { TenantSelector } from '@/components/layout/TenantSelector';
@@ -140,10 +140,12 @@ function LoginPageContent() {
       loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Normalized email: ${email.includes('@') ? `${email.substring(0, 3)}***@${email.split('@')[1]}` : email}`);
       loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Original input: ${emailInput}, Tenant defaultDomain: ${tenantWithDefaultDomain?.defaultDomain || 'not set'}`);
 
-      // Derive tenant domain: use selected tenant's domain, or app1.cinnagen.com when tenant is "none".
-      // Do not use current host (localhost/app host) when no tenant is selected—auth backend expects a tenant domain.
-      const DEFAULT_TENANT_DOMAIN = 'app1.cinnagen.com';
-      const tenantDomain = selectedTenant?.domain ?? DEFAULT_TENANT_DOMAIN;
+      // Derive tenant domain: use selected tenant's domain when set; otherwise use current hostname.
+      // Only when demo mode is true and no tenant is selected, use NEXT_PUBLIC_DEFAULT_TENANT if set.
+      const currentHostname = typeof window !== 'undefined' ? window.location.hostname : null;
+      const tenantDomain =
+        selectedTenant?.domain ??
+        (DEMO_MODE && !selectedTenant && DEFAULT_TENANT ? DEFAULT_TENANT : currentHostname);
       const currentHost = typeof window !== 'undefined' ? window.location.host : null;
       loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Tenant domain: ${tenantDomain}`);
       loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Selected tenant: ${JSON.stringify(selectedTenant)}`);

@@ -209,7 +209,7 @@ export function ProfessionalWritingModal({
           {/* Error Message */}
           {error && (
             <div className="w-full p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+              <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
             </div>
           )}
 
