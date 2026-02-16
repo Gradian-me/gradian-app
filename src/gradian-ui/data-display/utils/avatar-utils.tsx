@@ -9,6 +9,7 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { getSingleValueByRole, getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { getInitials } from '@/gradian-ui/form-builder/form-elements/utils/avatar-utils';
 import { getPrimaryDisplayString } from './value-display';
+import { resolveDisplayLabel, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 
 /**
  * Color map for avatar styling
@@ -256,10 +257,14 @@ export const RoleBasedAvatar: React.FC<RoleBasedAvatarProps> = ({
   defaultColor = 'violet',
 }) => {
   const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
   const resolved = resolveAvatarData(schema, data);
   const avatarColor = getAvatarColorClasses(resolved.colorValue, defaultColor);
   const sizeClasses = AVATAR_SIZE_MAP[size] || AVATAR_SIZE_MAP.md;
-  const initials = resolved.avatarLabel ? getInitials(resolved.avatarLabel, language) : 'A';
+  const avatarLabelStr = resolved.avatarLabel != null
+    ? resolveDisplayLabel(resolved.avatarLabel, language, defaultLang)
+    : '';
+  const initials = avatarLabelStr.trim() ? getInitials(avatarLabelStr, language) : 'A';
 
   // Render avatar with initials
   if (resolved.shouldShowAvatar) {

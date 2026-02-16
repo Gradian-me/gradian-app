@@ -3,7 +3,7 @@
 
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/gradian-ui/shared/utils';
 import { URL_HOME } from '@/gradian-ui/shared/configs/ui-config';
@@ -97,17 +97,18 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
         <TooltipProvider delayDuration={200}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                asChild
-                variant="outline"
-                size="sm"
-                className="h-10 w-10 p-0 rounded-lg"
-                aria-label={labelGoToApps}
+              <div
+                className={cn(buttonVariants({ variant: 'square', size: 'sm' }), 'relative')}
+                role="presentation"
               >
-                <Link href={URL_HOME}>
-                  <LayoutDashboard className="h-4 w-4" />
+                <Link
+                  href={URL_HOME}
+                  className="absolute inset-0 flex items-center justify-center no-underline text-violet-700 hover:text-violet-700 dark:text-violet-300 dark:hover:text-violet-300 focus:outline-none"
+                  aria-label={labelGoToApps}
+                >
+                  <LayoutDashboard className="h-4 w-4 shrink-0" />
                 </Link>
-              </Button>
+              </div>
             </TooltipTrigger>
             <TooltipContent>
               <p>{labelGoToApps}</p>
@@ -170,11 +171,8 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
             <TooltipTrigger asChild>
               <div>
                 <ModeToggle
-                  className={cn(
-                    isInline
-                      ? 'h-11 w-11 p-0 rounded-xl'
-                      : 'h-10 w-10 p-0 rounded-lg',
-                  )}
+                  variant="square"
+                  className={isInline ? 'h-11 w-11 p-0' : undefined}
                 />
               </div>
             </TooltipTrigger>
@@ -189,13 +187,9 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
               <TooltipTrigger asChild>
                 <Button
                   onClick={() => setIsQRDialogOpen(true)}
-                  variant="outline"
-                  size={isInline ? 'icon' : 'sm'}
-                  className={cn(
-                    isInline
-                      ? 'h-11 w-11 p-0 rounded-xl'
-                      : 'h-10 w-10 p-0 rounded-lg',
-                  )}
+                  variant="square"
+                  size="sm"
+                  className={isInline ? 'h-11 w-11 p-0' : undefined}
                   aria-label={labelShowQRCode}
                 >
                   <QrCode className="h-4 w-4" />
@@ -214,13 +208,9 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
             title={titleSharePage}
             text={textSharePage}
             tooltipLabel={labelShare}
-            variant="outline"
+            variant="square"
             size={isInline ? 'sm' : 'md'}
-            className={cn(
-              isInline
-                ? 'h-11 w-11 p-0 rounded-xl flex items-center justify-center'
-                : 'rounded-lg',
-            )}
+            className={isInline ? 'h-11 w-11 p-0 flex items-center justify-center' : 'flex items-center justify-center'}
           />
         )}
       </div>

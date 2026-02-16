@@ -1664,8 +1664,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent align="end" className="w-80 p-0">
-                        <div className="p-3">
+                      <PopoverContent align="end" className="mt-2 me-2 w-80 p-0  border border-violet-300 dark:border-violet-800 bg-gray-200 dark:bg-gray-800 shadow-2xl">
+                        <div className="p-0">
                           <DynamicQuickActions
                             actions={safeSchema.detailPageMetadata?.quickActions ?? []}
                             schema={safeSchema}

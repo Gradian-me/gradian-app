@@ -5681,60 +5681,6 @@
   ],
   "routes": [],
   "schemas": [],
-  "change-management": [
-    {
-      "status": [
-        {
-          "id": "01KBSSK2D70JP21YEM6187PX9M",
-          "label": "QA Detailed Evaluation",
-          "icon": "ClipboardCheck",
-          "color": "indigo"
-        }
-      ],
-      "changeNumber": "CM-2025-0417",
-      "changeRequestDate": "2026-01-09",
-      "changeTitle": "Replacement of Failed Primary Temperature Control Module & Integration of New Redundant Monitoring Logic in MAb Production Bioreactors (BR-12 & BR-14)",
-      "changeDescription": "During routine monitoring of upstream production, repeated deviations were observed in temperature feedback from BR-12 and BR-14. Investigation confirmed that the primary temperature control module in both reactors showed progressive signal drift and intermittent communication loss.\n\nGiven the failure mode and the fact that temperature is a critical process parameter (CPP) for mAb cell-culture viability and product quality, this change is classified as High Criticality.\n\nThe approved change involves:\n\nRemoval of the defective temperature control modules.\n\nInstallation of validated replacement modules.\n\nIntegration of a redundant dual-sensor verification logic within the control system to flag early drift and automatically shift to secondary sensor input.\n\nRequalification of reactors post-installation (high-level only).\n\nNo recipe, culture-handling, or operational parameters were modified.\n\n\nIssue Identified:\n\nIntermittent, non-linear temperature feedback fluctuations over several production cycles.\n\nDrift exceeding historical process variability limits.\n\nAlarms triggered inconsistently due to communication dropouts between the module and the automation system.\n\nScope of Change:\n\nApplies to Bioreactors BR-12 and BR-14 used for clinical and commercial mAb campaigns.\n\nAffects upstream equipment only; downstream systems remain unaffected.\n\nIncludes engineering replacement, system integration, and software configuration for new redundancy checks.\n\nRisk Assessment Summary:\n\nProcess Risk: Moderate–High without corrective action.\n\nQuality Risk: Medium due to CPP involvement.\n\nRegulatory Risk: Low–Moderate; mitigated by documented change and requalification.\n\nOperational Risk: Reduced after implementing redundant logic.",
-      "changeSolution": "Engineering Removal & Installation\nReplace faulty modules with validated, supplier-qualified units.\n\nAutomation Update\nAdd dual-sensor plausibility logic:\n\nAutomatic flag if discrepancy exceeds predefined limit.\n\nAuto-switch to secondary sensor in real time.\n\nGMP Documentation\n\nUpdate equipment qualification package (IQ/OQ high-level summary only).\n\nRevise equipment maintenance SOP to incorporate new drift-monitoring requirements.\n\nRequalification Activities\n\nConduct controlled functional tests verifying temperature stability and response accuracy.\n\nPerform system-level calibration checks.\n\nTraining\n\nBrief operators and engineering staff on revised alarm behavior and redundancy monitoring.",
-      "changeAdditionalDescription": "Historical data review showed mild drift beginning ~3 months prior but remaining within limits until failure escalation.\n\nRoot cause suspected to be internal board degradation compounded by thermal cycling stress; supplier analysis pending.\n\nNo confirmed product quality impact on any completed lot, but two batches underwent enhanced analytics as precaution.",
-      "changeConclusion": "The temperature control module failure created a clear risk to process stability in mAb production. The executed change—hardware replacement plus integration of enhanced redundancy logic—reduced this risk significantly and improved early-warning capability for future deviations.\n\nAll engineering, automation, and QA assessments concluded that bioreactors BR-12 and BR-14 are fit for continued GMP use following requalification.\n\nChange implemented successfully without unplanned downtime.\n\nAll post-change verification data met predefined acceptance criteria.\n\nRedundant control logic demonstrated correct failover response during testing.\n\nNo recurrence of drift or signal interruptions observed after 30-day monitoring period.\n\nFinal QA disposition: Change Closed – High Criticality, Fully Mitigated.",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "changeManagementTypes": [
-        {
-          "id": "01KBSR7B9B3S0A9JMAWHWNJ8S3"
-        }
-      ],
-      "changeSubjectTypes": [],
-      "changeCategories": [
-        {
-          "id": "01KD0683FRMXZKW61FKBM0RY9Q"
-        }
-      ],
-      "changeProcedure": [
-        {
-          "id": "01KD079DB9ZJG64D3RW22QTD0J"
-        }
-      ],
-      "id": "01KCDG346XD1GBAKQEADRABBHB",
-      "createdAt": "2025-12-14T03:57:26.114Z",
-      "updatedAt": "2026-01-07T05:57:56.822Z",
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
-      "affectedProcesses": [
-        {
-          "id": "01JGFJJZ006QQWDQPMW4ZJKA6R"
-        },
-        {
-          "id": "01JGFJJZ00HJ9BXFBM0GRAY6WN"
-        },
-        {
-          "id": "01JGFJJZ00EBBKVEA4SXPSMQRH"
-        }
-      ],
-      "follow-up": []
-    }
-  ],
   "change-classifications": [
     {
       "label_fa": "تغییرات کیفی عمده",
@@ -20723,6 +20669,55 @@
       "icon": "CheckCircle",
       "color": "emerald",
       "sourceUrl": "field-options:backup-restore-logs:test-result"
+    },
+    {
+      "id": "medium",
+      "label": "Medium",
+      "icon": "ArrowRight",
+      "color": "yellow",
+      "sourceUrl": "field-options:change-management-records:impact-product-quality"
+    },
+    {
+      "id": "low",
+      "label": "Low",
+      "icon": "ArrowDown",
+      "color": "green",
+      "sourceUrl": "field-options:change-management-records:impact-patient-safety"
+    },
+    {
+      "id": "medium",
+      "label": "Medium",
+      "icon": "ArrowRight",
+      "color": "yellow",
+      "sourceUrl": "field-options:change-management-records:impact-data-integrity"
+    },
+    {
+      "id": "medium",
+      "label": "Medium",
+      "icon": "ArrowRight",
+      "color": "yellow",
+      "sourceUrl": "field-options:change-management-records:impact-regulatory-compliance"
+    },
+    {
+      "id": "critical",
+      "label": "Critical",
+      "icon": "AlertOctagon",
+      "color": "red",
+      "sourceUrl": "field-options:change-management-records:impact-product-quality"
+    },
+    {
+      "id": "high",
+      "label": "High",
+      "icon": "ArrowUp",
+      "color": "orange",
+      "sourceUrl": "field-options:change-management-records:impact-patient-safety"
+    },
+    {
+      "id": "high",
+      "label": "High",
+      "icon": "ArrowUp",
+      "color": "orange",
+      "sourceUrl": "field-options:change-management-records:impact-regulatory-compliance"
     }
   ],
   "deviation-management": [
@@ -21058,5 +21053,168 @@
     }
   ],
   "change-managements": [],
-  "change-management-records": []
+  "change-management-records": [
+    {
+      "quality-assurance-analyses": [],
+      "follow-ups": [],
+      "changeNumber": "CHG-2026-0042",
+      "issueDate": "2026-02-16",
+      "changeTitle": "Replacement of Failed Primary Temperature Control Module & Integration of New Redundant Monitoring Logic in MAb Production Bioreactors (BR-12 & BR-14)",
+      "changeDescription": "During routine monitoring of upstream production, repeated deviations were observed in temperature feedback from BR-12 and BR-14. Investigation confirmed that the primary temperature control module in both reactors showed progressive signal drift and intermittent communication loss. Temperature is a critical process parameter (CPP) for mAb cell-culture viability and product quality. Historical data review showed mild drift beginning ~3 months prior but remaining within limits until failure escalation. Root cause suspected to be internal board degradation compounded by thermal cycling stress; supplier analysis pending.",
+      "proposedSolution": "Engineering Removal & Installation: Replace faulty modules with validated, supplier-qualified units. Automation Update: Add dual-sensor plausibility logic (automatic flag if discrepancy exceeds limit, auto-switch to secondary sensor). GMP Documentation: Update equipment qualification package (IQ/OQ), revise equipment maintenance SOP. Requalification: Controlled functional tests and system-level calibration checks. Training: Brief staff on revised alarm behavior.",
+      "affectedProductMaterial": [
+        "Monoclonal Antibody (mAb)",
+        "Cell Culture Media"
+      ],
+      "affectedBatchNumbers": [
+        "Precautionary testing on last 2 batches"
+      ],
+      "affectedEquipmentSystem": [
+        "Bioreactor BR-12",
+        "Bioreactor BR-14",
+        "Automation Control System"
+      ],
+      "impactProductQuality": [
+        {
+          "id": "medium"
+        }
+      ],
+      "impactPatientSafety": [
+        {
+          "id": "low"
+        }
+      ],
+      "impactDataIntegrity": [
+        {
+          "id": "medium"
+        }
+      ],
+      "impactRegulatoryCompliance": [
+        {
+          "id": "medium"
+        }
+      ],
+      "changeClassification": [
+        {
+          "id": "01KBSR8J6EWGTQ6DPKGH5XR3VE"
+        }
+      ],
+      "changeClassificationJustification": "Classified as High Criticality due to the involvement of a Critical Process Parameter (CPP) affecting cell-culture viability and potential product quality, requiring hardware replacement and automation logic changes.",
+      "qaFinalReview": "The temperature control module failure created a risk to process stability. Hardware replacement plus integration of enhanced redundancy logic reduced this risk and improved early-warning capability. All engineering, automation, and QA assessments concluded that bioreactors BR-12 and BR-14 are fit for continued GMP use. Redundant control logic demonstrated correct failover response during testing.",
+      "closureDate": "2026-02-16",
+      "justificationForClosure": "All post-change verification data met predefined acceptance criteria. No recurrence of drift or signal interruptions observed after 30-day monitoring period. Change implemented successfully without unplanned downtime. Final QA disposition: Change Closed – High Criticality, Fully Mitigated.",
+      "changeIsEffective": true,
+      "changeProcedure": [
+        {
+          "id": "01KD079DB28A53ADBQAW0NMTMW"
+        }
+      ],
+      "status": [
+        {
+          "id": "01KBSSP49BTQXY12YW52SEW78B",
+          "label": "Closed",
+          "icon": "CircleCheckBig",
+          "color": "emerald"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "changeCategory": [],
+      "affectedProcesses": [],
+      "relatedGuidelines": [],
+      "id": "01KHHSAA4AN1Z4H74FNMQH4J6S",
+      "createdAt": "2026-02-15T23:14:05.583Z",
+      "updatedAt": "2026-02-15T23:14:05.996Z"
+    },
+    {
+      "quality-assurance-analyses": [],
+      "follow-ups": [],
+      "changeNumber": "CHG-TEMP-2024-001",
+      "issueDate": "2026-02-16",
+      "changeTitle": "اصلاح و یکپارچه‌سازی افزونگی برای کنترل دمای بیوراکتورهای BR-12 و BR-14",
+      "changeCategory": [
+        {
+          "id": "01KD0683FSR5VCMC071QWHNVW7"
+        }
+      ],
+      "changeDescription": "شکست ماژول‌های اصلی کنترل دما در بیوراکتورهای BR-12 و BR-14 نشان‌دهنده ریسک قابل‌توجهی برای بخش تولید Upstream است. موارد مشاهده شده شامل Signal Drift و قطع موقت ارتباط، بیانگر نقص در لایه‌ی تبدیل A/D یا تخریب فیزیکی Bus Interface در برد کنترلی است که مستقیماً بر CPPهایی مانند الگوهای گلیکوزیلاسیون mAb تأثیر می‌گذارد.",
+      "proposedSolution": "۱. تعویض فوری ماژول‌های تخریب‌شده با واحدهای ارتقایافته دارای هیت‌سینک.\n۲. پیاده‌سازی منطق نظارتی Redundant Cross-Check در PLC/DCS با استفاده از سنسور کمکی PT100/RTD.\n۳. تنظیم مجدد پارامترهای PID و کالیبراسیون NIST.",
+      "affectedEquipmentSystem": [
+        "Bioreactor BR-12",
+        "Bioreactor BR-14",
+        "Temperature Control Module",
+        "PLC/DCS Controller"
+      ],
+      "affectedProcesses": [
+        {
+          "id": "01JGFJJZ00DE3B4WZZ6KYE37BB"
+        },
+        {
+          "id": "01JGFJJZ00KSPWSWMHSX4FMZKP"
+        }
+      ],
+      "impactProductQuality": [
+        {
+          "id": "critical"
+        }
+      ],
+      "impactPatientSafety": [
+        {
+          "id": "high"
+        }
+      ],
+      "impactDataIntegrity": [
+        {
+          "id": "medium"
+        }
+      ],
+      "impactRegulatoryCompliance": [
+        {
+          "id": "high"
+        }
+      ],
+      "changeProcedure": [
+        {
+          "id": "01KD079DB28A53ADBQAW0NMTMW"
+        }
+      ],
+      "changeClassification": [
+        {
+          "id": "01KBSR8J6EWGTQ6DPKGH5XR3VE"
+        }
+      ],
+      "relatedGuidelines": [
+        {
+          "id": "01KCHCHX8400000000000002HC"
+        },
+        {
+          "id": "01KCHCHX8100000000000002F8"
+        },
+        {
+          "id": "01KCHCHX8C00000000000002TS"
+        }
+      ],
+      "changeClassificationJustification": "به دلیل تأثیر مستقیم بر CPP (پارامتر کنترلی بحرانی) و نیاز به Re-IQ/OQ سیستم‌های کنترلی طبق استانداردهای GAMP 5 و ASTM E2500، این تغییر در رده بحرانی/عمده دسته‌بندی می‌شود.",
+      "changeIsEffective": true,
+      "affectedProductMaterial": [
+        "Monoclonal Antibodies (mAb)"
+      ],
+      "qaFinalReview": "بررسی نهایی باید شامل تایید صحت منطق Watchdog و تست Fail-Safe در هنگام قطع ارتباط ماژول باشد. اطمینان از کالیبراسیون همزمان هر دو سنسور برای جلوگیری از مثبت کاذب الزامی است.",
+      "status": [
+        {
+          "id": "01KBSSP49BTQXY12YW52SEW78B",
+          "label": "Closed",
+          "icon": "CircleCheckBig",
+          "color": "emerald"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+      "createdAt": "2026-02-15T23:58:31.870Z",
+      "updatedAt": "2026-02-15T23:58:32.290Z"
+    }
+  ]
 }

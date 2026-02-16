@@ -243,6 +243,8 @@ interface AiBuilderFormProps {
   onLanguageChange?: (language: string) => void;
   onFormValuesChange?: (formValues: Record<string, any>) => void; // Callback to expose formValues
   hidePreviewButton?: boolean; // Hide the preview button in PromptPreviewSheet (useful for dialog mode)
+  /** When true, render prompt preview as a Modal instead of Sheet (e.g. in AiAgentDialog to avoid z-index issues) */
+  previewAsDialog?: boolean;
   hideAgentSelector?: boolean; // Hide agent dropdown selector
   hideSearchConfig?: boolean; // Hide search type and summarization controls
   hideImageConfig?: boolean; // Hide image type selector
@@ -274,6 +276,7 @@ export function AiBuilderForm({
   onLanguageChange,
   onFormValuesChange,
   hidePreviewButton = false,
+  previewAsDialog = false,
   hideAgentSelector = false,
   hideSearchConfig = false,
   hideImageConfig = false,
@@ -1468,6 +1471,7 @@ export function AiBuilderForm({
                             summarizedPrompt={summarizedPrompt || undefined}
                             isSummarizing={isSummarizing}
                             hideButton={hidePreviewButton}
+                            asDialog={previewAsDialog}
                           />
                         );
                       })()}
@@ -1533,8 +1537,7 @@ export function AiBuilderForm({
                       }}
                       disabled={isLoading || disabled || runType === 'automatic'}
                       size="default"
-                      variant="default"
-                      className="h-10 shadow-sm w-full md:w-auto bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
+                      variant="gradient"
                     >
                       <Sparkles className="h-4 w-4 me-2" />
                       <span className="hidden md:inline">{getT(TRANSLATION_KEYS.AI_BUILDER_DO_THE_MAGIC, language, defaultLang)}</span>

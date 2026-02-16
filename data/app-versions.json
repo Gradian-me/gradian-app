@@ -6967,5 +6967,29 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000008",
+    "timestamp": "2026-02-16T00:00:00.000Z",
+    "version": "1.51.010",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "REFACTOR: Rearranged NotificationsDropdown component to improve user interface by placing it after the UserProfileSelector.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "layout",
+          "ui"
+        ]
+      },
+      {
+        "changeType": "add",
+        "description": "ADD: Updated button styles across various components to utilize the new 'square' variant for consistency. This update enhances the overall user experience and visual coherence in the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "ui"
+        ]
+      }
+    ]
   }
 ]

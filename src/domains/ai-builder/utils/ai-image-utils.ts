@@ -4029,16 +4029,32 @@ export async function processImageRequest(
 
     // Build prompt from formValues using buildStandardizedPrompt (like processChatRequest does)
     // This ensures we get the full prompt with all form field values, not just promptParams
+    // EXCEPT: prefer userPrompt when it contains substantive record content (from quick actions)
     let cleanPrompt = '';
-    
-    // First, try to build from formValues using buildStandardizedPrompt
-    if (requestData.formValues && agent.renderComponents) {
+    const hasSubstantiveUserPrompt = (requestData.userPrompt || '').trim().length > 0 && (
+      (requestData.userPrompt || '').includes('Working on') ||
+      (requestData.userPrompt || '').includes('```json') ||
+      (requestData.userPrompt || '').includes('Selected fields') ||
+      (requestData.userPrompt || '').includes('Full item data') ||
+      (requestData.userPrompt || '').trim().length > 150
+    );
+
+    if (hasSubstantiveUserPrompt) {
+      cleanPrompt = (requestData.userPrompt || '').trim();
+      // Append preloadedContext when available so the image has full record context
+      if (requestData.preloadedContext && typeof requestData.preloadedContext === 'string' && requestData.preloadedContext.trim()) {
+        cleanPrompt += `\n\n${requestData.preloadedContext.trim()}`;
+      }
+    }
+
+    // First, try to build from formValues using buildStandardizedPrompt (when userPrompt is not substantive)
+    if (!cleanPrompt && requestData.formValues && agent.renderComponents) {
       const builtPrompt = buildStandardizedPrompt(agent, requestData.formValues);
       if (builtPrompt && builtPrompt.trim()) {
         cleanPrompt = builtPrompt;
       }
     }
-    
+
     // If buildStandardizedPrompt didn't produce a prompt, try promptParams (fields without sectionId)
     if (!cleanPrompt && Object.keys(promptParams).length > 0) {
       // If we have prompt params, concatenate them in order
@@ -4081,6 +4097,11 @@ export async function processImageRequest(
       // If we have a cleanPrompt from formValues/promptParams but bodyParams also has a prompt,
       // prefer bodyParams.prompt for image generation (it's the actual user prompt)
       cleanPrompt = bodyParams.prompt;
+    }
+
+    // Append preloadedContext when available (if not already added by hasSubstantiveUserPrompt path)
+    if (cleanPrompt && !hasSubstantiveUserPrompt && requestData.preloadedContext && typeof requestData.preloadedContext === 'string' && requestData.preloadedContext.trim()) {
+      cleanPrompt += `\n\n${requestData.preloadedContext.trim()}`;
     }
 
     // Security: Sanitize and validate prompt

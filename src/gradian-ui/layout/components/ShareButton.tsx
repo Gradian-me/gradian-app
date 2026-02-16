@@ -14,7 +14,7 @@ export interface ShareButtonProps {
   /** Translated label for tooltip and aria-label */
   tooltipLabel?: string;
   className?: string;
-  variant?: 'default' | 'outline' | 'ghost';
+  variant?: 'default' | 'outline' | 'ghost' | 'square';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
 }

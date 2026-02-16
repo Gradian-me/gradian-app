@@ -209,9 +209,9 @@ export function NotificationsDropdown({ initialCount = 3, onOpenChange }: Notifi
       <DropdownMenuPrimitive.Root open={isMounted ? isOpen : false} onOpenChange={isMounted ? handleOpenChange : undefined}>
       <DropdownMenuPrimitive.Trigger asChild disabled={!isMounted}>
         <Button 
-          variant="outline" 
-          size="icon" 
-          className="relative h-11 w-11 p-0 rounded-xl"
+          variant="square" 
+          size="sm"
+          className="relative"
           aria-label="Notifications"
           disabled={!isMounted}
           type="button"

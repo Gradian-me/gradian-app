@@ -335,6 +335,9 @@ function getStorageFormat(requiredOutputFormat?: string): string {
 
 /**
  * Validate agent configuration and form fields
+ * Skips form field validation when userPrompt is provided (quick-action mode):
+ * the prompt is built from record data externally, so renderComponents required
+ * fields (e.g. productType, lifecycleStage for change-management-analyst) do not apply.
  */
 function validateRequest(
   agent: AgentConfig,
@@ -349,7 +352,17 @@ function validateRequest(
     };
   }
 
-  // Validate form fields if renderComponents exist
+  // Skip form field validation when userPrompt is provided and non-empty.
+  // In quick-action mode, the prompt is built from record data (selectedFields,
+  // selectedSections) and the agent's renderComponents (e.g. productType,
+  // lifecycleStage, manufacturingSites) are for the standalone form, not for
+  // record-driven invocations. The prompt already contains the necessary context.
+  const hasExternalPrompt = requestData.userPrompt && typeof requestData.userPrompt === 'string' && requestData.userPrompt.trim().length > 0;
+  if (hasExternalPrompt) {
+    return { valid: true };
+  }
+
+  // Validate form fields when building prompt from form (standalone form mode)
   if (agent.renderComponents && requestData.formValues) {
     const validationErrors = validateAgentFormFields(agent, requestData.formValues);
     if (validationErrors.length > 0) {

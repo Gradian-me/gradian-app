@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 import { MainLayout } from '@/components/layout/main-layout';
 import { Spinner } from '@/components/ui/spinner';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/gradian-ui/form-builder/form-elements';
+import { Button } from '@/components/ui/button';
 import { DynamicActionButtons } from './DynamicActionButtons';
 import { DynamicCardRenderer } from './DynamicCardRenderer';
 import { DynamicCardDialog } from './DynamicCardDialog';
@@ -1269,28 +1269,16 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                 }
               };
 
-              // Map QuickAction variants to form-builder Button variants
-              // Form-builder Button supports: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'outline' | 'ghost' | 'link'
+              // Map QuickAction variants to Button variants (Button: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'gradient')
               const buttonVariant = (() => {
                 const variant = action.variant;
-                
-                // Map 'destructive' to 'danger' (form-builder Button uses 'danger')
                 if (variant === 'destructive') {
-                  return 'danger' as const;
+                  return 'destructive' as const;
                 }
-                
-                // Direct mapping for supported variants
-                if (variant === 'outline' || variant === 'default' || variant === 'secondary' || 
-                    variant === 'ghost' || variant === 'link') {
-                  return variant as 'default' | 'secondary' | 'outline' | 'ghost' | 'link';
+                if (variant === 'outline' || variant === 'default' || variant === 'secondary' ||
+                    variant === 'ghost' || variant === 'link' || variant === 'gradient') {
+                  return variant;
                 }
-                
-                // Map 'gradient' to 'default' (form-builder Button doesn't support gradient)
-                if (variant === 'gradient') {
-                  return 'default' as const;
-                }
-                
-                // Default to 'outline' if variant is undefined or unknown
                 return 'outline' as const;
               })();
 
@@ -1662,7 +1650,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               action={
                 <Button
                   onClick={handleOpenCreateModal}
-                  className="bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+                  variant="gradient"
                 >
                   <Plus className="h-4 w-4 me-2" />
                   {labelAdd} {singularName}

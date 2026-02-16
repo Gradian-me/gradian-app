@@ -39,12 +39,10 @@ export const MaximizeButton: React.FC<MaximizeButtonProps> = ({
         <TooltipTrigger asChild>
           <Button
             onClick={toggleMaximize}
-            variant="outline"
-            size={isInline ? 'icon' : 'sm'}
+            variant="square"
+            size="sm"
             className={cn(
-              isInline
-                ? 'h-11 w-11 p-0 rounded-xl'
-                : 'h-10 w-10 p-0 rounded-lg',
+              isInline && 'h-11 w-11 p-0',
               className,
             )}
             aria-label={tooltipLabel}

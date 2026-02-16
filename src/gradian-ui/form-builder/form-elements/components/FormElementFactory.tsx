@@ -149,6 +149,9 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   
   // Extract enableVoiceInput from config or restProps if it exists
   const enableVoiceInput = Boolean((config as any)?.enableVoiceInput ?? (restProps as any)?.enableVoiceInput ?? false);
+
+  // Extract aiAgentId from config or restProps; for textarea/markdown default to professional-writing
+  const aiAgentId = (config as any)?.aiAgentId ?? (restProps as any)?.aiAgentId;
   
   // Extract loadingTextSwitches from restProps if it exists
   const loadingTextSwitches = (restProps as any)?.loadingTextSwitches;
@@ -330,6 +333,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           allowTranslation={(config as any)?.allowTranslation}
           language={language}
           defaultLanguage={defaultLang}
+          aiAgentId={aiAgentId ?? 'professional-writing'}
           enableVoiceInput={enableVoiceInput}
           loadingTextSwitches={loadingTextSwitches}
           rows={resolvedRows}
@@ -381,6 +385,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           config={config} 
           {...commonProps} 
           canCopy={canCopy} 
+          aiAgentId={aiAgentId ?? 'professional-writing'}
           enableVoiceInput={enableVoiceInput} 
           loadingTextSwitches={loadingTextSwitches}
           rows={(config as any)?.rows || (restProps as any)?.rows || 5}

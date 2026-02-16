@@ -343,9 +343,22 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
       
       // Load agent config to build prompt
       const agent = effectiveAgents.find(a => a.id === agentId);
-      
+
+      // For image-generator: prefer userPrompt when it contains substantive record content
+      // (e.g. from quick actions with selectedFields). buildStandardizedPrompt from formValues
+      // only produces metadata like "Image Type: Lego Style, Size: 1024x1024" - not what to draw.
+      const isImageGenerator = agentId === 'image-generator';
+      const hasSubstantiveUserPrompt = (request.userPrompt || '').trim().length > 0 && (
+        (request.userPrompt || '').includes('Working on') ||
+        (request.userPrompt || '').includes('```json') ||
+        (request.userPrompt || '').includes('Selected fields') ||
+        (request.userPrompt || '').includes('Full item data') ||
+        (request.userPrompt || '').trim().length > 150
+      );
+
       // Always try to build prompt from formValues first if they exist
-      if (agent && request.formValues && Object.keys(request.formValues).length > 0) {
+      // EXCEPT for image-generator when userPrompt has substantive content (record data)
+      if (agent && request.formValues && Object.keys(request.formValues).length > 0 && !(isImageGenerator && hasSubstantiveUserPrompt)) {
         // Build prompt from formValues using buildStandardizedPrompt
         const builtPrompt = buildStandardizedPrompt(agent, request.formValues);
         
@@ -359,7 +372,33 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
           loggingCustom(LogType.AI_BODY_LOG, 'warn', `buildStandardizedPrompt returned empty prompt for agent ${agentId} with formValues keys: ${Object.keys(request.formValues).join(', ')}`);
         }
       }
-      
+
+      // For image-generator with substantive userPrompt, use it as primary prompt
+      if (isImageGenerator && hasSubstantiveUserPrompt) {
+        finalPrompt = (request.userPrompt || '').trim();
+        // Append language instruction if formValues has non-English output language
+        if (request.formValues) {
+          const languageFieldNames = ['language', 'outputLanguage', 'output-language', 'output_language', 'outputLanguageCode', 'lang'];
+          let outputLanguage: string | null = null;
+          for (const fieldName of languageFieldNames) {
+            const value = request.formValues[fieldName];
+            if (value && typeof value === 'string' && value.trim() && value.toLowerCase() !== 'en' && value !== 'text') {
+              outputLanguage = value.trim();
+              break;
+            }
+          }
+          if (outputLanguage && !finalPrompt.includes('IMPORTANT OUTPUT LANGUAGE REQUIREMENT:')) {
+            const languageMap: Record<string, string> = {
+              'en': 'English', 'fa': 'Persian (Farsi)', 'ar': 'Arabic', 'es': 'Spanish', 'fr': 'French',
+              'de': 'German', 'it': 'Italian', 'pt': 'Portuguese', 'ru': 'Russian',
+            };
+            const languageCode = outputLanguage.toLowerCase();
+            const languageName = languageMap[languageCode] || languageCode.toUpperCase();
+            finalPrompt += `\n\nIMPORTANT OUTPUT LANGUAGE REQUIREMENT:\nAll output must be in ${languageName} (${languageCode.toUpperCase()}).`;
+          }
+        }
+      }
+
       // If building from formValues didn't produce a prompt (or only produced language instruction),
       // use userPrompt and append language instruction if needed
       if (!finalPrompt || !finalPrompt.trim()) {
@@ -785,6 +824,8 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
                     output_format: 'png',
                     ...(request.extra_body || {}), // Include other extra params if any
                   },
+                  formValues: request.formValues,
+                  preloadedContext: preloadedContext || undefined,
                 }),
                 signal: abortController.signal,
               }),

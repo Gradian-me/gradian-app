@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Modal } from '@/gradian-ui/data-display/components/Modal';
 import { AiBuilderWrapper } from './AiBuilderWrapper';
 import type { QuickAction } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -18,7 +18,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
 import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { Button } from '@/components/ui/button';
-import { Eye } from 'lucide-react';
+import { Eye, Maximize2, Minimize2 } from 'lucide-react';
 
 export interface AiAgentDialogProps {
   isOpen: boolean;
@@ -51,7 +51,8 @@ export function AiAgentDialog({
   const [userPrompt, setUserPrompt] = useState<string>('');
   const [processedBody, setProcessedBody] = useState<Record<string, any> | undefined>(undefined);
   const [processedExtraBody, setProcessedExtraBody] = useState<Record<string, any> | undefined>(undefined);
-  const openPreviewRef = useRef<(() => void) | null>(null);
+  const [isMaximized, setIsMaximized] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Process preset body and extra_body with dynamic context replacement
   useEffect(() => {
@@ -84,57 +85,13 @@ export function AiAgentDialog({
     }
   }, [isOpen, data, schema, action.body, action.extra_body]);
 
-  // Build preload routes from current item, selected sections, and action-defined routes
+  // Build preload routes from action-defined routes only.
+  // Skip the current-record API route: userPrompt already embeds the same data from selectedFields/selectedSections.
+  // Adding it would duplicate record data in both user message and system prompt, wasting tokens.
   useEffect(() => {
     if (!isOpen || !data || !schema) return;
 
     const routes: typeof preloadRoutes = [];
-
-    // Collect all field names from selectedFields and selectedSections
-    const allSelectedFieldNames = new Set<string>();
-
-    // Add fields from selectedFields
-    if (action.selectedFields && action.selectedFields.length > 0) {
-      action.selectedFields.forEach((fieldId) => {
-        const field = schema.fields?.find(f => f.id === fieldId);
-        if (field && field.name) {
-          // Field found in schema, use its name
-          allSelectedFieldNames.add(field.name);
-        } else {
-          // Field not found in schema (might be a computed field, dataPath, or component renderer field)
-          // Use the fieldId directly as the field name
-          allSelectedFieldNames.add(fieldId);
-        }
-      });
-    }
-
-    // Add fields from selectedSections
-    if (action.selectedSections && action.selectedSections.length > 0) {
-      action.selectedSections.forEach((sectionId) => {
-        const section = schema.sections?.find(s => s.id === sectionId);
-        if (section) {
-          const sectionFields = schema.fields?.filter(f => f.sectionId === sectionId) || [];
-          sectionFields.forEach(field => {
-            if (field.name) {
-              allSelectedFieldNames.add(field.name);
-            }
-          });
-        }
-      });
-    }
-
-    // Single route: current item API endpoint with all selected fields
-    if (data.id && allSelectedFieldNames.size > 0) {
-      routes.push({
-        route: `/api/data/${schema.id}/${data.id}`,
-        title: `${schema.singular_name || schema.name} Data`,
-        description: `Current ${schema.singular_name || schema.name} item data with selected fields and sections`,
-        method: 'GET',
-        jsonPath: 'data',
-        outputFormat: 'json',
-        includedFields: Array.from(allSelectedFieldNames), // Filter API response to only include selected fields
-      });
-    }
 
     // Add preload routes from action configuration (with dynamic context replacement)
     if (action.preloadRoutes && action.preloadRoutes.length > 0) {
@@ -156,7 +113,7 @@ export function AiAgentDialog({
     }
 
     setPreloadRoutes(routes);
-  }, [isOpen, data, schema, action.selectedFields, action.selectedSections, action.preloadRoutes]);
+  }, [isOpen, data, schema, action.preloadRoutes]);
 
   // Build user prompt from selected fields/sections
   useEffect(() => {
@@ -235,19 +192,8 @@ export function AiAgentDialog({
     setUserPrompt(promptParts.join('\n'));
   }, [isOpen, data, schema, action.selectedFields, action.selectedSections, action.additionalSystemPrompt]);
 
-  // Register the open preview function from AiBuilderWrapper
-  const handleOpenPreviewRequest = useCallback((callback: () => void) => {
-    openPreviewRef.current = callback;
-  }, []);
-
-  // Handle preview button click
-  const handlePreviewClick = useCallback(() => {
-    if (openPreviewRef.current) {
-      openPreviewRef.current();
-    } else {
-      console.warn('Preview callback not yet registered');
-    }
-  }, []);
+  // Open preview dialog (controlled state so footer button works reliably)
+  const handlePreviewClick = useCallback(() => setIsPreviewOpen(true), []);
 
   if (!agent) {
     return null;
@@ -260,7 +206,21 @@ export function AiAgentDialog({
       title={`AI Agent: ${agent.label}`}
       description={agent.description}
       size="xl"
+      className={isMaximized ? 'lg:max-w-[100vw] lg:max-h-screen' : undefined}
       showCloseButton={true}
+      headerActions={
+        <div className="flex items-center justify-end">
+          <Button
+            type="button"
+            variant="square"
+            size="sm"
+            onClick={() => setIsMaximized((prev) => !prev)}
+            aria-label={isMaximized ? 'Restore dialog size' : 'Maximize dialog'}
+          >
+            {isMaximized ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+          </Button>
+        </div>
+      }
       footerLeftActions={
         DEMO_MODE ? (
           <Button
@@ -287,7 +247,8 @@ export function AiAgentDialog({
         agent={agent}
         initialBody={processedBody}
         initialExtraBody={processedExtraBody}
-        onOpenPreviewRequest={handleOpenPreviewRequest}
+        previewOpen={isPreviewOpen}
+        onPreviewOpenChange={setIsPreviewOpen}
         initialSelectedLanguage={
           action.language || 
           (agent.agentType === 'image-generation' ? 'en' : 'fa')

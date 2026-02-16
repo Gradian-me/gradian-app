@@ -13,6 +13,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
+import { Modal } from '@/gradian-ui/data-display/components/Modal';
 import { Button } from '@/components/ui/button';
 import { Loader2, Eye } from 'lucide-react';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown';
@@ -40,6 +41,8 @@ interface PromptPreviewSheetProps {
   summarizedPrompt?: string; // Summarized version of the prompt (for search/image)
   isSummarizing?: boolean; // Whether summarization is in progress
   hideButton?: boolean; // Hide the preview button (useful when button is rendered elsewhere, e.g., in dialog footer)
+  /** When true, render as a Modal dialog instead of Sheet (e.g. when used inside AiAgentDialog to avoid z-index issues) */
+  asDialog?: boolean;
 }
 
 export function PromptPreviewSheet({
@@ -58,6 +61,7 @@ export function PromptPreviewSheet({
   summarizedPrompt,
   isSummarizing = false,
   hideButton = false,
+  asDialog = false,
 }: PromptPreviewSheetProps) {
   const [builtSystemPrompt, setBuiltSystemPrompt] = useState<string>(legacySystemPrompt || '');
   const [isLoadingPreload, setIsLoadingPreload] = useState<boolean>(legacyIsLoadingPreload || false);
@@ -119,35 +123,15 @@ export function PromptPreviewSheet({
   // Enable preview if there's a prompt OR if there are body/extra params (for image generation, etc.)
   const canPreview = hasPrompt || hasBodyParams || hasExtraBody;
 
-  return (
-    <>
-      {!hideButton && (
-        <Button
-          variant="outline"
-          size="default"
-          disabled={!canPreview || disabled}
-          className="h-10"
-          onClick={() => onOpenChange(true)}
-        >
-          <Eye className="h-4 w-4 me-2" />
-          Preview
-        </Button>
-      )}
-      <Sheet open={isOpen} onOpenChange={onOpenChange}>
-        <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 h-full [&>button]:z-20 !z-[100]" overlayClassName="!z-[95]">
-          <SheetHeader className="px-6 pt-6 pb-4 pe-12 border-b border-gray-200 dark:border-gray-700 shrink-0 sticky top-0 bg-white dark:bg-gray-900 z-10">
-            <SheetTitle>Prompt Sent to LLM</SheetTitle>
-            <SheetDescription>
-              This is the prompt that is being sent (or was sent) to the Language Model. You can preview it at any time, including during generation.
-              {requiredOutputFormat === 'string' && (
-                <span className="block mt-1 text-xs text-blue-600 dark:text-blue-400">
-                  Note: General markdown output rules are automatically appended for string format agents.
-                </span>
-              )}
-            </SheetDescription>
-          </SheetHeader>
-          <div className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
-            {(hasPrompt || hasBodyParams || hasExtraBody) ? (
+  const previewDescription =
+    'This is the prompt that is being sent (or was sent) to the Language Model. You can preview it at any time, including during generation.' +
+    (requiredOutputFormat === 'string'
+      ? ' Note: General markdown output rules are automatically appended for string format agents.'
+      : '');
+
+  const previewBodyContent = (
+    <div className={asDialog ? 'flex-1 overflow-y-auto min-h-0' : 'flex-1 overflow-y-auto px-6 py-6 min-h-0'}>
+      {(hasPrompt || hasBodyParams || hasExtraBody) ? (
               <div className="space-y-4">
                 {/* Show prompt from bodyParams if userPrompt is empty but bodyParams has prompt */}
                 {(!effectiveUserPrompt.trim() && bodyParams?.prompt) ? (
@@ -308,9 +292,45 @@ export function PromptPreviewSheet({
                 <p>Please enter a prompt and select an AI agent to view the prompt.</p>
               </div>
             )}
-          </div>
-        </SheetContent>
-      </Sheet>
+    </div>
+  );
+
+  return (
+    <>
+      {!hideButton && (
+        <Button
+          variant="outline"
+          size="default"
+          disabled={!canPreview || disabled}
+          className="h-10"
+          onClick={() => onOpenChange(true)}
+        >
+          <Eye className="h-4 w-4 me-2" />
+          Preview
+        </Button>
+      )}
+      {asDialog ? (
+        <Modal
+          isOpen={isOpen}
+          onClose={() => onOpenChange(false)}
+          title="Prompt Sent to LLM"
+          description={previewDescription}
+          size="lg"
+          showCloseButton={true}
+        >
+          {previewBodyContent}
+        </Modal>
+      ) : (
+        <Sheet open={isOpen} onOpenChange={onOpenChange}>
+          <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 h-full [&>button]:z-20 !z-[100]" overlayClassName="!z-[95]">
+            <SheetHeader className="px-6 pt-6 pb-4 pe-12 border-b border-gray-200 dark:border-gray-700 shrink-0 sticky top-0 bg-white dark:bg-gray-900 z-10">
+              <SheetTitle>Prompt Sent to LLM</SheetTitle>
+              <SheetDescription>{previewDescription}</SheetDescription>
+            </SheetHeader>
+            {previewBodyContent}
+          </SheetContent>
+        </Sheet>
+      )}
     </>
   );
 }

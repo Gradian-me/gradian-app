@@ -463,9 +463,9 @@ export const FormModal: React.FC<FormModalProps> = ({
 
     if (isEdit && schemaIconName) {
       return (
-        <span className="inline-flex items-center gap-2">
-          <IconRenderer iconName={schemaIconName} className="h-5 w-5 text-violet-600" />
-          <span>{defaultTitle}</span>
+        <span className="flex items-start gap-2 min-w-0">
+          <IconRenderer iconName={schemaIconName} className="h-5 w-5 shrink-0 text-violet-600" />
+          <span className="line-clamp-3 wrap-break-word min-w-0">{defaultTitle}</span>
         </span>
       );
     }
@@ -513,9 +513,8 @@ export const FormModal: React.FC<FormModalProps> = ({
           <div className="flex items-center justify-end">
             <Button
               type="button"
-              variant="outline"
-              size="icon"
-              className="h-9 w-9 rounded-xl"
+              variant="square"
+              size="sm"
               onClick={() => setIsMaximized((prev) => !prev)}
               aria-label={isMaximized ? 'Restore form size' : 'Maximize form'}
             >

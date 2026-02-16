@@ -39,6 +39,7 @@ export const TRANSLATION_KEYS = {
   BUTTON_LOAD_MORE: 'BUTTON_LOAD_MORE',
   LABEL_APPLYING: 'LABEL_APPLYING',
   TITLE_SELECT: 'TITLE_SELECT',
+  TITLE_PICKER_SELECT: 'TITLE_PICKER_SELECT',
   MESSAGE_LOADING_ITEMS: 'MESSAGE_LOADING_ITEMS',
   MESSAGE_LOADING_MORE: 'MESSAGE_LOADING_MORE',
   MESSAGE_LOADING_OPTIONS: 'MESSAGE_LOADING_OPTIONS',
@@ -395,6 +396,7 @@ export const TRANSLATION_KEYS = {
   PLACEHOLDER_SELECT_TYPE: 'PLACEHOLDER_SELECT_TYPE',
   PLACEHOLDER_SELECT_CATEGORY: 'PLACEHOLDER_SELECT_CATEGORY',
   PLACEHOLDER_SELECT_SOURCE: 'PLACEHOLDER_SELECT_SOURCE',
+  PLACEHOLDER_CLICK_TO_SELECT: 'PLACEHOLDER_CLICK_TO_SELECT',
   LABEL_ACTIVE_FILTERS: 'LABEL_ACTIVE_FILTERS',
   MESSAGE_LOADING_NOTIFICATIONS: 'MESSAGE_LOADING_NOTIFICATIONS',
   TITLE_ERROR_LOADING_NOTIFICATIONS: 'TITLE_ERROR_LOADING_NOTIFICATIONS',
@@ -1046,6 +1048,10 @@ export const TRANSLATIONS: TranslationEntry[] = [
   {
     key: TRANSLATION_KEYS.TITLE_SELECT,
     translations: [{ en: 'Select' }, { fa: 'انتخاب' }, { ar: 'اختر' }, { es: 'Seleccionar' }, { fr: 'Sélectionner' }, { de: 'Auswählen' }, { it: 'Seleziona' }, { ru: 'Выбрать' }],
+  },
+  {
+    key: TRANSLATION_KEYS.TITLE_PICKER_SELECT,
+    translations: [{ en: 'Select {0}' }, { fa: 'انتخاب {0}' }, { ar: 'اختر {0}' }, { es: 'Seleccionar {0}' }, { fr: 'Sélectionner {0}' }, { de: '{0} auswählen' }, { it: 'Seleziona {0}' }, { ru: 'Выберите {0}' }],
   },
   {
     key: TRANSLATION_KEYS.MESSAGE_LOADING_ITEMS,
@@ -2147,6 +2153,7 @@ export const TRANSLATIONS: TranslationEntry[] = [
   { key: TRANSLATION_KEYS.PLACEHOLDER_SELECT_CATEGORY, translations: [{ en: 'Select category...' }, { fa: 'انتخاب دسته‌بندی...' }, { ar: 'اختر الفئة...' }, { es: 'Seleccionar categoría...' }, { fr: 'Sélectionner la catégorie...' }, { de: 'Kategorie auswählen...' }, { it: 'Seleziona categoria...' }, { ru: 'Выберите категорию...' }] },
   { key: TRANSLATION_KEYS.PLACEHOLDER_SELECT_STATUS, translations: [{ en: 'Select status...' }, { fa: 'انتخاب وضعیت...' }, { ar: 'اختر الحالة...' }, { es: 'Seleccionar estado...' }, { fr: 'Sélectionner le statut...' }, { de: 'Status auswählen...' }, { it: 'Seleziona stato...' }, { ru: 'Выберите статус...' }] },
   { key: TRANSLATION_KEYS.PLACEHOLDER_SELECT_SOURCE, translations: [{ en: 'Select source...' }, { fa: 'انتخاب منبع...' }, { ar: 'اختر المصدر...' }, { es: 'Seleccionar fuente...' }, { fr: 'Sélectionner la source...' }, { de: 'Quelle auswählen...' }, { it: 'Seleziona sorgente...' }, { ru: 'Выберите источник...' }] },
+  { key: TRANSLATION_KEYS.PLACEHOLDER_CLICK_TO_SELECT, translations: [{ en: 'Click to select...' }, { fa: 'برای انتخاب کلیک کنید...' }, { ar: 'انقر للاختيار...' }, { es: 'Haga clic para seleccionar...' }, { fr: 'Cliquez pour sélectionner...' }, { de: 'Klicken Sie zum Auswählen...' }, { it: 'Clicca per selezionare...' }, { ru: 'Нажмите, чтобы выбрать...' }] },
   { key: TRANSLATION_KEYS.LABEL_ACTIVE_FILTERS, translations: [{ en: 'Active filters:' }, { fa: 'فیلترهای فعال:' }, { ar: 'الفلاتر النشطة:' }, { es: 'Filtros activos:' }, { fr: 'Filtres actifs :' }, { de: 'Aktive Filter:' }, { it: 'Filtri attivi:' }, { ru: 'Активные фильтры:' }] },
   { key: TRANSLATION_KEYS.MESSAGE_LOADING_NOTIFICATIONS, translations: [{ en: 'Loading notifications...' }, { fa: 'در حال بارگذاری اعلان‌ها...' }, { ar: 'جاري تحميل الإشعارات...' }, { es: 'Cargando notificaciones...' }, { fr: 'Chargement des notifications...' }, { de: 'Benachrichtigungen werden geladen...' }, { it: 'Caricamento notifiche...' }, { ru: 'Загрузка уведомлений...' }] },
   { key: TRANSLATION_KEYS.TITLE_ERROR_LOADING_NOTIFICATIONS, translations: [{ en: 'Error Loading Notifications' }, { fa: 'خطا در بارگذاری اعلان‌ها' }, { ar: 'خطأ في تحميل الإشعارات' }, { es: 'Error al cargar notificaciones' }, { fr: 'Erreur lors du chargement des notifications' }, { de: 'Fehler beim Laden der Benachrichtigungen' }, { it: 'Errore nel caricamento delle notifiche' }, { ru: 'Ошибка загрузки уведомлений' }] },

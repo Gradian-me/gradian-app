@@ -19,6 +19,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { cn } from '../../shared/utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Badge } from '../../form-builder/form-elements/components/Badge';
+import { getT, getDefaultLanguage } from '../../shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '../../shared/constants/translations';
+import { useLanguageStore } from '@/stores/language.store';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -53,6 +56,8 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
   initialTargetSchema = null,
 }) => {
   const router = useRouter();
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultLang = getDefaultLanguage();
 
   const tableDataState = useRepeatingTableData({
     config,
@@ -144,6 +149,11 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
   const alwaysShowPagination = tableProps.alwaysShowPagination ?? false;
   const isLoading = isLoadingRelations || (isRelationBased && isLoadingTargetSchema);
 
+  const emptyStateName = config.title
+    || (isRelationBased ? targetSchemaData?.plural_name : section?.title)
+    || getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang);
+  const emptyStateMessage = getT(TRANSLATION_KEYS.EMPTY_NO_X_FOUND, language, defaultLang).replace('{name}', emptyStateName);
+
   const tableConfig: TableConfig = useMemo(
     () => ({
       id: `table-${config.sectionId}`,
@@ -166,11 +176,7 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
         enabled: false,
       },
       emptyState: {
-        message: isRelationBased
-          ? config.title
-            ? `No ${config.title.toLowerCase()} found`
-            : 'No items found'
-          : 'No items found',
+        message: emptyStateMessage,
       },
       loading: isLoading,
       striped: true,
@@ -182,6 +188,7 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
       columns,
       config.sectionId,
       config.title,
+      emptyStateMessage,
       isLoading,
       isRelationBased,
       paginationEnabled,

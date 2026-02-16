@@ -13,9 +13,13 @@ export interface ModeToggleProps {
    * CSS class name
    */
   className?: string;
+  /**
+   * Button variant (square = squircle style for page action bar)
+   */
+  variant?: 'outline' | 'square';
 }
 
-export function ModeToggle({ className }: ModeToggleProps) {
+export function ModeToggle({ className, variant = 'outline' }: ModeToggleProps) {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
@@ -33,10 +37,12 @@ export function ModeToggle({ className }: ModeToggleProps) {
     setTheme(currentTheme === "light" ? "dark" : "light")
   }
 
+  const size = variant === 'square' ? 'sm' : 'icon';
+
   // Show loading state during SSR to avoid hydration mismatch
   if (!mounted) {
     return (
-      <Button variant="outline" size="icon" className={className} disabled type="button">
+      <Button variant={variant} size={size} className={className} disabled type="button">
         <Sun className="h-[1.2rem] w-[1.2rem]" />
         <span className="sr-only">Toggle theme</span>
       </Button>
@@ -47,8 +53,8 @@ export function ModeToggle({ className }: ModeToggleProps) {
 
   return (
     <Button 
-      variant="outline" 
-      size="icon" 
+      variant={variant} 
+      size={size} 
       className={className}
       onClick={toggleTheme}
       type="button"

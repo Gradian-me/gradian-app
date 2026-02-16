@@ -56,7 +56,7 @@ export function ResponseAnnotationViewer({
         </h3>
         <Button
           onClick={() => setIsDialogOpen(true)}
-          className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+          variant="gradient"
         >
           <CheckCircle2 className="h-4 w-4 me-2" />
           Apply ({totalAnnotations})
@@ -164,7 +164,7 @@ export function ResponseAnnotationViewer({
                     setIsDialogOpen(false);
                     onApply(schemasWithAnnotations);
                   }}
-                  className="bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+                  variant="gradient"
                 >
                   <CheckCircle2 className="h-4 w-4 me-2" />
                   Apply & Regenerate

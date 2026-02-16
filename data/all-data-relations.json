@@ -3552,5 +3552,203 @@
     "fieldId": "authentication-type",
     "createdAt": "2026-02-15T14:25:48.075Z",
     "updatedAt": "2026-02-15T21:06:11.526Z"
+  },
+  {
+    "id": "01KHHSAA8YY13X94F6D7WN481R",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHSAA4AN1Z4H74FNMQH4J6S",
+    "targetSchema": "external_nodes",
+    "targetId": "medium",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-product-quality",
+    "createdAt": "2026-02-15T23:14:05.725Z",
+    "updatedAt": "2026-02-15T23:14:05.725Z"
+  },
+  {
+    "id": "01KHHSAAA1KYSQ4908XRACBSJV",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHSAA4AN1Z4H74FNMQH4J6S",
+    "targetSchema": "external_nodes",
+    "targetId": "low",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-patient-safety",
+    "createdAt": "2026-02-15T23:14:05.761Z",
+    "updatedAt": "2026-02-15T23:14:05.761Z"
+  },
+  {
+    "id": "01KHHSAAB4J3B2GQ87JXFSH9EX",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHSAA4AN1Z4H74FNMQH4J6S",
+    "targetSchema": "external_nodes",
+    "targetId": "medium",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-data-integrity",
+    "createdAt": "2026-02-15T23:14:05.796Z",
+    "updatedAt": "2026-02-15T23:14:05.796Z"
+  },
+  {
+    "id": "01KHHSAACBGGQYRFPS3JV91SCX",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHSAA4AN1Z4H74FNMQH4J6S",
+    "targetSchema": "external_nodes",
+    "targetId": "medium",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-regulatory-compliance",
+    "createdAt": "2026-02-15T23:14:05.835Z",
+    "updatedAt": "2026-02-15T23:14:05.835Z"
+  },
+  {
+    "id": "01KHHSAACR23AGYMYV4EEM0NZD",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHSAA4AN1Z4H74FNMQH4J6S",
+    "targetSchema": "change-procedure",
+    "targetId": "01KD079DB28A53ADBQAW0NMTMW",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-procedure",
+    "createdAt": "2026-02-15T23:14:05.848Z",
+    "updatedAt": "2026-02-15T23:14:05.848Z"
+  },
+  {
+    "id": "01KHHSAAD890GHZTN5Q7T9P9GM",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHSAA4AN1Z4H74FNMQH4J6S",
+    "targetSchema": "change-classifications",
+    "targetId": "01KBSR8J6EWGTQ6DPKGH5XR3VE",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-classification",
+    "createdAt": "2026-02-15T23:14:05.864Z",
+    "updatedAt": "2026-02-15T23:14:05.864Z"
+  },
+  {
+    "id": "01KHHVVP0X29VH4QGQN4MTDXQB",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "change-categories",
+    "targetId": "01KD0683FSR5VCMC071QWHNVW7",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-category",
+    "createdAt": "2026-02-15T23:58:31.964Z",
+    "updatedAt": "2026-02-15T23:58:31.964Z"
+  },
+  {
+    "id": "01KHHVVP18T86GEZW983GW2B03",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "process-mappings",
+    "targetId": "01JGFJJZ00DE3B4WZZ6KYE37BB",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "affected-processes",
+    "createdAt": "2026-02-15T23:58:31.976Z",
+    "updatedAt": "2026-02-15T23:58:31.976Z"
+  },
+  {
+    "id": "01KHHVVP1EYWWNJW7R5WFDQMNE",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "process-mappings",
+    "targetId": "01JGFJJZ00KSPWSWMHSX4FMZKP",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "affected-processes",
+    "createdAt": "2026-02-15T23:58:31.976Z",
+    "updatedAt": "2026-02-15T23:58:31.976Z"
+  },
+  {
+    "id": "01KHHVVP32VNM6JBJ65Z2J3R2H",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "external_nodes",
+    "targetId": "critical",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-product-quality",
+    "createdAt": "2026-02-15T23:58:32.034Z",
+    "updatedAt": "2026-02-15T23:58:32.034Z"
+  },
+  {
+    "id": "01KHHVVP4DWTJJ077Q6CQ5VMVJ",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "external_nodes",
+    "targetId": "high",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-patient-safety",
+    "createdAt": "2026-02-15T23:58:32.077Z",
+    "updatedAt": "2026-02-15T23:58:32.077Z"
+  },
+  {
+    "id": "01KHHVVP5948QX90Z9H4KA88JC",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "external_nodes",
+    "targetId": "medium",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-data-integrity",
+    "createdAt": "2026-02-15T23:58:32.105Z",
+    "updatedAt": "2026-02-15T23:58:32.105Z"
+  },
+  {
+    "id": "01KHHVVP6VF89MWK3Z9C4SR3T1",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "external_nodes",
+    "targetId": "high",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-regulatory-compliance",
+    "createdAt": "2026-02-15T23:58:32.155Z",
+    "updatedAt": "2026-02-15T23:58:32.155Z"
+  },
+  {
+    "id": "01KHHVVP7CKYAB2K4GQ2DYWN9Y",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "change-procedure",
+    "targetId": "01KD079DB28A53ADBQAW0NMTMW",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-procedure",
+    "createdAt": "2026-02-15T23:58:32.172Z",
+    "updatedAt": "2026-02-15T23:58:32.172Z"
+  },
+  {
+    "id": "01KHHVVP7MM2E8SQWZKDW3QVDK",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "change-classifications",
+    "targetId": "01KBSR8J6EWGTQ6DPKGH5XR3VE",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "change-classification",
+    "createdAt": "2026-02-15T23:58:32.180Z",
+    "updatedAt": "2026-02-15T23:58:32.180Z"
+  },
+  {
+    "id": "01KHHVVP81DTM1345ZW5ZCWSKJ",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "guidelines",
+    "targetId": "01KCHCHX8400000000000002HC",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "related-guidelines",
+    "createdAt": "2026-02-15T23:58:32.193Z",
+    "updatedAt": "2026-02-15T23:58:32.193Z"
+  },
+  {
+    "id": "01KHHVVP85ZFY2FEDEP27WN0FQ",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "guidelines",
+    "targetId": "01KCHCHX8100000000000002F8",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "related-guidelines",
+    "createdAt": "2026-02-15T23:58:32.193Z",
+    "updatedAt": "2026-02-15T23:58:32.193Z"
+  },
+  {
+    "id": "01KHHVVP88HTY74QWK6BFQM8WW",
+    "sourceSchema": "change-management-records",
+    "sourceId": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
+    "targetSchema": "guidelines",
+    "targetId": "01KCHCHX8C00000000000002TS",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "related-guidelines",
+    "createdAt": "2026-02-15T23:58:32.193Z",
+    "updatedAt": "2026-02-15T23:58:32.193Z"
   }
 ]

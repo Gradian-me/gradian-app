@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { HeaderNotificationsProps } from '../types';
 import { cn } from '../../../shared/utils';
+import { Button } from '@/components/ui/button';
 
 export const HeaderNotifications: React.FC<HeaderNotificationsProps> = ({
   count = 0,
@@ -29,8 +30,7 @@ export const HeaderNotifications: React.FC<HeaderNotificationsProps> = ({
   );
 
   const buttonClasses = cn(
-    'relative p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100',
-    'focus:outline-none focus:ring-2 focus:ring-blue-500'
+    'relative'
   );
 
   const badgeClasses = cn(
@@ -47,13 +47,16 @@ export const HeaderNotifications: React.FC<HeaderNotificationsProps> = ({
 
   return (
     <div className={notificationsClasses} {...props}>
-      <button
+      <Button
+        type="button"
+        variant="square"
+        size="sm"
         onClick={handleClick}
         className={buttonClasses}
         aria-label={`Notifications${count > 0 ? ` (${count} unread)` : ''}`}
       >
         <svg
-          className="h-6 w-6"
+          className="h-4 w-4 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -70,7 +73,7 @@ export const HeaderNotifications: React.FC<HeaderNotificationsProps> = ({
             {count > 99 ? '99+' : count}
           </span>
         )}
-      </button>
+      </Button>
 
       {/* Notifications Dropdown */}
       <div className={dropdownClasses}>

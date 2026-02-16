@@ -468,21 +468,6 @@ function MainLayoutContent({
           </Tooltip>
           {/* Organization settings button that wraps tenant & company selection */}
           <OrganizationSettings />
-          {ENABLE_NOTIFICATION ? (
-            <Tooltip key="notifications-tooltip" open={isNotificationsDropdownOpen ? false : undefined}>
-              <TooltipTrigger asChild>
-                <div className="flex items-center">
-                  <NotificationsDropdown 
-                    initialCount={5} 
-                    onOpenChange={setIsNotificationsDropdownOpen}
-                  />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Notifications</p>
-              </TooltipContent>
-            </Tooltip>
-          ) : null}
           <Tooltip key="user-profile-tooltip" open={isUserMenuOpen ? false : undefined}>
             <TooltipTrigger asChild>
               <UserProfileSelector
@@ -512,6 +497,21 @@ function MainLayoutContent({
               <p>User Profile</p>
             </TooltipContent>
           </Tooltip>
+          {ENABLE_NOTIFICATION ? (
+            <Tooltip key="notifications-tooltip" open={isNotificationsDropdownOpen ? false : undefined}>
+              <TooltipTrigger asChild>
+                <div className="flex items-center">
+                  <NotificationsDropdown 
+                    initialCount={5} 
+                    onOpenChange={setIsNotificationsDropdownOpen}
+                  />
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Notifications</p>
+              </TooltipContent>
+            </Tooltip>
+          ) : null}
         </div>
       </TooltipProvider>
       <div className="flex lg:hidden items-center space-x-2">

@@ -20016,6 +20016,98 @@
         "columns": 2
       }
     ],
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "change-management-analyst-quick-action",
+          "label": "Change Management Analyst",
+          "icon": "ClipboardList",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "change-management-analyst-pharma-biotech",
+          "selectedFields": [
+            "change-number",
+            "change-title",
+            "change-description",
+            "proposed-solution",
+            "change-category",
+            "affected-equipment-system",
+            "affected-processes",
+            "affected-product-material",
+            "impact-product-quality",
+            "impact-patient-safety",
+            "impact-data-integrity",
+            "impact-regulatory-compliance",
+            "change-classification",
+            "change-classification-justification",
+            "qa-final-review"
+          ],
+          "selectedSections": [
+            "change-identification",
+            "change-details",
+            "impact-scope-assessment",
+            "change-classification",
+            "qa-review-closure"
+          ],
+          "additionalSystemPrompt": "Analyze this change management record as a Senior Change Management Analyst. Evaluate the proposed change against GMP systems and WHO guidelines. Provide comprehensive analysis including risk assessment, reporting category determination, validation requirements, and implementation recommendations.",
+          "displayType": "hideForm",
+          "runType": "manual",
+          "language": "en"
+        },
+        {
+          "id": "create-sketch-change-management",
+          "label": "Create Sketch",
+          "icon": "Pencil",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "sketch"
+          },
+          "selectedFields": [
+            "change-title",
+            "change-description",
+            "proposed-solution",
+            "change-category",
+            "affected-equipment-system",
+            "affected-processes",
+            "impact-product-quality",
+            "change-classification",
+            "qa-final-review"
+          ],
+          "additionalSystemPrompt": "Create a sketch-style illustration based on the change management information provided, showing the change scenario, proposed solution, impacts, and implementation context.",
+          "displayType": "hideForm",
+          "runType": "automatic",
+          "language": "en"
+        },
+        {
+          "id": "create-lego-change-management",
+          "label": "Create Lego Style",
+          "icon": "Image",
+          "variant": "gradient",
+          "action": "runAiAgent",
+          "agentId": "image-generator",
+          "body": {
+            "imageType": "lego-style"
+          },
+          "selectedFields": [
+            "change-title",
+            "change-description",
+            "proposed-solution",
+            "change-category",
+            "affected-equipment-system",
+            "affected-processes",
+            "impact-product-quality",
+            "change-classification",
+            "qa-final-review"
+          ],
+          "additionalSystemPrompt": "Create a lego-style illustration based on the change management information provided, visualizing the change scenario, proposed solution, and impacts in a playful lego aesthetic.",
+          "displayType": "hideForm",
+          "runType": "automatic",
+          "language": "en"
+        }
+      ]
+    },
     "showInNavigation": true,
     "icon": "GitBranch",
     "schemaType": "business",
@@ -24125,7 +24217,7 @@
           "variant": "default",
           "icon": "User",
           "agentId": "oox-analyzer-quality-control",
-          "runType": "automatic",
+          "runType": "manual",
           "displayType": "hideForm",
           "language": "en",
           "selectedFields": [

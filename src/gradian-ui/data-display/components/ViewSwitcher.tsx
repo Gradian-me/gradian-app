@@ -47,7 +47,7 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
           size="sm"
           onClick={() => onViewChange('hierarchy')}
           className={cn(
-            'h-full w-10 p-0 rounded-md',
+            'h-full w-10 p-0 rounded-xl',
             currentView === 'hierarchy'
               ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-sm'
               : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'
@@ -62,7 +62,7 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
           size="sm"
           onClick={() => onViewChange('table')}
           className={cn(
-            'h-full w-10 p-0 rounded-md',
+            'h-full w-10 p-0 rounded-xl',
             currentView === 'table' 
               ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-sm' 
               : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'
@@ -77,7 +77,7 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
           size="sm"
           onClick={() => onViewChange('list')}
           className={cn(
-            'h-full w-10 p-0 rounded-md',
+            'h-full w-10 p-0 rounded-xl',
             currentView === 'list' 
               ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-sm' 
               : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'
@@ -92,7 +92,7 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
           size="sm"
           onClick={() => onViewChange('grid')}
           className={cn(
-            'h-full w-10 p-0 rounded-md',
+            'h-full w-10 p-0 rounded-xl',
             currentView === 'grid' 
               ? 'bg-violet-500 hover:bg-violet-600 text-white shadow-sm' 
               : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'

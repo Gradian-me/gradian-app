@@ -4,6 +4,8 @@ import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { DynamicDetailPageRenderer, getPageTitle, getPageSubtitle } from '@/gradian-ui/data-display/components/DynamicDetailPageRenderer';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { useDynamicEntity } from '@/gradian-ui/shared/hooks/use-dynamic-entity';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { MainLayout } from '@/components/layout/main-layout';
@@ -394,8 +396,10 @@ export function DynamicDetailPageClient({
   }, [data, dataId, entityName, deleteEntity, router, schemaId]);
 
 
+  const language = useLanguageStore((s) => s.language);
+  const defaultLang = getDefaultLanguage();
   const pageTitle = getPageTitle(schemaState, data, dataId);
-  const pageSubtitle = getPageSubtitle(schemaState, entityName);
+  const pageSubtitle = getPageSubtitle(schemaState, entityName, language ?? undefined, defaultLang);
 
   return (
     <MainLayout

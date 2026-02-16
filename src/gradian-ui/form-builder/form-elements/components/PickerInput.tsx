@@ -22,6 +22,9 @@ import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-vari
 import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { replaceDynamicContext } from '../../utils/dynamic-context-replacer';
+import { getT, getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { useLanguageStore } from '@/stores/language.store';
 
 export interface PickerInputProps {
   config: any;
@@ -701,9 +704,13 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     return subtitle ? `${title} (${subtitle})` : title;
   };
 
+  const language = useLanguageStore((s) => s.getLanguage?.() ?? s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
   const fieldName = (config as any).name || 'unknown';
   const fieldLabel = (config as any).label;
-  const fieldPlaceholder = (config as any).placeholder || 'Click to select...';
+  const rawPlaceholder = (config as any).placeholder;
+  const resolvedPlaceholder = rawPlaceholder != null ? resolveDisplayLabel(rawPlaceholder, language, defaultLang) : '';
+  const fieldPlaceholder = resolvedPlaceholder.trim() !== '' ? resolvedPlaceholder : getT(TRANSLATION_KEYS.PLACEHOLDER_CLICK_TO_SELECT, language, defaultLang);
 
   return (
     <TooltipProvider delayDuration={300}>

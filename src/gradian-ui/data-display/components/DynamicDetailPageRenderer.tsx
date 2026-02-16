@@ -67,20 +67,31 @@ export interface DynamicDetailPageRendererProps {
 }
 
 /**
- * Get subtitle with icon for MainLayout
+ * Get subtitle with icon for MainLayout.
+ * When language and defaultLang are provided, entityName is treated as the schema singular name and translated.
  */
-export const getPageSubtitle = (schema: FormSchema, entityName: string): React.ReactNode => {
+export const getPageSubtitle = (
+  schema: FormSchema,
+  entityName: string,
+  language?: string,
+  defaultLang?: string
+): React.ReactNode => {
+  const displayName =
+    language != null && defaultLang != null
+      ? getSchemaTranslatedSingularName(schema, language, entityName)
+      : entityName;
+
   if (!schema.icon) {
-    return entityName;
+    return displayName;
   }
-  
+
   return (
     <span className="flex items-center gap-1.5">
-      <IconRenderer 
-        iconName={schema.icon} 
-        className="h-4 w-4 text-violet-600 dark:text-violet-300" 
+      <IconRenderer
+        iconName={schema.icon}
+        className="h-4 w-4 text-violet-600 dark:text-violet-300"
       />
-      <span>{entityName}</span>
+      <span>{displayName}</span>
     </span>
   );
 };
@@ -1246,7 +1257,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                       transition={{ duration: 0.15 }}
                     >
                       <motion.h1
-                        className="text-2xl font-bold text-gray-900 dark:text-gray-100"
+                        className="text-xl font-bold text-gray-900 dark:text-gray-100 text-wrap wrap-break-words line-clamp-3 leading-relaxed"
                         whileHover={{ x: 2 }}
                         transition={{ duration: 0.15 }}
                       >

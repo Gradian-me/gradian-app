@@ -77,7 +77,7 @@ export const DynamicFilterPane = ({
     if (!sortConfig || sortConfig.length === 0 || !schema) {
       return 'No sort applied';
     }
-    
+
     // System field labels
     const systemFieldLabels: Record<string, string> = {
       status: 'Status',
@@ -88,7 +88,7 @@ export const DynamicFilterPane = ({
       createdAt: 'Created At',
       companyId: 'Company',
     };
-    
+
     return sortConfig.map((sort, index) => {
       const direction = sort.isAscending ? '↑' : '↓';
       // Try to get label from schema field, otherwise use system field label or column id
@@ -119,9 +119,8 @@ export const DynamicFilterPane = ({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      variant="outline"
+                      variant="square"
                       size="sm"
-                      className="h-9 sm:h-10 w-9 sm:w-10 p-0 justify-center shrink-0"
                       onClick={() => setIsSortDialogOpen(true)}
                     >
                       <ArrowUpDown className="h-4 w-4" />
@@ -162,90 +161,88 @@ export const DynamicFilterPane = ({
               </TooltipProvider>
             )}
           </div>
-        <div className="flex flex-row gap-1.5 sm:gap-2 items-center w-full lg:w-auto flex-wrap">
-          <Button variant="outline" size="sm" className="hidden h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap">
-            <Filter className="h-4 w-4 sm:me-2" />
-            <span className="hidden sm:inline">Filters</span>
-          </Button>
-          {onRefresh && (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="h-9 sm:h-10 w-9 sm:w-10 p-0 justify-center shrink-0"
-              onClick={onRefresh}
-              title="Refresh"
-            >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+          <div className="flex flex-row gap-1.5 sm:gap-2 items-center w-full lg:w-auto flex-wrap">
+            <Button variant="outline" size="sm" className="hidden h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap">
+              <Filter className="h-4 w-4 sm:me-2" />
+              <span className="hidden sm:inline">Filters</span>
             </Button>
-          )}
-          <div className="border border-gray-300 dark:border-gray-500 rounded-md h-9 sm:h-10 flex items-center shrink-0">
-            <ViewSwitcher
-              currentView={viewMode}
-              onViewChange={onViewModeChange}
-              className="h-full"
-              showHierarchy={showHierarchy}
-              showOnly={showOnlyViews}
-              onExpandAll={onExpandAllHierarchy}
-              onCollapseAll={onCollapseAllHierarchy}
-              showExpandCollapse={viewMode === 'hierarchy' && !!onExpandAllHierarchy && !!onCollapseAllHierarchy}
-            />
-          </div>
-          {customActions && (
-            <div className="flex items-center border-s border-gray-300 dark:border-gray-500 ps-2">
-              {customActions}
-            </div>
-          )}
-          {showIds !== undefined && onShowIdsChange && (
-            <div className="flex items-center gap-2 border-s border-gray-300 dark:border-gray-500 ps-2">
-              <Label htmlFor="show-ids-switch-filter" className="text-xs cursor-pointer whitespace-nowrap">
-                Show IDs
-              </Label>
-              <Switch
-                id="show-ids-switch-filter"
-                checked={showIds}
-                onCheckedChange={onShowIdsChange}
+            {onRefresh && (
+              <Button
+                type="button"
+                variant="square"
+                size="sm"
+                onClick={onRefresh}
+                title="Refresh"
+              >
+                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </Button>
+            )}
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl h-9 sm:h-10 flex items-center shrink-0">
+              <ViewSwitcher
+                currentView={viewMode}
+                onViewChange={onViewModeChange}
+                className="h-full"
+                showHierarchy={showHierarchy}
+                showOnly={showOnlyViews}
+                onExpandAll={onExpandAllHierarchy}
+                onCollapseAll={onCollapseAllHierarchy}
+                showExpandCollapse={viewMode === 'hierarchy' && !!onExpandAllHierarchy && !!onCollapseAllHierarchy}
               />
             </div>
-          )}
-          {showAddButton && (
-            <Button 
-              variant="default" 
-              size="sm" 
-              className="h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap text-xs shadow-sm bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700"
-              onClick={onAddNew}
-            >
-              <Plus className="h-4 w-4 sm:me-2" />
-              <span className="hidden sm:inline">{addButtonText}</span>
-              <span className="sm:hidden">Add</span>
-            </Button>
-          )}
-        </div>
-      </div>
-    </motion.div>
-
-    {/* Sort Dialog */}
-    {schema && onSortChange && (
-      <Dialog open={isSortDialogOpen} onOpenChange={setIsSortDialogOpen}>
-        <DialogContent className="max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col">
-          <DialogHeader className="pb-3">
-            <DialogTitle>{getT(TRANSLATION_KEYS.TITLE_SORT_DATA, language ?? defaultLang, defaultLang)}</DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto pr-1">
-            <DataSort
-              schema={schema}
-              value={sortConfig}
-              onChange={(newSortConfig) => onSortChange(newSortConfig)}
-              excludedFieldIds={excludedFieldIds}
-              className="border-0"
-              showHeader={false}
-              requireApply
-              onApply={() => setIsSortDialogOpen(false)}
-            />
+            {customActions && (
+              <div className="flex items-center border-s border-gray-300 dark:border-gray-500 ps-2">
+                {customActions}
+              </div>
+            )}
+            {showIds !== undefined && onShowIdsChange && (
+              <div className="flex items-center gap-2 border-s border-gray-300 dark:border-gray-500 ps-2">
+                <Label htmlFor="show-ids-switch-filter" className="text-xs cursor-pointer whitespace-nowrap">
+                  Show IDs
+                </Label>
+                <Switch
+                  id="show-ids-switch-filter"
+                  checked={showIds}
+                  onCheckedChange={onShowIdsChange}
+                />
+              </div>
+            )}
+            {showAddButton && (
+              <Button
+                variant="gradient"
+                size="sm"
+                onClick={onAddNew}
+              >
+                <Plus className="h-4 w-4 sm:me-2" />
+                <span className="hidden sm:inline">{addButtonText}</span>
+                <span className="sm:hidden">Add</span>
+              </Button>
+            )}
           </div>
-        </DialogContent>
-      </Dialog>
-    )}
+        </div>
+      </motion.div>
+
+      {/* Sort Dialog */}
+      {schema && onSortChange && (
+        <Dialog open={isSortDialogOpen} onOpenChange={setIsSortDialogOpen}>
+          <DialogContent className="max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col">
+            <DialogHeader className="pb-3">
+              <DialogTitle>{getT(TRANSLATION_KEYS.TITLE_SORT_DATA, language ?? defaultLang, defaultLang)}</DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-y-auto pr-1">
+              <DataSort
+                schema={schema}
+                value={sortConfig}
+                onChange={(newSortConfig) => onSortChange(newSortConfig)}
+                excludedFieldIds={excludedFieldIds}
+                className="border-0"
+                showHeader={false}
+                requireApply
+                onApply={() => setIsSortDialogOpen(false)}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 };

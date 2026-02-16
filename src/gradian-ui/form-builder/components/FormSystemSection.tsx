@@ -159,7 +159,13 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
                     : field.id;
 
                   return (
-                    <div key={stableKey} className="space-y-2">
+                    <div
+                      key={stableKey}
+                      className={cn(
+                        'space-y-2',
+                        field.colSpan === 2 && 'md:col-span-2'
+                      )}
+                    >
                       <FormElementFactory
                         field={field as any}
                         value={fieldValue}

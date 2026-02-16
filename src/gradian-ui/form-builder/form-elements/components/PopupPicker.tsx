@@ -599,10 +599,6 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         if (companyQueryParam) {
           queryParams.companyIds = companyQueryParam;
         }
-        // Add cache-busting parameter for refresh
-        if (forceRefresh) {
-          queryParams._t = Date.now().toString();
-        }
 
         // Use shared utility function
         const result = await fetchOptionsFromSchemaOrUrl({
@@ -697,10 +693,6 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         }
         if (excludeIds && excludeIds.length > 0) {
           queryParams.excludeIds = excludeIds.join(',');
-        }
-        // Add cache-busting parameter for refresh
-        if (forceRefresh) {
-          queryParams._t = Date.now().toString();
         }
 
         // Use shared utility function
@@ -942,8 +934,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           await fetchSchemaItems(1, false, true);
         }
       } else {
-        // For non-paginated sources, we need to add cache-busting to loadItems
-        // Build query params with cache-busting
+        // For non-paginated sources, build query params and refetch
         const queryParams = new URLSearchParams();
         if (includeIds && includeIds.length > 0) {
           queryParams.append('includeIds', includeIds.join(','));
@@ -954,8 +945,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         if (companyQueryParam) {
           queryParams.append('companyIds', companyQueryParam);
         }
-        queryParams.append('_t', Date.now().toString()); // Cache-busting
-        
+
         const queryString = queryParams.toString();
         const relativeUrl = `/api/data/${schemaId}${queryString ? `?${queryString}` : ''}`;
         
@@ -1592,7 +1582,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           <div className="flex items-start gap-3">
             {/* Avatar */}
             <Avatar
-              fallback={getInitials(avatarField)}
+              fallback={getInitials(avatarField, lang)}
               size="md"
               variant="primary"
               className={cn(
@@ -1605,7 +1595,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   : ""
               )}
             >
-              {getInitials(avatarField)}
+              {getInitials(avatarField, lang)}
             </Avatar>
 
             {/* Content */}
@@ -1615,7 +1605,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <h4
                       className={cn(
-                        "text-sm font-semibold truncate transition-colors flex-1 min-w-0",
+                        "text-xs font-semibold text-wrap wrap-break-words line-clamp-3 transition-colors flex-1 min-w-0",
                         isSelected
                           ? "text-violet-900 dark:text-violet-100"
                           : "text-gray-900 dark:text-gray-100 group-hover:text-violet-700 dark:group-hover:text-violet-300"
@@ -1629,7 +1619,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                     )}
                   </div>
                   {subtitle.trim() && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 text-wrap wrap-break-words line-clamp-2 mt-0.5">
                       {renderHighlightedText(subtitle, highlightQuery)}
                     </p>
                   )}
@@ -1692,7 +1682,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     : getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang);
   const resolvedTitle =
     !title
-      ? `${schemaName}`
+      ? getT(TRANSLATION_KEYS.TITLE_PICKER_SELECT, language, defaultLang).replace('{0}', schemaName ?? '')
       : typeof title === 'string'
         ? title
         : resolveFromTranslationsArray(title, language, defaultLang);
@@ -2036,7 +2026,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 )}
               </button>
               <Avatar
-                fallback={getInitials(avatarField)}
+                fallback={getInitials(avatarField, langNode)}
                 size="md"
                 variant="primary"
                 className={cn(
@@ -2047,7 +2037,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                   isSelected ? 'ring-1 ring-violet-400' : ''
                 )}
               >
-                {getInitials(avatarField)}
+                {getInitials(avatarField, langNode)}
               </Avatar>
 
               <div className="flex-1 min-w-0">
@@ -2056,8 +2046,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <h4
                         className={cn(
-                          'text-sm font-semibold truncate transition-colors flex-1 min-w-0',
-                          isSelected
+                          'text-xs font-semibold text-wrap wrap-break-words transition-colors flex-1 min-w-0',
+                            isSelected
                             ? 'text-violet-900 dark:text-violet-100'
                             : 'text-gray-900 dark:text-gray-100 group-hover:text-violet-700 dark:group-hover:text-violet-300'
                         )}

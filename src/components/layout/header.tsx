@@ -47,11 +47,10 @@ export function Header({
           {/* Company Selector Component */}
           <CompanySelector />
 
-          {/* Notifications Component */}
-          {ENABLE_NOTIFICATION && <NotificationsDropdown initialCount={3} />}
-
           {/* User Profile Component */}
           <UserProfileSelector theme={profileTheme} />
+          {/* Notifications (after user selector) */}
+          {ENABLE_NOTIFICATION && <NotificationsDropdown initialCount={3} />}
 
           {/* Create Button */}
           {showCreateButton && (

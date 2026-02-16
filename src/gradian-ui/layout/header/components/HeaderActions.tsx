@@ -55,14 +55,6 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
       {/* Theme Toggle */}
       {actions?.theme?.enabled && <ModeToggle />}
 
-      {/* Notifications */}
-      {actions?.notifications?.enabled && (
-        <HeaderNotifications
-          count={actions.notifications.count}
-          onClick={handleNotificationClick}
-        />
-      )}
-
       {/* User Menu */}
       {actions?.user?.enabled && user && (
         <HeaderUser
@@ -71,6 +63,14 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({
           showAvatar={actions.user.showAvatar}
           showName={actions.user.showName}
           showRole={actions.user.showRole}
+        />
+      )}
+
+      {/* Notifications (after user selector) */}
+      {actions?.notifications?.enabled && (
+        <HeaderNotifications
+          count={actions.notifications.count}
+          onClick={handleNotificationClick}
         />
       )}
     </div>

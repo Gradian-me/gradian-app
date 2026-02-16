@@ -71,7 +71,7 @@ function isTranslatableMessage(
 
 export interface ConfirmationButton {
   label: string;
-  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'gradient';
   icon?: string; // Icon name for IconRenderer
   action: () => void;
   disabled?: boolean;

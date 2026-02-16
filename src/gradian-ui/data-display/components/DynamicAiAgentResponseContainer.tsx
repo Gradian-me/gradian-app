@@ -164,29 +164,29 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   // Parse image data if format is image
   const imageData = useMemo(() => {
     if (!aiResponse || !agent) return null;
-    
+
     const agentFormatValue = agent.requiredOutputFormat as string | undefined;
     const isImageFormat = agentFormatValue === 'image';
-    
+
     // Only try to parse as JSON if agent format is image or content looks like JSON
     const trimmedContent = aiResponse.trim();
     const looksLikeJson = trimmedContent.startsWith('{') || trimmedContent.startsWith('[');
-    
+
     if (!isImageFormat && !looksLikeJson) {
       return null;
     }
-    
+
     try {
       const parsed = JSON.parse(aiResponse);
-      
+
       // Check if response has image structure
-      const hasImageStructure = parsed && typeof parsed === 'object' && parsed.image && 
+      const hasImageStructure = parsed && typeof parsed === 'object' && parsed.image &&
         (parsed.image.url || parsed.image.b64_json);
-      
+
       if (!isImageFormat && !hasImageStructure) {
         return null;
       }
-      
+
       if (parsed && typeof parsed === 'object' && parsed.image) {
         const img = parsed.image;
         if (img && (img.url || img.b64_json)) {
@@ -202,29 +202,29 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   // Parse video data if format is video
   const videoData = useMemo(() => {
     if (!aiResponse || !agent) return null;
-    
+
     const agentFormatValue = agent.requiredOutputFormat as string | undefined;
     const isVideoFormat = agentFormatValue === 'video';
-    
+
     // Only try to parse as JSON if agent format is video or content looks like JSON
     const trimmedContent = aiResponse.trim();
     const looksLikeJson = trimmedContent.startsWith('{') || trimmedContent.startsWith('[');
-    
+
     if (!isVideoFormat && !looksLikeJson) {
       return null;
     }
-    
+
     try {
       const parsed = JSON.parse(aiResponse);
-      
+
       // Check if response has video structure
-      const hasVideoStructure = parsed && typeof parsed === 'object' && parsed.video && 
+      const hasVideoStructure = parsed && typeof parsed === 'object' && parsed.video &&
         (parsed.video.video_id || parsed.video.url || parsed.video.file_path);
-      
+
       if (!isVideoFormat && !hasVideoStructure) {
         return null;
       }
-      
+
       if (parsed && typeof parsed === 'object' && parsed.video) {
         const vid = parsed.video;
         // Return video data if we have video_id, url, or file_path
@@ -252,23 +252,23 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   // Parse graph data if format is graph
   const graphData = useMemo(() => {
     if (!aiResponse || !agent) return null;
-    
+
     const agentFormatValue = agent.requiredOutputFormat as string | undefined;
     const isGraphFormat = agentFormatValue === 'graph';
-    
+
     if (!isGraphFormat) return null;
-    
+
     try {
       // Extract JSON from markdown code blocks if present
       const extractedJson = extractJson(aiResponse);
       if (!extractedJson) return null;
-      
+
       const parsed = JSON.parse(extractedJson);
       // Check if response has graph structure
       if (parsed && typeof parsed === 'object') {
         const graph = parsed.graph || parsed;
-        if (graph && typeof graph === 'object' && 
-            Array.isArray(graph.nodes) && Array.isArray(graph.edges)) {
+        if (graph && typeof graph === 'object' &&
+          Array.isArray(graph.nodes) && Array.isArray(graph.edges)) {
           return graph;
         }
       }
@@ -383,54 +383,13 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     }
   }, [data, schema, action.body, action.extra_body]);
 
-  // Build preload routes from current item, selected sections, and action-defined routes
+  // Build preload routes from action-defined routes only.
+  // Skip the current-record API route: userPrompt already embeds the same data from selectedFields/selectedSections.
+  // Adding it would duplicate record data in both user message and system prompt, wasting tokens.
   useEffect(() => {
     if (!data || !schema) return;
 
     const routes: typeof preloadRoutes = [];
-
-    // Collect all field names from selectedFields and selectedSections
-    const allSelectedFieldNames = new Set<string>();
-
-    // Add fields from selectedFields
-    if (action.selectedFields && action.selectedFields.length > 0) {
-      action.selectedFields.forEach((fieldId) => {
-        const field = schema.fields?.find(f => f.id === fieldId);
-        if (field && field.name) {
-          allSelectedFieldNames.add(field.name);
-        } else {
-          allSelectedFieldNames.add(fieldId);
-        }
-      });
-    }
-
-    // Add fields from selectedSections
-    if (action.selectedSections && action.selectedSections.length > 0) {
-      action.selectedSections.forEach((sectionId) => {
-        const section = schema.sections?.find(s => s.id === sectionId);
-        if (section) {
-          const sectionFields = schema.fields?.filter(f => f.sectionId === sectionId) || [];
-          sectionFields.forEach(field => {
-            if (field.name) {
-              allSelectedFieldNames.add(field.name);
-            }
-          });
-        }
-      });
-    }
-
-    // Single route: current item API endpoint with all selected fields
-    if (data.id && allSelectedFieldNames.size > 0) {
-      routes.push({
-        route: `/api/data/${schema.id}/${data.id}`,
-        title: `${schema.singular_name || schema.name} Data`,
-        description: `Current ${schema.singular_name || schema.name} item data with selected fields and sections`,
-        method: 'GET',
-        jsonPath: 'data',
-        outputFormat: 'json',
-        includedFields: Array.from(allSelectedFieldNames),
-      });
-    }
 
     // Add preload routes from action configuration (with dynamic context replacement)
     if (action.preloadRoutes && action.preloadRoutes.length > 0) {
@@ -445,55 +404,89 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     }
 
     setPreloadRoutes(routes);
-  }, [data, schema, action.selectedFields, action.selectedSections, action.preloadRoutes]);
+  }, [data, schema, action.preloadRoutes]);
 
   // Build user prompt from selected fields/sections
+  // For image-generator: use condensed narrative to save tokens (matches AI builder flow)
   useEffect(() => {
     if (!data || !schema) {
       setUserPrompt('');
       return;
     }
 
-    const promptParts: string[] = [];
+    const isImageGenerator = action.agentId === 'image-generator';
 
-    // Add context about what we're working on
+    const extractCondensedNarrative = (obj: Record<string, any>): string => {
+      const parts: string[] = [];
+      const skipKeys = new Set(['id', 'icon', 'color', 'targetSchema', 'sectionId']);
+      for (const [key, value] of Object.entries(obj)) {
+        if (value === null || value === undefined || skipKeys.has(key)) continue;
+        if (typeof value === 'string' && value.trim()) {
+          parts.push(value.trim());
+        } else if (Array.isArray(value) && value.length > 0) {
+          const items = value.map((v: any) =>
+            typeof v === 'string' ? v : (v?.label ?? v?.id ?? v?.value ?? String(v))
+          ).filter(Boolean);
+          if (items.length > 0) parts.push(items.join(', '));
+        } else if (typeof value === 'object' && !Array.isArray(value)) {
+          const label = value.label ?? value.value;
+          if (typeof label === 'string' && label.trim()) parts.push(label);
+        }
+      }
+      return parts.join('. ');
+    };
+
+    if (isImageGenerator) {
+      let sourceData: Record<string, any> = {};
+      if (action.selectedFields && action.selectedFields.length > 0) {
+        action.selectedFields.forEach((fieldId) => {
+          const field = schema.fields?.find(f => f.id === fieldId);
+          const name = field?.name ?? fieldId;
+          if (data[name] !== undefined) sourceData[name] = data[name];
+        });
+      } else if (action.selectedSections && action.selectedSections.length > 0) {
+        action.selectedSections.forEach((sectionId) => {
+          const sectionFields = schema.fields?.filter(f => f.sectionId === sectionId) || [];
+          sectionFields.forEach((f) => {
+            if (f.name && data[f.name] !== undefined) sourceData[f.name] = data[f.name];
+          });
+        });
+      } else {
+        sourceData = { ...data };
+      }
+      const narrative = extractCondensedNarrative(sourceData);
+      const instruction = action.additionalSystemPrompt?.trim() || 'Create an illustration based on the provided context.';
+      setUserPrompt(narrative ? `${narrative}\n\n${instruction}` : instruction);
+      return;
+    }
+
+    const promptParts: string[] = [];
     promptParts.push(`Working on ${schema.singular_name || schema.name} data:`);
 
-    // Extract data based on selected fields
     if (action.selectedFields && action.selectedFields.length > 0) {
       const selectedData: Record<string, any> = {};
       action.selectedFields.forEach((fieldId) => {
         const field = schema.fields?.find(f => f.id === fieldId);
         if (field && field.name) {
-          if (data[field.name] !== undefined) {
-            selectedData[field.name] = data[field.name];
-          }
-        } else {
-          if (data[fieldId] !== undefined) {
-            selectedData[fieldId] = data[fieldId];
-          }
+          if (data[field.name] !== undefined) selectedData[field.name] = data[field.name];
+        } else if (data[fieldId] !== undefined) {
+          selectedData[fieldId] = data[fieldId];
         }
       });
-
       if (Object.keys(selectedData).length > 0) {
         promptParts.push(`\nSelected fields data:\n\`\`\`json\n${JSON.stringify(selectedData, null, 2)}\n\`\`\``);
       }
     }
 
-    // Extract data based on selected sections
     if (action.selectedSections && action.selectedSections.length > 0) {
       action.selectedSections.forEach((sectionId) => {
         const section = schema.sections?.find(s => s.id === sectionId);
         if (section) {
           const sectionFields = schema.fields?.filter(f => f.sectionId === sectionId) || [];
           const sectionData: Record<string, any> = {};
-
           sectionFields.forEach((field) => {
-            if (field.name && data[field.name] !== undefined) {
-              sectionData[field.name] = data[field.name];
-            }
+            if (field.name && data[field.name] !== undefined) sectionData[field.name] = data[field.name];
           });
-
           if (Object.keys(sectionData).length > 0) {
             promptParts.push(`\n${section.title || sectionId} section data:\n\`\`\`json\n${JSON.stringify(sectionData, null, 2)}\n\`\`\``);
           }
@@ -501,19 +494,17 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
       });
     }
 
-    // If no specific fields/sections selected, include all data
     if ((!action.selectedFields || action.selectedFields.length === 0) &&
-        (!action.selectedSections || action.selectedSections.length === 0)) {
+      (!action.selectedSections || action.selectedSections.length === 0)) {
       promptParts.push(`\nFull item data:\n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``);
     }
 
-    // Concatenate additionalSystemPrompt if provided
     if (action.additionalSystemPrompt) {
       promptParts.push(`\n\n${action.additionalSystemPrompt}`);
     }
 
     setUserPrompt(promptParts.join('\n'));
-  }, [data, schema, action.selectedFields, action.selectedSections, action.additionalSystemPrompt]);
+  }, [data, schema, action.agentId, action.selectedFields, action.selectedSections, action.additionalSystemPrompt]);
 
   // Load preload routes when agent is ready
   useEffect(() => {
@@ -540,14 +531,25 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     if (!agent || !action.agentId || !userPrompt.trim()) return;
 
     isCurrentlyLoadingRef.current = true;
+    const formValues: Record<string, any> = {};
+    if (language && language !== 'en') {
+      formValues['output-language'] = language;
+    }
+    if (processedBody && Object.keys(processedBody).length > 0) {
+      Object.assign(formValues, processedBody);
+    }
+    if (processedExtraBody && Object.keys(processedExtraBody).length > 0) {
+      Object.assign(formValues, processedExtraBody);
+    }
     generateResponse({
       userPrompt,
       agentId: action.agentId,
       body: processedBody,
       extra_body: processedExtraBody,
+      formValues: Object.keys(formValues).length > 0 ? formValues : undefined,
     });
     setHasExecuted(true);
-  }, [agent, action.agentId, userPrompt, processedBody, processedExtraBody, generateResponse]);
+  }, [agent, action.agentId, userPrompt, processedBody, processedExtraBody, language, generateResponse]);
 
   // Track loading state
   useEffect(() => {
@@ -561,26 +563,26 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   // Auto-execute when runType is 'automatic' after delay
   useEffect(() => {
     if (!agent || isLoadingAgent) return;
-    
+
     const runType = action.runType || 'manual';
-    
+
     // If there's already a response, mark as executed and don't re-execute
     if (aiResponse && aiResponse.trim().length > 0) {
       setHasExecuted(true);
       isCurrentlyLoadingRef.current = false;
       return;
     }
-    
+
     // Don't execute if already executed, if manual mode, if currently loading, or if there's no prompt
     if (hasExecuted || runType !== 'automatic' || isCurrentlyLoadingRef.current || !userPrompt.trim()) {
       return;
     }
-    
+
     // Clear any existing timeout
     if (autoExecuteTimeoutRef.current) {
       clearTimeout(autoExecuteTimeoutRef.current);
     }
-    
+
     // Set timeout for ~500ms delay
     autoExecuteTimeoutRef.current = setTimeout(() => {
       // Double-check we're not loading before executing
@@ -625,7 +627,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   const renderContent = useCallback(() => {
     // Early return inside the callback is fine - the hook itself is always called
     if (!agent) return null;
-    
+
     // Check for error first - show error message instead of manual button or response
     if (error) {
       return (
@@ -633,8 +635,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
           <Button
             onClick={executeAgent}
             size="default"
-            variant="default"
-            className="bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+            variant="gradient"
           >
             <RefreshCw className="h-4 w-4 me-2" />
             Try Again
@@ -649,7 +650,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         </div>
       );
     }
-    
+
     if (showSkeleton) {
       return (
         <AnimatePresence>
@@ -681,15 +682,14 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         </AnimatePresence>
       );
     }
-    
+
     if (showManualButton) {
       return (
         <div className="flex items-center justify-center min-h-[200px]">
           <Button
             onClick={executeAgent}
             size="default"
-            variant="default"
-            className="bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm"
+            variant="gradient"
           >
             <Sparkles className="h-4 w-4 me-2" />
             Do the Magic
@@ -697,7 +697,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         </div>
       );
     }
-    
+
     if (hasResponse) {
       return (
         <div className="w-full">
@@ -794,7 +794,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               />
             </div>
           ) : agent?.requiredOutputFormat === 'string' ? (
-            <MarkdownViewer 
+            <MarkdownViewer
               content={cleanMarkdownResponse(aiResponse || '')}
               showToggle={false}
               isEditable={false}
@@ -810,7 +810,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         </div>
       );
     }
-    
+
     return null;
   }, [
     showSkeleton,
@@ -879,7 +879,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               </div>
             </div>
           </CardHeader>
-          <CardContent 
+          <CardContent
             className="p-6"
             style={
               action.maxHeight && action.maxHeight > 0
@@ -952,7 +952,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
               </div>
             </div>
           </CardHeader>
-          <CardContent 
+          <CardContent
             className="p-6"
             style={
               action.maxHeight && action.maxHeight > 0
@@ -1060,7 +1060,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
             </div>
           </div>
         </CardHeader>
-        <CardContent 
+        <CardContent
           className="p-6"
           style={
             action.maxHeight && action.maxHeight > 0
@@ -1071,7 +1071,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
           {renderContent()}
         </CardContent>
       </CardWrapper>
-      
+
       <ConfirmationMessage
         isOpen={showRefreshConfirmation}
         onOpenChange={setShowRefreshConfirmation}

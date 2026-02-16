@@ -2362,6 +2362,7 @@
         "sectionId": "body",
         "component": "textarea",
         "type": "textarea",
+        "aiAgentId": "professional-writing",
         "placeholder": "Describe the data you want to fill in the form. Be specific about values, relationships, and requirements.",
         "validation": {
           "required": true,

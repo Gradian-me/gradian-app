@@ -54,7 +54,11 @@ export interface AiBuilderWrapperProps {
   agent?: AiAgent | null; // Optional: If provided, use this agent directly without fetching
   initialBody?: Record<string, any>; // Preset body parameters for AI agent (with context replacement applied)
   initialExtraBody?: Record<string, any>; // Preset extra_body parameters for AI agent (with context replacement applied)
-  onOpenPreviewRequest?: (callback: () => void) => void; // Callback to register a function that opens the preview sheet
+  onOpenPreviewRequest?: (callback: () => void) => void; // Callback to register a function that opens the preview sheet (legacy; prefer previewOpen/onPreviewOpenChange in dialog mode)
+  /** Controlled preview open state (e.g. from AiAgentDialog footer). When provided, overrides internal isSheetOpen. */
+  previewOpen?: boolean;
+  /** Called when preview open state should change (e.g. user closes preview dialog). */
+  onPreviewOpenChange?: (open: boolean) => void;
   hideAgentSelector?: boolean; // Hide agent dropdown selector
   hideSearchConfig?: boolean; // Hide search type and summarization controls
   hideImageConfig?: boolean; // Hide image type selector
@@ -81,6 +85,8 @@ export function AiBuilderWrapper({
   initialBody,
   initialExtraBody,
   onOpenPreviewRequest,
+  previewOpen: controlledPreviewOpen,
+  onPreviewOpenChange: onPreviewOpenChange,
   hideAgentSelector = false,
   hideSearchConfig = false,
   hideImageConfig = false,
@@ -93,6 +99,16 @@ export function AiBuilderWrapper({
 }: AiBuilderWrapperProps) {
   const [selectedAgentId, setSelectedAgentId] = useState<string>(initialAgentId);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  // When parent controls preview (e.g. AiAgentDialog), use their state; otherwise use internal
+  const isPreviewControlled = onPreviewOpenChange != null;
+  const effectiveSheetOpen = isPreviewControlled && controlledPreviewOpen !== undefined ? controlledPreviewOpen : isSheetOpen;
+  const effectiveSetSheetOpen = useCallback(
+    (open: boolean) => {
+      if (isPreviewControlled && onPreviewOpenChange) onPreviewOpenChange(open);
+      else setIsSheetOpen(open);
+    },
+    [isPreviewControlled, onPreviewOpenChange]
+  );
   const [previewSchema, setPreviewSchema] = useState<{ schema: FormSchema; schemaId: string } | null>(null);
   const [selectedLanguage, setSelectedLanguage] = useState<string>(initialSelectedLanguage || 'fa'); // Default language for string output agents
   
@@ -251,12 +267,15 @@ export function AiBuilderWrapper({
   // Expose function to open preview sheet via callback
   // Use useCallback to ensure stable reference
   const openPreview = useCallback(() => {
-    setIsSheetOpen(true);
-  }, []);
+    if (isPreviewControlled && onPreviewOpenChange) {
+      onPreviewOpenChange(true);
+    } else {
+      setIsSheetOpen(true);
+    }
+  }, [isPreviewControlled, onPreviewOpenChange]);
 
   useEffect(() => {
     if (onOpenPreviewRequest && openPreview) {
-      // Register the callback to open the preview sheet
       onOpenPreviewRequest(openPreview);
     }
   }, [onOpenPreviewRequest, openPreview]);
@@ -311,7 +330,7 @@ export function AiBuilderWrapper({
         : selectedAgent.preloadRoutes || [];
 
     if (routes.length === 0) {
-      if (customPreloadRoutes === undefined && (isSheetOpen || mode === 'dialog')) {
+      if (customPreloadRoutes === undefined && (effectiveSheetOpen || mode === 'dialog')) {
         loadPreloadRoutes(selectedAgent);
       }
       return;
@@ -327,7 +346,7 @@ export function AiBuilderWrapper({
         ? selectedAgent
         : { ...selectedAgent, preloadRoutes: routes };
     loadPreloadRoutes(agentToLoad);
-  }, [isSheetOpen, selectedAgent, loadPreloadRoutes, customPreloadRoutes, mode]);
+  }, [effectiveSheetOpen, selectedAgent, loadPreloadRoutes, customPreloadRoutes, mode]);
 
   // Convert annotations map to array for ResponseAnnotationViewer
   const annotationsArray = Array.from(annotations.values());
@@ -681,14 +700,15 @@ export function AiBuilderWrapper({
           onStop={stopGeneration}
           systemPrompt={promptForLLM?.systemPrompt || ''}
           isLoadingPreload={isLoadingPreload}
-          isSheetOpen={isSheetOpen}
-          onSheetOpenChange={setIsSheetOpen}
+          isSheetOpen={effectiveSheetOpen}
+          onSheetOpenChange={effectiveSetSheetOpen}
           onReset={showResetButton ? handleReset : undefined}
           displayType={displayType}
           runType={runType}
           selectedLanguage={selectedLanguage}
           onLanguageChange={handleLanguageChange}
           hidePreviewButton={mode === 'dialog'}
+          previewAsDialog={mode === 'dialog'}
           onFormValuesChange={setFormValues}
           hideAgentSelector={hideAgentSelector}
           hideSearchConfig={hideSearchConfig}
@@ -833,10 +853,9 @@ export function AiBuilderWrapper({
           },
           {
             label: getT(TRANSLATION_KEYS.AI_BUILDER_DO_THE_MAGIC, language, defaultLang),
-            variant: 'default',
+            variant: 'gradient',
             icon: 'Sparkles',
             action: handleDoMagicAgainConfirm,
-            className: 'bg-linear-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white',
           },
         ]}
         size="md"
