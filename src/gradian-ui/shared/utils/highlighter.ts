@@ -9,9 +9,10 @@ const escapeRegExp = (value: string): string =>
   value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const buildRegex = (query: string): RegExp | null => {
+  if (typeof query !== 'string') return null;
   const tokens = query
     .split(/\s+/)
-    .map((token) => token.trim())
+    .map((token) => (typeof token === 'string' ? token : '').trim())
     .filter(Boolean);
 
   if (tokens.length === 0) {
@@ -23,29 +24,31 @@ const buildRegex = (query: string): RegExp | null => {
 };
 
 export const getHighlightSegments = (text: string, query: string): HighlightSegment[] => {
-  if (!text || !query) {
-    return [{ text, match: false }];
+  const safeText = typeof text === 'string' ? text : String(text ?? '');
+  const safeQuery = typeof query === 'string' ? query : String(query ?? '');
+  if (!safeText || !safeQuery) {
+    return [{ text: safeText, match: false }];
   }
 
-  const regex = buildRegex(query);
+  const regex = buildRegex(safeQuery);
   if (!regex) {
-    return [{ text, match: false }];
+    return [{ text: safeText, match: false }];
   }
 
-  const parts = text.split(regex).filter((part) => part !== '');
+  const parts = safeText.split(regex).filter((part) => part !== '');
 
   if (parts.length === 0) {
-    return [{ text, match: false }];
+    return [{ text: safeText, match: false }];
   }
 
-  const loweredTokens = query
+  const loweredTokens = safeQuery
     .split(/\s+/)
-    .map((token) => token.trim().toLowerCase())
+    .map((token) => (typeof token === 'string' ? token : '').trim().toLowerCase())
     .filter(Boolean);
 
   return parts.map((part) => ({
     text: part,
-    match: loweredTokens.includes(part.toLowerCase()),
+    match: loweredTokens.includes((typeof part === 'string' ? part : '').toLowerCase()),
   }));
 };
 
@@ -54,15 +57,17 @@ export const renderHighlightedText = (
   query: string,
   highlightClassName = 'bg-yellow-200 text-gray-900 rounded px-0.5'
 ): ReactNode => {
-  if (!text || !query) {
-    return text;
+  const safeText = typeof text === 'string' ? text : String(text ?? '');
+  const safeQuery = typeof query === 'string' ? query : String(query ?? '');
+  if (!safeText || !safeQuery) {
+    return safeText;
   }
 
-  const segments = getHighlightSegments(text, query);
+  const segments = getHighlightSegments(safeText, safeQuery);
   const hasMatch = segments.some((segment) => segment.match);
 
   if (!hasMatch) {
-    return text;
+    return safeText;
   }
 
   return segments.map((segment, index) =>

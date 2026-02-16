@@ -103,9 +103,10 @@ export interface WelcomeCardProps {
 }
 
 const getInitials = (name: string): string => {
-  if (!name) return 'A';
+  const safeName = typeof name === 'string' ? name : '';
+  if (!safeName) return 'A';
   
-  const words = name.trim().split(/\s+/).filter(word => word.length > 0);
+  const words = safeName.trim().split(/\s+/).filter(word => word.length > 0);
   
   if (words.length === 0) return 'A';
   

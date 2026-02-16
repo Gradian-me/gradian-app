@@ -122,7 +122,7 @@ export function mapMenuItemsToNavigationItems(
     })
     .filter((item) => {
       // Exclude Home-like items (href /); Home is shown separately outside the menu
-      const url = (item.menuUrl ?? '/').trim();
+      const url = (typeof (item.menuUrl ?? '/') === 'string' ? item.menuUrl ?? '/' : '/').trim();
       return url !== '/';
     })
     .sort((a, b) => {
@@ -159,9 +159,10 @@ export function mapMenuItemsToNavigationItems(
  * Maximum 3 characters: first two words + last word if more than 2 words
  */
 export const getInitials = (name: string): string => {
-  if (!name) return '?';
+  const safeName = typeof name === 'string' ? name : '';
+  if (!safeName) return '?';
   
-  const words = name.trim().split(/\s+/).filter(word => word.length > 0);
+  const words = safeName.trim().split(/\s+/).filter(word => word.length > 0);
   
   if (words.length === 0) return '?';
   
@@ -219,11 +220,12 @@ export const filterNavigationItems = (
   items: NavigationItem[],
   searchQuery: string
 ): NavigationItem[] => {
-  if (!searchQuery || searchQuery.trim() === '') {
+  const safeQuery = typeof searchQuery === 'string' ? searchQuery : '';
+  if (!safeQuery || safeQuery.trim() === '') {
     return items;
   }
 
-  const query = searchQuery.toLowerCase().trim();
+  const query = safeQuery.toLowerCase().trim();
   
   return items.filter((item) => {
     // Search in item name
@@ -259,11 +261,12 @@ export const filterFormSchemas = (
   schemas: any[],
   searchQuery: string
 ): any[] => {
-  if (!searchQuery || searchQuery.trim() === '') {
+  const safeQuery = typeof searchQuery === 'string' ? searchQuery : '';
+  if (!safeQuery || safeQuery.trim() === '') {
     return schemas;
   }
 
-  const query = searchQuery.toLowerCase().trim();
+  const query = safeQuery.toLowerCase().trim();
   
   return schemas.filter((schema) => {
     // Search in plural name

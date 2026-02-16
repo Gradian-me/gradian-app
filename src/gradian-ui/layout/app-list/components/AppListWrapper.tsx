@@ -353,7 +353,7 @@ export function AppListWrapper() {
   const userFirstName = user ? resolveLocalizedField(user.name, language, 'en') : '';
   const userDisplayName = userFirstName || user?.email || getT(TRANSLATION_KEYS.WELCOME_NAME_FALLBACK, language, defaultLang);
   const userInitials = (() => {
-    const source = userDisplayName?.trim() || 'GR';
+    const source = (typeof userDisplayName === 'string' ? userDisplayName : '').trim() || 'GR';
     return source
       .split(' ')
       .map((word) => word[0])
@@ -382,7 +382,7 @@ export function AppListWrapper() {
   );
 
   const filteredApps = useMemo(() => {
-    const query = searchQuery.trim().toLowerCase();
+    const query = (typeof searchQuery === 'string' ? searchQuery : '').trim().toLowerCase();
     if (!query) return apps;
 
     return apps.filter((schema) => {

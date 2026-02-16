@@ -16,19 +16,19 @@ export const resolveLocalizedField = (
   if (!isRecord(value)) return '';
 
   const primary = value[language];
-  if (primary && primary.trim()) {
+  if (typeof primary === 'string' && primary.trim()) {
     return primary;
   }
 
   if (fallbackLanguage && fallbackLanguage !== language) {
     const fallback = value[fallbackLanguage];
-    if (fallback && fallback.trim()) {
+    if (typeof fallback === 'string' && fallback.trim()) {
       return fallback;
     }
   }
 
-  const firstNonEmpty = Object.values(value).find((entry) => entry && entry.trim());
-  return firstNonEmpty?.trim() ?? '';
+  const firstNonEmpty = Object.values(value).find((entry) => typeof entry === 'string' && entry.trim());
+  return (typeof firstNonEmpty === 'string' ? firstNonEmpty.trim() : null) ?? '';
 };
 
 
