@@ -3982,7 +3982,10 @@
     "cardMetadata": [
       {
         "id": "user-info",
-        "title": {"en":"User Information", "fa":"اطلاعات کاربر"},
+        "title": {
+          "en": "User Information",
+          "fa": "اطلاعات کاربر"
+        },
         "colSpan": 2,
         "fieldIds": [
           "username",
@@ -4512,12 +4515,14 @@
             "ru": "Выберите тип аутентификации"
           }
         ],
-        "defaultValue": [{
-          "id": "form-based",
-          "label": "Form-Based",
-          "icon": "User",
-          "color": "cyan"
-        }],
+        "defaultValue": [
+          {
+            "id": "form-based",
+            "label": "Form-Based",
+            "icon": "User",
+            "color": "cyan"
+          }
+        ],
         "validation": {
           "required": true
         },
@@ -4605,24 +4610,56 @@
         {
           "id": "user-overview",
           "title": [
-            {"en": "User Overview"},
-            {"fa": "نمای کلی کاربر"},
-            {"ar": "نظرة عامة على المستخدم"},
-            {"es": "Resumen del usuario"},
-            {"fr": "Aperçu de l'utilisateur"},
-            {"de": "Benutzerübersicht"},
-            {"it": "Panoramica utente"},
-            {"ru": "Обзор пользователя"}
+            {
+              "en": "User Overview"
+            },
+            {
+              "fa": "نمای کلی کاربر"
+            },
+            {
+              "ar": "نظرة عامة على المستخدم"
+            },
+            {
+              "es": "Resumen del usuario"
+            },
+            {
+              "fr": "Aperçu de l'utilisateur"
+            },
+            {
+              "de": "Benutzerübersicht"
+            },
+            {
+              "it": "Panoramica utente"
+            },
+            {
+              "ru": "Обзор пользователя"
+            }
           ],
           "description": [
-            {"en": "Core user information"},
-            {"fa": "اطلاعات اصلی کاربر"},
-            {"ar": "معلومات المستخدم الأساسية"},
-            {"es": "Información principal del usuario"},
-            {"fr": "Informations principales de l'utilisateur"},
-            {"de": "Kernbenutzerinformationen"},
-            {"it": "Informazioni principali dell'utente"},
-            {"ru": "Основная информация о пользователе"}
+            {
+              "en": "Core user information"
+            },
+            {
+              "fa": "اطلاعات اصلی کاربر"
+            },
+            {
+              "ar": "معلومات المستخدم الأساسية"
+            },
+            {
+              "es": "Información principal del usuario"
+            },
+            {
+              "fr": "Informations principales de l'utilisateur"
+            },
+            {
+              "de": "Kernbenutzerinformationen"
+            },
+            {
+              "it": "Informazioni principali dell'utente"
+            },
+            {
+              "ru": "Основная информация о пользователе"
+            }
           ],
           "colSpan": 2,
           "fieldIds": [
@@ -4639,14 +4676,30 @@
         {
           "id": "reset-password",
           "label": [
-            {"en": "Reset Password"},
-            {"fa": "بازنشانی رمز عبور"},
-            {"ar": "إعادة تعيين كلمة المرور"},
-            {"es": "Restablecer contraseña"},
-            {"fr": "Réinitialiser le mot de passe"},
-            {"de": "Passwort zurücksetzen"},
-            {"it": "Reimposta password"},
-            {"ru": "Сбросить пароль"}
+            {
+              "en": "Reset Password"
+            },
+            {
+              "fa": "بازنشانی رمز عبور"
+            },
+            {
+              "ar": "إعادة تعيين كلمة المرور"
+            },
+            {
+              "es": "Restablecer contraseña"
+            },
+            {
+              "fr": "Réinitialiser le mot de passe"
+            },
+            {
+              "de": "Passwort zurücksetzen"
+            },
+            {
+              "it": "Reimposta password"
+            },
+            {
+              "ru": "Сбросить пароль"
+            }
           ],
           "icon": "Key",
           "variant": "default",
@@ -24710,6 +24763,10 @@
       {
         "id": "01KBFBD109G6CYRT7RA04TMMXC",
         "label": "AryoGen"
+      },
+      {
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
       }
     ],
     "syncStrategy": "schema-only",
@@ -24739,6 +24796,38 @@
       },
       {
         "ru": "Определение и управление отображениями процессов с иерархическими связями родитель–потомок."
+      }
+    ],
+    "applications": [
+      {
+        "id": "01KFZFTS259QZVTR2ETNZ1H0GF",
+        "name": [
+          {
+            "en": "Process Management"
+          },
+          {
+            "fa": "مدیریت فرایندها"
+          },
+          {
+            "ar": "إدارة العمليات"
+          },
+          {
+            "es": "Gestión de procesos"
+          },
+          {
+            "fr": "Gestion des processus"
+          },
+          {
+            "de": "Prozessmanagement"
+          },
+          {
+            "it": "Gestione dei processi"
+          },
+          {
+            "ru": "Управление процессами"
+          }
+        ],
+        "icon": "Workflow"
       }
     ]
   },

@@ -960,7 +960,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     if (hasDescriptionRole) {
       // First try to get by role (concatenates multiple fields with |)
       const roleBasedDescription = getValueByRole(targetSchemaData, entity, 'description');
-      if (roleBasedDescription && roleBasedDescription.trim() !== '') {
+      if (roleBasedDescription != null && typeof roleBasedDescription === 'string' && roleBasedDescription.trim() !== '') {
         descriptionValue = roleBasedDescription;
       } else {
         // If not found by role, find by field label containing "description"

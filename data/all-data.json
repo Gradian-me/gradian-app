@@ -3330,8 +3330,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-02-15T21:08:05.600Z",
-      "lastSynced": "2026-02-15T21:08:05.600Z",
+      "updatedAt": "2026-02-16T08:26:00.195Z",
+      "lastSynced": "2026-02-16T08:26:00.195Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -3371,7 +3371,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-02-15T21:08:22.715Z",
+      "updatedAt": "2026-02-16T08:25:27.156Z",
       "isTenantBased": true,
       "category": [
         {
@@ -3381,8 +3381,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-02-15T21:08:22.715Z",
-      "lastSyncMessage": "Generated relations for 45 out of 45 schemas",
+      "lastSynced": "2026-02-16T08:25:27.156Z",
+      "lastSyncMessage": "Generated relations for 35 out of 35 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -3432,7 +3432,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2026-02-15T21:09:58.238Z",
+      "updatedAt": "2026-02-16T08:26:34.509Z",
       "category": [
         {
           "id": "production-integration",
@@ -3441,8 +3441,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-02-15T21:09:58.238Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 60, nodes updated: 167, edges created: 102, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2026-02-16T08:26:34.509Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 227, edges created: 102, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },

@@ -1618,7 +1618,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       {renderHighlightedText(title, highlightQuery)}
                     </h4>
                   </div>
-                  {subtitle.trim() && (
+                  {(typeof subtitle === 'string' ? subtitle : String(subtitle ?? '')).trim() && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 text-wrap wrap-break-words line-clamp-2 mt-0.5">
                       {renderHighlightedText(subtitle, highlightQuery)}
                     </p>
@@ -2056,7 +2056,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                         {renderHighlightedText(title, highlightQuery)}
                       </h4>
                     </div>
-                    {subtitle.trim() && (
+                    {(typeof subtitle === 'string' ? subtitle : String(subtitle ?? '')).trim() && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5">
                         {renderHighlightedText(subtitle, highlightQuery)}
                       </p>

@@ -17,7 +17,8 @@ function getAppTranslationsMap(): Map<string, LangRecord> {
     const merged: LangRecord = {};
     for (const rec of entry.translations) {
       for (const [lang, value] of Object.entries(rec)) {
-        if (value != null && value.trim() !== '') merged[lang] = value;
+        const str = value != null ? String(value).trim() : '';
+        if (str !== '') merged[lang] = str;
       }
     }
     map.set(entry.key, merged);
@@ -53,8 +54,8 @@ export function resolveFromTranslationsArray(
  * Safe for server and client (NEXT_PUBLIC_* is available on both).
  */
 export function getDefaultLanguage(): string {
-  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_DEFAULT_LANGUAGE) {
-    const v = process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE.trim();
+  if (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_DEFAULT_LANGUAGE != null) {
+    const v = String(process.env.NEXT_PUBLIC_DEFAULT_LANGUAGE).trim();
     if (v) return v;
   }
   return 'en';

@@ -24,10 +24,11 @@ interface AssignmentSwitcherProps {
 }
 
 const buildInitials = (label?: string) => {
-  if (!label) {
+  const safeLabel = label != null && typeof label === 'string' ? label : '';
+  if (!safeLabel) {
     return '?';
   }
-  const parts = label.trim().split(' ');
+  const parts = safeLabel.trim().split(' ');
   if (parts.length === 1) {
     return parts[0].slice(0, 2).toUpperCase();
   }

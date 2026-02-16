@@ -15,6 +15,7 @@ import {
   getDefaultLanguage,
   getT,
   resolveFromTranslationsArray,
+  resolveDisplayLabel,
   isTranslationArray,
   recordToTranslationArray,
 } from '@/gradian-ui/shared/utils/translation-utils';
@@ -182,13 +183,16 @@ export function SectionEditor({
     tempSection.repeatingConfig?.relationTypeId;
 
   // Check if a field is incomplete (has default values)
+  // Resolve label/name to string (API may return translation arrays/objects)
   const isFieldIncomplete = (field: any): boolean => {
+    const labelStr = typeof field.label === 'string' ? field.label : resolveDisplayLabel(field.label, language, defaultLang);
+    const nameStr = typeof field.name === 'string' ? field.name : String(field.name ?? '');
     return (field.label === 'New Field' && field.name === 'newField') || 
            !field.label || 
            !field.name ||
            !field.component ||
-           field.label.trim() === '' ||
-           field.name.trim() === '';
+           labelStr.trim() === '' ||
+           nameStr.trim() === '';
   };
 
   // Check if there are any incomplete fields
@@ -203,10 +207,12 @@ export function SectionEditor({
   // Check if there are unsaved changes (tempSection differs from original section)
   const hasUnsavedChanges = JSON.stringify(tempSection) !== JSON.stringify(section);
   
+  // Resolve section title to string (API may return translation array/object)
+  const titleStr = typeof tempSection.title === 'string' ? tempSection.title : resolveDisplayLabel(tempSection.title, language, defaultLang);
   // Check if the title is invalid (empty, whitespace only, or "New Section")
-  const isTitleInvalid = !tempSection.title || 
-                         tempSection.title.trim() === '' || 
-                         tempSection.title.trim() === 'New Section';
+  const isTitleInvalid = !titleStr || 
+                         titleStr.trim() === '' || 
+                         titleStr.trim() === 'New Section';
   
   // Check if connectToSchema requires target schema and relation type
   const requiresConnectionConfig = tempSection.isRepeatingSection && 
