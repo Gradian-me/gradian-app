@@ -10,7 +10,7 @@ import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/
 import { NormalizedOption } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 import { AssignmentCounts, AssignmentUser, AssignmentView } from '../types';
 import { useLanguageStore } from '@/stores/language.store';
-import { getT, getDefaultLanguage, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, isRTL, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 interface AssignmentSwitcherProps {
@@ -68,8 +68,9 @@ export const AssignmentSwitcher = ({
   );
 
   const tabs = useMemo(() => {
-    const assigneeLabel = selectedUser ? `${labelAssignedTo} ${selectedUser.label}` : `${labelAssignedTo} ${labelUser}`;
-    const initiatorLabel = selectedUser ? `${labelInitiatedBy} ${selectedUser.label}` : `${labelInitiatedBy} ${labelUser}`;
+    const userLabelStr = selectedUser?.label != null ? (typeof selectedUser.label === 'string' ? selectedUser.label : resolveDisplayLabel(selectedUser.label, language ?? defaultLang, defaultLang)) : '';
+    const assigneeLabel = selectedUser ? `${labelAssignedTo} ${userLabelStr || labelUser}` : `${labelAssignedTo} ${labelUser}`;
+    const initiatorLabel = selectedUser ? `${labelInitiatedBy} ${userLabelStr || labelUser}` : `${labelInitiatedBy} ${labelUser}`;
     return [
       {
         id: 'assignedTo' as const,
@@ -92,9 +93,11 @@ export const AssignmentSwitcher = ({
       count: number;
       disabled: boolean;
     }>;
-  }, [counts.assignedTo, counts.initiatedBy, selectedUser, labelAssignedTo, labelInitiatedBy, labelUser]);
+  }, [counts.assignedTo, counts.initiatedBy, selectedUser, labelAssignedTo, labelInitiatedBy, labelUser, language, defaultLang]);
 
-  const userSubtitle = selectedUser?.subtitle ?? labelSwitchUserPerspective;
+  const userLabelDisplay = selectedUser?.label != null ? (typeof selectedUser.label === 'string' ? selectedUser.label : resolveDisplayLabel(selectedUser.label, language ?? defaultLang, defaultLang)) : labelNoUserSelected;
+  const userSubtitleRaw = selectedUser?.subtitle ?? labelSwitchUserPerspective;
+  const userSubtitle = typeof userSubtitleRaw === 'string' ? userSubtitleRaw : resolveDisplayLabel(userSubtitleRaw, language ?? defaultLang, defaultLang);
 
   return (
     <div className="w-full rounded-2xl border border-gray-100 bg-white/70 p-4 shadow-sm dark:border-gray-800/80 dark:bg-gray-900/40" dir={isRtl ? 'rtl' : undefined}>
@@ -104,15 +107,15 @@ export const AssignmentSwitcher = ({
           <div className="flex items-center gap-3 min-w-0">
             <Avatar className="h-9 w-9 border border-gray-200 dark:border-gray-700">
               {selectedUser?.avatarUrl ? (
-                <AvatarImage src={selectedUser.avatarUrl} alt={selectedUser.label} />
+                <AvatarImage src={selectedUser.avatarUrl} alt={userLabelDisplay} />
               ) : null}
               <AvatarFallback className="bg-linear-to-br from-violet-600 to-purple-600 text-white text-xs">
-                {buildInitials(selectedUser?.label)}
+                {buildInitials(userLabelDisplay)}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
               <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">
-                {labelViewingAs} {selectedUser?.label ?? labelNoUserSelected}
+                {labelViewingAs} {userLabelDisplay}
               </p>
               <p className="truncate text-[0.7rem] text-gray-500 dark:text-gray-400">
                 {userSubtitle}

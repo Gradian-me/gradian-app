@@ -15,6 +15,7 @@ type SchemaWithNameTranslations = {
 /**
  * Resolve a translated string from schema name translations array.
  * Format: [{"en": "Task"}, {"fa": "وظیفه"}]
+ * Always returns a string (coerces entry[lang] to string if needed).
  */
 function resolveFromNameTranslations(
   translations: Array<Record<string, string>> | undefined,
@@ -23,7 +24,10 @@ function resolveFromNameTranslations(
 ): string {
   if (!lang || !Array.isArray(translations)) return fallback;
   for (const entry of translations) {
-    if (entry && typeof entry === 'object' && lang in entry && entry[lang]) return entry[lang];
+    if (entry && typeof entry === 'object' && lang in entry) {
+      const v = entry[lang];
+      if (v != null) return typeof v === 'string' ? v : String(v);
+    }
   }
   return fallback;
 }
@@ -31,6 +35,7 @@ function resolveFromNameTranslations(
 /**
  * Get the singular name for a schema in the given language.
  * Uses singular_name_translations when present and lang is set; otherwise returns schema.singular_name or fallback.
+ * Ensures return value is always a string (API may return singular_name as translation object).
  */
 export function getSchemaTranslatedSingularName(
   schema: SchemaWithNameTranslations | null | undefined,
@@ -38,13 +43,16 @@ export function getSchemaTranslatedSingularName(
   fallback = 'Entity'
 ): string {
   if (!schema) return fallback;
-  const base = schema.singular_name || fallback;
-  return resolveFromNameTranslations(schema.singular_name_translations, lang, base);
+  const raw = schema.singular_name || fallback;
+  const base = typeof raw === 'string' ? raw : fallback;
+  const resolved = resolveFromNameTranslations(schema.singular_name_translations, lang, base);
+  return typeof resolved === 'string' ? resolved : base;
 }
 
 /**
  * Get the plural name for a schema in the given language.
  * Uses plural_name_translations when present and lang is set; otherwise returns schema.plural_name or fallback.
+ * Ensures return value is always a string (API may return plural_name as translation object).
  */
 export function getSchemaTranslatedPluralName(
   schema: SchemaWithNameTranslations | null | undefined,
@@ -52,13 +60,16 @@ export function getSchemaTranslatedPluralName(
   fallback = 'Entities'
 ): string {
   if (!schema) return fallback;
-  const base = schema.plural_name || fallback;
-  return resolveFromNameTranslations(schema.plural_name_translations, lang, base);
+  const raw = schema.plural_name || fallback;
+  const base = typeof raw === 'string' ? raw : fallback;
+  const resolved = resolveFromNameTranslations(schema.plural_name_translations, lang, base);
+  return typeof resolved === 'string' ? resolved : base;
 }
 
 /**
  * Get the schema description in the given language.
  * Uses description_translations when present and lang is set; otherwise returns schema.description or fallback.
+ * Ensures return value is always a string (API may return description as translation object).
  */
 export function getSchemaTranslatedDescription(
   schema: SchemaWithNameTranslations | null | undefined,
@@ -66,8 +77,10 @@ export function getSchemaTranslatedDescription(
   fallback = ''
 ): string {
   if (!schema) return fallback;
-  const base = schema.description ?? fallback;
-  return resolveFromNameTranslations(schema.description_translations, lang, base);
+  const raw = schema.description ?? fallback;
+  const base = typeof raw === 'string' ? raw : fallback;
+  const resolved = resolveFromNameTranslations(schema.description_translations, lang, base);
+  return typeof resolved === 'string' ? resolved : base;
 }
 
 /** Section with title/description as string or translation array */
@@ -83,6 +96,7 @@ type SectionWithTranslations = {
 /**
  * Get the section title in the given language.
  * Supports title as string, translation array [{en:"..."}, {fa:"..."}], or legacy titleTranslations.
+ * Always returns a string (safe for React children).
  */
 export function getSectionTranslatedTitle(
   section: SectionWithTranslations | null | undefined,
@@ -95,12 +109,14 @@ export function getSectionTranslatedTitle(
   if (fromLegacy) return fromLegacy;
   const resolved = resolveDisplayLabel(section.title, lang, 'en');
   if (resolved) return resolved;
-  return typeof section.title === 'string' ? (section.title || fallback) : fallback;
+  const raw = section.title;
+  return typeof raw === 'string' ? (raw || fallback) : fallback;
 }
 
 /**
  * Get the section description in the given language.
  * Supports description as string, translation array, or legacy descriptionTranslations.
+ * Always returns a string (safe for React children).
  */
 export function getSectionTranslatedDescription(
   section: SectionWithTranslations | null | undefined,
@@ -112,7 +128,8 @@ export function getSectionTranslatedDescription(
   if (fromLegacy) return fromLegacy;
   const resolved = resolveDisplayLabel(section.description, lang, 'en');
   if (resolved) return resolved;
-  return typeof section.description === 'string' ? (section.description ?? fallback) : fallback;
+  const raw = section.description;
+  return typeof raw === 'string' ? (raw ?? fallback) : fallback;
 }
 
 // Extended form schema with additional properties

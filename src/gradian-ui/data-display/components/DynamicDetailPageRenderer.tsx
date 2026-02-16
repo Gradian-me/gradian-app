@@ -1188,7 +1188,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
                   onClick={onBack}
                 >
                   <BackIcon className="h-4 w-4 me-2" />
-                  {showBack ? labelBack : (schema.plural_name || labelBack)}
+                  {showBack ? labelBack : (translatedPluralName || labelBack)}
                 </Button>
               )}
 

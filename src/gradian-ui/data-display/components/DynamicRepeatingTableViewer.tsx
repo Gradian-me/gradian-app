@@ -19,7 +19,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { cn } from '../../shared/utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { Badge } from '../../form-builder/form-elements/components/Badge';
-import { getT, getDefaultLanguage } from '../../shared/utils/translation-utils';
+import { getT, getDefaultLanguage, resolveDisplayLabel } from '../../shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '../../shared/constants/translations';
 import { useLanguageStore } from '@/stores/language.store';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -202,7 +202,8 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
   const shouldShowCards = isSmallScreen;
 
   const colSpan = config.colSpan || 1;
-  const title = config.title || (isRelationBased ? targetSchemaData?.plural_name || 'Related Items' : section?.title);
+  const titleRaw = config.title || (isRelationBased ? targetSchemaData?.plural_name || 'Related Items' : section?.title);
+  const title = typeof titleRaw === 'string' ? titleRaw : resolveDisplayLabel(titleRaw, language, defaultLang) || 'Table';
   const description = config.description || (isRelationBased ? undefined : section?.description);
 
   const relationDirections = relationInfo.directions;
@@ -284,15 +285,15 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
                       <div className="flex items-center gap-1 text-xs text-gray-900 dark:text-gray-200">
                         {relationDirections.has('target') ? (
                           <>
-                            <span>{targetSchemaData?.title || targetSchemaData?.plural_name || targetSchemaData?.name || config.targetSchema}</span>
+                            <span>{resolveDisplayLabel(targetSchemaData?.title || targetSchemaData?.plural_name || targetSchemaData?.name || config.targetSchema, language, defaultLang)}</span>
                             <IconRenderer iconName="ArrowRight" className="h-3 w-3" />
-                            <span>{schema.title || schema.plural_name || schema.name}</span>
+                            <span>{resolveDisplayLabel(schema.title || schema.plural_name || schema.name, language, defaultLang)}</span>
                           </>
                         ) : (
                           <>
-                            <span>{schema.title || schema.plural_name || schema.name}</span>
+                            <span>{resolveDisplayLabel(schema.title || schema.plural_name || schema.name, language, defaultLang)}</span>
                             <IconRenderer iconName="ArrowRight" className="h-3 w-3" />
-                            <span>{targetSchemaData?.title || targetSchemaData?.plural_name || targetSchemaData?.name || config.targetSchema}</span>
+                            <span>{resolveDisplayLabel(targetSchemaData?.title || targetSchemaData?.plural_name || targetSchemaData?.name || config.targetSchema, language, defaultLang)}</span>
                           </>
                         )}
                       </div>
