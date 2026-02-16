@@ -833,7 +833,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               >
                 <RepeatingSectionButton
                   sectionId={section.id}
-                  sectionTitle={section.title}
+                  sectionTitle={sectionTitleResolved}
                   entityData={row}
                   entityId={row.id}
                   itemCount={itemCount}

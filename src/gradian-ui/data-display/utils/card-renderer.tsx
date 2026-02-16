@@ -3,6 +3,8 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { resolveFieldById, getFieldValue } from '../../form-builder/form-elements/utils/field-resolver';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { BadgeRenderer } from '../../form-builder/form-elements/utils/badge-viewer';
+import { getSectionTranslatedTitle } from '@/gradian-ui/schema-manager/utils/schema-utils';
+import { getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 
 interface RenderFieldValueProps {
   field: any;
@@ -68,7 +70,13 @@ const renderValueByType = ({ field, value, data }: RenderFieldValueProps): React
  */
 export const renderCardSection = ({ section, formSchema, data }: RenderSectionProps): React.ReactNode | null => {
   const sectionWidth = section.width || '100%';
-  
+  const defaultLang = getDefaultLanguage();
+  const sectionTitleResolved = getSectionTranslatedTitle(
+    section,
+    defaultLang,
+    typeof section.title === 'string' ? section.title : section?.id ?? ''
+  );
+
   // Resolve fieldIds to actual field data
   const resolveFieldByIdLocal = (fieldId: string, data: any): any => {
     if (!formSchema) {
@@ -86,11 +94,12 @@ export const renderCardSection = ({ section, formSchema, data }: RenderSectionPr
     const field = resolveFieldByIdLocal(fieldId, data);
     // Prefer ui properties, fallback to display for backward compatibility
     const displayOptions = field?.ui || field?.display || {};
-    
+    const labelResolved = typeof field.label === 'string' ? field.label : resolveDisplayLabel(field.label, defaultLang, defaultLang) || field.name;
+
     return {
       id: fieldId,
       name: field.name,
-      label: field.label || field.name,
+      label: labelResolved,
       value: field.value,
       type: displayOptions?.type || 'text',
       icon: displayOptions?.icon,
@@ -124,7 +133,7 @@ export const renderCardSection = ({ section, formSchema, data }: RenderSectionPr
   if (section.layout === 'grid' && section.columns) {
     return (
       <div className="space-y-2 w-full">
-        <p className="text-sm font-medium text-gray-700">{section.title}</p>
+        <p className="text-sm font-medium text-gray-700">{sectionTitleResolved}</p>
         <div className={`grid grid-cols-${section.columns} gap-2 text-xs`}>
           {resolvedFields.map((field: any) => {
             let value = field.value;
@@ -151,7 +160,7 @@ export const renderCardSection = ({ section, formSchema, data }: RenderSectionPr
 
   return (
     <div className="space-y-2 w-full max-w-full">
-      <p className="text-sm font-medium text-gray-700">{section.title}</p>
+      <p className="text-sm font-medium text-gray-700">{sectionTitleResolved}</p>
       <div className="space-y-2 w-full">
         {fields}
       </div>

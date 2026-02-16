@@ -59,12 +59,13 @@ export const RepeatingSectionDialog: React.FC<RepeatingSectionDialogProps> = ({
 
   const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
   const defaultLang = getDefaultLanguage();
+  const sectionTitleStr = typeof sectionTitle === 'string' ? sectionTitle : (resolveDisplayLabel(sectionTitle, language, defaultLang) || sectionId);
   const tableDataState = useRepeatingTableData({
     config: {
       id: sectionId,
       schemaId: schema.id,
       sectionId,
-      title: sectionTitle,
+      title: sectionTitleStr,
       description: section ? getSectionTranslatedDescription(section, language, section.description ?? '') : undefined,
       targetSchema: section?.repeatingConfig?.targetSchema,
       relationTypeId: section?.repeatingConfig?.relationTypeId,
