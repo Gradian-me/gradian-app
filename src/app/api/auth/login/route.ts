@@ -263,16 +263,30 @@ export async function POST(request: NextRequest) {
 
     if (upstreamResponse.status < 200 || upstreamResponse.status >= 300) {
       const is5xx = upstreamResponse.status >= 500;
+
+      // Extract user-friendly message: prefer error_description over error/message
+      let errorDescription = upstreamJson?.error_description;
+      if (!errorDescription && typeof upstreamJson?.fullData === 'string') {
+        try {
+          const parsed = JSON.parse(upstreamJson.fullData) as { error_description?: string };
+          errorDescription = parsed?.error_description;
+        } catch {
+          // fullData not parseable, ignore
+        }
+      }
+      const upstreamMessage =
+        errorDescription || upstreamJson?.error || upstreamJson?.message;
+
       loggingCustom(LogType.LOGIN_LOG, 'error', `External auth service returned error: ${JSON.stringify({
         status: upstreamResponse.status,
         error: upstreamJson?.error,
+        error_description: errorDescription ?? upstreamJson?.error_description,
         message: upstreamJson?.message,
         ...(is5xx && upstreamJson ? { fullUpstreamBody: upstreamJson } : {}),
       })}`);
 
-      const upstreamMessage = upstreamJson?.error || upstreamJson?.message;
       const clientError =
-        is5xx
+        is5xx && !upstreamMessage
           ? 'The authentication service is temporarily unavailable. Please try again later.'
           : upstreamMessage || `Authentication service responded with status ${upstreamResponse.status}`;
 

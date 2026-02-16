@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
 
     // Get video API base URL
     const videosApiBaseUrl = getApiUrlForAgentType('video-generation');
-    // Construct list URL: https://api.avalai.ir/v1/videos
     const listUrl = videosApiBaseUrl;
 
     // Get query parameters from request

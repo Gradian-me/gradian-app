@@ -77,7 +77,6 @@ export async function parseErrorResponse(response: Response): Promise<string> {
         const [, code, message] = errorCodeMatch;
         errorMessage = `${code}: ${message.trim()}`;
       } else if (titleMatch) {
-        // Extract from title tag (e.g., "api.avalai.ir | 502: Bad gateway")
         const title = titleMatch[1];
         const codeMatch = title.match(/(\d{3}):\s*([^|]+)/i);
         if (codeMatch) {

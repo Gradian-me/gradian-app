@@ -35,7 +35,6 @@ export async function GET(
 
     // Get video API base URL
     const videosApiBaseUrl = getApiUrlForAgentType('video-generation');
-    // Construct content URL: https://api.avalai.ir/v1/videos/{videoId}/content
     const contentUrl = `${videosApiBaseUrl}/${videoId}/content`;
 
     // Fetch video content from API
