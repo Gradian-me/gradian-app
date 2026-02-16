@@ -36,13 +36,14 @@ import { useTheme } from 'next-themes';
 import { useDialogContext } from '@/gradian-ui/shared/contexts/DialogContext';
 import { cn } from '@/gradian-ui/shared/utils';
 import { useLayoutContext, LayoutProvider } from '@/gradian-ui/layout/contexts/LayoutContext';
+import { useLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { useLanguageStore } from '@/stores/language.store';
 import { getDefaultLanguage, getT, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
-interface MainLayoutProps {
+export interface MainLayoutProps {
   children: React.ReactNode;
-  title: string;
+  title?: string;
   subtitle?: string | React.ReactNode;
   icon?: string;
   showActionButtons?: boolean;
@@ -82,22 +83,40 @@ const getInitialSidebarState = (): boolean => {
   return stored === 'true';
 };
 
-function MainLayoutContent({ 
-  children, 
-  title,
-  subtitle,
-  icon,
-  showActionButtons = true,
-  showCreateButton = false, 
-  createButtonText = "Create",
-  onCreateClick,
-  editSchemaPath,
-  isAdmin = false,
-  navigationSchemas,
-  customHeaderActions,
-  showEndLine = true,
-  hidePadding = false,
-}: MainLayoutProps) {
+function MainLayoutContent(initialProps: MainLayoutProps) {
+  const {
+    children,
+    title: titleProp,
+    subtitle: subtitleProp,
+    icon: iconProp,
+    showActionButtons: showActionButtonsProp = true,
+    showCreateButton: showCreateButtonProp = false,
+    createButtonText: createButtonTextProp = 'Create',
+    onCreateClick: onCreateClickProp,
+    editSchemaPath: editSchemaPathProp,
+    isAdmin: isAdminProp = false,
+    navigationSchemas: navigationSchemasProp,
+    customHeaderActions: customHeaderActionsProp,
+    showEndLine: showEndLineProp = true,
+    hidePadding: hidePaddingProp = false,
+  } = initialProps;
+
+  const { layoutProps: contextProps } = useLayoutProps();
+
+  const title = (titleProp ?? contextProps.title) ?? '';
+  const subtitle = subtitleProp ?? contextProps.subtitle;
+  const icon = iconProp ?? contextProps.icon;
+  const showActionButtons = showActionButtonsProp ?? contextProps.showActionButtons ?? true;
+  const showCreateButton = showCreateButtonProp ?? contextProps.showCreateButton ?? false;
+  const createButtonText = createButtonTextProp ?? contextProps.createButtonText ?? 'Create';
+  const onCreateClick = onCreateClickProp ?? contextProps.onCreateClick;
+  const editSchemaPath = editSchemaPathProp ?? contextProps.editSchemaPath;
+  const isAdmin = isAdminProp ?? contextProps.isAdmin ?? false;
+  const navigationSchemas = navigationSchemasProp ?? contextProps.navigationSchemas;
+  const customHeaderActions = customHeaderActionsProp ?? contextProps.customHeaderActions;
+  const showEndLine = showEndLineProp ?? contextProps.showEndLine ?? true;
+  const hidePadding = hidePaddingProp ?? contextProps.hidePadding ?? false;
+
   const router = useRouter();
   const pathname = usePathname();
   const { resolvedTheme } = useTheme();

@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ulid } from 'ulid';
 import { toast } from 'sonner';
 
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { useSchemas as useSchemaSummaries } from '@/gradian-ui/schema-manager/hooks/use-schemas';
 import { useTenantStore } from '@/stores/tenant.store';
 import { FormModal } from '@/gradian-ui/form-builder';
@@ -63,6 +63,18 @@ export interface GraphDesignerWrapperProps {
 export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
   const { viewMode = false, graphData, onGraphChange, extraNodeContextActions, embedMode = false, hideSelectEditAndSave = false } = props;
   const isControlled = !!(graphData && onGraphChange);
+
+  useSetLayoutProps(
+    embedMode
+      ? {}
+      : {
+          title: 'Graph Designer',
+          icon: 'Waypoints',
+          subtitle: 'Design and manage data relationship graphs.',
+          showActionButtons: false,
+        }
+  );
+
   const tenantId = useTenantStore((state) => state.getTenantId());
   const { schemas, isLoading, refetch } = useSchemaSummaries({ 
     summary: true,
@@ -652,12 +664,7 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
   }
 
   return (
-    <MainLayout
-      title="Graph Designer"
-      icon="Waypoints"
-      subtitle="Design and manage data relationship graphs."
-      showActionButtons={false}
-    >
+    <>
       {graphContent}
       {!viewMode && activeSchemaId && activeNodeForForm && !formJustSaved && (
         <FormModal
@@ -753,7 +760,7 @@ export function GraphDesignerWrapper(props: GraphDesignerWrapperProps = {}) {
           allowMultiselect={false}
         />
       )}
-    </MainLayout>
+    </>
   );
 }
 

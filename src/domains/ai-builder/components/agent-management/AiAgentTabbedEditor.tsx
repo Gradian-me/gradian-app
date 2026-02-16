@@ -10,7 +10,7 @@ import { RenderComponentsTab } from './tabs/RenderComponentsTab';
 import { PreloadRoutesTab } from './tabs/PreloadRoutesTab';
 import { NextActionTab } from './tabs/NextActionTab';
 import { ResponseCardsTab } from './tabs/ResponseCardsTab';
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -128,10 +128,16 @@ export function AiAgentTabbedEditor({
 
   const hasChanges = JSON.stringify(agent) !== JSON.stringify(originalAgent);
 
+  useSetLayoutProps({
+    title: loading ? 'Loading...' : !agent ? 'Agent Not Found' : (agent.label || agent.id),
+    icon: 'Bot',
+    subtitle: 'AI Agent Editor',
+    showEndLine: !!agent,
+  });
+
   if (loading) {
     return (
-      <MainLayout title="Loading..." icon="Bot" subtitle="AI Agent Editor">
-        <div className="space-y-6">
+      <div className="space-y-6">
           <div className="flex items-center justify-between gap-4">
             <Skeleton className="h-9 w-24 rounded-md" />
             <div className="flex items-center gap-2">
@@ -157,28 +163,22 @@ export function AiAgentTabbedEditor({
             </Card>
           </div>
         </div>
-      </MainLayout>
     );
   }
 
   if (!agent) {
     return (
-      <MainLayout title="Agent Not Found" icon="Bot" subtitle="AI Agent Editor" showEndLine={false}>
-        <AiAgentNotFound
-          onGoBack={onBack || (() => router.push('/builder/ai-agents'))}
-          showGoBackButton
-          showHomeButton
-          homeHref="/builder/ai-agents"
-        />
-      </MainLayout>
+      <AiAgentNotFound
+        onGoBack={onBack || (() => router.push('/builder/ai-agents'))}
+        showGoBackButton
+        showHomeButton
+        homeHref="/builder/ai-agents"
+      />
     );
   }
 
   return (
-    <MainLayout 
-      title={agent.label || agent.id} 
-      icon="Bot" 
-      subtitle="AI Agent Editor">
+    <>
       <div className="space-y-6">
         {apiResponse && (apiResponse.message || apiResponse.error) && (
           <MessageBox
@@ -330,7 +330,7 @@ export function AiAgentTabbedEditor({
           },
         ]}
       />
-    </MainLayout>
+    </>
   );
 }
 

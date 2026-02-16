@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Spinner } from '@/components/ui/spinner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -1236,15 +1236,16 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   // Skip this check if schema is not company-based
   const canCreateRecords = schema?.isNotCompanyBased || (selectedCompany && selectedCompany.id !== -1);
 
+  useSetLayoutProps({
+    title: pluralName,
+    icon: schema.icon,
+    editSchemaPath: schema.id ? `/builder/schemas/${schema.id}` : undefined,
+    isAdmin,
+    navigationSchemas: reconstructedNavigationSchemas,
+  });
 
   return (
-    <MainLayout 
-      title={pluralName}
-      icon={schema.icon}
-      editSchemaPath={schema.id ? `/builder/schemas/${schema.id}` : undefined}
-      isAdmin={isAdmin}
-      navigationSchemas={reconstructedNavigationSchemas}
-    >
+    <>
       {/* Individual entity loading indicator */}
       <div 
         id="entity-loading-indicator" 
@@ -1980,7 +1981,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           entityId={repeatingSectionDialog.entityId}
         />
       )}
-    </MainLayout>
+    </>
   );
 }
 

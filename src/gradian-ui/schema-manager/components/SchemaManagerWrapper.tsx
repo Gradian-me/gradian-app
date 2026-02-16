@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Plus, RefreshCw, Settings, Building2, FileText, Zap } from 'lucide-react';
 import { useBackIcon } from '@/gradian-ui/shared/hooks';
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SchemaCardGrid, SchemaCardSkeletonGrid } from './SchemaCardGrid';
@@ -162,10 +162,14 @@ export function SchemaManagerWrapper() {
     );
   }, [filteredSchemas.length, loading, openCreateDialog, searchQuery]);
 
+  useSetLayoutProps({
+    title: 'Schema Builder',
+    icon: 'Brackets',
+    subtitle: 'Create and manage dynamic form schemas',
+  });
+
   return (
-    <MainLayout 
-      title="Schema Builder"
-      icon="Brackets" subtitle="Create and manage dynamic form schemas">
+    <>
       <div className="space-y-6">
         {messages && ((messages.messages && messages.messages.length > 0) || messages.message) && !createDialogOpen && (
           <MessageBox
@@ -499,6 +503,6 @@ export function SchemaManagerWrapper() {
         schemaName={deleteDialog.schema?.plural_name || deleteDialog.schema?.singular_name || deleteDialog.schema?.id || 'this schema'}
         onConfirm={handleDelete}
       />
-    </MainLayout>
+    </>
   );
 }

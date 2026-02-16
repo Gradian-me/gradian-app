@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { Plus, RefreshCw, Bot } from 'lucide-react';
 import { useBackIcon } from '@/gradian-ui/shared/hooks';
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AiAgentCardGrid, AiAgentCardSkeletonGrid } from './AiAgentCardGrid';
@@ -96,20 +96,23 @@ export function AiAgentManagerWrapper() {
     );
   }, [filteredAgents.length, loading, openCreateDialog, searchQuery]);
 
+  useSetLayoutProps({
+    title: 'AI Agents Builder',
+    icon: 'Bot',
+    subtitle: (
+      <div className="flex items-center gap-2">
+        <span>Create and manage AI agents for intelligent automation</span>
+        {!loading && agents.length > 0 && (
+          <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+            {agents.length}
+          </Badge>
+        )}
+      </div>
+    ),
+  });
+
   return (
-    <MainLayout 
-      title="AI Agents Builder"
-      icon="Bot" 
-      subtitle={
-        <div className="flex items-center gap-2">
-          <span>Create and manage AI agents for intelligent automation</span>
-          {!loading && agents.length > 0 && (
-            <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-              {agents.length}
-            </Badge>
-          )}
-        </div>
-      }>
+    <>
       <div className="space-y-6">
         {messages && (messages.message || messages.error) && !createDialogOpen && (
           <MessageBox
@@ -245,7 +248,7 @@ export function AiAgentManagerWrapper() {
         agentName={deleteDialog.agent?.label || deleteDialog.agent?.id || 'this agent'}
         onConfirm={handleDelete}
       />
-    </MainLayout>
+    </>
   );
 }
 

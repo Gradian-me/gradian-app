@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { useHealth, useHealthService } from '../hooks';
 import { calculateHealthStats, getServiceMetrics } from '../utils';
 import { HealthService } from '../types';
@@ -69,8 +69,9 @@ export function HealthPage() {
     });
   };
 
+  useSetLayoutProps({ title: 'Health Monitoring' });
+
   return (
-    <MainLayout title="Health Monitoring">
       <div className="space-y-6">
         <HealthPageHeader
           onNewService={openNewServiceForm}
@@ -152,7 +153,6 @@ export function HealthPage() {
           />
         )}
       </div>
-    </MainLayout>
   );
 }
 

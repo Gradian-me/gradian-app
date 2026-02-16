@@ -13,7 +13,7 @@ import { ResetDialog } from './ResetDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { DragEndEvent } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Button } from '@/components/ui/button';
 import { SchemaNotFound } from './SchemaNotFound';
 import { FormAlert } from '@/components/ui/form-alert';
@@ -307,9 +307,25 @@ export function SchemaBuilderEditor({
       .sort((a, b) => (a.order || 0) - (b.order || 0));
   };
 
+  const layoutTitle = loading
+    ? (title || getT(TRANSLATION_KEYS.SCHEMA_LOADING, language, defaultLang))
+    : loadError
+      ? (title || getT(TRANSLATION_KEYS.SCHEMA_NOT_FOUND, language, defaultLang))
+      : schema
+        ? (title || (schema.singular_name
+          ? getT(TRANSLATION_KEYS.SCHEMA_EDIT_TITLE, language, defaultLang).replace('{name}', schema.singular_name)
+          : getT(TRANSLATION_KEYS.SCHEMA_EDIT_TITLE, language, defaultLang).replace('{name}', schema.plural_name || '')))
+        : '';
+  useSetLayoutProps({
+    title: layoutTitle,
+    subtitle: subtitleResolved,
+    icon: 'Brackets',
+    showEndLine: !loadError,
+  });
+
   if (loading) {
     return (
-      <MainLayout title={title || getT(TRANSLATION_KEYS.SCHEMA_LOADING, language, defaultLang)} subtitle={subtitleResolved} icon="Brackets">
+      <>
         <div className="space-y-6 max-w-7xl mx-auto">
           {/* Action Buttons Skeleton */}
           <div className="flex items-center justify-between gap-4">
@@ -367,13 +383,13 @@ export function SchemaBuilderEditor({
             </Card>
           </div>
         </div>
-      </MainLayout>
+      </>
     );
   }
 
   if (loadError) {
     return (
-      <MainLayout title={title || getT(TRANSLATION_KEYS.SCHEMA_NOT_FOUND, language, defaultLang)} subtitle={subtitleResolved} icon="Brackets" showEndLine={false}>
+      <>
         <SchemaNotFound
           onGoBack={onBack}
           showGoBackButton={!!onBack}
@@ -381,7 +397,7 @@ export function SchemaBuilderEditor({
           onRefresh={onRefreshSchema}
           refreshing={refreshing}
         />
-      </MainLayout>
+      </>
     );
   }
 
@@ -389,16 +405,8 @@ export function SchemaBuilderEditor({
     return null;
   }
 
-  const editTitleTemplate = getT(TRANSLATION_KEYS.SCHEMA_EDIT_TITLE, language, defaultLang);
-  const editTitle = title || (schema.singular_name
-    ? editTitleTemplate.replace('{name}', schema.singular_name)
-    : editTitleTemplate.replace('{name}', schema.plural_name || ''));
   return (
-    <MainLayout 
-      title={editTitle} 
-      subtitle={subtitleResolved}
-      icon="Brackets"
-    >
+    <>
       <div className="space-y-6 max-w-7xl mx-auto">
         {/* Display API response messages if available */}
         {apiResponse && (
@@ -523,7 +531,7 @@ export function SchemaBuilderEditor({
           onConfirm={deleteConfirm.onConfirm}
         />
       )}
-    </MainLayout>
+    </>
   );
 }
 

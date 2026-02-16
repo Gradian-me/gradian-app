@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
-import { MermaidSimple } from '@/app/ui/components/mermaid-viewer/MermaidSimple';
+import { MermaidSimple } from '@/app/(app)/ui/components/mermaid-viewer/MermaidSimple';
 import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
 import { extractLanguage, extractLanguageFromNode, getCodeContent } from '../../utils/markdownComponentUtils';
 import { sanitizeHtml } from '@/gradian-ui/shared/utils/html-sanitizer';

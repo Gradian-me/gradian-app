@@ -7,7 +7,7 @@ import { VendorPerformanceChart } from '@/components/dashboard/charts/vendor-per
 import { KPICard } from '@/gradian-ui/analytics/indicators/kpi-card';
 import { KPIList } from '@/gradian-ui/analytics/indicators/kpi-list';
 import { MetricCard } from '@/gradian-ui/analytics/indicators/metric-card';
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { motion } from 'framer-motion';
@@ -90,16 +90,19 @@ export function DashboardPage() {
     fetchKpiLists();
   }, [fetchDashboardStats, fetchSpendAnalysisData, fetchKpiCards, fetchPerformanceMetrics]);
 
-  if (isLoading) {
-    return (
-      <MainLayout title="Dashboard" subtitle="Loading dashboard data…" icon="LayoutDashboard">
-        <LoadingSpinner centered containerClassName="h-64" />
-      </MainLayout>
-    );
-  }
-
   const userFirstName = user ? resolveLocalizedField(user.name, language, 'en') : '';
   const userDisplayName = userFirstName || user?.email || 'there';
+  const displaySubtitle = isLoading ? 'Loading dashboard data…' : `Welcome back, ${userDisplayName}!`;
+  useSetLayoutProps({
+    title: isLoading ? 'Dashboard' : dashboardTitle,
+    subtitle: displaySubtitle,
+    icon: 'LayoutDashboard',
+  });
+
+  if (isLoading) {
+    return <LoadingSpinner centered containerClassName="h-64" />;
+  }
+
   const userInitials = (() => {
     const source = userDisplayName?.trim() || 'GR';
     return source
@@ -111,10 +114,7 @@ export function DashboardPage() {
       .toUpperCase();
   })();
 
-  const subtitle = `Welcome back, ${userDisplayName}!`;
-
   return (
-    <MainLayout title={dashboardTitle} subtitle={subtitle} icon="LayoutDashboard">
       <div className="space-y-6">
         <UserWelcome
           userName={userDisplayName}
@@ -295,7 +295,6 @@ export function DashboardPage() {
           </motion.div>
         )}
       </div>
-    </MainLayout>
   );
 }
 

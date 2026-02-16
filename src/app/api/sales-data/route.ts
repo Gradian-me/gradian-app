@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { parseSalesCSV } from '@/app/sales-analytics/utils/csv-parser';
+import { parseSalesCSV } from '@/app/(app)/sales-analytics/utils/csv-parser';
 
 export async function GET() {
   try {

@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Save, TestTube, RefreshCw, CheckCircle, Loader2 } from 'lucide-react';
 import { validateRule } from '../utils/rule-operations';
 import { toast } from 'sonner';
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 
 interface BusinessRuleWrapperProps {
   initialRule?: BusinessRule;
@@ -161,35 +161,32 @@ export function BusinessRuleWrapper({
     toast.success('Group duplicated');
   };
 
+  useSetLayoutProps({ title });
+
   if (operatorsLoading || propertiesLoading) {
     return (
-      <MainLayout title={title}>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
-            <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-          </div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
         </div>
-      </MainLayout>
+      </div>
     );
   }
 
   if (operatorsError || propertiesError) {
     return (
-      <MainLayout title={title}>
-        <Card className="border-red-200 bg-red-50 dark:bg-red-950">
+      <Card className="border-red-200 bg-red-50 dark:bg-red-950">
           <CardContent className="p-6">
             <p className="text-red-800 dark:text-red-200">
               Error: {operatorsError || propertiesError}
             </p>
           </CardContent>
         </Card>
-      </MainLayout>
     );
   }
 
   return (
-    <MainLayout title={title}>
       <div className="space-y-6">
         {/* Rule Metadata */}
         <Card>
@@ -293,7 +290,6 @@ export function BusinessRuleWrapper({
         </Card>
 
       </div>
-    </MainLayout>
   );
 }
 

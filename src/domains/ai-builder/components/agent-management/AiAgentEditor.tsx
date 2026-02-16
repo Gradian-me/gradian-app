@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Save, RefreshCw, Trash2 } from 'lucide-react';
 import { useBackIcon } from '@/gradian-ui/shared/hooks';
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MessageBox } from '@/gradian-ui/layout/message-box';
@@ -144,34 +144,34 @@ export function AiAgentEditor({
 
   const hasChanges = JSON.stringify(agent) !== JSON.stringify(originalAgent);
 
+  useSetLayoutProps({
+    title: loading ? 'Loading...' : !agent ? 'Agent Not Found' : (agent.label || agent.id),
+    icon: 'Bot',
+    subtitle: 'AI Agent Editor',
+    showEndLine: !!agent,
+  });
+
   if (loading) {
     return (
-      <MainLayout title="Loading..." icon="Bot" subtitle="AI Agent Editor">
-        <div className="space-y-4">
-          <Skeleton className="h-96 w-full" />
-        </div>
-      </MainLayout>
+      <div className="space-y-4">
+        <Skeleton className="h-96 w-full" />
+      </div>
     );
   }
 
   if (!agent) {
     return (
-      <MainLayout title="Agent Not Found" icon="Bot" subtitle="AI Agent Editor" showEndLine={false}>
-        <AiAgentNotFound
-          onGoBack={() => router.push('/builder/ai-agents')}
-          showGoBackButton
-          showHomeButton
-          homeHref="/builder/ai-agents"
-        />
-      </MainLayout>
+      <AiAgentNotFound
+        onGoBack={() => router.push('/builder/ai-agents')}
+        showGoBackButton
+        showHomeButton
+        homeHref="/builder/ai-agents"
+      />
     );
   }
 
   return (
-    <MainLayout 
-      title={agent.label || agent.id} 
-      icon="Bot" 
-      subtitle="AI Agent Editor">
+    <>
       <div className="space-y-6">
         {apiResponse && (apiResponse.message || apiResponse.error) && (
           <MessageBox
@@ -250,7 +250,7 @@ export function AiAgentEditor({
         agentName={agent.label || agent.id}
         onConfirm={handleDelete}
       />
-    </MainLayout>
+    </>
   );
 }
 

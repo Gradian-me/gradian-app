@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AppWindow, Grid3X3, List, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
 
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -420,18 +420,19 @@ export function AppListWrapper() {
 
   const hasApps = filteredApps.length > 0;
 
-  return (
-    <MainLayout
-      title={getT(TRANSLATION_KEYS.TITLE_APPS, language, defaultLang)}
-      icon="Grid2X2"
-      subtitle={
-        <span className="flex items-center gap-1">
-          <span className="font-medium text-gray-800 dark:text-gray-100">
-            {getT(TRANSLATION_KEYS.SUBTITLE_APPS_LAUNCH, language, defaultLang)}
-          </span>
+  useSetLayoutProps({
+    title: getT(TRANSLATION_KEYS.TITLE_APPS, language, defaultLang),
+    icon: 'Grid2X2',
+    subtitle: (
+      <span className="flex items-center gap-1">
+        <span className="font-medium text-gray-800 dark:text-gray-100">
+          {getT(TRANSLATION_KEYS.SUBTITLE_APPS_LAUNCH, language, defaultLang)}
         </span>
-      }
-    >
+      </span>
+    ),
+  });
+
+  return (
       <div className="space-y-6">
         {/* User Welcome Section */}
         <UserWelcome
@@ -644,7 +645,6 @@ export function AppListWrapper() {
           )}
         </AnimatePresence>
       </div>
-    </MainLayout>
   );
 }
 

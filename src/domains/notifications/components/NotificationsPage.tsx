@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
-import { MainLayout } from '@/components/layout/main-layout';
+import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -234,10 +234,11 @@ export function NotificationsPage() {
     };
   }, [unreadCount, t]);
 
+  useSetLayoutProps({ title: t(TRANSLATION_KEYS.TITLE_NOTIFICATIONS), icon: 'Bell' });
+
   return (
     <>
       <FaviconBadge count={unreadCount} />
-      <MainLayout title={t(TRANSLATION_KEYS.TITLE_NOTIFICATIONS)} icon="Bell">
       <div className="space-y-6">
         {/* Header Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -496,7 +497,6 @@ export function NotificationsPage() {
           </Accordion>
         )}
       </div>
-    </MainLayout>
     </>
   );
 }
