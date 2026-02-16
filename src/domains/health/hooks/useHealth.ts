@@ -483,8 +483,20 @@ export const useHealth = (options: UseHealthOptions = {}): UseHealthReturn => {
           return;
         }
 
-        const result = await response.json();
-        
+        let result: unknown;
+        const text = await response.text();
+        try {
+          result = text ? JSON.parse(text) : {};
+        } catch {
+          // Handle plain text "healthy" (or similar) responses
+          const trimmed = text?.trim().toLowerCase() ?? '';
+          if (trimmed === 'healthy' || trimmed === 'ok') {
+            result = { status: 'healthy', timestamp: new Date().toISOString(), message: trimmed };
+          } else {
+            throw new Error(`Invalid health response: expected JSON or "healthy"/"ok", got "${(text ?? '').slice(0, 50)}${(text?.length ?? 0) > 50 ? '...' : ''}"`);
+          }
+        }
+
         // Handle proxy response format
         let data: HealthCheckResponse;
         if (isExternalUrl && result.success === false) {

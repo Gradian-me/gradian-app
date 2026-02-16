@@ -71,7 +71,24 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const data = await response.json();
+      const text = await response.text();
+      let data: Record<string, unknown>;
+
+      try {
+        data = text ? (JSON.parse(text) as Record<string, unknown>) : {};
+      } catch {
+        // Handle plain text "healthy" (or similar) responses
+        const trimmed = text?.trim().toLowerCase() ?? '';
+        if (trimmed === 'healthy' || trimmed === 'ok') {
+          data = {
+            status: 'healthy',
+            timestamp: new Date().toISOString(),
+            message: trimmed,
+          };
+        } else {
+          throw new Error(`Invalid response: expected JSON or "healthy"/"ok", got "${(text ?? '').slice(0, 50)}${(text?.length ?? 0) > 50 ? '...' : ''}"`);
+        }
+      }
 
       return NextResponse.json({
         success: true,

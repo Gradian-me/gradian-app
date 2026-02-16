@@ -3,7 +3,7 @@
 import React from 'react';
 import { ChevronsDown, ChevronsUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
 export interface ExpandCollapseControlsProps {
@@ -60,62 +60,64 @@ export const ExpandCollapseControls: React.FC<ExpandCollapseControlsProps> = ({
             : 'h-10 rounded-md';
 
   return (
-    <div className={containerClasses}>
-      {onExpandAll && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              type="button"
-              variant={buttonVariant}
-              size={buttonSize}
-              className={cn(
-                buttonClassName,
-                variant === 'ghost' &&
-                  'text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-gray-800',
-                variant === 'nobackground' &&
-                  'text-gray-500 hover:text-violet-600 hover:bg-violet-50',
-                showLabels && 'gap-2'
-              )}
-              onClick={onExpandAll}
-              disabled={expandDisabled}
-            >
-              <ChevronsDown className="h-4 w-4" />
-              {showLabels && <span className="hidden md:inline">Expand All</span>}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            <span>Expand all</span>
-          </TooltipContent>
-        </Tooltip>
-      )}
-      {onCollapseAll && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              type="button"
-              variant={buttonVariant}
-              size={buttonSize}
-              className={cn(
-                buttonClassName,
-                variant === 'ghost' &&
-                  'text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-gray-800',
-                variant === 'nobackground' &&
-                  'text-gray-500 hover:text-violet-600 hover:bg-violet-50',
-                showLabels && 'gap-2'
-              )}
-              onClick={onCollapseAll}
-              disabled={collapseDisabled}
-            >
-              <ChevronsUp className="h-4 w-4" />
-              {showLabels && <span className="hidden md:inline">Collapse All</span>}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            <span>Collapse all</span>
-          </TooltipContent>
-        </Tooltip>
-      )}
-    </div>
+    <TooltipProvider delayDuration={200}>
+      <div className={containerClasses}>
+        {onExpandAll && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant={buttonVariant}
+                size={buttonSize}
+                className={cn(
+                  buttonClassName,
+                  variant === 'ghost' &&
+                    'text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-gray-800',
+                  variant === 'nobackground' &&
+                    'text-gray-500 hover:text-violet-600 hover:bg-violet-50',
+                  showLabels && 'gap-2'
+                )}
+                onClick={onExpandAll}
+                disabled={expandDisabled}
+              >
+                <ChevronsDown className="h-4 w-4" />
+                {showLabels && <span className="hidden md:inline">Expand All</span>}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <span>Expand all</span>
+            </TooltipContent>
+          </Tooltip>
+        )}
+        {onCollapseAll && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                type="button"
+                variant={buttonVariant}
+                size={buttonSize}
+                className={cn(
+                  buttonClassName,
+                  variant === 'ghost' &&
+                    'text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-gray-800',
+                  variant === 'nobackground' &&
+                    'text-gray-500 hover:text-violet-600 hover:bg-violet-50',
+                  showLabels && 'gap-2'
+                )}
+                onClick={onCollapseAll}
+                disabled={collapseDisabled}
+              >
+                <ChevronsUp className="h-4 w-4" />
+                {showLabels && <span className="hidden md:inline">Collapse All</span>}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <span>Collapse all</span>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
+    </TooltipProvider>
   );
 };
 
