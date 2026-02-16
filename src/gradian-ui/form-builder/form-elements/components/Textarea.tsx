@@ -1,3 +1,5 @@
+'use client';
+
 // Textarea Component
 
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';

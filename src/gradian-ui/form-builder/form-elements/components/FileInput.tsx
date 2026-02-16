@@ -1,3 +1,5 @@
+'use client';
+
 // File Input Component
 // File input with type="file" embedded
 

@@ -1,3 +1,5 @@
+'use client';
+
 // Number Input Component
 // Number input with type="number" embedded
 

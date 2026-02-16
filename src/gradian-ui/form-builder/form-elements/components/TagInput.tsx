@@ -1,3 +1,5 @@
+'use client';
+
 // Tag Input Component
 // Tag input that displays entered values as badges
 

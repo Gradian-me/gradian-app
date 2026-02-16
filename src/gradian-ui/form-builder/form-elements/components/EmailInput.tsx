@@ -1,3 +1,5 @@
+'use client';
+
 // Email Input Component
 // Email input with type="email" embedded
 

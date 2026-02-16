@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { cn } from '@/gradian-ui/shared/utils';
 import { CircularProgress } from '@/gradian-ui/analytics/indicators/kpi-list/components/CircularProgress';

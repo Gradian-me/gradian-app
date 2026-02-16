@@ -1,3 +1,5 @@
+'use client';
+
 // MarkdownInput Component
 // A textarea component that handles markdown by default
 

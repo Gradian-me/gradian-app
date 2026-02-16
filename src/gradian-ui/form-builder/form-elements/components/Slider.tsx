@@ -1,3 +1,5 @@
+'use client';
+
 // Slider Component
 // Modern minimal slider for numeric values
 

@@ -1,3 +1,5 @@
+'use client';
+
 // Phone Input Component
 // Phone input with type="tel" embedded and call button
 

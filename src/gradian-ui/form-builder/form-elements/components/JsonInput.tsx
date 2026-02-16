@@ -1,3 +1,5 @@
+'use client';
+
 // JSON Input Component
 // Displays JSON in a textarea for editing, but stores as actual JSON object/array
 

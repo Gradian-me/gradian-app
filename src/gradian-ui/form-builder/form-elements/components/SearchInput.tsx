@@ -1,3 +1,5 @@
+'use client';
+
 // Search Input Component
 
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';

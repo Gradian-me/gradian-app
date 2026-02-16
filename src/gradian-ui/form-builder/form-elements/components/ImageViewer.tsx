@@ -1,3 +1,5 @@
+'use client';
+
 // Image Viewer Component
 // Displays images from URL or base64 content using Next.js Image component
 

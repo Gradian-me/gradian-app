@@ -1,3 +1,5 @@
+'use client';
+
 // QRCodeCanvas Component
 // QR Code generator component using react-qrcode-pretty
 

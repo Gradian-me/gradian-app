@@ -1,3 +1,5 @@
+'use client';
+
 // Date Time Input Component
 // Date time input with type="datetime-local" embedded
 

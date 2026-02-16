@@ -1,3 +1,5 @@
+'use client';
+
 // Date Input Component
 // Date input with type="date" embedded
 

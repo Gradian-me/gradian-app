@@ -1,3 +1,5 @@
+'use client';
+
 // Checkbox Component
 
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';

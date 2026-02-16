@@ -1152,24 +1152,26 @@ export default function IntegrationsPage() {
               onClear={() => setSearchQuery('')}
             />
           </div>
-          <div className="flex items-center gap-2">
-            <ExpandCollapseControls
-              onExpandAll={handleExpandAll}
-              onCollapseAll={handleCollapseAll}
-              variant="outline"
-              size="icon"
-            />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleRefresh}
-              disabled={isRefreshing || loading}
-              className="h-10 w-10"
-              title="Refresh"
-            >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            </Button>
-          </div>
+          <TooltipProvider>
+            <div className="flex items-center gap-2">
+              <ExpandCollapseControls
+                onExpandAll={handleExpandAll}
+                onCollapseAll={handleCollapseAll}
+                variant="outline"
+                size="icon"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleRefresh}
+                disabled={isRefreshing || loading}
+                className="h-10 w-10"
+                title="Refresh"
+              >
+                <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </Button>
+            </div>
+          </TooltipProvider>
         </motion.div>
 
         {/* Integration List */}

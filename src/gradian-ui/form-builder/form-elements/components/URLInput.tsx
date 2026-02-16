@@ -1,3 +1,5 @@
+'use client';
+
 // URL Input Component
 // URL input with type="url" embedded
 

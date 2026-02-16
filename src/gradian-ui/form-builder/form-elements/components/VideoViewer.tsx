@@ -1,3 +1,5 @@
+'use client';
+
 // Video Viewer Component
 // Displays videos from URL, base64 content, or video_id using HTML5 video element
 
