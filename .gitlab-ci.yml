@@ -703,6 +703,7 @@ trivy_image_scan:
     - CG-GR-APP-DEV-shell
   only:
     - main
+    - master
   allow_failure: true
   retry:
     max: 2
