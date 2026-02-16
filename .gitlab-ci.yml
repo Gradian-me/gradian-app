@@ -465,6 +465,7 @@ build:
   needs:
     - job: security_approval
       artifacts: false
+      optional: true
   cache:
     key: 
       files:
