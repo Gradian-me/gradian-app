@@ -27,6 +27,8 @@ interface SidebarNavigationDynamicProps {
   className?: string;
   initialSchemas?: FormSchema[];
   searchQuery?: string;
+  /** Called when a nav link is clicked (e.g. close mobile sidebar). */
+  onNavigate?: () => void;
 }
 
 const ACCORDION_STATE_KEY = 'gradian-sidebar-accordion-open';
@@ -37,6 +39,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
   className,
   initialSchemas,
   searchQuery,
+  onNavigate,
 }) => {
   const pathname = usePathname();
   const language = useLanguageStore((s) => s.language) ?? 'en';
@@ -395,7 +398,7 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                             {flatGroup.schemas.map((schema, schemaIndex) => {
                               const active = isActive(schema.id);
                               const schemaItem = (
-                                <Link key={schema.id} href={`/page/${schema.id}`} prefetch={false}>
+                                <Link key={schema.id} href={`/page/${schema.id}`} prefetch={false} onClick={() => onNavigate?.()}>
                                   <motion.div
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
@@ -577,8 +580,8 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                 {group.schemas.map((schema, schemaIndex) => {
                                   const active = isActive(schema.id);
                                   const schemaItem = (
-                                    <Link key={schema.id} href={`/page/${schema.id}`} prefetch={false}>
-                                      <motion.div
+<Link key={schema.id} href={`/page/${schema.id}`} prefetch={false} onClick={() => onNavigate?.()}>
+                                    <motion.div
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         transition={{

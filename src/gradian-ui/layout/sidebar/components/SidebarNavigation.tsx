@@ -24,6 +24,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   isMobile,
   activePath,
   onItemClick,
+  onNavigate,
   className,
   navigationSchemas,
   searchQuery,
@@ -75,7 +76,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
             {shouldShowTooltip ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link href="/" prefetch={false} className="block">
+                  <Link href="/" prefetch={false} className="block" onClick={() => onNavigate?.()}>
                     <div
                       className={cn(
                         "flex items-center py-2 min-h-8 rounded-lg transition-colors duration-150",
@@ -99,7 +100,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                 </TooltipContent>
               </Tooltip>
             ) : (
-              <Link href="/" prefetch={false} className="block">
+              <Link href="/" prefetch={false} className="block" onClick={() => onNavigate?.()}>
                 <div
                   className={cn(
                     "flex items-center py-2 min-h-8 rounded-lg transition-colors duration-150",
@@ -171,7 +172,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                           const Icon = item.icon;
                           
                           const content = (
-                            <Link key={item.name} href={item.href} prefetch={false} onClick={() => onItemClick?.(item)}>
+                            <Link key={item.name} href={item.href} prefetch={false} onClick={() => { onItemClick?.(item); onNavigate?.(); }}>
                               <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
@@ -245,6 +246,7 @@ export const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
             isMobile={isMobile}
             initialSchemas={navigationSchemas}
             searchQuery={searchQuery}
+            onNavigate={onNavigate}
           />
         </div>
       </ScrollArea>

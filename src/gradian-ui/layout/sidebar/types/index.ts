@@ -49,6 +49,11 @@ export interface SidebarProps extends BaseComponentProps {
    * Right-to-left layout (sidebar on right, content on left)
    */
   isRtl?: boolean;
+
+  /**
+   * Called when a navigation link is clicked (e.g. to close mobile sidebar after route change).
+   */
+  onNavigate?: () => void;
 }
 
 export interface SidebarConfig {
@@ -183,6 +188,8 @@ export interface SidebarNavigationProps extends BaseComponentProps {
   isMobile: boolean;
   activePath?: string;
   onItemClick?: (item: NavigationItem) => void;
+  /** Called when any nav link is clicked (e.g. close mobile sidebar). */
+  onNavigate?: () => void;
   navigationSchemas?: FormSchema[];
   searchQuery?: string;
 }

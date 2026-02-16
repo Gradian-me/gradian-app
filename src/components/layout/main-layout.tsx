@@ -302,6 +302,12 @@ function MainLayoutContent(initialProps: MainLayoutProps) {
     });
   }, []);
 
+  const closeMobileMenu = useCallback(() => {
+    startTransition(() => {
+      setIsMobileMenuOpen(false);
+    });
+  }, []);
+
   // Register mobile menu as a dialog for back button handling
   useEffect(() => {
     const menuId = 'mobile-sidebar-menu';
@@ -613,6 +619,7 @@ function MainLayoutContent(initialProps: MainLayoutProps) {
                 isCollapsed={false} 
                 onToggle={toggleMobileMenu} 
                 isMobile={true}
+                onNavigate={closeMobileMenu}
                 company={selectedCompany ? {
                   name: selectedCompany.name,
                   abbreviation: selectedCompany.abbreviation,

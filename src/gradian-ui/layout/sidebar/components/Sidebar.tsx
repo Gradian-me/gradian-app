@@ -22,6 +22,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({
   className,
   navigationSchemas,
   isRtl = false,
+  onNavigate,
 }) => {
   const width = isMobile ? 320 : (isCollapsed ? config.styling?.collapsedWidth || 80 : config.styling?.expandedWidth || 280);
   const prevWidthRef = useRef<number>(width);
@@ -75,6 +76,7 @@ const SidebarComponent: React.FC<SidebarProps> = ({
           isCollapsed={isCollapsed}
           isMobile={isMobile}
           navigationSchemas={navigationSchemas}
+          onNavigate={onNavigate}
         />
       </div>
 

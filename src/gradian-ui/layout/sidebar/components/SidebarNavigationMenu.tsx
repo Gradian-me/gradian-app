@@ -17,13 +17,14 @@ import type { NavigationItem } from '../types';
 
 type SidebarNavigationMenuProps = Pick<
   SidebarProps,
-  'isCollapsed' | 'isMobile' | 'navigationSchemas'
+  'isCollapsed' | 'isMobile' | 'navigationSchemas' | 'onNavigate'
 >;
 
 export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
   isCollapsed,
   isMobile,
   navigationSchemas,
+  onNavigate,
 }) => {
   const [items, setItems] = useState<NavigationItem[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -234,6 +235,7 @@ export const SidebarNavigationMenu: React.FC<SidebarNavigationMenuProps> = ({
         isMobile={isMobile ?? false}
         navigationSchemas={navigationSchemas}
         searchQuery={searchQuery}
+        onNavigate={onNavigate}
       />
     </>
   );

@@ -72,6 +72,8 @@ export function useLayoutProps() {
  * Call with the same props you would pass to MainLayout.
  * When the page unmounts, layout props are reset so the next page can set its own.
  * When title/icon (or other key props) change, layout is updated.
+ * Dependencies are only primitives to avoid infinite loops when subtitle/customHeaderActions
+ * are React nodes (new reference every render).
  */
 export function useSetLayoutProps(props: Partial<LayoutPropsState>) {
   const { setLayoutProps } = useLayoutProps();
@@ -81,5 +83,16 @@ export function useSetLayoutProps(props: Partial<LayoutPropsState>) {
     return () => {
       setLayoutProps(defaultLayoutProps);
     };
-  }, [setLayoutProps, props.title, props.icon, props.subtitle, props.showActionButtons, props.showCreateButton, props.createButtonText, props.editSchemaPath, props.isAdmin, props.showEndLine, props.hidePadding]);
+  }, [
+    setLayoutProps,
+    props.title,
+    props.icon,
+    props.showActionButtons,
+    props.showCreateButton,
+    props.createButtonText,
+    props.editSchemaPath,
+    props.isAdmin,
+    props.showEndLine,
+    props.hidePadding,
+  ]);
 }
