@@ -12,6 +12,7 @@ import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { DiscussionsDialog, type DiscussionConfig } from '@/gradian-ui/communication';
+import { getDiscussionCount } from '@/gradian-ui/data-display/utils';
 
 export type ActionType = 'view' | 'edit' | 'delete';
 
@@ -50,6 +51,11 @@ export interface DynamicActionButtonsProps {
    * When provided, shows a discussions button that opens the discussions dialog
    */
   discussionConfig?: DiscussionConfig;
+
+  /**
+   * Engagement counts from /api/data (e.g. [{ discussion: 1 }]); used to show discussion badge when present
+   */
+  engagementCounts?: unknown;
 }
 
 /**
@@ -62,6 +68,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
   className,
   stopPropagation = true,
   discussionConfig,
+  engagementCounts,
 }) => {
   const [discussionOpen, setDiscussionOpen] = useState(false);
   const router = useRouter();
@@ -120,6 +127,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
       }
     : {};
 
+  const discussionCount = getDiscussionCount(engagementCounts);
   const discussionButton = discussionConfig ? (
     <Button
       key="discussion"
@@ -133,7 +141,7 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
       }}
       className={cn(
         variant === 'minimal'
-          ? 'h-8 w-8 p-0'
+          ? 'h-8 w-8 p-0 relative'
           : 'flex-1',
         'transition-all duration-200 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600',
         'hover:bg-sky-50 hover:border-sky-300 hover:text-sky-400'
@@ -143,6 +151,18 @@ export const DynamicActionButtons: React.FC<DynamicActionButtonsProps> = ({
       <IconRenderer iconName="MessageCircle" className="h-4 w-4" />
       {variant === 'expanded' && (
         <span className="ms-2">Discussions</span>
+      )}
+      {discussionCount > 0 && (
+        <span
+          className={cn(
+            'tabular-nums text-xs font-medium bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300 rounded-full',
+            variant === 'minimal'
+              ? 'absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1.5 flex items-center justify-center'
+              : 'ms-2 min-w-5 h-5 px-1.5 inline-flex items-center justify-center'
+          )}
+        >
+          {discussionCount > 99 ? '99+' : discussionCount}
+        </span>
       )}
     </Button>
   ) : null;

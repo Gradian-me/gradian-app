@@ -1,11 +1,13 @@
 // Count API for assignment badges (tasks per user)
 // GET /api/data/[schema-id]/count?userId=xxx&companyIds=id1,id2
 // Returns: { success: true, data: { assignedToCount, initiatedByCount } }
+// When demo mode is false, proxies to backend (URL_DATA_CRUD).
 
 import { NextRequest, NextResponse } from 'next/server';
 import { readSchemaData } from '@/gradian-ui/shared/domain/utils/data-storage.util';
 import { isValidSchemaId, getSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry.server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
+import { isDemoModeEnabled, proxyDataRequest } from '../../utils';
 
 const normalizeCreatorId = (creator: unknown): string | null => {
   if (creator == null) return null;
@@ -73,6 +75,12 @@ export async function GET(
       { success: false, error: `Schema \"${schemaId}\" not found.` },
       { status: 404 }
     );
+  }
+
+  // When demo mode is false, proxy to backend (same path and query string).
+  if (!isDemoModeEnabled()) {
+    const targetPathWithQuery = `/api/data/${schemaId}/count${request.nextUrl.search}`;
+    return proxyDataRequest(request, targetPathWithQuery);
   }
 
   const schema = await getSchemaById(schemaId);

@@ -70,7 +70,7 @@ export const FormActions: React.FC<FormActionsProps> = ({
             action.loading || false
           )}
         >
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             {action.loading && (
               <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
             )}
@@ -78,6 +78,11 @@ export const FormActions: React.FC<FormActionsProps> = ({
               <span>{action.icon}</span>
             )}
             <span className="hidden md:inline">{action.label}</span>
+            {typeof action.badge === 'number' && action.badge > 0 && (
+              <span className="min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-xs font-medium bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300 tabular-nums">
+                {action.badge > 99 ? '99+' : action.badge}
+              </span>
+            )}
           </div>
         </button>
       ))}

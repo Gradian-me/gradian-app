@@ -8,10 +8,12 @@ import { FormFooterProps } from '../types';
 import { FormActions } from './FormActions';
 import { cn } from '../../../shared/utils';
 import { DiscussionsDialog } from '@/gradian-ui/communication';
+import { getDiscussionCount } from '@/gradian-ui/data-display/utils';
 
 export const FormFooter: React.FC<FormFooterProps> = ({
   actions,
   discussionConfig,
+  engagementCounts,
   showReset = true,
   showCancel = false,
   onSubmit,
@@ -110,6 +112,7 @@ export const FormFooter: React.FC<FormFooterProps> = ({
   let finalActions = convertActionsToArray(actions);
 
   if (discussionConfig) {
+    const discussionCount = getDiscussionCount(engagementCounts);
     finalActions = [
       {
         type: 'custom' as const,
@@ -118,6 +121,7 @@ export const FormFooter: React.FC<FormFooterProps> = ({
         icon: <MessageCircle className="h-4 w-4" />,
         disabled: disabled || loading,
         onClick: () => setDiscussionOpen(true),
+        badge: discussionCount > 0 ? discussionCount : undefined,
       },
       ...finalActions,
     ];

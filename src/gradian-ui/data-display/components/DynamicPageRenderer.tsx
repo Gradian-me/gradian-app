@@ -876,6 +876,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                   }
                 : undefined
             }
+            engagementCounts={row?.engagementCounts}
             actions={[
               {
                 type: 'view',

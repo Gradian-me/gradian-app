@@ -82,6 +82,8 @@ export interface FormContentProps extends BaseComponentProps {
 
 export interface FormFooterProps extends BaseComponentProps {
   discussionConfig?: DiscussionConfig;
+  /** Engagement counts from /api/data; used to show discussion badge when present */
+  engagementCounts?: unknown;
   actions?: FormActionProps[] | {
     submit?: {
       label: string;
@@ -117,6 +119,8 @@ export interface FormActionProps {
   loading?: boolean;
   onClick?: () => void;
   icon?: React.ReactNode;
+  /** Optional badge count (e.g. discussion count); shown when > 0 */
+  badge?: number;
 }
 
 /** Discussion config for forms (schemaId + instanceId scopes discussions to a record) */

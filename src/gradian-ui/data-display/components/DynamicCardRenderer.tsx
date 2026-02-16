@@ -1312,6 +1312,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                                 }
                               : undefined
                           }
+                          engagementCounts={data?.engagementCounts}
                           actions={[
                             ...(onViewDetail || onView
                               ? [
@@ -1372,6 +1373,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       }
                     : undefined
                 }
+                engagementCounts={data?.engagementCounts}
                 actions={[
                   ...(onViewDetail || onView ? [{
                     type: 'view' as const,

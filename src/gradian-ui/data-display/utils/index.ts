@@ -61,3 +61,6 @@ export {
   renderRatingStars,
 } from '../../form-builder/form-elements/utils/rating-utils';
 
+// Engagement counts (from /api/data)
+export { getDiscussionCount, type EngagementCountItem } from './engagement-counts';
+

@@ -37,6 +37,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DynamicQuickActions } from '@/gradian-ui/data-display/components/DynamicQuickActions';
 import { DiscussionsDialog } from '@/gradian-ui/communication';
+import { getDiscussionCount } from '@/gradian-ui/data-display/utils';
 
 export const useFormContext = () => {
   const context = useContext(FormContext);
@@ -1716,37 +1717,50 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                 {/* Fill With AI Button - Only show in create mode */}
                 <TooltipProvider>
                   <div className="flex items-center gap-2 shrink-0">
-                    {discussionConfig && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="inline-flex">
-                            <Button
-                              type="button"
-                              variant="square"
-                              size="icon"
-                              onClick={() => setIsDiscussionsOpen(true)}
-                              disabled={disabled}
-                              className="md:hidden"
-                            >
-                              <MessageCircle className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="link"
-                              onClick={() => setIsDiscussionsOpen(true)}
-                              disabled={disabled}
-                              className="hidden md:inline-flex gap-2 text-xs"
-                            >
-                              <MessageCircle className="h-4 w-4" />
-                              <span>Discussions</span>
-                            </Button>
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">
-                          <span>Discussions</span>
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
+                    {discussionConfig && (() => {
+                      const discussionCount = getDiscussionCount(referenceEntityData?.engagementCounts);
+                      return (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="inline-flex items-center gap-1.5">
+                              <Button
+                                type="button"
+                                variant="square"
+                                size="icon"
+                                onClick={() => setIsDiscussionsOpen(true)}
+                                disabled={disabled}
+                                className="md:hidden relative"
+                              >
+                                <MessageCircle className="h-4 w-4" />
+                                {discussionCount > 0 && (
+                                  <span className="absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1.5 flex items-center justify-center rounded-full text-xs font-medium bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300 tabular-nums">
+                                    {discussionCount > 99 ? '99+' : discussionCount}
+                                  </span>
+                                )}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="link"
+                                onClick={() => setIsDiscussionsOpen(true)}
+                                disabled={disabled}
+                                className="hidden md:inline-flex gap-2 text-xs"
+                              >
+                                <MessageCircle className="h-4 w-4" />
+                                <span>Discussions</span>
+                                {discussionCount > 0 && (
+                                  <span className="min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-xs font-medium bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300 tabular-nums">
+                                    {discussionCount > 99 ? '99+' : discussionCount}
+                                  </span>
+                                )}
+                              </Button>
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            <span>Discussions</span>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })()}
                     {!editMode && (
                       <Tooltip>
                         <TooltipTrigger asChild>

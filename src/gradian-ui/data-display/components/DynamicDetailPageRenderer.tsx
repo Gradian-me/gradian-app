@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import React from 'react';
-import { Edit, RefreshCw, Trash2, LayoutList } from 'lucide-react';
+import { Edit, RefreshCw, Trash2, LayoutList, MessageCircle } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
 import { AvatarUser } from './AvatarUser';
@@ -45,6 +45,9 @@ import { CardWrapper, CardHeader, CardContent, CardTitle } from '../card/compone
 import { EndLine } from '../../layout/end-line/components/EndLine';
 import { EntityNotFound } from '@/gradian-ui/schema-manager/components';
 import { getSchemaTranslatedSingularName, getSchemaTranslatedPluralName, getSectionTranslatedTitle, getSectionTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
+import { DiscussionsDialog } from '@/gradian-ui/communication';
+import { getDiscussionCount } from '../utils';
+import { useUserStore } from '@/stores/user.store';
 
 export interface DynamicDetailPageRendererProps {
   schema: FormSchema;
@@ -421,6 +424,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   const translatedSingularName = getSchemaTranslatedSingularName(schema, language ?? defaultLang, schema?.singular_name || schema?.name || 'Entity');
 
   const [editEntityId, setEditEntityId] = useState<string | null>(null);
+  const [discussionOpen, setDiscussionOpen] = useState(false);
   const [relatedSchemas, setRelatedSchemas] = useState<string[]>([]);
   const [isLoadingAutoTables, setIsLoadingAutoTables] = useState(false);
   const [targetSchemaCache, setTargetSchemaCache] = useState<Record<string, FormSchema>>(() => {
@@ -686,6 +690,10 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
   // For standalone pages without data, use empty object
   const pageData = isStandalonePage && !data ? {} : data;
+  const detailDiscussionCount = useMemo(
+    () => getDiscussionCount(pageData?.engagementCounts),
+    [pageData?.engagementCounts]
+  );
 
   const headerInfo = pageData ? getHeaderInfo(schema, pageData) : {
     title: '',
@@ -1194,6 +1202,21 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
               {showActions && (onEdit || onDelete || onRefreshData || schema?.id) && (
                 <div className="flex items-center space-x-2">
+                  {schema?.id && pageData?.id && (
+                    <Button
+                      variant="outline"
+                      onClick={() => setDiscussionOpen(true)}
+                      className="px-4 py-2 gap-2"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      <span className="hidden md:block">Discussions</span>
+                      {detailDiscussionCount > 0 && (
+                        <span className="min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-xs font-medium bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300 tabular-nums">
+                          {detailDiscussionCount > 99 ? '99+' : detailDiscussionCount}
+                        </span>
+                      )}
+                    </Button>
+                  )}
                   {schema?.id && (
                     <Button variant="outline" asChild className="px-4 py-2 gap-2">
                       <Link href={`/page/${schema.id}`}>
@@ -1854,6 +1877,19 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
       {/* Go to Top Button */}
       <GoToTop threshold={100} />
+
+      {/* Discussions dialog for detail page */}
+      {schema?.id && pageData?.id && (
+        <DiscussionsDialog
+          isOpen={discussionOpen}
+          onOpenChange={setDiscussionOpen}
+          config={{
+            schemaId: schema.id,
+            instanceId: String(pageData.id),
+            currentUserId: useUserStore.getState().user?.id ?? undefined,
+          }}
+        />
+      )}
 
       {/* Edit Modal - using unified FormModal. No getInitialEntityData so the modal always fetches GET /api/data/[schema-id]/[id] for the latest data. */}
       {editEntityId && schema?.id && data?.id && (
