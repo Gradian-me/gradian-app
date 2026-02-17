@@ -5648,7 +5648,7 @@
         "name": "methods",
         "label": "Methods",
         "sectionId": "basic-information",
-        "component": "multi-select",
+        "component": "picker",
         "placeholder": "Select HTTP methods",
         "required": false,
         "translations": [

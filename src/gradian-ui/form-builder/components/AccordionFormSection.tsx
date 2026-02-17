@@ -7,7 +7,7 @@ import { FormSectionProps } from '@/gradian-ui/schema-manager/types/form-schema'
 import { FormElementFactory } from '../form-elements';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
 import { Button } from '../../../components/ui/button';
-import { ChevronDown, ChevronRight, Edit, Trash2, RefreshCw, X } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronLeft, Edit, Trash2, RefreshCw, X } from 'lucide-react';
 import { cn } from '../../shared/utils';
 import { getFieldsForSection, getValueByRole, getSingleValueByRole, getFieldsByRole, getArrayValuesByRole } from '../form-elements/utils/field-resolver';
 import { FormAlert } from '../../../components/ui/form-alert';
@@ -30,6 +30,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DynamicCardRenderer } from '../../data-display/components/DynamicCardRenderer';
+import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
 import { toast } from 'sonner';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage, getTranslationsArray, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
@@ -100,6 +101,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     open: boolean;
     willEnable: boolean;
   }>({ open: false, willEnable: false });
+  const [inlineDeleteDialog, setInlineDeleteDialog] = useState<{
+    open: boolean;
+    index: number | null;
+  }>({ open: false, index: null });
   const queryClient = useQueryClient();
   const editTitle = getT(TRANSLATION_KEYS.BUTTON_EDIT, language, defaultLang);
   const deleteTitle = getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang);
@@ -1188,7 +1193,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                     "w-full text-base font-medium text-gray-900 dark:text-gray-100 leading-relaxed",
                     isNotApplicable && "opacity-50"
                   )}>{title}</CardTitle>
-                  <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
+                  <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 border border-violet-200 dark:border-violet-800">
                     {itemsCount}
                   </span>
                   {headerSectionMessage && (
@@ -1258,8 +1263,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                       className="p-1 h-6 w-6 hover:bg-gray-200"
                       onClick={(e) => { e.stopPropagation(); toggleExpanded(); }}
                     >
-                      {isExpanded ? (
+                  {isExpanded ? (
                         <ChevronDown className="h-4 w-4" />
+                      ) : isRtl ? (
+                        <ChevronLeft className="h-4 w-4" />
                       ) : (
                         <ChevronRight className="h-4 w-4" />
                       )}
@@ -1890,7 +1897,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         'overflow-visible' // Allow dropdowns to overflow the card
       )}>
         <CardHeader 
-          className="pb-4 px-6 pt-4 cursor-pointer hover:bg-gray-100/50 transition-colors"
+          className="pb-4 px-6 pt-4 rounded-2xl cursor-pointer bg-gray-100 dark:bg-gray-800 hover:bg-gray-100/50 dark:hover:bg-gray-700/50 transition-colors"
           onClick={toggleExpanded}
         >
           <div className="flex items-center justify-between">
@@ -1900,7 +1907,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   "w-full text-base font-medium text-gray-900 dark:text-gray-100",
                   isNotApplicable && "opacity-50"
                 )}>{title}</CardTitle>
-                <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
+                <span className="inline-flex items-center justify-center px-2 py-0.5 text-xs font-medium rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300 border border-violet-200 dark:border-violet-800">
                   {(repeatingItems || []).length}
                 </span>
                 {displaySectionError && (
@@ -1945,6 +1952,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 >
                   {isExpanded ? (
                     <ChevronDown className="h-4 w-4" />
+                  ) : isRtl ? (
+                    <ChevronLeft className="h-4 w-4" />
                   ) : (
                     <ChevronRight className="h-4 w-4" />
                   )}
@@ -1977,7 +1986,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                       {(repeatingItems || []).map((item, index) => (
                         <div
                           key={item.id || `item-${index}`}
-                            className="rounded-xl bg-white dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 shadow-sm"
+                            className="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 shadow-sm"
                         >
                           <div className="flex items-center justify-between px-4 sm:px-6 pt-4">
                             <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -1991,7 +2000,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => onRemoveRepeatingItem(index)}
+                                onClick={() => setInlineDeleteDialog({ open: true, index })}
                                 className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors duration-200 p-2"
                                 disabled={disabled}
                               >
@@ -2059,7 +2068,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                           type="button"
                           variant="ghost"
                           size="sm"
-                          onClick={() => onRemoveRepeatingItem(index)}
+                          onClick={() => setInlineDeleteDialog({ open: true, index })}
                           className="text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors duration-200 p-2"
                           disabled={disabled}
                         >
@@ -2100,6 +2109,51 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         </CardContent>
       )}
       </Card>
+      
+      {/* Inline repeating item delete confirmation */}
+      <ConfirmationMessage
+        isOpen={inlineDeleteDialog.open}
+        onOpenChange={(open) => setInlineDeleteDialog({ open, index: open ? inlineDeleteDialog.index : null })}
+        title={[
+          { en: 'Delete Item' },
+          { fa: 'حذف آیتم' },
+          { ar: 'حذف العنصر' },
+          { es: 'Eliminar elemento' },
+          { fr: 'Supprimer l\'élément' },
+          { de: 'Element löschen' },
+          { it: 'Elimina elemento' },
+          { ru: 'Удалить элемент' },
+        ]}
+        message={[
+          { en: 'Are you sure you want to delete this item? This action cannot be undone.' },
+          { fa: 'آیا مطمئن هستید که می‌خواهید این آیتم را حذف کنید؟ این عمل قابل بازگشت نیست.' },
+          { ar: 'هل أنت متأكد أنك تريد حذف هذا العنصر؟ لا يمكن التراجع عن هذا الإجراء.' },
+          { es: '¿Está seguro de que desea eliminar este elemento? Esta acción no se puede deshacer.' },
+          { fr: 'Voulez-vous vraiment supprimer cet élément ? Cette action est irréversible.' },
+          { de: 'Möchten Sie dieses Element wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.' },
+          { it: 'Sei sicuro di voler eliminare questo elemento? Questa azione non può essere annullata.' },
+          { ru: 'Вы уверены, что хотите удалить этот элемент? Это действие нельзя отменить.' },
+        ]}
+        variant="destructive"
+        buttons={[
+          {
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
+            variant: 'outline',
+            action: () => setInlineDeleteDialog({ open: false, index: null }),
+          },
+          {
+            label: getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang),
+            variant: 'destructive',
+            icon: 'Trash2',
+            action: () => {
+              if (inlineDeleteDialog.index != null && onRemoveRepeatingItem) {
+                onRemoveRepeatingItem(inlineDeleteDialog.index);
+              }
+              setInlineDeleteDialog({ open: false, index: null });
+            },
+          },
+        ]}
+      />
       
       {/* N.A Confirmation Dialog */}
       <ConfirmationMessage
@@ -2193,6 +2247,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               >
                 {isExpanded ? (
                   <ChevronDown className="h-4 w-4" />
+                ) : isRtl ? (
+                  <ChevronLeft className="h-4 w-4" />
                 ) : (
                   <ChevronRight className="h-4 w-4" />
                 )}
@@ -2260,3 +2316,5 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
 };
 
 AccordionFormSection.displayName = 'AccordionFormSection';
+
+export { ViewSwitcher };

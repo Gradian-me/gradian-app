@@ -33,7 +33,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       error,
       disabled = false,
       required = false,
-      rows = 8,
+      rows = 5,
       cols,
       resize = 'vertical',
       maxLength,

@@ -267,7 +267,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         />
       );
     
-    case 'multi-select':
+    case 'multi-select-legacy':
       // Debug: Verify component type is being matched
       if (process.env.NODE_ENV === 'development') {
         loggingCustom(LogType.CLIENT_LOG, 'log', `[FormElementFactory] Rendering MultiSelect component ${JSON.stringify({
@@ -587,9 +587,13 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     }
     
     case 'file':
+    case 'file-input':
       return <FileInput config={config} {...commonProps} />;
     
     case 'picker':
+    case 'multi-select':
+    case 'multiselect':
+    case 'popup-picker':
       return <PickerInput config={config} {...commonProps} />;
     
     case 'icon':
