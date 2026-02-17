@@ -528,6 +528,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           minDate={minDate}
           maxDate={maxDate}
           showPresets={true}
+          allowChangeCalendar={true}
         />
       );
     }
@@ -580,6 +581,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           id={config?.name}
           minDate={minDate}
           maxDate={maxDate}
+          allowChangeCalendar={true}
         />
       );
     }
