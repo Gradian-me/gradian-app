@@ -678,7 +678,21 @@ export function DatePickerCalendar({
                     <input
                       type="time"
                       value={timeStart}
-                      onChange={(e) => { setTimeStart(e.target.value); setTimeError(undefined); }}
+                      onChange={(e) => {
+                        setTimeStart(e.target.value);
+                        setTimeError(undefined);
+                      }}
+                      // Explicitly trigger the native time picker on pointer tap (helps in some mobile + Drawer combinations)
+                      onClick={(e) => {
+                        const target = e.currentTarget as HTMLInputElement;
+                        if (typeof target.showPicker === 'function') {
+                          try {
+                            target.showPicker();
+                          } catch {
+                            // Ignore – not all browsers allow programmatic showPicker
+                          }
+                        }
+                      }}
                       className={cn(baseInputClasses, 'min-h-9')}
                     />
                     <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
@@ -687,7 +701,20 @@ export function DatePickerCalendar({
                     <input
                       type="time"
                       value={timeEnd}
-                      onChange={(e) => { setTimeEnd(e.target.value); setTimeError(undefined); }}
+                      onChange={(e) => {
+                        setTimeEnd(e.target.value);
+                        setTimeError(undefined);
+                      }}
+                      onClick={(e) => {
+                        const target = e.currentTarget as HTMLInputElement;
+                        if (typeof target.showPicker === 'function') {
+                          try {
+                            target.showPicker();
+                          } catch {
+                            // Best-effort only
+                          }
+                        }
+                      }}
                       className={cn(baseInputClasses, 'min-h-9')}
                     />
                   </>
@@ -699,7 +726,20 @@ export function DatePickerCalendar({
                     <input
                       type="time"
                       value={timeStart}
-                      onChange={(e) => { setTimeStart(e.target.value); setTimeError(undefined); }}
+                      onChange={(e) => {
+                        setTimeStart(e.target.value);
+                        setTimeError(undefined);
+                      }}
+                      onClick={(e) => {
+                        const target = e.currentTarget as HTMLInputElement;
+                        if (typeof target.showPicker === 'function') {
+                          try {
+                            target.showPicker();
+                          } catch {
+                            // Ignore unsupported browsers
+                          }
+                        }
+                      }}
                       className={cn(baseInputClasses, 'min-h-9')}
                     />
                   </>

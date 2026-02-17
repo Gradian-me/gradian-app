@@ -137,12 +137,14 @@ function Calendar({
         ),
         dropdown_root: cn(
           defaultClassNames.dropdown_root,
-          "relative flex items-center justify-between gap-1.5 min-h-8 min-w-[4.5rem] px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm cursor-pointer text-sm transition-colors hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600 focus-within:outline-none focus-within:ring-0 focus-within:ring-offset-0 focus-within:border-violet-400 dark:focus-within:border-violet-500"
+          // Ensure strong contrast and readable text in both light and dark modes
+          "relative flex items-center justify-between gap-1.5 min-h-8 min-w-[4.5rem] px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-50 shadow-sm cursor-pointer text-sm transition-colors hover:border-gray-50 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500 focus-within:outline-none focus-within:ring-0 focus-within:ring-offset-0 focus-within:border-violet-400 dark:focus-within:border-violet-500"
         ),
         dropdown: cn("absolute inset-0 opacity-0 cursor-pointer w-full", defaultClassNames.dropdown),
         caption_label: cn(
           defaultClassNames.caption_label,
-          "select-none justify-between w-full font-medium text-sm text-gray-900 dark:text-gray-100 pointer-events-none"
+          // Match dropdown trigger text for better readability in dark mode
+          "select-none justify-between w-full font-medium text-sm text-gray-900 dark:text-gray-50 pointer-events-none"
         ),
         chevron: cn(
           defaultClassNames.chevron,
