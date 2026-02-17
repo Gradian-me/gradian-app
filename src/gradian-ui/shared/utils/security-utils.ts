@@ -133,9 +133,10 @@ export function validateFilePath(filePath: string, baseDir: string): string | nu
     // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal
     const resolvedPath = path.resolve(baseDir, normalized);
 
-    // SECURITY: Ensure resolved path is within base directory
-    // This prevents directory traversal even after normalization
-    if (!resolvedPath.startsWith(resolvedBase)) {
+    // SECURITY: Ensure resolved path is strictly under base directory (not just prefix).
+    // e.g. base "C:\app" must not allow "C:\app-backup\file" (Windows) or "/app/../app-backup" (Unix)
+    const baseWithSep = resolvedBase + path.sep;
+    if (resolvedPath !== resolvedBase && !resolvedPath.startsWith(baseWithSep)) {
       return null;
     }
 

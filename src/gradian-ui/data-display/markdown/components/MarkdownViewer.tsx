@@ -270,22 +270,27 @@ export function MarkdownViewer({
     return createMarkdownComponents(levels, markdownLoadedTimestamp);
   }, [stickyHeadingsKey, markdownLoadedTimestamp]);
 
-  // SECURITY: enforce safe link behavior (no reverse tabnabbing, reduced link abuse)
+  // SECURITY: enforce safe link behavior (no javascript:/data: XSS, no reverse tabnabbing)
   const secureMarkdownComponents = useMemo(() => {
     const baseComponents = markdownComponents || {};
+    const dangerousProtocols = /^\s*(javascript|data|vbscript|file):/i;
 
     return {
       ...baseComponents,
       a: (props: any) => {
         const { href, children, ...rest } = props || {};
         const BaseAnchor = (baseComponents as any).a || 'a';
+        const safeHref =
+          href && typeof href === 'string' && !dangerousProtocols.test(href.trim())
+            ? href
+            : undefined;
 
         return (
           <BaseAnchor
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
             {...rest}
+            href={safeHref}
+            target={safeHref ? '_blank' : undefined}
+            rel={safeHref ? 'noopener noreferrer nofollow' : undefined}
           >
             {children}
           </BaseAnchor>

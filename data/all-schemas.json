@@ -17809,9 +17809,6 @@
             "deviation-criticality",
             "identified-root-causes",
             "contributing-factors",
-            "corrective-actions",
-            "preventive-actions",
-            "related-processes",
             "qa-final-review"
           ],
           "selectedSections": [
@@ -17846,8 +17843,6 @@
             "deviation-categories",
             "identified-root-causes",
             "contributing-factors",
-            "corrective-actions",
-            "preventive-actions",
             "qa-final-review"
           ],
           "additionalSystemPrompt": "Summarize this deviation management record into one or two flowing narrative paragraphs that capture the essence, main ideas, and critical information. Focus on the deviation details, root causes, impacts, and key corrective/preventive actions.",
@@ -17918,8 +17913,7 @@
             "expected-condition",
             "actual-condition-observed",
             "deviation-categories",
-            "identified-root-causes",
-            "corrective-actions"
+            "identified-root-causes"
           ],
           "additionalSystemPrompt": "Create a lego-style illustration based on the deviation management information provided, visualizing the deviation scenario, root causes, and corrective actions in a playful lego aesthetic.",
           "displayType": "hideForm",
@@ -17967,10 +17961,7 @@
             "impact-regulatory-compliance",
             "deviation-criticality",
             "identified-root-causes",
-            "corrective-actions",
-            "preventive-actions",
             "effectiveness-result",
-            "related-processes",
             "qa-final-review"
           ],
           "additionalSystemPrompt": "Perform comprehensive analysis of the deviation management data including risk assessment, trend analysis, root cause patterns, and improvement opportunities. Focus on GMP compliance and quality assurance.",

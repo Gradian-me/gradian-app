@@ -9,6 +9,7 @@ import {
   EXCLUDED_LOGIN_ROUTES,
   AUTH_CONFIG,
   FORBIDDEN_ROUTES_PRODUCTION,
+  PUBLIC_PAGES,
 } from '@/gradian-ui/shared/configs/auth-config';
 
 /**
@@ -152,6 +153,18 @@ function shouldSkipProxy(pathname: string): boolean {
     return true;
   }
 
+  return false;
+}
+
+/**
+ * Check if path is public (no auth required)
+ * Matches AuthGuard logic: exact or prefix match
+ */
+function isPublicPath(pathname: string, publicPages: string[]): boolean {
+  for (const publicPage of publicPages) {
+    if (pathname === publicPage) return true;
+    if (pathname.startsWith(publicPage + '/')) return true;
+  }
   return false;
 }
 
@@ -449,6 +462,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (isPublicPath(pathname, PUBLIC_PAGES ?? [])) {
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `Skipping public path: ${pathname}`);
+    return NextResponse.next();
+  }
+
   try {
     const requireLogin = REQUIRE_LOGIN ?? false;
     const excludedRoutes = EXCLUDED_LOGIN_ROUTES ?? [];
@@ -552,14 +570,17 @@ export async function proxy(request: NextRequest) {
       loggingCustom(LogType.LOGIN_LOG, 'warn', `Failed to decode refresh token: ${error instanceof Error ? error.message : String(error)}, but allowing request (client will validate)`);
     }
 
-    // Refresh token exists - allow request regardless of expiration
-    // Client-side API client will handle refresh token validation and refresh
-    // This prevents redirect loops when refresh tokens are rotated
+    // Refresh token exists but is expired: redirect to login before sending the page.
+    // This prevents the "flash" of protected content then redirect (unprofessional UX).
     if (refreshTokenExpired) {
-      loggingCustom(LogType.LOGIN_LOG, 'info', 'Refresh token exists but appears expired - allowing request (client will attempt refresh)');
-    } else {
-      loggingCustom(LogType.LOGIN_LOG, 'info', 'Refresh token exists and appears valid - allowing request');
+      loggingCustom(LogType.LOGIN_LOG, 'info', 'Refresh token expired - redirecting to login before sending page');
+      const loginUrl = new URL('/authentication/login', request.url);
+      const encryptedReturnUrl = encryptReturnUrl(pathname);
+      loginUrl.searchParams.set('returnUrl', encryptedReturnUrl);
+      return NextResponse.redirect(loginUrl);
     }
+
+    loggingCustom(LogType.LOGIN_LOG, 'info', 'Refresh token exists and appears valid - allowing request');
     loggingCustom(LogType.LOGIN_LOG, 'info', '========== PROXY COMPLETED SUCCESSFULLY ==========');
     return NextResponse.next();
   } catch (error) {

@@ -49,14 +49,16 @@ export default async function MarkdownRenderPage({ params, searchParams }: PageP
   }
 
   // SECURITY: Restrict access to only allowed directories (docs and public markdown files)
-  // Prevent access to source code, config files, and other sensitive project files
+  // Prevent access to source code, config files, and other sensitive project files.
+  // Use base+sep so "src/docs" does not allow "src/docs-backup" (path prefix edge case)
   const allowedBasePaths = [
     path.resolve(process.cwd(), 'src', 'docs'),
     path.resolve(process.cwd(), 'public'),
   ];
-  const isInAllowedDirectory = allowedBasePaths.some(allowedPath => 
-    resolvedPath.startsWith(allowedPath)
-  );
+  const isInAllowedDirectory = allowedBasePaths.some(allowedPath => {
+    const baseWithSep = allowedPath + path.sep;
+    return resolvedPath === allowedPath || resolvedPath.startsWith(baseWithSep);
+  });
   if (!isInAllowedDirectory) {
     notFound();
   }
@@ -80,9 +82,10 @@ export default async function MarkdownRenderPage({ params, searchParams }: PageP
   // SECURITY: Double-check resolved path after following symlink (if any)
   // This ensures even if a symlink exists, the final resolved path is still in allowed directory
   const realPath = fs.realpathSync(resolvedPath);
-  const isRealPathInAllowedDirectory = allowedBasePaths.some(allowedPath => 
-    realPath.startsWith(allowedPath)
-  );
+  const isRealPathInAllowedDirectory = allowedBasePaths.some(allowedPath => {
+    const baseWithSep = allowedPath + path.sep;
+    return realPath === allowedPath || realPath.startsWith(baseWithSep);
+  });
   if (!isRealPathInAllowedDirectory) {
     notFound();
   }
