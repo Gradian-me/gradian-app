@@ -251,6 +251,8 @@ interface AiBuilderFormProps {
   hideEditAgent?: boolean; // Hide Edit Agent button
   hidePromptHistory?: boolean; // Hide Prompt History button
   hideLanguageSelector?: boolean; // Hide language selector from form (use in footer instead)
+  /** When false, footer language selector does not update the global app language (output language only). Default true. */
+  languageSelectorSyncsToStore?: boolean;
   summarizedPrompt?: string; // Summarized version of the prompt (for search/image)
   isSummarizing?: boolean; // Whether summarization is in progress
 }
@@ -283,6 +285,7 @@ export function AiBuilderForm({
   hideEditAgent = false,
   hidePromptHistory = false,
   hideLanguageSelector = false,
+  languageSelectorSyncsToStore = true,
   summarizedPrompt: propSummarizedPrompt,
   isSummarizing: propIsSummarizing,
 }: AiBuilderFormProps) {
@@ -1299,6 +1302,7 @@ export function AiBuilderForm({
                               placeholder: getT(TRANSLATION_KEYS.AI_BUILDER_LABEL_LANGUAGE, language, defaultLang),
                             }}
                             value={selectedLanguage || 'fa'}
+                            syncToStore={languageSelectorSyncsToStore}
                             onChange={(lang) => {
                               const languageValue = lang || 'fa';
                               onLanguageChange(languageValue);

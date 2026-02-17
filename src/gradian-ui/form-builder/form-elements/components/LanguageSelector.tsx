@@ -23,6 +23,8 @@ export interface LanguageSelectorProps extends Omit<FormElementProps, 'config'> 
   className?: string;
   placeholder?: string;
   defaultLanguage?: string;
+  /** When false, changing the selection does not update the global app language store. Default true. */
+  syncToStore?: boolean;
 }
 
 // Default language options; use flag when available (LanguageSelector shows flag instead of icon)
@@ -49,6 +51,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   className,
   placeholder,
   defaultLanguage,
+  syncToStore = true,
   ...props
 }) => {
   const defaultLang = defaultLanguage ?? getDefaultLanguage();
@@ -82,9 +85,9 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 
   const setLanguage = useLanguageStore((s) => s.setLanguage);
 
-  // Handle value change – sync to global language store so calendar/translations follow
+  // Handle value change – optionally sync to global language store (e.g. skip when used as AI output language only)
   const handleValueChange = (selectedValue: string) => {
-    setLanguage(selectedValue);
+    if (syncToStore) setLanguage(selectedValue);
     if (onChange) {
       onChange(selectedValue);
     }
@@ -94,7 +97,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   const handleNormalizedChange = (selection: any[]) => {
     if (selection && selection.length > 0) {
       const selectedId = String(selection[0]?.id ?? selection[0]?.value ?? '');
-      setLanguage(selectedId);
+      if (syncToStore) setLanguage(selectedId);
       if (onChange) onChange(selectedId);
     } else {
       if (onChange) onChange('');

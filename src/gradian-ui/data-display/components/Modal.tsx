@@ -87,7 +87,9 @@ export const Modal: React.FC<ModalProps> = ({
                   {title}
                 </DialogTitle>
               )}
-                {description && <DialogDescription>{description}</DialogDescription>}
+                {description && (!enableMaximize || !isMaximized) && (
+                  <DialogDescription>{description}</DialogDescription>
+                )}
               </div>
               {(headerActions || enableMaximize) && (
                 <div className="flex items-center gap-2 shrink-0">

@@ -110,15 +110,13 @@ export function AiBuilderWrapper({
     [isPreviewControlled, onPreviewOpenChange]
   );
   const [previewSchema, setPreviewSchema] = useState<{ schema: FormSchema; schemaId: string } | null>(null);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>(initialSelectedLanguage || 'fa'); // Default language for string output agents
-  
-  // Sync language with external changes
-  useEffect(() => {
-    if (initialSelectedLanguage !== undefined && initialSelectedLanguage !== selectedLanguage) {
-      setSelectedLanguage(initialSelectedLanguage);
-    }
-  }, [initialSelectedLanguage]);
-  
+  // Default footer language to app language (same as LanguageSelector) when not explicitly set by parent
+  const storeLanguage = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  // Default to app language as initial value only; AI footer language is independent after that (no two-way sync)
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(
+    () => storeLanguage ?? initialSelectedLanguage ?? getDefaultLanguage() ?? 'fa'
+  );
+
   // Notify parent when language changes
   const handleLanguageChange = useCallback((language: string) => {
     setSelectedLanguage(language);
@@ -716,6 +714,7 @@ export function AiBuilderWrapper({
           hideEditAgent={hideEditAgent}
           hidePromptHistory={hidePromptHistory}
           hideLanguageSelector={hideLanguageSelector}
+          languageSelectorSyncsToStore={false}
           summarizedPrompt={summarizedPrompt || undefined}
           isSummarizing={isSummarizing}
         />
