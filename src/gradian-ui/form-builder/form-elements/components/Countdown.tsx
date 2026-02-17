@@ -165,6 +165,7 @@ export const Countdown: React.FC<CountdownProps> = ({
 
   return (
     <div
+      dir="ltr"
       className={`flex flex-col gap-2 ${className}`}
       title={tooltipLabel}
       aria-label={tooltipLabel}
