@@ -111,7 +111,8 @@ function validateElement(element: HTMLElement): void {
 async function loadJsPDF(): Promise<any> {
   try {
     const jsPDFModule = await import('jspdf');
-    return (jsPDFModule as any).default || (jsPDFModule as any).jsPDF;
+    // Support both CJS default and ESM named export (jspdf 4.x)
+    return (jsPDFModule as any).default ?? (jsPDFModule as any).jsPDF;
   } catch (error) {
     throw new Error('Failed to load PDF library');
   }
