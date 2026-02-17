@@ -12,6 +12,7 @@ import { ProfessionalWritingModal } from '@/gradian-ui/communication/professiona
 import { VoiceInputDialog } from '@/gradian-ui/communication/voice/components/VoiceInputDialog';
 import { TextareaAiEnhanceButton } from './TextareaAiEnhanceButton';
 import { TextareaVoiceInputButton } from './TextareaVoiceInputButton';
+import { TextareaFloatingActionButton } from './TextareaFloatingActionButton';
 import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 import {
   resolveFromTranslationsArray,
@@ -38,7 +39,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       maxLength,
       className,
       touched,
-      canCopy = false,
+      canCopy = true,
       allowTranslation = false,
       language: languageProp,
       defaultLanguage: defaultLanguageProp,
@@ -63,6 +64,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
         : typeof value === 'string'
           ? value
           : '';
+    const contentToCopy = allowTranslation ? displayValue : (typeof value === 'string' ? value : '');
     const valueForValidation = allowTranslation ? displayValue : (typeof value === 'string' ? value : '');
 
     useImperativeHandle(ref, () => ({
@@ -122,9 +124,8 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       resize === 'horizontal' && 'resize-x',
       resize === 'vertical' && 'resize-y',
       resize === 'both' && 'resize',
-      (aiAgentId || enableVoiceInput) && !allowTranslation && 'pe-12',
-      allowTranslation && 'pe-10',
       allowTranslation && 'read-only:bg-white read-only:border-gray-300 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-gray-600 read-only:dark:text-gray-300 read-only:cursor-default',
+      (contentToCopy.trim() || (allowTranslation && !disabled) || (aiAgentId && !allowTranslation) || (enableVoiceInput && !allowTranslation)) && 'pb-10',
       className
     );
 
@@ -156,27 +157,26 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
             disabled={disabled}
             readOnly={allowTranslation && !disabled}
             className={textareaClasses}
-            style={(aiAgentId || enableVoiceInput) && !allowTranslation ? { paddingInlineEnd: '3rem' } : undefined}
+            dir="auto"
             {...props}
           />
-          <div className="absolute end-3 top-2 flex items-center gap-1">
-            {canCopy && displayValue && (
-              <CopyContent content={displayValue} />
+        {(contentToCopy.trim() || (allowTranslation && !disabled) || (aiAgentId && !allowTranslation && typeof value === 'string' && value.trim()) || (enableVoiceInput && !allowTranslation)) && (
+          <div className="absolute bottom-2 end-2 mb-2 flex items-center justify-end gap-1">
+            {contentToCopy.trim() && (
+              <CopyContent content={contentToCopy} className="shrink-0" />
             )}
             {allowTranslation && !disabled && (
-              <button
-                type="button"
+              <TextareaFloatingActionButton
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   setTranslationDialogOpen(true);
                 }}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                disabled={disabled}
                 title="Edit translations"
-                aria-label="Edit translations"
               >
-                <Languages className="h-4 w-4" />
-              </button>
+                <Languages className="h-3.5 w-3.5" />
+              </TextareaFloatingActionButton>
             )}
             {aiAgentId && !allowTranslation && typeof value === 'string' && value.trim() && (
               <TextareaAiEnhanceButton
@@ -184,15 +184,14 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
                 disabled={disabled}
               />
             )}
-          </div>
-          {enableVoiceInput && !allowTranslation && (
-            <div className="absolute end-3 bottom-4 flex items-center gap-1">
+            {enableVoiceInput && !allowTranslation && (
               <TextareaVoiceInputButton
                 onClick={handleVoiceInputClick}
                 disabled={disabled}
               />
-            </div>
-          )}
+            )}
+          </div>
+        )}
         </div>
         {error && (
           <p className={errorTextClasses} role="alert">

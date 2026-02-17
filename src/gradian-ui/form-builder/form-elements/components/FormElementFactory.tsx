@@ -329,7 +329,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         <Textarea
           config={config}
           {...commonProps}
-          canCopy={canCopy}
+          canCopy={Boolean((config as any)?.canCopy ?? (restProps as any)?.canCopy ?? true)}
           allowTranslation={(config as any)?.allowTranslation}
           language={language}
           defaultLanguage={defaultLang}
@@ -385,7 +385,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           config={config} 
           {...commonProps} 
           canCopy={canCopy} 
-          aiAgentId={aiAgentId ?? 'professional-writing'}
+          aiAgentId={aiAgentId}
           enableVoiceInput={enableVoiceInput} 
           loadingTextSwitches={loadingTextSwitches}
           rows={(config as any)?.rows || (restProps as any)?.rows || 5}

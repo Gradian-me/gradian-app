@@ -9,13 +9,22 @@ import {
 } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
+import { useLanguageStore } from "@/stores/language.store"
+import { isRTL, getDefaultLanguage } from "@/gradian-ui/shared/utils/translation-utils"
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme()
+  const language = useLanguageStore((s) => s.language)
+  const lang = language || getDefaultLanguage()
+  const rtl = isRTL(lang)
+  const dir = rtl ? "rtl" : "ltr"
+  const position = rtl ? "bottom-left" : "bottom-right"
 
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
+      dir={dir}
+      position={position}
       className="toaster group"
       toastOptions={{
         classNames: {

@@ -1860,17 +1860,6 @@
     "updatedAt": "2026-01-04T14:18:19.220Z"
   },
   {
-    "id": "01KE4CJ3A7YSC66MBF7F10P1B6",
-    "sourceSchema": "users",
-    "sourceId": "01KE4CJ37WKF60JWQGQ0BD0WF4",
-    "targetSchema": "external_nodes",
-    "targetId": "active-directory",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "authentication-type",
-    "createdAt": "2026-01-04T11:33:56.167Z",
-    "updatedAt": "2026-02-15T14:24:34.813Z"
-  },
-  {
     "id": "01KE4CJW8Q6P3AP23AZMERB03T",
     "sourceSchema": "app-access-policies",
     "sourceId": "01KE4CJW76P9RQC931TH0ENJ75",
@@ -2369,17 +2358,6 @@
   },
   {
     "sourceSchema": "user-roles",
-    "sourceId": "01KBSTFQSKSN3W9CGK59VZ1FRX",
-    "targetSchema": "users",
-    "targetId": "01KE4CJ37WKF60JWQGQ0BD0WF4",
-    "relationTypeId": "HAS_MEMBER",
-    "id": "01KE9GTXPACR5PDF4XRQFSDMJX",
-    "createdAt": "2026-01-06T11:24:51.786Z",
-    "updatedAt": "2026-01-06T11:24:54.122Z",
-    "inactive": true
-  },
-  {
-    "sourceSchema": "user-roles",
     "sourceId": "01KE4C760Y3VY0YJBT0Q0D3C4J",
     "targetSchema": "users",
     "targetId": "01KDFEH9R5NH6C1QXN7PE3HK43",
@@ -2520,17 +2498,6 @@
     "fieldId": "virtual-assignedTo-tasks",
     "createdAt": "2026-01-07T09:35:57.101Z",
     "updatedAt": "2026-01-07T09:35:57.101Z"
-  },
-  {
-    "id": "01KECBRJR0530BS6JKSWWQRYJP",
-    "sourceSchema": "tasks",
-    "sourceId": "01KECBRJJ18CMXVYHACBYWVM86",
-    "targetSchema": "users",
-    "targetId": "01KE4CJ37WKF60JWQGQ0BD0WF4",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "virtual-assignedTo-tasks",
-    "createdAt": "2026-01-07T13:53:55.455Z",
-    "updatedAt": "2026-01-07T13:53:55.455Z"
   },
   {
     "id": "01KECDEA84FYSACK6W4SGQ9ESE",

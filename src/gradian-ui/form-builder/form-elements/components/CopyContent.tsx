@@ -71,14 +71,14 @@ export const CopyContent: React.FC<CopyContentProps> = ({
       }
 
       setCopied(true);
-      toast.success('Copied to clipboard');
+      toast.success(toastCopied);
       
       // Reset the check icon after 2 seconds
       setTimeout(() => {
         setCopied(false);
       }, 2000);
     } catch (err) {
-      toast.error('Failed to copy');
+      toast.error(toastFailed);
     }
   };
 

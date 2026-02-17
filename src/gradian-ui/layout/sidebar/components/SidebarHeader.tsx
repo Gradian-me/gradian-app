@@ -20,9 +20,10 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
 
   // LTR: sidebar on left — collapsed = PanelLeftOpen (expand), expanded = PanelRightOpen (collapse).
   // RTL: sidebar on right — collapsed = PanelRightOpen (expand toward left), expanded = PanelLeftOpen (collapse toward right).
+  // Mobile: LTR = PanelRightOpen (close slides left), RTL = PanelLeftOpen (close slides right).
   const toggleIcon =
     isMobile ? (
-      <PanelRightOpen className="h-5 w-5" />
+      isRtl ? <PanelLeftOpen className="h-5 w-5" /> : <PanelRightOpen className="h-5 w-5" />
     ) : isRtl ? (
       isCollapsed ? <PanelRightOpen className="h-5 w-5" /> : <PanelLeftOpen className="h-5 w-5" />
     ) : (

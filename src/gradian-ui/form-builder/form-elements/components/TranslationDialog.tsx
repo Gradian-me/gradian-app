@@ -123,7 +123,7 @@ export function TranslationDialog({
 
   const inputClasses = cn(
     baseInputClasses,
-    isTextarea ? 'min-h-[80px] resize-y leading-relaxed' : 'min-h-11'
+    isTextarea ? 'min-h-[100px] resize-y leading-relaxed' : 'min-h-11'
   );
 
   // In view mode only show languages that have a value
@@ -178,6 +178,7 @@ export function TranslationDialog({
                 ) : isTextarea ? (
                   <div className="p-1.5">
                     <textarea
+                      dir="auto"
                       className={inputClasses}
                       value={record[code] ?? ''}
                       onChange={(e) => handleLangChange(code, e.target.value)}
