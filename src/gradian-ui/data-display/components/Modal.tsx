@@ -2,14 +2,15 @@
 
 'use client';
 
-import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '../../../components/ui/dialog';
-import { ModalProps } from '../types';
-import { cn } from '../../shared/utils';
 import { Button } from '@/components/ui/button';
-import { useLanguageStore } from '@/stores/language.store';
-import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { Maximize2, Minimize2 } from 'lucide-react';
+import React from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
+import { cn } from '../../shared/utils';
+import { ModalProps } from '../types';
 
 export const Modal: React.FC<ModalProps> = ({
   isOpen,
@@ -26,24 +27,31 @@ export const Modal: React.FC<ModalProps> = ({
   hideCloseButton = false,
   footerLeftActions,
   headerActions,
+  enableMaximize,
+  defaultMaximized,
+  onMaximizeChange,
   ...props
 }) => {
   const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
   const defaultLang = getDefaultLanguage();
   const closeButtonLabel = getT(TRANSLATION_KEYS.BUTTON_CLOSE, language, defaultLang);
 
-  const sizeClasses = {
-    sm: 'max-w-md',
-    md: 'md:max-w-4xl',
-    lg: 'lg:max-w-7xl',
-    xl: 'xl:max-w-[88rem]',
-    full: 'max-w-full mx-4',
-  };
+  const [isMaximized, setIsMaximized] = React.useState<boolean>(!!defaultMaximized);
+
+  React.useEffect(() => {
+    if (typeof onMaximizeChange === 'function') {
+      onMaximizeChange(isMaximized);
+    }
+  }, [isMaximized, onMaximizeChange]);
 
   const modalClasses = cn(
     hideDialogHeader 
       ? 'border-0 bg-white dark:bg-gray-900 shadow-none overflow-hidden rounded-none h-full w-full' // Full screen, no border, no rounded corners, no max constraints when header is hidden
-      : 'border-none bg-white dark:bg-gray-900 shadow-xl overflow-hidden rounded-none lg:rounded-2xl h-full w-full lg:max-w-5xl lg:max-h-[90vh]', // No rounded corners on mobile, rounded on desktop
+      : cn(
+          'border-none bg-white dark:bg-gray-900 shadow-xl overflow-hidden rounded-none lg:rounded-2xl h-full w-full lg:max-h-[90vh] lg:max-w-[90vw]', // No rounded corners on mobile, rounded on desktop
+          // When maximized, expand on large screens to full viewport width/height
+          enableMaximize && isMaximized && 'lg:max-w-screen lg:max-h-screen'
+        ),
     'mx-0', // No margin on mobile, margin on desktop
     'flex flex-col', // Add flex column layout
     className
@@ -70,7 +78,7 @@ export const Modal: React.FC<ModalProps> = ({
           <DialogTitle className="sr-only absolute w-0 h-0 overflow-hidden pointer-events-none">
             {titleContent}
           </DialogTitle>
-        ) : (title || description || headerActions) && (
+        ) : (title || description || headerActions || enableMaximize) && (
           <DialogHeader className="px-6 pt-2 pb-2 shrink-0">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 gap-2 flex flex-col">
@@ -81,9 +89,26 @@ export const Modal: React.FC<ModalProps> = ({
               )}
                 {description && <DialogDescription>{description}</DialogDescription>}
               </div>
-              {headerActions && (
+              {(headerActions || enableMaximize) && (
                 <div className="flex items-center gap-2 shrink-0">
                   {headerActions}
+                  {enableMaximize && (
+                    // By default show on large screens; callers can further control with wrapper classes.
+                    <Button
+                      type="button"
+                      variant="square"
+                      size="sm"
+                      className="hidden lg:inline-flex"
+                      onClick={() => setIsMaximized((prev) => !prev)}
+                      aria-label={isMaximized ? 'Restore dialog size' : 'Maximize dialog'}
+                    >
+                      {isMaximized ? (
+                        <Minimize2 className="h-4 w-4" />
+                      ) : (
+                        <Maximize2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                  )}
                 </div>
               )}
             </div>

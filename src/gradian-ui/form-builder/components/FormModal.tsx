@@ -21,7 +21,6 @@ import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getSchemaTranslatedSingularName } from '@/gradian-ui/schema-manager/utils/schema-utils';
-import { Maximize2, Minimize2 } from 'lucide-react';
 import { ConfirmationMessage } from '../form-elements/components/ConfirmationMessage';
 
 const EXCLUDED_TITLE_ROLES = new Set(['code', 'subtitle', 'description']);
@@ -175,7 +174,6 @@ export const FormModal: React.FC<FormModalProps> = ({
   hideCloseButton = false,
   referenceEntityData,
 }) => {
-  const [isMaximized, setIsMaximized] = React.useState(false);
 
   // Create customActionSubmit handler using useCallback to maintain hook order consistency
   const customActionSubmit = React.useCallback(async (formData: Record<string, any>, schema: any) => {
@@ -504,25 +502,10 @@ export const FormModal: React.FC<FormModalProps> = ({
       title={modalTitle}
       description={modalDescription}
       size={size}
-      className={isMaximized ? 'lg:max-w-[100vw] lg:max-h-screen' : undefined}
       showCloseButton={false}
       hideDialogHeader={hideDialogHeader}
       hideCloseButton={hideCloseButton}
-      headerActions={
-        !hideDialogHeader ? (
-          <div className="flex items-center justify-end">
-            <Button
-              type="button"
-              variant="square"
-              size="sm"
-              onClick={() => setIsMaximized((prev) => !prev)}
-              aria-label={isMaximized ? 'Restore form size' : 'Maximize form'}
-            >
-              {isMaximized ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-            </Button>
-          </div>
-        ) : undefined
-      }
+      enableMaximize={!hideDialogHeader}
     >
       <FormDialogErrorBoundary onClose={handleClose} resetKey={modalContentResetKey}>
         {/* Quick actions popover is now rendered inline with action buttons in FormLifecycleManager */}

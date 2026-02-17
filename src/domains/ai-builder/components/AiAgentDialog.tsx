@@ -5,20 +5,18 @@
 
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { Modal } from '@/gradian-ui/data-display/components/Modal';
-import { AiBuilderWrapper } from './AiBuilderWrapper';
-import type { QuickAction } from '@/gradian-ui/schema-manager/types/form-schema';
-import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
-import type { AiAgent } from '../types';
-import { replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
-import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
-import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
-import { LogType } from '@/gradian-ui/shared/configs/log-config';
-import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
-import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { Button } from '@/components/ui/button';
-import { Eye, Maximize2, Minimize2 } from 'lucide-react';
+import { Modal } from '@/gradian-ui/data-display/components/Modal';
+import { replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
+import type { FormSchema, QuickAction } from '@/gradian-ui/schema-manager/types/form-schema';
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
+import { Eye } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import type { AiAgent } from '../types';
+import { AiBuilderWrapper } from './AiBuilderWrapper';
 
 export interface AiAgentDialogProps {
   isOpen: boolean;
@@ -51,7 +49,6 @@ export function AiAgentDialog({
   const [userPrompt, setUserPrompt] = useState<string>('');
   const [processedBody, setProcessedBody] = useState<Record<string, any> | undefined>(undefined);
   const [processedExtraBody, setProcessedExtraBody] = useState<Record<string, any> | undefined>(undefined);
-  const [isMaximized, setIsMaximized] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Process preset body and extra_body with dynamic context replacement
@@ -206,21 +203,8 @@ export function AiAgentDialog({
       title={`AI Agent: ${agent.label}`}
       description={agent.description}
       size="xl"
-      className={isMaximized ? 'lg:max-w-[100vw] lg:max-h-screen' : undefined}
       showCloseButton={true}
-      headerActions={
-        <div className="flex items-center justify-end">
-          <Button
-            type="button"
-            variant="square"
-            size="sm"
-            onClick={() => setIsMaximized((prev) => !prev)}
-            aria-label={isMaximized ? 'Restore dialog size' : 'Maximize dialog'}
-          >
-            {isMaximized ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-          </Button>
-        </div>
-      }
+      enableMaximize={true}
       footerLeftActions={
         DEMO_MODE ? (
           <Button

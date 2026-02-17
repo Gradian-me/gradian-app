@@ -6,13 +6,6 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
 import { Modal } from '@/gradian-ui/data-display/components/Modal';
 import { Button } from '@/components/ui/button';
 import { Loader2, Eye } from 'lucide-react';
@@ -23,6 +16,7 @@ import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
 import { VoicePoweredOrb } from '@/components/ui/voice-powered-orb';
 import { TextSwitcher } from '@/components/ui/text-switcher';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DrawerDialog } from '@/gradian-ui/data-display/components/DrawerDialog';
 
 interface PromptPreviewSheetProps {
   isOpen: boolean;
@@ -136,11 +130,11 @@ export function PromptPreviewSheet({
                 {/* Show prompt from bodyParams if userPrompt is empty but bodyParams has prompt */}
                 {(!effectiveUserPrompt.trim() && bodyParams?.prompt) ? (
                   <div>
-                    <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                    <h3 dir="auto" className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
                       Prompt (from body parameters):
                     </h3>
                     <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
-                      <MarkdownViewer 
+                      <MarkdownViewer   
                         content={String(bodyParams.prompt)}
                         showToggle={false}
                       />
@@ -149,7 +143,7 @@ export function PromptPreviewSheet({
                 ) : (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                      <h3 dir="auto" className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
                         User Prompt:
                       </h3>
                       {effectiveUserPrompt.trim() ? (
@@ -170,7 +164,7 @@ export function PromptPreviewSheet({
                     {/* Show summarized prompt if available and different from original */}
                     {(summarizedPrompt || isSummarizing) && (
                       <div>
-                        <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                        <h3 dir="auto" className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
                           Summarized Prompt (for search/image):
                           {isSummarizing && (
                             <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
@@ -228,7 +222,7 @@ export function PromptPreviewSheet({
                   </div>
                 )}
                 <div>
-                  <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                  <h3 dir="auto" className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
                     System Prompt:
                   </h3>
                   {isLoadingPreload ? (
@@ -255,7 +249,7 @@ export function PromptPreviewSheet({
                 </div>
                 {(hasBodyParams || hasExtraBody) && (
                   <div>
-                    <h3 className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
+                    <h3 dir="auto" className="text-sm font-semibold mb-2 text-gray-900 dark:text-gray-100">
                       Request Parameters:
                     </h3>
                     <div className="space-y-3">
@@ -321,15 +315,16 @@ export function PromptPreviewSheet({
           {previewBodyContent}
         </Modal>
       ) : (
-        <Sheet open={isOpen} onOpenChange={onOpenChange}>
-          <SheetContent className="w-full sm:max-w-2xl flex flex-col p-0 h-full [&>button]:z-20 !z-[100]" overlayClassName="!z-[95]">
-            <SheetHeader className="px-6 pt-6 pb-4 pe-12 border-b border-gray-200 dark:border-gray-700 shrink-0 sticky top-0 bg-white dark:bg-gray-900 z-10">
-              <SheetTitle>Prompt Sent to LLM</SheetTitle>
-              <SheetDescription>{previewDescription}</SheetDescription>
-            </SheetHeader>
-            {previewBodyContent}
-          </SheetContent>
-        </Sheet>
+        <DrawerDialog
+          open={isOpen}
+          onOpenChange={onOpenChange}
+          title="Prompt Sent to LLM"
+          alwaysDrawer={true}
+          description={previewDescription}
+          handlerPosition="side"
+        >
+          {previewBodyContent}
+        </DrawerDialog>
       )}
     </>
   );

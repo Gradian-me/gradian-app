@@ -320,6 +320,19 @@ export interface ModalProps extends BaseComponentProps {
   hideDialogHeader?: boolean; // Hide the dialog header (title/description) when true
   hideCloseButton?: boolean; // Hide the X close button in top right when true
   footerLeftActions?: React.ReactNode; // Actions to show on the left side of the footer
+  /**
+   * Enable built-in maximize/minimize toggle in the modal header.
+   * When true, a small square button is shown in the header (configurable via breakpoint classes).
+   */
+  enableMaximize?: boolean;
+  /**
+   * Optional initial maximize state when enableMaximize is true.
+   */
+  defaultMaximized?: boolean;
+  /**
+   * Optional callback when maximize state changes.
+   */
+  onMaximizeChange?: (value: boolean) => void;
 }
 
 // Data Table Component Types

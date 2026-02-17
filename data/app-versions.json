@@ -7085,5 +7085,23 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000012",
+    "timestamp": "2026-02-17T00:10:00.000Z",
+    "version": "1.55.002",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "REFACTOR: Updated UserProfileSelector to default to full width for better layout consistency. Refactored AiAgentDialog and PromptPreviewSheet components to enhance UI and usability by integrating maximize functionality and replacing Sheet with DrawerDialog. Improved Modal component to support maximize/minimize feature, enhancing user interaction. This update enhances overall user experience and component consistency across the application.",
+        "priority": "High",
+        "affectedDomains": [
+          "ui",
+          "layout",
+          "ai-builder",
+          "data-display"
+        ]
+      }
+    ]
   }
 ]

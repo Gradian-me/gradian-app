@@ -65,7 +65,9 @@ export function UserProfileSelector({
   // SECURITY: Always default to 'light' on server to ensure consistent hydration
   const computedVariant = theme ?? (isMounted ? (resolvedTheme === 'dark' ? 'dark' : 'light') : 'light');
   const isDarkVariant = computedVariant === 'dark';
-  const fullWidth = config?.layout?.fullWidth ?? false;
+  // Default to full width so the profile selector naturally fills sidebar width,
+  // while still allowing callers to override via config.layout.fullWidth = false.
+  const fullWidth = config?.layout?.fullWidth ?? true;
 
   // Only compute user-dependent values after mount to avoid hydration mismatch
   // Before mount, these will return empty/default values
