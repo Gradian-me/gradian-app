@@ -152,30 +152,48 @@ const isRecordInactive = (row?: any): boolean => {
 };
 
 // Helper to wrap content with ForceIcon if isForce is true and field is title role
-// Also applies strike-through if record is inactive and bold styling for title
-const wrapWithForceIcon = (content: React.ReactNode, isForce: boolean, field?: any, row?: any): React.ReactNode => {
+// Also applies strike-through if record is inactive, bold styling for title, and copy button for title content
+const wrapWithForceIcon = (
+  content: React.ReactNode,
+  isForce: boolean,
+  field?: any,
+  row?: any
+): React.ReactNode => {
   const isInactive = isRecordInactive(row);
   const isTitle = field?.role === 'title';
-  
+
   let wrappedContent = isTitle ? (
     <span className="font-semibold w-full block">{content}</span>
-  ) : content;
-  
+  ) : (
+    content
+  );
+
   // Apply strike-through to title if inactive
-  wrappedContent = isInactive && isTitle ? (
-    <span className="line-through">{wrappedContent}</span>
-  ) : wrappedContent;
-  
-  // Only show ForceIcon for title role fields
-  if (!isForce || !isTitle) return wrappedContent;
-  
-  // Get title from row data
-  const titleValue = row ? getFieldValue(field, row) : undefined;
+  wrappedContent =
+    isInactive && isTitle ? <span className="line-through">{wrappedContent}</span> : wrappedContent;
+
+  // Get title from row data for copy content (only for title role)
+  const titleValue = isTitle && row ? getFieldValue(field, row) : undefined;
   const title = titleValue ? String(titleValue).trim() : undefined;
+
+  // Enhance title fields with copy-to-clipboard action when we have a non-empty title
+  const contentWithCopy =
+    isTitle && title ? (
+      <span className="inline-flex items-center gap-1.5">
+        <span className="min-w-0">{wrappedContent}</span>
+        <CopyContent content={title} />
+      </span>
+    ) : (
+      wrappedContent
+    );
+
+  // Only show ForceIcon for title role fields
+  if (!isForce || !isTitle) return contentWithCopy;
+
   return (
     <span className="inline-flex items-center gap-1.5">
       <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} title={title} />
-      {wrappedContent}
+      {contentWithCopy}
     </span>
   );
 };

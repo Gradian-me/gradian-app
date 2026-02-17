@@ -114,7 +114,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
   return (
     <div ref={setNodeRef} style={style} className="relative">
       <div className={cn(
-        "w-full flex items-center gap-2 rounded border p-2 transition-all",
+        "w-full flex items-center gap-2 rounded-xl border p-2 transition-all",
         isDragging
           ? 'border-violet-400 dark:border-violet-500 bg-white dark:bg-gray-800 shadow-md'
           : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50'
@@ -339,13 +339,13 @@ export const DataSort: React.FC<DataSortProps> = ({
               <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                 {getT(TRANSLATION_KEYS.LABEL_COLUMNS, language ?? defaultLang, defaultLang)}
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 {availableColumns.map((column) => {
                   const checked = isColumnSelected(column.name);
                   return (
                     <label
                       key={column.id}
-                      className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
+                      className="flex items-center gap-1 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
                     >
                       <Checkbox
                         checked={checked}
@@ -363,13 +363,13 @@ export const DataSort: React.FC<DataSortProps> = ({
               <p className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
                 {getT(TRANSLATION_KEYS.LABEL_SYSTEM, language ?? defaultLang, defaultLang)}
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-3">
                 {systemFields.map((field) => {
                   const checked = isColumnSelected(field.name);
                   return (
                     <label
                       key={field.id}
-                      className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
+                      className="flex items-center gap-1 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
                     >
                       <Checkbox
                         checked={checked}
@@ -388,7 +388,7 @@ export const DataSort: React.FC<DataSortProps> = ({
   );
 
   const renderRightPanel = () => (
-    <div className="w-80 shrink-0 flex flex-col border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+    <div className="w-80 shrink-0 flex flex-col border border-gray-200 dark:border-gray-700 rounded-lg p-3 overflow-x-hidden">
       <div className="flex items-center justify-between gap-2 mb-2">
         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
           {getT(TRANSLATION_KEYS.LABEL_SORT_ORDER, language ?? defaultLang, defaultLang)}
@@ -405,7 +405,7 @@ export const DataSort: React.FC<DataSortProps> = ({
           </Button>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto space-y-1 min-h-[120px]">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-1 min-h-[120px]">
         {displayValue.length === 0 ? (
           <p className="text-sm text-muted-foreground py-4">
             {getT(TRANSLATION_KEYS.MESSAGE_SELECT_COLUMNS_FROM_LEFT, language ?? defaultLang, defaultLang)}

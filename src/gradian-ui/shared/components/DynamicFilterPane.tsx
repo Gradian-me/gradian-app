@@ -224,7 +224,7 @@ export const DynamicFilterPane = ({
       {/* Sort Dialog */}
       {schema && onSortChange && (
         <Dialog open={isSortDialogOpen} onOpenChange={setIsSortDialogOpen}>
-          <DialogContent className="max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col">
+          <DialogContent className="w-full h-full rounded-none sm:rounded-2xl lg:max-w-4xl lg:max-h-[85vh] lg:h-auto overflow-hidden flex flex-col">
             <DialogHeader className="pb-3">
               <DialogTitle>{getT(TRANSLATION_KEYS.TITLE_SORT_DATA, language ?? defaultLang, defaultLang)}</DialogTitle>
             </DialogHeader>

@@ -124,7 +124,7 @@ function SortableGroupingRow({
     <div ref={setNodeRef} style={style} className="relative">
       <div
         className={cn(
-          'flex items-center gap-2 rounded border p-2 transition-all',
+          'flex items-center gap-2 rounded-xl border p-2 transition-all',
           isDragging
             ? 'border-violet-400 bg-white dark:bg-gray-800 shadow-md'
             : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50'
@@ -362,7 +362,7 @@ export function DynamicQueryGroupingDialog({
                     return (
                       <label
                         key={rowKey}
-                        className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
+                        className="flex items-center gap-1 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
                       >
                         <Checkbox
                           checked={checked}
@@ -388,7 +388,7 @@ export function DynamicQueryGroupingDialog({
     onDragEnd: (event: DragEndEvent) => void,
     onRemove: (item: GroupingItem) => void
   ) => (
-    <div className="w-80 shrink-0 flex flex-col border rounded-lg p-3">
+    <div className="w-80 shrink-0 flex flex-col border rounded-lg p-3 overflow-x-hidden">
       <div className="flex items-center justify-between gap-2 mb-2">
         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{title}</p>
         {list.length > 0 && (
@@ -403,7 +403,7 @@ export function DynamicQueryGroupingDialog({
           </Button>
         )}
       </div>
-      <div className="flex-1 overflow-y-auto space-y-1">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-1">
         {list.length === 0 ? (
           <p className="text-sm text-muted-foreground">Select columns from the left.</p>
         ) : (

@@ -101,7 +101,7 @@ function SortableColumnRow({
     <div ref={setNodeRef} style={style} className="relative">
       <div
         className={cn(
-          'flex items-center gap-2 rounded border p-2 transition-all',
+          'flex items-center gap-2 rounded-xl border p-2 transition-all',
           isDragging
             ? 'border-violet-400 bg-white dark:bg-gray-800 shadow-md'
             : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50'
@@ -228,7 +228,7 @@ export function DynamicQueryColumnConfigDialog({
         <DialogHeader className="pb-3">
           <DialogTitle>Configure columns: {schema?.plural_name ?? schemaId}</DialogTitle>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden space-y-4 pr-1">
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
               Selected columns (drag to set order)
@@ -269,7 +269,7 @@ export function DynamicQueryColumnConfigDialog({
               {availableFields.map((field) => (
                 <label
                   key={field.id}
-                  className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
+                  className="flex items-center gap-1 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
                 >
                   <Checkbox
                     checked={selectedFieldIds.has(field.id)}
