@@ -7066,5 +7066,24 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000011",
+    "timestamp": "2026-02-17T00:05:00.000Z",
+    "version": "1.55.001",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "REFACTOR MAJOR: Refactored schema caching mechanisms across multiple components to utilize client-side IndexedDB caching more effectively. Enhanced the DynamicDetailPageClient, TenantSelector, and SchemaManagerWrapper components to prefer cached schemas before making API requests, improving performance and reducing unnecessary network calls. This update also includes improved error handling and logging for cache operations, enhancing overall reliability and user experience.",
+        "priority": "High",
+        "affectedDomains": [
+          "schema-manager",
+          "caching",
+          "layout",
+          "detail-pages",
+          "performance"
+        ]
+      }
+    ]
   }
 ]

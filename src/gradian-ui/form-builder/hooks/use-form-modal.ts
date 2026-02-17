@@ -398,48 +398,46 @@ export function useFormModal(
     setIsLoading(true);
     
     try {
-      // Always fetch fresh schema from API to ensure we have the latest schema definition
-      // This is especially important for nested modals where schemas might have been updated
       let schemaSource: FormSchema | null = null;
       
-      // Fetch from API with cache disabled to get the latest schema
-      const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
-        disableCache: true, // Always fetch fresh schema
-      });
-      
-      if (response.success && response.data) {
-        // Handle both { data: schema } and { data: { data: schema } } response structures
-        const rawData = response.data as any;
-        const hasSchemaStructure = rawData?.id != null && typeof rawData === 'object';
-        const nestedSchema = rawData?.data && typeof rawData.data === 'object' && rawData.data?.id != null;
-        schemaSource = hasSchemaStructure ? rawData : (nestedSchema ? rawData.data : rawData);
-        if (schemaSource?.id) {
-          await cacheSchemaClientSide(schemaSource, { queryClient, persist: false });
+      // 1) Try to use an already-loaded schema if caller provided one
+      if (getInitialSchema) {
+        try {
+          schemaSource = getInitialSchema(schemaId) ?? null;
+        } catch (error) {
+          loggingCustom(
+            LogType.CLIENT_LOG,
+            'warn',
+            `getInitialSchema threw an error for ${schemaId}: ${error instanceof Error ? error.message : String(error)}`
+          );
+          schemaSource = null;
         }
-      } else {
-        // Fallback to getInitialSchema if API fetch fails
-        if (getInitialSchema) {
-          try {
-            schemaSource = getInitialSchema(schemaId) ?? null;
-            if (schemaSource) {
-              loggingCustom(LogType.CLIENT_LOG, 'warn', `API fetch failed for schema ${schemaId}, using cached schema from getInitialSchema`);
-            }
-          } catch (error) {
-            loggingCustom(LogType.CLIENT_LOG, 'warn', `getInitialSchema threw an error: ${error instanceof Error ? error.message : String(error)}`);
-            schemaSource = null;
-          }
-        }
+      }
+
+      // 2) If no cached schema available, fetch from API
+      if (!schemaSource) {
+        const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
+          // Allow HTTP / browser caching; apiRequest still adds auth / tenant headers
+          disableCache: false,
+        });
         
-        // If still no schema, throw error
-        if (!schemaSource) {
+        if (response.success && response.data) {
+          // Handle both { data: schema } and { data: { data: schema } } response structures
+          const rawData = response.data as any;
+          const hasSchemaStructure = rawData?.id != null && typeof rawData === 'object';
+          const nestedSchema = rawData?.data && typeof rawData.data === 'object' && rawData.data?.id != null;
+          schemaSource = hasSchemaStructure ? rawData : (nestedSchema ? rawData.data : rawData);
+          if (schemaSource?.id) {
+            await cacheSchemaClientSide(schemaSource, { queryClient, persist: false });
+          }
+        } else {
+          // If still no schema, throw error
           throw new Error(response.error || `Schema not found: ${schemaId}`);
         }
       }
 
-      const schemaCopy = JSON.parse(JSON.stringify(schemaSource));
-
-      // Reconstruct RegExp objects
-      const rawSchema = reconstructRegExp(schemaCopy) as FormSchema;
+      // Reconstruct RegExp objects (in-place) to avoid deep JSON clone on large schemas
+      const rawSchema = reconstructRegExp(schemaSource) as FormSchema;
       
       // Validate schema structure
       if (!rawSchema?.id) {

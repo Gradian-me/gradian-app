@@ -3,11 +3,11 @@
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
 import { ReactNode, useEffect } from 'react';
 import { getCacheConfig } from '@/gradian-ui/shared/configs/cache-config';
-import { clearSchemaCache } from '@/gradian-ui/indexdb-manager/schema-cache';
 import { clearCompaniesCache } from '@/gradian-ui/indexdb-manager/companies-cache';
 import { toast } from 'sonner';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 import { clearMenuItemsCache } from '@/stores/menu-items.store';
+import { clearClientSchemaCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 
 // Get default cache configuration from config file
 const defaultCacheConfig = getCacheConfig('schemas');
@@ -191,14 +191,15 @@ function ReactQueryCacheClearHandler() {
     const handleCacheClear = async (event: CustomEvent<{ queryKeys?: string[] }>) => {
       const queryKeys = event.detail?.queryKeys || ['schemas', 'companies'];
       try {
-        await clearSchemaCache();
-      } catch (error) {
-        console.warn('[schema-cache] Failed to clear IndexedDB cache:', error);
-      }
-      try {
         await clearCompaniesCache();
       } catch (error) {
         console.warn('[schema-cache] Failed to clear companies IndexedDB cache:', error);
+      }
+      // Clear per-schema client-side IndexedDB namespace ("schemas:*" keys)
+      try {
+        await clearClientSchemaCache();
+      } catch (error) {
+        console.warn('[schema-cache] Failed to clear client schema IndexedDB cache:', error);
       }
       // Clear menu items cache
       try {
@@ -239,14 +240,15 @@ function ReactQueryCacheClearHandler() {
       if (e.key === 'react-query-cache-cleared') {
         const queryKeys = e.newValue ? JSON.parse(e.newValue) : ['schemas', 'companies'];
         try {
-          await clearSchemaCache();
-        } catch (error) {
-          console.warn('[schema-cache] Failed to clear IndexedDB cache from storage event:', error);
-        }
-        try {
           await clearCompaniesCache();
         } catch (error) {
           console.warn('[schema-cache] Failed to clear companies cache from storage event:', error);
+        }
+        // Clear per-schema client-side IndexedDB namespace ("schemas:*" keys)
+        try {
+          await clearClientSchemaCache();
+        } catch (error) {
+          console.warn('[schema-cache] Failed to clear client schema cache from storage event:', error);
         }
         // Clear menu items cache
         try {

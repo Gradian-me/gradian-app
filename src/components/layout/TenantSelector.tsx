@@ -19,8 +19,7 @@ import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { SCHEMAS_QUERY_KEY, SCHEMAS_SUMMARY_QUERY_KEY } from '@/gradian-ui/schema-manager/hooks/use-schemas';
-import { clearSchemaCache } from '@/gradian-ui/indexdb-manager/schema-cache';
-import { SCHEMA_SUMMARY_CACHE_KEY, SCHEMA_CACHE_KEY } from '@/gradian-ui/indexdb-manager/types';
+import { clearClientSchemaCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 
 interface Tenant {
   id: string | number;
@@ -259,7 +258,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
       }
     }
     
-    // Clear schema cache when tenant changes (both React Query and IndexedDB)
+      // Clear schema cache when tenant changes (React Query + client-side IndexedDB per-schema cache)
     try {
       loggingCustom(LogType.CLIENT_LOG, 'info', 'Clearing schema cache due to tenant change');
       
@@ -282,15 +281,16 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
         loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to call clear-cache API: ${apiError instanceof Error ? apiError.message : String(apiError)}`);
       }
       
-      // Clear IndexedDB cache (this is persistent storage)
+      // Clear client-side per-schema IndexedDB cache (this is persistent storage)
       try {
-        await Promise.all([
-          clearSchemaCache(undefined, SCHEMA_CACHE_KEY),
-          clearSchemaCache(undefined, SCHEMA_SUMMARY_CACHE_KEY),
-        ]);
-        loggingCustom(LogType.CLIENT_LOG, 'info', 'IndexedDB schema cache cleared');
+        await clearClientSchemaCache();
+        loggingCustom(LogType.CLIENT_LOG, 'info', 'Client schema IndexedDB cache cleared');
       } catch (indexedDbError) {
-        loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to clear IndexedDB schema cache: ${indexedDbError instanceof Error ? indexedDbError.message : String(indexedDbError)}`);
+        loggingCustom(
+          LogType.CLIENT_LOG,
+          'warn',
+          `Failed to clear client schema IndexedDB cache: ${indexedDbError instanceof Error ? indexedDbError.message : String(indexedDbError)}`
+        );
       }
       
       // Invalidate all schema queries (this marks them as stale and triggers refetch)

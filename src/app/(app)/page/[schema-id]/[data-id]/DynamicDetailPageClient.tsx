@@ -12,6 +12,7 @@ import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsConte
 import { QueryClientContext } from '@tanstack/react-query';
 import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { getSchemaWithClientCache, clearClientSchemaCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 
 interface DynamicDetailPageClientProps {
   schema: FormSchema;
@@ -103,18 +104,13 @@ export function DynamicDetailPageClient({
     deleteEntity,
   } = useDynamicEntity(schemaState);
 
-  // Fetch schema from API on mount to ensure fresh data
+  // Fetch schema on mount, preferring client-side IndexedDB cache first
   useEffect(() => {
     const fetchSchemaFromApi = async () => {
       try {
-        // Fetch from /api/schemas/{schemaId} to get fresh schema data
-        // Disable cache to ensure we always get fresh data from the server
-        const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
-          disableCache: true,
-          callerName: 'DynamicDetailPageClient',
-        });
-        if (response.success && response.data) {
-          const updated = reconstructRegExp(response.data) as FormSchema;
+        const cachedOrFresh = await getSchemaWithClientCache(schemaId);
+        if (cachedOrFresh) {
+          const updated = reconstructRegExp(cachedOrFresh) as FormSchema;
           setSchemaState(ensureSchemaActions(updated));
           if (queryClient) {
             queryClient.setQueryData(['schemas', schemaId], updated);
@@ -135,12 +131,9 @@ export function DynamicDetailPageClient({
             Promise.all(
               targetSchemas.map(async (targetSchemaId) => {
                 try {
-                  const schemaResponse = await apiRequest<FormSchema>(`/api/schemas/${targetSchemaId}`, {
-                    disableCache: true,
-                    callerName: 'DynamicDetailPageClient.preloadQuickActionSchema',
-                  });
-                  if (schemaResponse.success && schemaResponse.data) {
-                    const reconstructed = reconstructRegExp(schemaResponse.data) as FormSchema;
+                  const target = await getSchemaWithClientCache(targetSchemaId);
+                  if (target) {
+                    const reconstructed = reconstructRegExp(target) as FormSchema;
                     await cacheSchemaClientSide(reconstructed, { queryClient, persist: false });
                     queryClient.setQueryData(['schemas', targetSchemaId], reconstructed);
                   }
@@ -161,12 +154,9 @@ export function DynamicDetailPageClient({
 
   const refreshSchema = useCallback(async () => {
     try {
-      const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
-        disableCache: true,
-        callerName: 'DynamicDetailPageClient-refresh',
-      });
-      if (response.success && response.data) {
-        const updated = reconstructRegExp(response.data) as FormSchema;
+      const fresh = await getSchemaWithClientCache(schemaId);
+      if (fresh) {
+        const updated = reconstructRegExp(fresh) as FormSchema;
         setSchemaState(ensureSchemaActions(updated));
         if (queryClient) {
           queryClient.setQueryData(['schemas', schemaId], updated);
@@ -200,6 +190,9 @@ export function DynamicDetailPageClient({
             // Also trigger storage event for other tabs
             window.localStorage.setItem('react-query-cache-cleared', JSON.stringify(reactQueryKeys));
             window.localStorage.removeItem('react-query-cache-cleared');
+            
+            // Clear client-side IndexedDB schema cache as well
+            await clearClientSchemaCache();
             
             // Wait a bit for cache to clear, then refresh
             setTimeout(async () => {

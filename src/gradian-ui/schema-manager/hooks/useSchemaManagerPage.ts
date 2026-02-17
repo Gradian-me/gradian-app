@@ -11,8 +11,6 @@ import { config } from '@/lib/config';
 import { useSchemas, SCHEMAS_QUERY_KEY, SCHEMAS_SUMMARY_QUERY_KEY } from './use-schemas';
 import { useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
-import { clearSchemaCache } from '@/gradian-ui/indexdb-manager/schema-cache';
-import { SCHEMA_SUMMARY_CACHE_KEY } from '@/gradian-ui/indexdb-manager/types';
 import { useTenantStore } from '@/stores/tenant.store';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 
@@ -411,26 +409,6 @@ export const useSchemaManagerPage = () => {
       await invalidateSchemaQueryCaches();
       await refetchSchemas();
 
-      // Force-refresh summary cache so IndexedDB stores the latest snapshot
-      try {
-        await clearSchemaCache(undefined, SCHEMA_SUMMARY_CACHE_KEY);
-        const params: Record<string, string> = {
-          summary: 'true',
-          cacheBust: Date.now().toString(),
-        };
-        if (showStatistics) {
-          params.includeStatistics = 'true';
-        }
-        if (tenantId) {
-          params.tenantIds = String(tenantId);
-        }
-        await apiRequest<FormSchema[]>('/api/schemas', {
-          params,
-          callerName: 'SchemaManagerRefresh',
-        });
-      } catch (cacheError) {
-        console.warn('[schema-manager] Failed to refresh summary cache', cacheError);
-      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Error refreshing schemas';
       setMessages({
@@ -498,13 +476,6 @@ export const useSchemaManagerPage = () => {
           console.warn('Error calling clear-cache route:', error);
         }
 
-        // Clear IndexedDB schema cache first
-        try {
-          await clearSchemaCache(undefined, SCHEMA_SUMMARY_CACHE_KEY);
-        } catch (error) {
-          console.warn('Failed to clear IndexedDB schema cache:', error);
-        }
-        
         // Invalidate and refetch queries to ensure fresh data
         await invalidateSchemaQueryCaches();
         

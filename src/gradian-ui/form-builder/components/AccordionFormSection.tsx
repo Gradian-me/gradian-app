@@ -1296,12 +1296,12 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   <motion.div
                     layout
                     key="relation-section-content"
-                    initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  className="overflow-hidden"
-                >
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 4 }}
+                    transition={{ duration: 0.18, ease: 'easeOut' }}
+                    className="overflow-hidden"
+                  >
                   <CardContent className="px-2 md:px-6 pb-6 overflow-visible">
                     <div className="space-y-4">
                       <AnimatePresence mode="wait">
@@ -1964,17 +1964,17 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         </CardHeader>
         
         {isCollapsible ? (
-          <AnimatePresence>
-            {isExpanded && (
-              <motion.div
-                layout
-                key="inline-repeating-section-content"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="overflow-hidden"
-              >
+        <AnimatePresence>
+          {isExpanded && (
+            <motion.div
+              layout
+              key="inline-repeating-section-content"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 4 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="overflow-hidden"
+            >
                 <CardContent className="px-2 md:px-6 pb-6 overflow-visible">
                 <div className="space-y-4">
                   {(repeatingItems || []).length === 0 ? (
@@ -2264,10 +2264,10 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             <motion.div
               layout
               key="standard-section-content"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 4 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
               className="overflow-hidden"
             >
               <CardContent className="px-2 md:px-6 pb-6 overflow-visible">

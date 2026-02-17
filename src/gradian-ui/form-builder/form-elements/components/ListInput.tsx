@@ -849,37 +849,47 @@ export const ListInput: React.FC<ListInputProps> = ({
       {error && (
         <p className="mt-1 text-xs text-red-600 dark:text-red-400">{error}</p>
       )}
-      {displayValue.length > 0 ? (
-        reorderingEnabled ? (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-          >
-            <SortableContext
-              items={itemIds}
-              strategy={verticalListSortingStrategy}
+      <div
+        className={cn(
+          'rounded-xl border px-3 py-3 space-y-3 bg-white/60 dark:bg-gray-900/30',
+          error ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700',
+          disabled && 'opacity-60'
+        )}
+      >
+        {displayValue.length > 0 ? (
+          reorderingEnabled ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
             >
-              {listContent}
-            </SortableContext>
-          </DndContext>
+              <SortableContext
+                items={itemIds}
+                strategy={verticalListSortingStrategy}
+              >
+                {listContent}
+              </SortableContext>
+            </DndContext>
+          ) : (
+            listContent
+          )
         ) : (
-          listContent
-        )
-      ) : (
-        <div className={cn(
-          'text-xs text-gray-500 dark:text-gray-400 text-center py-6 px-4 border border-dashed rounded-xl bg-gray-50/50 dark:bg-gray-800/30',
-          error ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700'
-        )}>
-          {emptyClickToAddOne}
-        </div>
-      )}
+          <div
+            className={cn(
+              'text-xs text-gray-500 dark:text-gray-400 text-center py-6 px-4 border border-dashed rounded-xl bg-gray-50/50 dark:bg-gray-800/30',
+              error ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700'
+            )}
+          >
+            {emptyClickToAddOne}
+          </div>
+        )}
 
-      <AddButtonFull
-        label={addButtonText}
-        onClick={handleAddItem}
-        disabled={hasEmptyItem || disabled}
-      />
+        <AddButtonFull
+          label={addButtonText}
+          onClick={handleAddItem}
+          disabled={hasEmptyItem || disabled}
+        />
+      </div>
     </div>
   );
 };

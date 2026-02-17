@@ -31,6 +31,7 @@ import { FormSchema } from '../types';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { clearClientSchemaCache } from '../utils/client-schema-cache';
 
 export function SchemaManagerWrapper() {
   const router = useRouter();
@@ -92,11 +93,20 @@ export function SchemaManagerWrapper() {
     const toastId = toast.loading('Clearing schema cache...');
 
     try {
+      // Call server-side clear-cache route
       const response = await fetch('/api/schemas/clear-cache', {
         method: 'POST',
       });
 
-      const data = await response.json();
+      let data: any = null;
+      try {
+        data = await response.json();
+      } catch {
+        data = { success: response.ok };
+      }
+
+      // Always clear client-side IndexedDB schema cache as well
+      await clearClientSchemaCache();
 
       if (data.success) {
         const reactQueryKeys: string[] = Array.isArray(data.reactQueryKeys) && data.reactQueryKeys.length > 0
@@ -119,6 +129,8 @@ export function SchemaManagerWrapper() {
         toast.error(data.error || 'Failed to clear cache', { id: toastId });
       }
     } catch (error) {
+      // On network error, still clear client-side cache to avoid stale data
+      await clearClientSchemaCache();
       toast.error(
         error instanceof Error ? error.message : 'Failed to clear cache',
         { id: toastId }

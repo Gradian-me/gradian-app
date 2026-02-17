@@ -2,8 +2,6 @@
 
 import type { QueryClient } from '@tanstack/react-query';
 import type { FormSchema } from '../types/form-schema';
-import { persistSchemasToCache } from '@/gradian-ui/indexdb-manager/schema-cache';
-import { SCHEMA_CACHE_KEY } from '@/gradian-ui/indexdb-manager/types';
 import { SCHEMAS_QUERY_KEY } from '../hooks/use-schemas';
 
 interface CacheOptions {
@@ -20,14 +18,6 @@ export async function cacheSchemaClientSide(schema: FormSchema | null | undefine
   }
 
   const { queryClient, persist = true } = options || {};
-
-  if (persist && typeof window !== 'undefined') {
-    try {
-      await persistSchemasToCache([schema], { cacheKey: SCHEMA_CACHE_KEY });
-    } catch (error) {
-      console.warn('[schema-cache] Failed to persist schema to IndexedDB', error);
-    }
-  }
 
   if (queryClient) {
     queryClient.setQueryData<FormSchema>(['schemas', schema.id], schema);
