@@ -21,6 +21,8 @@ import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getDisplayNameFields, normalizeLocalizedFieldForStorage } from '@/gradian-ui/shared/utils';
+import type { LocalizedField } from '@/types';
 
 const ACCESS_TOKEN_COOKIE = AUTH_CONFIG?.ACCESS_TOKEN_COOKIE || 'access_token';
 
@@ -258,12 +260,15 @@ function LoginModalContent() {
 
       if (data.user) {
         const u = data.user as Record<string, unknown>;
+        const displayNames = getDisplayNameFields(u);
+        const nameForStore = normalizeLocalizedFieldForStorage(displayNames.name ?? u.name) ?? '';
+        const lastnameForStore = normalizeLocalizedFieldForStorage(displayNames.lastname ?? u.lastname);
         setUser({
           id: u.id as string,
           email: (u.email as string) ?? '',
           username: (u.username as string) ?? '',
-          name: (u.name as string) ?? '',
-          lastname: (u.lastname as string) ?? '',
+          name: nameForStore as LocalizedField,
+          lastname: (lastnameForStore ?? '') as LocalizedField | undefined,
           role: (u.role as 'admin' | 'procurement' | 'vendor') ?? 'vendor',
           department: u.department as string | undefined,
           avatar: u.avatar as string | undefined,

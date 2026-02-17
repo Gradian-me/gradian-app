@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { cn, resolveLocalizedField } from '@/gradian-ui/shared/utils';
+import { cn, getDisplayNameFields, resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { Badge as FormBadge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
 import { useUserStore } from '@/stores/user.store';
 import { useLanguageStore } from '@/stores/language.store';
@@ -69,15 +69,19 @@ export function UserProfileSelector({
   // while still allowing callers to override via config.layout.fullWidth = false.
   const fullWidth = config?.layout?.fullWidth ?? true;
 
-  // Only compute user-dependent values after mount to avoid hydration mismatch
-  // Before mount, these will return empty/default values
+  // Resolve display name from user; support name/lastname and API variants (firstName/lastName, first_name/last_name)
+  // so the selected language is used and we show name instead of email when the API returns those fields.
+  const displayNameFields = useMemo(
+    () => (isMounted && user ? getDisplayNameFields(user as unknown as Record<string, unknown>) : { name: undefined, lastname: undefined }),
+    [isMounted, user]
+  );
   const firstName = useMemo(
-    () => (isMounted && user ? resolveLocalizedField(user.name, language, 'en') : ''),
-    [isMounted, user, language]
+    () => (isMounted && user ? resolveLocalizedField(displayNameFields.name, language, 'en') : ''),
+    [isMounted, user, language, displayNameFields.name]
   );
   const lastName = useMemo(
-    () => (isMounted && user ? resolveLocalizedField(user.lastname, language, 'en') : ''),
-    [isMounted, user, language]
+    () => (isMounted && user ? resolveLocalizedField(displayNameFields.lastname, language, 'en') : ''),
+    [isMounted, user, language, displayNameFields.lastname]
   );
   const displayName = useMemo(() => {
     if (!isMounted || !user) return '';
@@ -275,14 +279,14 @@ export function UserProfileSelector({
             </Avatar>
             <div
               className={cn(
-                'flex flex-col leading-tight text-start mx-2',
+                'flex flex-col leading-tight text-start mx-2 min-w-0',
                 fullWidth ? 'flex-1 overflow-hidden' : 'max-w-[140px] overflow-hidden'
               )}
             >
-              <span className="text-gray-900 dark:text-gray-100 text-sm font-semibold truncate" title={displayName}>
+              <span className="text-gray-900 dark:text-gray-100 text-sm font-semibold truncate block" title={displayName}>
                 {displayName}
               </span>
-              <span className="text-xs text-gray-500 dark:text-gray-400 truncate" title={user?.email || ''}>
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate block" title={user?.email || ''}>
                 {user?.email || ''}
               </span>
             </div>
@@ -311,9 +315,9 @@ export function UserProfileSelector({
                   }}
                   dir={isRTLLanguage ? 'rtl' : 'ltr'}
                 >
-                  <div className="px-3 py-2">
-                    <div className="flex items-center gap-2">
-                      <p className="text-gray-900 dark:text-gray-100 text-sm font-semibold truncate" title={displayName}>
+                  <div className="px-3 py-2 min-w-0 overflow-hidden">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <p className="text-gray-900 dark:text-gray-100 text-sm font-semibold truncate min-w-0" title={displayName}>
                         {displayName}
                       </p>
                       {isAdmin && (
@@ -329,7 +333,7 @@ export function UserProfileSelector({
                       )}
                     </div>
                     <p
-                      className="text-xs text-gray-500 dark:text-gray-400 truncate"
+                      className="text-xs text-gray-500 dark:text-gray-400 truncate min-w-0"
                       title={user.email}
                     >
                       {user.email}

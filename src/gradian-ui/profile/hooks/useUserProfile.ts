@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
 import { getUserInitials } from '../utils';
 import { config } from '@/lib/config';
-import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
+import { getDisplayNameFields, resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 
 export interface UseUserProfileReturn {
@@ -20,8 +20,9 @@ export interface UseUserProfileReturn {
  * Convert API user data to UserProfile format
  */
 function convertUserToProfile(user: any, language: string): UserProfile {
-  const firstName = resolveLocalizedField(user.name, language, 'en');
-  const lastName = resolveLocalizedField(user.lastname, language, 'en');
+  const displayNameFields = getDisplayNameFields(user && typeof user === 'object' ? user : undefined);
+  const firstName = resolveLocalizedField(displayNameFields.name, language, 'en');
+  const lastName = resolveLocalizedField(displayNameFields.lastname, language, 'en');
   const fullName = lastName 
     ? `${firstName} ${lastName}`.trim()
     : firstName;

@@ -101,9 +101,14 @@ export const DrawerDialog: React.FC<DrawerDialogProps> = ({
           drawerClassName,
         )}
       >
-        {/* Custom handler: side = always on the right (right edge of drawer); RTL drawer opens from left so handle stays right */}
+        {/* Custom handler: side = on inner edge — left when RTL (drawer opens from left), right when LTR (drawer opens from right) */}
         {showSideHandle ? (
-          <div className="absolute top-1/2 right-1 -translate-y-1/2 h-20 w-2 rounded-full bg-gray-200 dark:bg-gray-700" />
+          <div
+            className={cn(
+              'absolute top-1/2 -translate-y-1/2 h-20 w-2 rounded-full bg-gray-200 dark:bg-gray-700',
+              isRTLLanguage ? 'left-1' : 'right-1'
+            )}
+          />
         ) : (
           <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-gray-200 dark:bg-gray-700" />
         )}

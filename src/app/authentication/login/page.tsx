@@ -20,6 +20,7 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getDisplayNameFields, normalizeLocalizedFieldForStorage } from '@/gradian-ui/shared/utils';
 
 const ACCESS_TOKEN_COOKIE = AUTH_CONFIG?.ACCESS_TOKEN_COOKIE || 'access_token';
 
@@ -300,12 +301,15 @@ function LoginPageContent() {
           relatedCompanies: data.user.relatedCompanies?.length,
           entityType: data.user.entityType?.length,
         })}`);
+        const displayNames = getDisplayNameFields(data.user as Record<string, unknown>);
+        const nameForStore = normalizeLocalizedFieldForStorage(displayNames.name ?? data.user.name) ?? '';
+        const lastnameForStore = normalizeLocalizedFieldForStorage(displayNames.lastname ?? data.user.lastname) ?? '';
         setUser({
           id: data.user.id,
           email: data.user.email,
           username: data.user.username,
-          name: data.user.name,
-          lastname: data.user.lastname,
+          name: nameForStore,
+          lastname: lastnameForStore,
           role: data.user.role as 'admin' | 'procurement' | 'vendor',
           department: data.user.department,
           avatar: data.user.avatar,

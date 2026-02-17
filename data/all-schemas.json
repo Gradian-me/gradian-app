@@ -22179,6 +22179,125 @@
         "colSpan": 2,
         "order": 2,
         "role": "description"
+      },
+      {
+        "id": "task-definition-of-done",
+        "name": "definitionOfDone",
+        "label": "Definition of Done",
+        "sectionId": "task-information",
+        "component": "checklist",
+        "placeholder": "Describe what must be done for this task to be considered complete",
+        "translations": [
+          { "en": "Definition of Done" },
+          { "fa": "معیار تکمیل" },
+          { "ar": "تعريف الإنجاز" },
+          { "es": "Definición de hecho" },
+          { "fr": "Définition of done" },
+          { "de": "Definition of Done" },
+          { "it": "Definition of Done" },
+          { "ru": "Критерии приёмки" }
+        ],
+        "placeholderTranslations": [
+          { "en": "Describe what must be done for this task to be considered complete" },
+          { "fa": "شرح دهید برای تکمیل این وظیفه چه باید انجام شود" },
+          { "ar": "صف ما يجب إنجازه لاعتبار هذه المهمة مكتملة" },
+          { "es": "Describa qué debe hacerse para dar por completada esta tarea" },
+          { "fr": "Décrivez ce qui doit être fait pour considérer cette tâche comme terminée" },
+          { "de": "Beschreiben Sie, was erledigt sein muss, damit die Aufgabe als abgeschlossen gilt" },
+          { "it": "Descrivi cosa deve essere fatto per considerare completata questa attività" },
+          { "ru": "Опишите, что должно быть сделано, чтобы задача считалась выполненной" }
+        ],
+        "validation": { "required": false },
+        "colSpan": 2,
+        "order": 3,
+        "role": "list"
+      },
+      {
+        "id": "task-progress-percent",
+        "name": "progressPercent",
+        "label": "Progress %",
+        "sectionId": "actions-taken",
+        "component": "slider",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "defaultValue": 0,
+        "translations": [
+          { "en": "Progress %" },
+          { "fa": "درصد پیشرفت" },
+          { "ar": "نسبة التقدم %" },
+          { "es": "Progreso %" },
+          { "fr": "Progression %" },
+          { "de": "Fortschritt %" },
+          { "it": "Progresso %" },
+          { "ru": "Прогресс %" }
+        ],
+        "validation": { "required": false, "min": 0, "max": 100 },
+        "colSpan": 1,
+        "order": 1,
+        "role": "progress"
+      },
+      {
+        "id": "task-complete-date",
+        "name": "completeDate",
+        "label": "Complete Date",
+        "sectionId": "actions-taken",
+        "component": "date",
+        "placeholder": "Select completion date",
+        "translations": [
+          { "en": "Complete Date" },
+          { "fa": "تاریخ تکمیل" },
+          { "ar": "تاريخ الإكمال" },
+          { "es": "Fecha de finalización" },
+          { "fr": "Date d'achèvement" },
+          { "de": "Abschlussdatum" },
+          { "it": "Data completamento" },
+          { "ru": "Дата завершения" }
+        ],
+        "placeholderTranslations": [
+          { "en": "Select completion date" },
+          { "fa": "تاریخ تکمیل را انتخاب کنید" },
+          { "ar": "اختر تاريخ الإكمال" },
+          { "es": "Seleccione la fecha de finalización" },
+          { "fr": "Sélectionnez la date d'achèvement" },
+          { "de": "Abschlussdatum auswählen" },
+          { "it": "Seleziona data completamento" },
+          { "ru": "Выберите дату завершения" }
+        ],
+        "validation": { "required": false },
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "task-actions-taken",
+        "name": "actionsTaken",
+        "label": "Actions Taken",
+        "sectionId": "actions-taken",
+        "component": "checklist",
+        "placeholder": "Add action item",
+        "translations": [
+          { "en": "Actions Taken" },
+          { "fa": "اقدامات انجام شده" },
+          { "ar": "الإجراءات المتخذة" },
+          { "es": "Acciones realizadas" },
+          { "fr": "Actions effectuées" },
+          { "de": "Durchgeführte Maßnahmen" },
+          { "it": "Azioni intraprese" },
+          { "ru": "Выполненные действия" }
+        ],
+        "placeholderTranslations": [
+          { "en": "Add action item" },
+          { "fa": "اقدام انجام شده را اضافه کنید" },
+          { "ar": "أضف إجراء" },
+          { "es": "Agregar acción" },
+          { "fr": "Ajouter une action" },
+          { "de": "Maßnahme hinzufügen" },
+          { "it": "Aggiungi azione" },
+          { "ru": "Добавить действие" }
+        ],
+        "validation": { "required": false },
+        "colSpan": 2,
+        "order": 3
       }
     ],
     "sections": [
@@ -22237,6 +22356,33 @@
           {
             "ru": "Подробности и описание задачи"
           }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "actions-taken",
+        "title": "Actions Taken",
+        "description": "Progress, completion date and actions taken",
+        "titleTranslations": [
+          { "en": "Actions Taken" },
+          { "fa": "اقدامات انجام شده" },
+          { "ar": "الإجراءات المتخذة" },
+          { "es": "Acciones realizadas" },
+          { "fr": "Actions effectuées" },
+          { "de": "Durchgeführte Maßnahmen" },
+          { "it": "Azioni intraprese" },
+          { "ru": "Выполненные действия" }
+        ],
+        "descriptionTranslations": [
+          { "en": "Progress, completion date and actions taken" },
+          { "fa": "پیشرفت، تاریخ تکمیل و اقدامات انجام شده" },
+          { "ar": "التقدم وتاريخ الإكمال والإجراءات المتخذة" },
+          { "es": "Progreso, fecha de finalización y acciones realizadas" },
+          { "fr": "Progression, date d'achèvement et actions effectuées" },
+          { "de": "Fortschritt, Abschlussdatum und durchgeführte Maßnahmen" },
+          { "it": "Progresso, data di completamento e azioni intraprese" },
+          { "ru": "Прогресс, дата завершения и выполненные действия" }
         ],
         "initialState": "expanded",
         "columns": 2

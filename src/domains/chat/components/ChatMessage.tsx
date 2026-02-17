@@ -5,7 +5,7 @@
 
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn, resolveLocalizedField } from '@/gradian-ui/shared/utils';
+import { cn, getDisplayNameFields, resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { Bot, Hash, AtSign, Clock, Info, Download, ChevronUp, ChevronDown } from 'lucide-react';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
 import { AISearchResults } from '@/domains/ai-builder/components/AISearchResults';
@@ -142,11 +142,12 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   const aiGeneratedContentLabel = getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang);
   const [isMetadataDialogOpen, setIsMetadataDialogOpen] = useState(false);
 
-  // Get user display name and initials for avatar
+  // Get user display name and initials for avatar (support name/lastname and API variants by language)
   const displayName = useMemo(() => {
     if (!user) return 'User';
-    const firstName = resolveLocalizedField(user.name, language, 'en') || '';
-    const lastName = resolveLocalizedField(user.lastname, language, 'en') || '';
+    const displayNameFields = getDisplayNameFields(user as unknown as Record<string, unknown>);
+    const firstName = resolveLocalizedField(displayNameFields.name, language, 'en') || '';
+    const lastName = resolveLocalizedField(displayNameFields.lastname, language, 'en') || '';
     const combined = `${firstName} ${lastName}`.trim();
     return combined || firstName || lastName || user.email || 'User';
   }, [user, language]);

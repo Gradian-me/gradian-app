@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { NormalizedOption } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 import { useUserStore } from '@/stores/user.store';
+import { useLanguageStore } from '@/stores/language.store';
 import { User, LocalizedField } from '@/types';
+import { getDisplayNameFields, resolveLocalizedField as resolveLocalized } from '@/gradian-ui/shared/utils';
 import { AssignmentCounts, AssignmentUser, AssignmentView } from '../types';
 
 /** Counts from GET /api/data/[schema-id]/count (when provided, badges use these) */
@@ -50,16 +52,19 @@ const resolveLocalizedField = (field?: LocalizedField): string | undefined => {
   return typeof firstValue === 'string' ? firstValue : undefined;
 };
 
-const buildAssignmentUserFromUser = (user: User | null): AssignmentUser | null => {
+const buildAssignmentUserFromUser = (user: User | null, language: string): AssignmentUser | null => {
   if (!user?.id) {
     return null;
   }
-  const label = resolveLocalizedField(user.name) ?? user.username ?? user.email ?? user.id;
-  const subtitle = user.email ?? resolveLocalizedField(user.lastname);
+  const displayNameFields = getDisplayNameFields(user as unknown as Record<string, unknown>);
+  const firstName = resolveLocalized(displayNameFields.name, language, 'en');
+  const lastName = resolveLocalized(displayNameFields.lastname, language, 'en');
+  const label = [firstName, lastName].filter(Boolean).join(' ').trim() || (user.username ?? user.email ?? user.id);
+  const subtitle = user.email ?? (lastName || undefined);
   return {
     id: String(user.id),
     label,
-    subtitle,
+    subtitle: subtitle || undefined,
     avatarUrl: user.avatar,
   };
 };
@@ -85,7 +90,11 @@ export const useAssignmentSwitcher = ({
   setActiveView,
 }: UseAssignmentSwitcherArgs): UseAssignmentSwitcherResult => {
   const currentUser = useUserStore((state) => state.user);
-  const defaultAssignmentUser = useMemo(() => buildAssignmentUserFromUser(currentUser), [currentUser]);
+  const language = useLanguageStore((s) => s.language) ?? 'en';
+  const defaultAssignmentUser = useMemo(
+    () => buildAssignmentUserFromUser(currentUser, language),
+    [currentUser, language]
+  );
 
   const [selectedUser, setSelectedUser] = useState<AssignmentUser | null>(defaultAssignmentUser);
   const [hasUserOverride, setHasUserOverride] = useState(false);

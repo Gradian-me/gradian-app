@@ -54,6 +54,7 @@ import { LanguageSelector } from './LanguageSelector';
 import { FormulaField } from './FormulaField';
 import { ImageViewer } from './ImageViewer';
 import { VideoViewer } from './VideoViewer';
+import { Slider } from './Slider';
 import {
   normalizeChecklistValue,
   checklistToListInputItems,
@@ -232,6 +233,27 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         ...((config as any)?.componentTypeConfig || {}),
       };
       return <NumberInput config={numberConfig} {...commonProps} canCopy={canCopy} />;
+
+    case 'slider': {
+      const sliderMin = (config as any)?.min ?? 0;
+      const sliderMax = (config as any)?.max ?? 100;
+      const sliderStep = (config as any)?.step ?? 1;
+      return (
+        <Slider
+          config={config}
+          min={sliderMin}
+          max={sliderMax}
+          step={sliderStep}
+          value={restProps.value}
+          onChange={restProps.onChange}
+          onBlur={restProps.onBlur}
+          onFocus={restProps.onFocus}
+          error={restProps.error}
+          disabled={restProps.disabled}
+          className={restProps.className}
+        />
+      );
+    }
     
     case 'select':
       // Convert options to SelectOption[] format if they have icon/color

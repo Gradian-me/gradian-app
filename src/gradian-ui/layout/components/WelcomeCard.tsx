@@ -72,7 +72,7 @@ export interface WelcomeCardProps {
   initials?: string;
   
   /**
-   * Welcome message title (optional, defaults to "Welcome back, {userName}! 👋")
+   * Welcome message title (optional, defaults to "Welcome back, dear {userName}")
    */
   title?: string;
   
@@ -153,7 +153,7 @@ export const WelcomeCard: React.FC<WelcomeCardProps> = ({
   className,
 }) => {
   const userInitials = initials || getInitials(userName);
-  const displayTitle = title || `Welcome back, ${userName}! 👋`;
+  const displayTitle = title || `Welcome back, dear ${userName}`;
   const gradientClass = gradientClasses[gradient] || gradientClasses['violet'];
   const borderClass = gradientClass.split(' ').find(cls => cls.startsWith('border-')) || 'border-violet-200/50 dark:border-violet-800/50';
 

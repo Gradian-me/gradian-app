@@ -142,6 +142,40 @@ function clearZustandStores(): void {
 }
 
 /**
+ * Call clear-cache API and trigger client-side cache clear (IndexedDB, React Query, etc.)
+ * so that after logout/force-logout the next login gets fresh keys.
+ * Runs while credentials are still present; if API returns 401 we still dispatch the
+ * client clear event so local caches are cleared.
+ */
+async function callClearCacheAndNotifyClient(): Promise<void> {
+  try {
+    loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGOUT_FLOW] Calling clear-cache API...');
+    const response = await fetch('/api/schemas/clear-cache', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+    const data = await response.json().catch(() => ({}));
+    const queryKeys = Array.isArray(data?.reactQueryKeys) && data.reactQueryKeys.length > 0
+      ? data.reactQueryKeys
+      : ['schemas', 'companies'];
+    if (response.ok && data?.clearReactQueryCache) {
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGOUT_FLOW] Clear-cache API success, dispatching client cache clear');
+    } else {
+      loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGOUT_FLOW] Clear-cache API returned ${response.status}, still clearing client caches`);
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('react-query-cache-clear', { detail: { queryKeys } }));
+    }
+  } catch (error) {
+    loggingCustom(LogType.CLIENT_LOG, 'warn', `[LOGOUT_FLOW] Clear-cache request failed, still dispatching client cache clear: ${error instanceof Error ? error.message : String(error)}`);
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('react-query-cache-clear', { detail: { queryKeys: ['schemas', 'companies'] } }));
+    }
+  }
+}
+
+/**
  * Call logout API endpoint to invalidate server-side session
  * Returns true if successful, false otherwise
  */
@@ -207,12 +241,13 @@ function redirectToLogin(currentPath?: string): void {
  * Unified logout flow
  * 
  * This function performs a complete logout:
- * 1. Calls logout API to invalidate server-side session
- * 2. Clears in-memory access token
- * 3. Clears all cookies (access_token, refresh_token, session_token, user_session_id)
- * 4. Clears all localStorage stores
- * 5. Clears all Zustand stores
- * 6. Redirects to login page
+ * 1. Calls clear-cache API and dispatches client cache clear (IndexedDB, React Query) so keys are fresh after next login
+ * 2. Calls logout API to invalidate server-side session
+ * 3. Clears in-memory access token
+ * 4. Clears all Zustand stores
+ * 5. Clears all auth cookies
+ * 6. Clears all localStorage stores
+ * 7. Redirects to login page
  * 
  * @param reason - Optional reason for logout (for logging)
  * @param skipRedirect - If true, skip redirect to login page (useful for testing or special cases)
@@ -229,19 +264,22 @@ export async function logoutFlow(reason?: string, skipRedirect: boolean = false)
   })}`);
 
   try {
-    // Step 1: Call logout API (non-blocking - we'll continue cleanup even if it fails)
+    // Step 1: Clear server and client caches (schemas, IndexedDB, React Query) while credentials still valid
+    await callClearCacheAndNotifyClient();
+
+    // Step 2: Call logout API (non-blocking - we'll continue cleanup even if it fails)
     const apiSuccess = await callLogoutAPI();
     
-    // Step 2: Clear in-memory access token
+    // Step 3: Clear in-memory access token
     clearInMemoryAccessToken();
     
-    // Step 3: Clear all Zustand stores
+    // Step 4: Clear all Zustand stores
     clearZustandStores();
     
-    // Step 4: Clear all auth cookies
+    // Step 5: Clear all auth cookies
     clearAuthCookies();
     
-    // Step 5: Clear all localStorage stores
+    // Step 6: Clear all localStorage stores
     clearLocalStorageStores();
     
     loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGOUT_FLOW] ========== LOGOUT CLEANUP COMPLETED ========== ${JSON.stringify({
@@ -256,7 +294,7 @@ export async function logoutFlow(reason?: string, skipRedirect: boolean = false)
       stack: error instanceof Error ? error.stack : undefined,
     })}`);
   } finally {
-    // Step 6: Redirect to login page (unless skipRedirect is true)
+    // Step 7: Redirect to login page (unless skipRedirect is true)
     if (!skipRedirect) {
       redirectToLogin();
     } else {

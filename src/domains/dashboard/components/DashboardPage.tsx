@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useUserStore } from '@/stores/user.store';
-import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
+import { getDisplayNameFields, resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { useDashboard } from '../hooks/useDashboard';
 import { LoadingSpinner, UserWelcome } from '@/gradian-ui/layout/components';
@@ -90,9 +90,10 @@ export function DashboardPage() {
     fetchKpiLists();
   }, [fetchDashboardStats, fetchSpendAnalysisData, fetchKpiCards, fetchPerformanceMetrics]);
 
-  const userFirstName = user ? resolveLocalizedField(user.name, language, 'en') : '';
-  const userDisplayName = userFirstName || user?.email || 'there';
-  const displaySubtitle = isLoading ? 'Loading dashboard data…' : `Welcome back, ${userDisplayName}!`;
+  const displayNameFields = user ? getDisplayNameFields(user as unknown as Record<string, unknown>) : { name: undefined, lastname: undefined };
+  const userFirstName = user ? resolveLocalizedField(displayNameFields.name, language, 'en') : '';
+  const userDisplayName = userFirstName.trim() || user?.email || 'there';
+  const displaySubtitle = isLoading ? loadingSubtitle : getT(TRANSLATION_KEYS.WELCOME_BACK_TITLE, language, defaultLang).replace('{name}', userDisplayName);
   useSetLayoutProps({
     title: isLoading ? 'Dashboard' : dashboardTitle,
     subtitle: displaySubtitle,

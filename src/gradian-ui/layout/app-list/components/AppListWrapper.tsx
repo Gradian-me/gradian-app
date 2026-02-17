@@ -23,7 +23,7 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types';
 import { getSchemaTranslatedPluralName, getSchemaTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import { UserWelcome } from '@/gradian-ui/layout/components/UserWelcome';
 import { useUserStore } from '@/stores/user.store';
-import { resolveLocalizedField } from '@/gradian-ui/shared/utils';
+import { getDisplayNameFields, resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
@@ -349,9 +349,11 @@ export function AppListWrapper() {
   const [viewMode, setViewMode] = useState<AppViewMode>('grid');
   const [refreshing, setRefreshing] = useState(false);
 
-  // Get user display info for UserWelcome
-  const userFirstName = user ? resolveLocalizedField(user.name, language, 'en') : '';
-  const userDisplayName = userFirstName || user?.email || getT(TRANSLATION_KEYS.WELCOME_NAME_FALLBACK, language, defaultLang);
+  // Get user display info for UserWelcome (same logic as UserProfileSelector: support name/lastname and API variants by language)
+  const displayNameFields = user ? getDisplayNameFields(user as unknown as Record<string, unknown>) : { name: undefined, lastname: undefined };
+  const userFirstName = user ? resolveLocalizedField(displayNameFields.name, language, 'en') : '';
+  const welcomeName = userFirstName.trim() || user?.email || getT(TRANSLATION_KEYS.WELCOME_NAME_FALLBACK, language, defaultLang);
+  const userDisplayName = welcomeName;
   const userInitials = (() => {
     const source = (typeof userDisplayName === 'string' ? userDisplayName : '').trim() || 'GR';
     return source
