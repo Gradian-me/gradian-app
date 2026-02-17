@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTheme } from 'next-themes';
 import type { Locale as DayPickerLocale } from 'react-day-picker';
 import { type DateRange } from 'react-day-picker';
-import { format, addDays, isSameDay, setHours, setMinutes, setSeconds } from 'date-fns';
+import { format, addDays, addMonths, isSameDay, setHours, setMinutes, setSeconds } from 'date-fns';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -16,6 +16,7 @@ import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from '@/components/
 import { Button } from '@/components/ui/button';
 import { cn } from '@/gradian-ui/shared/utils';
 import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { Select } from './Select';
 import { getLocale } from '@/gradian-ui/shared/utils/date-utils';
 import { getDayPickerLocaleAndDir } from '@/gradian-ui/shared/utils/date-picker-locale';
 import { getDateForCalendar, PersianDate } from '@/gradian-ui/shared/utils/persian-date';
@@ -51,6 +52,7 @@ const DEFAULT_PRESETS: DatePickerCalendarPreset[] = [
   { label: 'In 3 days', translationKey: TRANSLATION_KEYS.DATE_PICKER_PRESET_IN_3_DAYS, getValue: () => addDays(new Date(), 3) },
   { label: 'In a week', translationKey: TRANSLATION_KEYS.DATE_PICKER_PRESET_IN_A_WEEK, getValue: () => addDays(new Date(), 7) },
   { label: 'In 2 weeks', translationKey: TRANSLATION_KEYS.DATE_PICKER_PRESET_IN_2_WEEKS, getValue: () => addDays(new Date(), 14) },
+  { label: 'In a month', translationKey: TRANSLATION_KEYS.DATE_PICKER_PRESET_IN_ONE_MONTH, getValue: () => addMonths(new Date(), 1) },
 ];
 
 export interface DatePickerCalendarProps {
@@ -136,7 +138,7 @@ function formatDateForDisplay(
 
 function applyTimeToDate(date: Date, timeStr: string): Date {
   const [h = 0, m = 0, s = 0] = timeStr.split(':').map(Number);
-  let d = setSeconds(setMinutes(setHours(date, h), m), s);
+  const d = setSeconds(setMinutes(setHours(date, h), m), s);
   return d;
 }
 
@@ -260,6 +262,7 @@ export function DatePickerCalendar({
   );
 
   const localeCode = resolvedLocale?.code ?? appLanguage;
+  const presetLabelLang = allowChangeCalendar && calendarType === 'persian' ? 'fa' : appLanguage;
   const resolvedPlaceholder = placeholder ?? getT(TRANSLATION_KEYS.DATE_PICKER_PLACEHOLDER, appLanguage, defaultLang);
   const displayValue = useMemo(() => {
     const df = displayFormat ?? (mode === 'range' ? 'PP' : 'PP');
@@ -305,12 +308,25 @@ export function DatePickerCalendar({
   ]);
 
   const startMonth = useMemo(() => {
-    if (!minDate) return undefined;
-    return resolvedDateLib ? resolvedDateLib.startOfMonth(minDate) : getStartOfMonth(minDate);
+    if (minDate) {
+      return resolvedDateLib ? resolvedDateLib.startOfMonth(minDate) : getStartOfMonth(minDate);
+    }
+    if (resolvedDateLib) {
+      return resolvedDateLib.startOfMonth(resolvedDateLib.newDate(1300, 0, 1));
+    }
+    return getStartOfMonth(new Date(1900, 0, 1));
   }, [minDate, resolvedDateLib]);
   const endMonth = useMemo(() => {
-    if (!maxDate) return undefined;
-    return resolvedDateLib ? resolvedDateLib.endOfMonth(maxDate) : getEndOfMonth(maxDate);
+    if (maxDate) {
+      return resolvedDateLib ? resolvedDateLib.endOfMonth(maxDate) : getEndOfMonth(maxDate);
+    }
+    const now = new Date();
+    if (resolvedDateLib) {
+      const nowJalali = getDateForCalendar(now, 'fa-IR');
+      const jalaliYear = nowJalali.getFullYear();
+      return resolvedDateLib.endOfMonth(resolvedDateLib.newDate(jalaliYear + 10, 11, 1));
+    }
+    return getEndOfMonth(new Date(now.getFullYear() + 10, 11, 1));
   }, [maxDate, resolvedDateLib]);
 
   const startOfDayLocal = useCallback((d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()), []);
@@ -561,16 +577,23 @@ export function DatePickerCalendar({
               <label htmlFor="date-picker-calendar-type" className="text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
                 {getT(TRANSLATION_KEYS.DATE_PICKER_LABEL_CALENDAR, appLanguage, defaultLang)}
               </label>
-              <select
-                id="date-picker-calendar-type"
-                value={calendarType}
-                onChange={(e) => setCalendarType(e.target.value as 'gregorian' | 'persian')}
-                className={cn(baseInputClasses, 'min-h-8 flex-1 min-w-0 text-sm')}
-                aria-label={getT(TRANSLATION_KEYS.DATE_PICKER_LABEL_CALENDAR, appLanguage, defaultLang)}
-              >
-                <option value="gregorian">{getT(TRANSLATION_KEYS.DATE_PICKER_CALENDAR_GREGORIAN, appLanguage, defaultLang)}</option>
-                <option value="persian">{getT(TRANSLATION_KEYS.DATE_PICKER_CALENDAR_PERSIAN, appLanguage, defaultLang)}</option>
-              </select>
+              <div className="flex-1 min-w-0">
+                <Select
+                  config={{ name: 'date-picker-calendar-type' }}
+                  value={calendarType}
+                  onValueChange={(v) => setCalendarType(v as 'gregorian' | 'persian')}
+                  options={[
+                    { id: 'gregorian', label: getT(TRANSLATION_KEYS.DATE_PICKER_CALENDAR_GREGORIAN, appLanguage, defaultLang) },
+                    { id: 'persian', label: getT(TRANSLATION_KEYS.DATE_PICKER_CALENDAR_PERSIAN, appLanguage, defaultLang) },
+                  ]}
+                  size="sm"
+                  enableSearch={false}
+                  enableGrouping={false}
+                  sortAtoZ={false}
+                  className="min-h-8 text-sm"
+                  aria-label={getT(TRANSLATION_KEYS.DATE_PICKER_LABEL_CALENDAR, appLanguage, defaultLang)}
+                />
+              </div>
             </div>
           )}
           {showToday && (
@@ -586,8 +609,8 @@ export function DatePickerCalendar({
               </Button>
             </div>
           )}
-          <div data-date-picker-calendar-row className={cn('w-fit flex gap-2 rounded-xl', mode === 'range' ? 'flex-row' : 'flex-col sm:flex-row')} style={{ backgroundColor: popoverBg }}>
-            <div className={cn('p-1.5 rounded-t-xl sm:rounded-l-xl', mode === 'range' && 'overflow-x-auto min-w-0')} style={{ backgroundColor: popoverBg }}>
+          <div data-date-picker-calendar-row className={cn('w-full flex gap-2 rounded-xl', mode === 'range' ? 'flex-row' : 'flex-col sm:flex-row')} style={{ backgroundColor: popoverBg }}>
+            <div className={cn('p-1.5 rounded-t-xl sm:rounded-l-xl justify-center flex', mode === 'range' && 'overflow-x-auto min-w-0')} style={{ backgroundColor: popoverBg }}>
               {mode === 'single' ? (
                 <Calendar
                   mode="single"
@@ -689,7 +712,7 @@ export function DatePickerCalendar({
               </div>
             )}
             {showPresets && (
-              <div className="flex flex-col gap-2 p-3 border-t sm:border-t-0 sm:border-s border-gray-200 dark:border-gray-700 min-w-[120px]" style={{ backgroundColor: popoverBg }}>
+              <div className="grid grid-cols-2 sm:flex sm:flex-col gap-2 p-3 border-t sm:border-t-0 sm:border-s border-gray-200 dark:border-gray-700 min-w-[120px]" style={{ backgroundColor: popoverBg }}>
                 {presets.map((preset) => (
                   <Button
                     key={preset.label}
@@ -699,7 +722,7 @@ export function DatePickerCalendar({
                     className="w-full justify-start text-xs"
                     onClick={() => handlePresetClick(preset)}
                   >
-                    {preset.translationKey ? getT(preset.translationKey, appLanguage, defaultLang) : preset.label}
+                    {preset.translationKey ? getT(preset.translationKey, presetLabelLang, defaultLang) : preset.label}
                   </Button>
                 ))}
               </div>

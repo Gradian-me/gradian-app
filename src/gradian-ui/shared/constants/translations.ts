@@ -131,6 +131,7 @@ export const TRANSLATION_KEYS = {
   DATE_PICKER_PRESET_IN_3_DAYS: 'DATE_PICKER_PRESET_IN_3_DAYS',
   DATE_PICKER_PRESET_IN_A_WEEK: 'DATE_PICKER_PRESET_IN_A_WEEK',
   DATE_PICKER_PRESET_IN_2_WEEKS: 'DATE_PICKER_PRESET_IN_2_WEEKS',
+  DATE_PICKER_PRESET_IN_ONE_MONTH: 'DATE_PICKER_PRESET_IN_ONE_MONTH',
   DATE_PICKER_RANGE_PRESET_THIS_WEEK: 'DATE_PICKER_RANGE_PRESET_THIS_WEEK',
   DATE_PICKER_RANGE_PRESET_NEXT_7_DAYS: 'DATE_PICKER_RANGE_PRESET_NEXT_7_DAYS',
   DATE_PICKER_ERROR_TIME_REQUIRED: 'DATE_PICKER_ERROR_TIME_REQUIRED',
@@ -1104,6 +1105,10 @@ export const TRANSLATIONS: TranslationEntry[] = [
   {
     key: TRANSLATION_KEYS.DATE_PICKER_PRESET_IN_2_WEEKS,
     translations: [{ en: 'In 2 weeks' }, { fa: '۲ هفته دیگر' }, { ar: 'خلال أسبوعين' }, { es: 'En 2 semanas' }, { fr: 'Dans 2 semaines' }, { de: 'In 2 Wochen' }, { it: 'Tra 2 settimane' }, { ru: 'Через 2 недели' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_PRESET_IN_ONE_MONTH,
+    translations: [{ en: 'In a month' }, { fa: 'یک ماه دیگر' }, { ar: 'خلال شهر' }, { es: 'En un mes' }, { fr: 'Dans un mois' }, { de: 'In einem Monat' }, { it: 'Tra un mese' }, { ru: 'Через месяц' }],
   },
   {
     key: TRANSLATION_KEYS.DATE_PICKER_RANGE_PRESET_THIS_WEEK,

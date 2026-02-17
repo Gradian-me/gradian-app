@@ -905,11 +905,17 @@ input.bg-transparent:-webkit-autofill:active {
 
 /* React Day Picker: readable day cells, range start left-rounded only, range end right-rounded only */
 .rdp-root {
+  --rdp-accent-color: rgb(139 92 246); /* violet-500 */
+  --rdp-accent-background-color: rgb(245 243 255); /* violet-50 */
   --rdp-day_button-border-radius: 0.375rem !important;
   --rdp-day-width: 2.25rem !important;
   --rdp-day-height: 2.25rem !important;
   --rdp-day_button-width: 2.25rem !important;
   --rdp-day_button-height: 2.25rem !important;
+}
+.dark .rdp-root {
+  --rdp-accent-color: rgb(167 139 250); /* violet-400 */
+  --rdp-accent-background-color: rgb(46 16 101); /* violet-900/80 */
 }
 .rdp-range_start .rdp-day_button {
   border-top-left-radius: 0.375rem !important;

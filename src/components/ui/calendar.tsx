@@ -120,12 +120,12 @@ function Calendar({
           defaultClassNames.nav
         ),
         button_previous: cn(
-          "size-7 rounded p-0 aria-disabled:opacity-50",
-          defaultClassNames.button_previous
+          defaultClassNames.button_previous,
+          "relative z-10 size-7 rounded p-0 aria-disabled:opacity-50"
         ),
         button_next: cn(
-          "size-7 rounded p-0 aria-disabled:opacity-50",
-          defaultClassNames.button_next
+          defaultClassNames.button_next,
+          "relative z-10 size-7 rounded p-0 aria-disabled:opacity-50"
         ),
         month_caption: cn(
           "flex items-center justify-center h-8 w-full px-3 gap-2",
@@ -136,17 +136,17 @@ function Calendar({
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
-          "relative flex items-center justify-between gap-1.5 min-h-8 min-w-[4.5rem] px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 shadow-sm cursor-pointer text-sm transition-colors hover:border-gray-400 dark:hover:border-gray-500 focus-within:outline-none focus-within:ring-1 focus-within:ring-violet-300 dark:focus-within:ring-violet-500 focus-within:ring-offset-1 focus-within:border-violet-400 dark:focus-within:border-violet-500",
-          defaultClassNames.dropdown_root
+          defaultClassNames.dropdown_root,
+          "relative flex items-center justify-between gap-1.5 min-h-8 min-w-[4.5rem] px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm cursor-pointer text-sm transition-colors hover:border-gray-400 dark:hover:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-600 focus-within:outline-none focus-within:ring-0 focus-within:ring-offset-0 focus-within:border-violet-400 dark:focus-within:border-violet-500"
         ),
         dropdown: cn("absolute inset-0 opacity-0 cursor-pointer w-full", defaultClassNames.dropdown),
         caption_label: cn(
-          "select-none font-medium text-sm text-gray-900 dark:text-gray-100 pointer-events-none",
-          defaultClassNames.caption_label
+          defaultClassNames.caption_label,
+          "select-none justify-between w-full font-medium text-sm text-gray-900 dark:text-gray-100 pointer-events-none"
         ),
         chevron: cn(
-          "size-4 shrink-0 text-gray-500 dark:text-gray-400 pointer-events-none",
-          defaultClassNames.chevron
+          defaultClassNames.chevron,
+          "size-4 shrink-0 fill-transparent text-gray-500 dark:text-gray-400 pointer-events-none"
         ),
         table: "w-full border-collapse",
         weekdays: cn("flex", defaultClassNames.weekdays),
@@ -193,33 +193,19 @@ function Calendar({
       }}
       components={{
         Chevron: ({ className: chevronClassName, orientation, ...rest }) => {
+          const iconClass = cn("size-4 fill-transparent", chevronClassName);
           if (orientation === "left") {
-            return (
-              <ChevronLeftIcon
-                className={cn("size-4", chevronClassName)}
-                {...rest}
-              />
-            );
+            return <ChevronLeftIcon className={iconClass} {...rest} />;
           }
           if (orientation === "right") {
-            return (
-              <ChevronRightIcon
-                className={cn("size-4", chevronClassName)}
-                {...rest}
-              />
-            );
+            return <ChevronRightIcon className={iconClass} {...rest} />;
           }
           if (orientation === "down") {
-            return (
-              <ChevronDownIcon
-                className={cn("size-4", chevronClassName)}
-                {...rest}
-              />
-            );
+            return <ChevronDownIcon className={iconClass} {...rest} />;
           }
           return (
             <ChevronDownIcon
-              className={cn("size-4 rotate-180", chevronClassName)}
+              className={cn("size-4 rotate-180 fill-transparent", chevronClassName)}
               {...rest}
             />
           );
