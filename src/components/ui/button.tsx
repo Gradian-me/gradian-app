@@ -20,9 +20,9 @@ const buttonVariants = cva(
         link: "text-violet-600 underline-offset-4 hover:underline hover:text-violet-700 dark:text-violet-300 dark:hover:text-violet-300",
         gradient: "bg-gradient-to-r from-violet-500 to-purple-500 dark:from-violet-600 dark:to-purple-600 hover:from-violet-700 hover:to-purple-700 text-white shadow-sm",
         square:
-          "h-10 min-h-10 w-10 min-w-10 p-0 shrink-0 [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0 squircle squircle-2xl squircle-smooth-md squircle-gray-50 squircle-border-2 squircle-border-gray-100 hover:squircle-gray-100 hover:squircle-border-gray-200 dark:squircle-gray-700 dark:squircle-border-gray-700 dark:hover:squircle-gray-600 dark:hover:squircle-border-gray-600 text-violet-700 dark:text-violet-300 hover:text-violet-700 dark:hover:text-violet-300",
+          "h-10 min-h-10 w-10 min-w-10 p-0 shrink-0 shadow-sm [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0 squircle squircle-2xl squircle-smooth-md squircle-gray-50 squircle-border-2 squircle-border-gray-100 hover:squircle-gray-100 hover:squircle-border-gray-200 dark:squircle-gray-700 dark:squircle-border-gray-700 dark:hover:squircle-gray-600 dark:hover:squircle-border-gray-600 text-violet-700 dark:text-violet-300 hover:text-violet-700 dark:hover:text-violet-300",
         squareGradient:
-          "h-10 min-h-10 w-10 min-w-10 p-0 shrink-0 [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0 squircle squircle-2xl squircle-smooth-md squircle-violet-50 squircle-border-2 squircle-border-violet-100 hover:squircle-violet-100 hover:squircle-border-violet-200 dark:squircle-violet-700 dark:squircle-border-violet-700 dark:hover:squircle-violet-600 dark:hover:squircle-border-violet-600 text-violet-700 dark:text-violet-300 hover:text-violet-700 dark:hover:text-violet-300",
+          "h-10 min-h-10 w-10 min-w-10 p-0 shrink-0 shadow-sm [&_svg]:h-4 [&_svg]:w-4 [&_svg]:shrink-0 squircle squircle-2xl squircle-smooth-md squircle-violet-50 squircle-border-2 squircle-border-violet-100 hover:squircle-violet-100 hover:squircle-border-violet-200 dark:squircle-violet-700 dark:squircle-border-violet-700 dark:hover:squircle-violet-600 dark:hover:squircle-border-violet-600 text-violet-700 dark:text-violet-300 hover:text-violet-700 dark:hover:text-violet-300",
       },
       size: {
         default: "h-10 px-6 py-2",

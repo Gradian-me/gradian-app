@@ -902,3 +902,36 @@ input.bg-transparent:-webkit-autofill:active {
 .prose .katex-display {
   margin: 1.5em 0;
 }
+
+/* React Day Picker: readable day cells, range start left-rounded only, range end right-rounded only */
+.rdp-root {
+  --rdp-day_button-border-radius: 0.375rem !important;
+  --rdp-day-width: 2.25rem !important;
+  --rdp-day-height: 2.25rem !important;
+  --rdp-day_button-width: 2.25rem !important;
+  --rdp-day_button-height: 2.25rem !important;
+}
+.rdp-range_start .rdp-day_button {
+  border-top-left-radius: 0.375rem !important;
+  border-bottom-left-radius: 0.375rem !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+.rdp-range_end .rdp-day_button {
+  border-top-right-radius: 0.375rem !important;
+  border-bottom-right-radius: 0.375rem !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+.rdp-root[dir="rtl"] .rdp-range_start .rdp-day_button {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-top-right-radius: 0.375rem !important;
+  border-bottom-right-radius: 0.375rem !important;
+}
+.rdp-root[dir="rtl"] .rdp-range_end .rdp-day_button {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  border-top-left-radius: 0.375rem !important;
+  border-bottom-left-radius: 0.375rem !important;
+}

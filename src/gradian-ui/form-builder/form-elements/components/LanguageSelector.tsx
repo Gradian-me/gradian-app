@@ -80,8 +80,11 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     color: lang.color || fieldColor || 'default',
   }));
 
-  // Handle value change
+  const setLanguage = useLanguageStore((s) => s.setLanguage);
+
+  // Handle value change – sync to global language store so calendar/translations follow
   const handleValueChange = (selectedValue: string) => {
+    setLanguage(selectedValue);
     if (onChange) {
       onChange(selectedValue);
     }
@@ -89,11 +92,12 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
 
   // Handle normalized change (from Select component)
   const handleNormalizedChange = (selection: any[]) => {
-    if (selection && selection.length > 0 && onChange) {
-      const selectedId = selection[0]?.id || selection[0]?.value;
-      onChange(selectedId);
-    } else if (onChange) {
-      onChange('');
+    if (selection && selection.length > 0) {
+      const selectedId = String(selection[0]?.id ?? selection[0]?.value ?? '');
+      setLanguage(selectedId);
+      if (onChange) onChange(selectedId);
+    } else {
+      if (onChange) onChange('');
     }
   };
 

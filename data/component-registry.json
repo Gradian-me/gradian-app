@@ -267,79 +267,64 @@
   },
   {
     "id": "date-input",
-    "label": "DateInput",
+    "label": "Date",
     "color": "lime",
     "icon": "Calendar",
     "category": "form-elements",
-    "description": "Date picker input.",
+    "description": "Date-only picker (DatePickerCalendar, single mode, no time).",
     "usecase": "Pick dates, birth dates, deadlines, start/end dates, appointment dates.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/DateInput.tsx",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/DatePickerCalendar.tsx",
     "componentValue": "date",
     "configSchema": {
       "fields": [
         {
-          "name": "minDate",
+          "name": "min",
           "label": "Minimum Date",
           "type": "string",
           "description": "Minimum selectable date (YYYY-MM-DD)"
         },
         {
-          "name": "maxDate",
+          "name": "max",
           "label": "Maximum Date",
           "type": "string",
           "description": "Maximum selectable date (YYYY-MM-DD)"
-        },
-        {
-          "name": "format",
-          "label": "Date Format",
-          "type": "string",
-          "description": "Date display format (e.g., YYYY-MM-DD)",
-          "defaultValue": "YYYY-MM-DD"
         }
       ]
     }
   },
   {
+    "id": "date-picker-calendar",
+    "label": "DatePickerCalendar",
+    "color": "lime",
+    "icon": "Calendar",
+    "category": "form-elements",
+    "description": "Shadcn-style calendar picker with single/range mode, optional Apply, time inputs, presets, and disabled days.",
+    "usecase": "Rich date/range selection with locale, time, presets; replaces native date input with calendar UI.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/DatePickerCalendar.tsx"
+  },
+  {
     "id": "datetime",
-    "label": "DateTimeInput",
+    "label": "Date & Time",
     "color": "lime",
     "icon": "Clock",
     "category": "form-elements",
-    "description": "Date and time picker input.",
+    "description": "Date and time picker (DatePickerCalendar, single mode with time, Apply to confirm).",
     "usecase": "Pick date-time values, timestamps, scheduled events, appointment times.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/DateTimeInput.tsx",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/DatePickerCalendar.tsx",
     "componentValue": "datetime-local",
     "configSchema": {
       "fields": [
         {
-          "name": "minDate",
+          "name": "min",
           "label": "Minimum Date",
           "type": "string",
           "description": "Minimum selectable date (YYYY-MM-DD)"
         },
         {
-          "name": "maxDate",
+          "name": "max",
           "label": "Maximum Date",
           "type": "string",
           "description": "Maximum selectable date (YYYY-MM-DD)"
-        },
-        {
-          "name": "format",
-          "label": "Date Format",
-          "type": "string",
-          "description": "Date display format",
-          "defaultValue": "YYYY-MM-DD HH:mm"
-        },
-        {
-          "name": "timeFormat",
-          "label": "Time Format",
-          "type": "select",
-          "description": "Time display format",
-          "defaultValue": "24h",
-          "options": [
-            { "value": "12h", "label": "12 Hour (AM/PM)" },
-            { "value": "24h", "label": "24 Hour" }
-          ]
         }
       ]
     }

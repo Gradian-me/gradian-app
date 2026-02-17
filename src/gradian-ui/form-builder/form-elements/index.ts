@@ -32,6 +32,7 @@ export * from './components/PhoneInput';
 export * from './components/PasswordInput';
 export * from './components/NumberInput';
 export * from './components/DateInput';
+export * from './components/DatePickerCalendar';
 export * from './components/DateTimeInput';
 export * from './components/FileInput';
 export * from './components/PickerInput';

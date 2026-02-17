@@ -32,22 +32,28 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
 
   // No flex-row-reverse: with dir=rtl inherited from document, flex puts first child at start (right),
   // second at end (left), so the toggle stays on the content edge (left side of sidebar in RTL).
+  // When collapsed (desktop): center the toggle like nav icons — same row height (py-2 min-h-8) and justify-center.
+  const isCollapsedDesktop = isCollapsed && !isMobile;
   return (
     <div
       className={cn(
-        "flex items-center justify-between h-16 border-b border-gray-700 px-4 w-full gap-3",
+        "flex items-center w-full border-b border-gray-700 gap-3",
+        isCollapsedDesktop
+          ? "justify-center py-2 min-h-8 px-0"
+          : "justify-between h-16 px-4",
         className
       )}
     >
       <AnimatePresence mode="wait">
-        {isCollapsed && !isMobile ? (
+        {isCollapsedDesktop ? (
           <motion.div
             key="collapsed"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="min-w-0 flex-1"
+            className="absolute pointer-events-none"
+            aria-hidden
           />
         ) : (
           <motion.div

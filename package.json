@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.53.005",
+  "version": "1.54.001",
   "private": true,
   "scripts": {
     "dev": "npm run clean:relations && next dev --turbopack",
@@ -66,6 +66,7 @@
     "cytoscape-dagre": "^2.5.0",
     "cytoscape-edgehandles": "^4.0.1",
     "date-fns": "^4.1.0",
+    "vaul": "^1.1.2",
     "dexie": "^4.2.1",
     "echarts": "^5.6.0",
     "echarts-for-react": "^3.0.5",
@@ -109,6 +110,7 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "ulid": "^3.0.2",
+    "vaul": "^1.1.2",
     "zod": "^4.1.13",
     "zustand": "^5.0.9"
   },

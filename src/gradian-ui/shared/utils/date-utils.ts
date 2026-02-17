@@ -31,7 +31,8 @@ function isPersianLocale(localeCode?: string | null): boolean {
   return localeCode.split('-')[0].toLowerCase() === 'fa';
 }
 
-function getLocale(localeCode?: string | null): Locale {
+/** Resolves a locale code (e.g. "en", "en-US") to a date-fns Locale. */
+export function getLocale(localeCode?: string | null): Locale {
   if (!localeCode) return enUS;
   const normalized = localeCode.split('-')[0].toLowerCase();
   return LOCALE_MAP[normalized] ?? enUS;

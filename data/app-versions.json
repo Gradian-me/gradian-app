@@ -7049,5 +7049,22 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000010",
+    "timestamp": "2026-02-17T00:00:00.000Z",
+    "version": "1.54.001",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "FEATURE MINOR: New Date Picker Input ShadCN. Refactored date input components to utilize 'DatePickerCalendar' for improved date selection experience. Updated translations for date picker functionality and added calendar support for Persian locale. This update enhances localization and user experience in date handling across the application.",
+        "priority": "Medium",
+        "affectedDomains": [
+          "form-builder",
+          "ui",
+          "i18n"
+        ]
+      }
+    ]
   }
 ]

@@ -118,6 +118,23 @@ export const TRANSLATION_KEYS = {
   PLACEHOLDER_FORCE_REASON: 'PLACEHOLDER_FORCE_REASON',
   LABEL_DUE_DATE: 'LABEL_DUE_DATE',
   PLACEHOLDER_SELECT_DUE_DATE: 'PLACEHOLDER_SELECT_DUE_DATE',
+  DATE_PICKER_PLACEHOLDER: 'DATE_PICKER_PLACEHOLDER',
+  DATE_PICKER_LABEL_CALENDAR: 'DATE_PICKER_LABEL_CALENDAR',
+  DATE_PICKER_TODAY: 'DATE_PICKER_TODAY',
+  DATE_PICKER_CALENDAR_GREGORIAN: 'DATE_PICKER_CALENDAR_GREGORIAN',
+  DATE_PICKER_CALENDAR_PERSIAN: 'DATE_PICKER_CALENDAR_PERSIAN',
+  DATE_PICKER_LABEL_START: 'DATE_PICKER_LABEL_START',
+  DATE_PICKER_LABEL_END: 'DATE_PICKER_LABEL_END',
+  DATE_PICKER_LABEL_TIME: 'DATE_PICKER_LABEL_TIME',
+  DATE_PICKER_PRESET_TODAY: 'DATE_PICKER_PRESET_TODAY',
+  DATE_PICKER_PRESET_TOMORROW: 'DATE_PICKER_PRESET_TOMORROW',
+  DATE_PICKER_PRESET_IN_3_DAYS: 'DATE_PICKER_PRESET_IN_3_DAYS',
+  DATE_PICKER_PRESET_IN_A_WEEK: 'DATE_PICKER_PRESET_IN_A_WEEK',
+  DATE_PICKER_PRESET_IN_2_WEEKS: 'DATE_PICKER_PRESET_IN_2_WEEKS',
+  DATE_PICKER_RANGE_PRESET_THIS_WEEK: 'DATE_PICKER_RANGE_PRESET_THIS_WEEK',
+  DATE_PICKER_RANGE_PRESET_NEXT_7_DAYS: 'DATE_PICKER_RANGE_PRESET_NEXT_7_DAYS',
+  DATE_PICKER_ERROR_TIME_REQUIRED: 'DATE_PICKER_ERROR_TIME_REQUIRED',
+  DATE_PICKER_ERROR_START_END_TIME_REQUIRED: 'DATE_PICKER_ERROR_START_END_TIME_REQUIRED',
   LABEL_STATUS: 'LABEL_STATUS',
   PLACEHOLDER_SELECT_STATUS: 'PLACEHOLDER_SELECT_STATUS',
   DESCRIPTION_STATUS_FROM_GROUP: 'DESCRIPTION_STATUS_FROM_GROUP',
@@ -1035,6 +1052,74 @@ export const TRANSLATIONS: TranslationEntry[] = [
   {
     key: TRANSLATION_KEYS.BUTTON_APPLY,
     translations: [{ en: 'Apply' }, { fa: 'اعمال' }, { ar: 'تطبيق' }, { es: 'Aplicar' }, { fr: 'Appliquer' }, { de: 'Übernehmen' }, { it: 'Applica' }, { ru: 'Применить' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_PLACEHOLDER,
+    translations: [{ en: 'Pick a date' }, { fa: 'انتخاب تاریخ' }, { ar: 'اختر تاريخاً' }, { es: 'Elegir fecha' }, { fr: 'Choisir une date' }, { de: 'Datum wählen' }, { it: 'Scegli data' }, { ru: 'Выберите дату' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_LABEL_CALENDAR,
+    translations: [{ en: 'Calendar' }, { fa: 'تقویم' }, { ar: 'التقويم' }, { es: 'Calendario' }, { fr: 'Calendrier' }, { de: 'Kalender' }, { it: 'Calendario' }, { ru: 'Календарь' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_TODAY,
+    translations: [{ en: 'Today' }, { fa: 'امروز' }, { ar: 'اليوم' }, { es: 'Hoy' }, { fr: "Aujourd'hui" }, { de: 'Heute' }, { it: 'Oggi' }, { ru: 'Сегодня' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_CALENDAR_GREGORIAN,
+    translations: [{ en: 'Gregorian' }, { fa: 'میلادی' }, { ar: 'ميلادي' }, { es: 'Gregoriano' }, { fr: 'Grégorien' }, { de: 'Gregorianisch' }, { it: 'Gregoriano' }, { ru: 'Григорианский' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_CALENDAR_PERSIAN,
+    translations: [{ en: 'Persian (Shamsi)' }, { fa: 'شمسی' }, { ar: 'فارسي (شمسي)' }, { es: 'Persa (Shamsi)' }, { fr: 'Perse (Shamsi)' }, { de: 'Persisch (Schamsi)' }, { it: 'Persiano (Shamsi)' }, { ru: 'Персидский (Шамси)' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_LABEL_START,
+    translations: [{ en: 'Start' }, { fa: 'شروع' }, { ar: 'البداية' }, { es: 'Inicio' }, { fr: 'Début' }, { de: 'Start' }, { it: 'Inizio' }, { ru: 'Начало' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_LABEL_END,
+    translations: [{ en: 'End' }, { fa: 'پایان' }, { ar: 'النهاية' }, { es: 'Fin' }, { fr: 'Fin' }, { de: 'Ende' }, { it: 'Fine' }, { ru: 'Конец' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_LABEL_TIME,
+    translations: [{ en: 'Time' }, { fa: 'زمان' }, { ar: 'الوقت' }, { es: 'Hora' }, { fr: 'Heure' }, { de: 'Uhrzeit' }, { it: 'Ora' }, { ru: 'Время' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_PRESET_TODAY,
+    translations: [{ en: 'Today' }, { fa: 'امروز' }, { ar: 'اليوم' }, { es: 'Hoy' }, { fr: "Aujourd'hui" }, { de: 'Heute' }, { it: 'Oggi' }, { ru: 'Сегодня' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_PRESET_TOMORROW,
+    translations: [{ en: 'Tomorrow' }, { fa: 'فردا' }, { ar: 'غداً' }, { es: 'Mañana' }, { fr: 'Demain' }, { de: 'Morgen' }, { it: 'Domani' }, { ru: 'Завтра' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_PRESET_IN_3_DAYS,
+    translations: [{ en: 'In 3 days' }, { fa: '۳ روز دیگر' }, { ar: 'خلال 3 أيام' }, { es: 'En 3 días' }, { fr: 'Dans 3 jours' }, { de: 'In 3 Tagen' }, { it: 'Tra 3 giorni' }, { ru: 'Через 3 дня' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_PRESET_IN_A_WEEK,
+    translations: [{ en: 'In a week' }, { fa: 'یک هفته دیگر' }, { ar: 'خلال أسبوع' }, { es: 'En una semana' }, { fr: 'Dans une semaine' }, { de: 'In einer Woche' }, { it: 'Tra una settimana' }, { ru: 'Через неделю' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_PRESET_IN_2_WEEKS,
+    translations: [{ en: 'In 2 weeks' }, { fa: '۲ هفته دیگر' }, { ar: 'خلال أسبوعين' }, { es: 'En 2 semanas' }, { fr: 'Dans 2 semaines' }, { de: 'In 2 Wochen' }, { it: 'Tra 2 settimane' }, { ru: 'Через 2 недели' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_RANGE_PRESET_THIS_WEEK,
+    translations: [{ en: 'This week' }, { fa: 'این هفته' }, { ar: 'هذا الأسبوع' }, { es: 'Esta semana' }, { fr: 'Cette semaine' }, { de: 'Diese Woche' }, { it: 'Questa settimana' }, { ru: 'На этой неделе' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_RANGE_PRESET_NEXT_7_DAYS,
+    translations: [{ en: 'Next 7 days' }, { fa: '۷ روز آینده' }, { ar: 'الـ 7 أيام القادمة' }, { es: 'Próximos 7 días' }, { fr: '7 prochains jours' }, { de: 'Nächste 7 Tage' }, { it: 'Prossimi 7 giorni' }, { ru: 'Следующие 7 дней' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_ERROR_TIME_REQUIRED,
+    translations: [{ en: 'Time is required' }, { fa: 'زمان الزامی است' }, { ar: 'الوقت مطلوب' }, { es: 'La hora es obligatoria' }, { fr: "L'heure est requise" }, { de: 'Uhrzeit ist erforderlich' }, { it: 'L\'ora è obbligatoria' }, { ru: 'Укажите время' }],
+  },
+  {
+    key: TRANSLATION_KEYS.DATE_PICKER_ERROR_START_END_TIME_REQUIRED,
+    translations: [{ en: 'Start and end time are required' }, { fa: 'زمان شروع و پایان الزامی است' }, { ar: 'وقت البداية والنهاية مطلوب' }, { es: 'La hora de inicio y fin son obligatorias' }, { fr: "L'heure de début et de fin sont requises" }, { de: 'Start- und Endzeit sind erforderlich' }, { it: 'L\'ora di inizio e fine sono obbligatorie' }, { ru: 'Укажите время начала и окончания' }],
   },
   {
     key: TRANSLATION_KEYS.BUTTON_CLEAR_SELECTION,

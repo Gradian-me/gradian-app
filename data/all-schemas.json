@@ -14018,7 +14018,7 @@
       }
     ],
     "showInNavigation": true,
-    "icon": "Tag",
+    "icon": "Layers",
     "schemaType": "business",
     "relatedTenants": [
       {

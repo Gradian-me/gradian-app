@@ -37,8 +37,8 @@ import { URLInput } from './URLInput';
 import { PhoneInput } from './PhoneInput';
 import { PasswordInput } from './PasswordInput';
 import { NumberInput } from './NumberInput';
-import { DateInput } from './DateInput';
-import { DateTimeInput } from './DateTimeInput';
+import { format } from 'date-fns';
+import { DatePickerCalendar } from './DatePickerCalendar';
 import { FileInput } from './FileInput';
 import { PickerInput } from './PickerInput';
 import { IconInput } from './IconInput';
@@ -483,12 +483,106 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         }));
       return <RadioGroup config={config} options={radioOptions} {...commonProps} />;
     
-    case 'date':
-      return <DateInput config={config} {...commonProps} />;
-    
+    case 'date': 
+    case 'date-input': 
+    case 'date-picker-calendar': {
+      const rawValue = restProps.value;
+      const dateValue =
+        rawValue && typeof rawValue === 'string'
+          ? (() => {
+              const d = new Date(rawValue);
+              return isNaN(d.getTime()) ? undefined : d;
+            })()
+          : rawValue instanceof Date
+            ? rawValue
+            : undefined;
+      const minDate = (config as any).min
+        ? (() => {
+            const d = new Date((config as any).min);
+            return isNaN(d.getTime()) ? undefined : d;
+          })()
+        : undefined;
+      const maxDate = (config as any).max
+        ? (() => {
+            const d = new Date((config as any).max);
+            return isNaN(d.getTime()) ? undefined : d;
+          })()
+        : undefined;
+      return (
+        <DatePickerCalendar
+          mode="single"
+          timeInput={false}
+          showApply={false}
+          value={dateValue}
+          onChange={(value) => {
+            const next = value instanceof Date ? format(value, 'yyyy-MM-dd') : '';
+            restProps.onChange?.(next);
+          }}
+          label={config?.label}
+          placeholder={config?.placeholder}
+          error={restProps.error}
+          disabled={restProps.disabled}
+          required={restProps.required ?? config?.validation?.required ?? false}
+          className={restProps.className}
+          id={config?.name}
+          minDate={minDate}
+          maxDate={maxDate}
+          showPresets={true}
+        />
+      );
+    }
+
     case 'datetime-local':
-    case 'datetime':
-      return <DateTimeInput config={config} {...commonProps} />;
+    case 'datetime-input':
+    case 'datetime-picker-calendar':
+    case 'datetime': {
+      const rawValue = restProps.value;
+      const dateValue =
+        rawValue && typeof rawValue === 'string'
+          ? (() => {
+              const d = new Date(rawValue);
+              return isNaN(d.getTime()) ? undefined : d;
+            })()
+          : rawValue instanceof Date
+            ? rawValue
+            : undefined;
+      const minDate = (config as any).min
+        ? (() => {
+            const d = new Date((config as any).min);
+            return isNaN(d.getTime()) ? undefined : d;
+          })()
+        : undefined;
+      const maxDate = (config as any).max
+        ? (() => {
+            const d = new Date((config as any).max);
+            return isNaN(d.getTime()) ? undefined : d;
+          })()
+        : undefined;
+      return (
+        <DatePickerCalendar
+          mode="single"
+          timeInput={true}
+          showApply={true}
+          value={dateValue}
+          onChange={(value) => {
+            if (value instanceof Date) {
+              restProps.onChange?.(value.toISOString());
+            } else {
+              restProps.onChange?.('');
+            }
+          }}
+          label={config?.label}
+          placeholder={config?.placeholder}
+          error={restProps.error}
+          disabled={restProps.disabled}
+          required={restProps.required ?? config?.validation?.required ?? false}
+          className={restProps.className}
+          id={config?.name}
+          minDate={minDate}
+          maxDate={maxDate}
+        />
+      );
+    }
     
     case 'file':
       return <FileInput config={config} {...commonProps} />;
