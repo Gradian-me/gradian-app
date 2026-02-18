@@ -63,4 +63,18 @@ export interface CompaniesCacheEventDetail {
   reason: 'update' | 'clear';
 }
 
+/** IndexedDB cache for GET /api/schemas?summary=true response (unified with api layer). */
+export const SCHEMAS_SUMMARY_CACHE_VERSION = 1;
+
+export interface SchemasSummaryCachePayload {
+  version: number;
+  updatedAt: number;
+  schemas: FormSchema[];
+}
+
+export interface SchemasSummaryCacheLookupResult {
+  hit: boolean;
+  schemas: FormSchema[];
+}
+
 

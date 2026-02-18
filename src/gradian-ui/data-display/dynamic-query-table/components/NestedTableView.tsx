@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useLanguageStore } from '@/stores/language.store';
 import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
@@ -12,7 +13,8 @@ import { createColumnsFromSchema, getSchemaHeaderBorderColor, getBorderColorClas
 import { useNestedTableExpansion } from '../hooks';
 import { TableColumn } from '../../table/types';
 import { formatFieldValue } from '../../table/utils/field-formatters';
-import { DynamicActionButtons } from '@/gradian-ui/data-display/components/DynamicActionButtons';
+import { HierarchyActionsMenu } from '@/gradian-ui/data-display/hierarchy/HierarchyActionsMenu';
+import type { ActionConfig } from '@/gradian-ui/data-display/components/action-types';
 // Import will be handled via forward reference
 
 export function NestedTableView({ 
@@ -33,6 +35,7 @@ export function NestedTableView({
   dynamicQueryId,
   onEditEntity
 }: NestedTableViewProps) {
+  const router = useRouter();
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const isRtl = isRTL(language);
   // Helper function to check if a schema ID is in flattenedSchemas at the current depth
@@ -528,12 +531,25 @@ export function NestedTableView({
                           {/* Action buttons cell before each schema group that has actions */}
                           {isFirstColumnInGroup && groupSchema && (() => {
                             const groupRowId = getRowIdForSchema(groupSchema.id);
-                            const groupActionButtons = dynamicQueryId && dynamicQueryActions 
+                            const groupActionButtons: ActionConfig[] | null = dynamicQueryId && dynamicQueryActions
                               ? getActionButtonsForSchema(groupSchema, dynamicQueryActions, dynamicQueryId, groupRowId, onEditEntity)
                               : null;
-                            return groupActionButtons ? (
+                            if (!groupActionButtons?.length) return null;
+                            const viewAction = groupActionButtons.find((a) => a.type === 'view');
+                            const editAction = groupActionButtons.find((a) => a.type === 'edit');
+                            const deleteAction = groupActionButtons.find((a) => a.type === 'delete');
+                            const hasAny = viewAction || editAction || deleteAction;
+                            return hasAny ? (
                               <td className="p-2 text-center">
-                                <DynamicActionButtons actions={groupActionButtons} variant="minimal" />
+                                <HierarchyActionsMenu
+                                  stopPropagation
+                                  outOfEllipsis={['view', 'edit']}
+                                  permissions={groupSchema?.permissions}
+                                  viewHref={viewAction?.href}
+                                  onView={viewAction && !viewAction.href ? () => viewAction.onClick() : undefined}
+                                  onEdit={editAction ? () => editAction.onClick() : undefined}
+                                  onDelete={deleteAction ? () => deleteAction.onClick() : undefined}
+                                />
                               </td>
                             ) : null;
                           })()}

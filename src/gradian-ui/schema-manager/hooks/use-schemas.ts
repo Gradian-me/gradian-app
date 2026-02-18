@@ -60,13 +60,15 @@ export function useSchemas(options?: UseSchemasOptions) {
       : [...SCHEMAS_SUMMARY_QUERY_KEY, tenantIdsKey]
     : [...SCHEMAS_QUERY_KEY, tenantIdsKey];
   
+  // Use IndexedDB cache for summary only when no tenant filter (single key in IndexedDB)
+  const useSummaryIndexedDbCache = isSummary && (normalizedTenantIds === undefined || normalizedTenantIds.length === 0);
+
   const { data, isLoading, error, refetch } = useQuery({
     queryKey,
     queryFn: async () => {
-      // Use /api/schemas directly (apiRequest will handle it correctly via resolveApiUrl)
       const response = await apiRequest<FormSchema[]>(apiPath, {
         params: Object.keys(queryParams).length > 0 ? queryParams : undefined,
-        disableCache: true, // Force network to make call visible and fresh
+        disableCache: !useSummaryIndexedDbCache,
         callerName,
       });
       if (!response.success || !response.data) {

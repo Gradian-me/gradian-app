@@ -16,7 +16,9 @@ import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsConte
 import { Spinner } from '@/components/ui/spinner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { DynamicActionButtons } from './DynamicActionButtons';
+import { HierarchyActionsMenu } from '@/gradian-ui/data-display/hierarchy/HierarchyActionsMenu';
+import { getDiscussionCount } from '@/gradian-ui/data-display/utils';
+import { DiscussionsDialog } from '@/gradian-ui/communication';
 import { DynamicCardRenderer } from './DynamicCardRenderer';
 import { DynamicCardDialog } from './DynamicCardDialog';
 import { EmptyState } from './EmptyState';
@@ -250,6 +252,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     initiatedByCount: number;
   } | null>(null);
   const [assignmentCountRefreshToken, setAssignmentCountRefreshToken] = useState(0);
+  const [openDiscussionForRowId, setOpenDiscussionForRowId] = useState<string | null>(null);
 
   const {
     isEnabled: assignmentSwitcherEnabled,
@@ -863,41 +866,21 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       align: 'center',
       width: 120,
       render: (value: any, row: any) => {
-        const currentUserId = useUserStore.getState().user?.id ?? undefined;
+        const hasDiscussion = Boolean(schema?.id && row?.id);
         return (
-          <DynamicActionButtons
-            variant="minimal"
-            discussionConfig={
-              schema?.id && row?.id
-                ? {
-                    schemaId: schema.id,
-                    instanceId: String(row.id),
-                    currentUserId,
-                  }
+          <HierarchyActionsMenu
+            stopPropagation
+            outOfEllipsis={['view', 'edit']}
+            permissions={schema?.permissions}
+            onView={() => handleViewDetailPage(row)}
+            onEdit={!isEditLoading[row.id] ? () => handleEditEntity(row) : undefined}
+            onDelete={() => handleDeleteWithConfirmation(row)}
+            onDiscussions={
+              hasDiscussion
+                ? () => setOpenDiscussionForRowId(String(row.id))
                 : undefined
             }
-            engagementCounts={row?.engagementCounts}
-            actions={[
-              {
-                type: 'view',
-                onClick: () => handleViewDetailPage(row),
-                href: row?.id && schema?.id ? `/page/${schema.id}/${row.id}` : undefined,
-                canOpenInNewTab: true,
-              },
-              {
-                type: 'edit',
-                onClick: () => {
-                if (!isEditLoading[row.id]) {
-                  handleEditEntity(row);
-                }
-                },
-                disabled: isEditLoading[row.id],
-              },
-              {
-                type: 'delete',
-                onClick: () => handleDeleteWithConfirmation(row),
-              },
-            ]}
+            discussionCount={row?.engagementCounts ? getDiscussionCount(row.engagementCounts) : undefined}
           />
         );
       },
@@ -1394,6 +1377,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             onChangeParent={handleChangeParent}
             onView={handleViewEntity}
             onViewDetail={handleViewDetailPage}
+            onDiscussions={(entity) => setOpenDiscussionForRowId(String(entity.id))}
             expandAllTrigger={hierarchyExpandToken}
             collapseAllTrigger={hierarchyCollapseToken}
             isLoading={isLoading}
@@ -1476,6 +1460,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                               }
                             }}
                             onDelete={handleDeleteWithConfirmation}
+                            onDiscussions={(data) => setOpenDiscussionForRowId(String(data.id))}
                             className={isEditLoading[entity.id] ? "opacity-70" : ""}
                             highlightQuery={debouncedSearchTerm}
                             showUserDetails={showMetadataColumns}
@@ -1548,6 +1533,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                             }
                           }}
                           onDelete={handleDeleteWithConfirmation}
+                          onDiscussions={(data) => setOpenDiscussionForRowId(String(data.id))}
                           className={isEditLoading[entity.id] ? "opacity-70" : ""}
                           highlightQuery={debouncedSearchTerm}
                           showUserDetails={showMetadataColumns}
@@ -1619,6 +1605,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
                       }
                     }}
                     onDelete={handleDeleteWithConfirmation}
+                    onDiscussions={(data) => setOpenDiscussionForRowId(String(data.id))}
                     className={isEditLoading[entity.id] ? "opacity-70" : ""}
                     highlightQuery={debouncedSearchTerm}
                     showUserDetails={showMetadataColumns}
@@ -1674,6 +1661,11 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         onViewDetail={handleViewDetailPage}
         onEdit={handleEditEntity}
         onDelete={handleDeleteWithConfirmation}
+        onDiscussions={
+          selectedEntityForDetail?.id
+            ? () => setOpenDiscussionForRowId(String(selectedEntityForDetail.id))
+            : undefined
+        }
       />
 
       {/* Create Modal - using unified FormModal */}
@@ -1826,15 +1818,21 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         onOpenChange={(open: boolean) => setDeleteConfirmDialog({ open, entity: deleteConfirmDialog.entity })}
         title={[{ en: `Delete ${singularName}` }, { fa: `حذف ${singularName}` }, { ar: `حذف ${singularName}` }, { es: `Eliminar ${singularName}` }, { fr: `Supprimer ${singularName}` }, { de: `${singularName} löschen` }, { it: `Elimina ${singularName}` }, { ru: `Удалить ${singularName}` }]}
         message={
-          deleteConfirmDialog.entity ? (
-            <>
-              Are you sure you want to delete "{getValueByRole(schema, deleteConfirmDialog.entity, 'title') || deleteConfirmDialog.entity.name || deleteConfirmDialog.entity.title || deleteConfirmDialog.entity.id}"?
-              <br />
-              <span className="font-medium mt-2 block">This action cannot be undone.</span>
-            </>
-          ) : (
-            ''
-          )
+          deleteConfirmDialog.entity
+            ? (() => {
+                const itemName = String(getValueByRole(schema, deleteConfirmDialog.entity!, 'title') || deleteConfirmDialog.entity!.name || deleteConfirmDialog.entity!.title || deleteConfirmDialog.entity!.id || '');
+                return {
+                  en: `Are you sure you want to delete "${itemName}"? This action cannot be undone.`,
+                  fa: `آیا مطمئن هستید که می‌خواهید "${itemName}" را حذف کنید؟ این عمل قابل بازگشت نیست.`,
+                  ar: `هل أنت متأكد أنك تريد حذف "${itemName}"؟ لا يمكن التراجع عن هذا الإجراء.`,
+                  es: `¿Está seguro de que desea eliminar "${itemName}"? Esta acción no se puede deshacer.`,
+                  fr: `Voulez-vous vraiment supprimer « ${itemName} » ? Cette action est irréversible.`,
+                  de: `Möchten Sie "${itemName}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.`,
+                  it: `Sei sicuro di voler eliminare "${itemName}"? Questa azione non può essere annullata.`,
+                  ru: `Вы уверены, что хотите удалить «${itemName}»? Это действие нельзя отменить.`,
+                } as Record<string, string>;
+              })()
+            : ''
         }
         variant="destructive"
         buttons={[
@@ -1851,6 +1849,19 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           },
         ]}
       />
+
+      {/* Discussions dialog (opened from table row actions) */}
+      {schema?.id && openDiscussionForRowId && (
+        <DiscussionsDialog
+          isOpen={true}
+          onOpenChange={(open) => !open && setOpenDiscussionForRowId(null)}
+          config={{
+            schemaId: schema.id,
+            instanceId: openDiscussionForRowId,
+            currentUserId: useUserStore.getState().user?.id ?? undefined,
+          }}
+        />
+      )}
 
       {/* Edit Modal - using unified FormModal */}
       {editEntityId && schema?.id && (

@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData, ensurePasswordFieldsAreSensitive } from './utils';
+import { applyMockSchemaPermissions } from '@/gradian-ui/shared/configs/mock-schema-permissions';
 import { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '@/gradian-ui/shared/configs/general-config';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -527,13 +528,13 @@ export async function GET(request: NextRequest) {
         ? matchedSchemas.map((schema) => buildSchemaSummary(schema, includeStatistics, allData))
         : matchedSchemas;
 
-      // Add applications to each schema
+      // Add applications and mock permissions to each schema
       const schemasWithApplications = responseData.map((schema: any) => {
         const relatedApplications = getRelatedApplications(schema.id, tenantIds);
-        return {
+        return applyMockSchemaPermissions({
           ...schema,
           applications: relatedApplications,
-        };
+        });
       });
 
       return NextResponse.json({
@@ -568,11 +569,11 @@ export async function GET(request: NextRequest) {
       // Get related applications for this schema
       const relatedApplications = getRelatedApplications(schemaId, tenantIds);
       
-      // Add applications to response
-      const responseData = {
+      // Add applications and mock permissions to response
+      const responseData = applyMockSchemaPermissions({
         ...responseSchema,
         applications: relatedApplications,
-      };
+      });
 
       return NextResponse.json({
         success: true,
@@ -592,13 +593,13 @@ export async function GET(request: NextRequest) {
       ? filteredSchemas.map((schema) => buildSchemaSummary(schema, includeStatistics, allData))
       : filteredSchemas;
 
-    // Add applications to each schema
+    // Add applications and mock permissions to each schema
     const schemasWithApplications = responseSchemas.map((schema: any) => {
       const relatedApplications = getRelatedApplications(schema.id, tenantIds);
-      return {
+      return applyMockSchemaPermissions({
         ...schema,
         applications: relatedApplications,
-      };
+      });
     });
 
     return NextResponse.json({

@@ -1,4 +1,4 @@
-import { ActionConfig, ActionType } from '@/gradian-ui/data-display/components/DynamicActionButtons';
+import type { ActionConfig, ActionType } from '@/gradian-ui/data-display/components/action-types';
 import { Schema } from '../types';
 
 /**
@@ -115,7 +115,7 @@ export function createActionConfigs(
         });
         // TODO: Implement delete functionality with confirmation dialog
       } else {
-        // View actions will be handled via href navigation in DynamicActionButtons
+        // View actions are handled via href in HierarchyActionsMenu / table renderers
         console.log(`Action: ${actionType}`, {
           schemaId,
           dynamicQueryId,

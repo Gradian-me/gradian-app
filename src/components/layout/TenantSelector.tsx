@@ -20,6 +20,7 @@ import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { SCHEMAS_QUERY_KEY, SCHEMAS_SUMMARY_QUERY_KEY } from '@/gradian-ui/schema-manager/hooks/use-schemas';
 import { clearClientSchemaCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
+import { clearSchemasSummaryCache } from '@/gradian-ui/indexdb-manager/schemas-summary-cache';
 
 interface Tenant {
   id: string | number;
@@ -281,9 +282,10 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
         loggingCustom(LogType.CLIENT_LOG, 'warn', `Failed to call clear-cache API: ${apiError instanceof Error ? apiError.message : String(apiError)}`);
       }
       
-      // Clear client-side per-schema IndexedDB cache (this is persistent storage)
+      // Clear client-side IndexedDB caches (per-schema and schemas-summary)
       try {
         await clearClientSchemaCache();
+        await clearSchemasSummaryCache();
         loggingCustom(LogType.CLIENT_LOG, 'info', 'Client schema IndexedDB cache cleared');
       } catch (indexedDbError) {
         loggingCustom(

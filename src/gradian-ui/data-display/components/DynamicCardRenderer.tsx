@@ -15,7 +15,8 @@ import { getArrayValuesByRole, getBadgeConfig, getSingleValueByRole, getValueByR
 import { AvatarUser } from './AvatarUser';
 import { BadgeViewer, BadgeRenderer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { getFieldsByRole } from '../../form-builder/form-elements/utils/field-resolver';
-import { DynamicActionButtons } from './DynamicActionButtons';
+import { HierarchyActionsMenu } from '@/gradian-ui/data-display/hierarchy/HierarchyActionsMenu';
+import { getDiscussionCount } from '@/gradian-ui/data-display/utils';
 import { DynamicMetricRenderer } from './DynamicMetricRenderer';
 import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { CopyContent } from '../../form-builder/form-elements/components/CopyContent';
@@ -39,6 +40,8 @@ export interface DynamicCardRendererProps {
   onViewDetail?: (data: any) => void; // Navigates to detail page (view button)
   onEdit?: (data: any) => void;
   onDelete?: (data: any) => void;
+  /** Called when user opens discussions from the actions menu; parent should open DiscussionsDialog for this instance */
+  onDiscussions?: (data: any) => void;
   viewMode?: 'grid' | 'list';
   className?: string;
   maxBadges?: number;
@@ -63,6 +66,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   onViewDetail, // View button - navigates to detail page
   onEdit,
   onDelete,
+  onDiscussions,
   viewMode = 'grid',
   className,
   maxBadges = 2,
@@ -643,6 +647,17 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     </motion.div>
                   )}
                   <div className="flex-1 min-w-0">
+                    {/* Code on top of title (card view) */}
+                    {hasCodeField && cardConfig.codeField && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, y: -4 }}
+                        animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+                        transition={disableAnimation ? {} : { duration: 0.2 }}
+                        className="mb-1.5"
+                      >
+                        <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
+                      </motion.div>
+                    )}
                     {/* Title row */}
                     <motion.div
                       className="flex items-center gap-1.5 min-w-0 pe-2"
@@ -728,22 +743,41 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     )}
                   </div>
                 </div>
-                {(hasCodeField || hasRatingField) && (
+                {(hasRatingField || hasStatusField || hasEntityTypeField) && (
                   <div className={cn(
-                    "flex gap-2",
+                    "flex gap-2 flex-wrap",
                     isInDialog 
                       ? "flex-row sm:flex-col items-start sm:items-end w-full sm:w-auto sm:shrink-0" 
                       : "flex-col items-end shrink-0"
                   )}>
-                    {/* Code Badge */}
-                    {hasCodeField && cardConfig.codeField && (
+                    {/* Status (card view) */}
+                    {hasStatusField && (statusFieldDef || hasStatusGroup) && normalizedStatusMetadata.label && (
                       <motion.div
                         initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
                         animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
                         transition={disableAnimation ? {} : { duration: 0.2 }}
-                        whileHover={disableAnimation ? undefined : { x: 2, scale: 1.05, transition: { duration: 0.1, delay: 0 } }}
                       >
-                        <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
+                        <Badge variant={getValidBadgeVariant(normalizedStatusMetadata.color)}>
+                          {normalizedStatusMetadata.icon && (
+                            <IconRenderer iconName={normalizedStatusMetadata.icon} className="h-3 w-3 me-1" />
+                          )}
+                          <span className="text-xs">{normalizedStatusMetadata.label}</span>
+                        </Badge>
+                      </motion.div>
+                    )}
+                    {/* Entity type (card view) */}
+                    {hasEntityTypeField && (entityTypeFieldDef || hasEntityTypeGroup) && normalizedEntityTypeMetadata.label && (
+                      <motion.div
+                        initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
+                        animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                        transition={disableAnimation ? {} : { duration: 0.2 }}
+                      >
+                        <Badge variant={getValidBadgeVariant(normalizedEntityTypeMetadata.color)}>
+                          {normalizedEntityTypeMetadata.icon && (
+                            <IconRenderer iconName={normalizedEntityTypeMetadata.icon} className="h-3 w-3 me-1" />
+                          )}
+                          <span className="text-xs">{normalizedEntityTypeMetadata.label}</span>
+                        </Badge>
                       </motion.div>
                     )}
                     {/* Rating */}
@@ -1022,29 +1056,35 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
               </div>
             </>
           ) : (
-            // List view layout: two rows so title gets full width
+            // List view layout: row 1 = avatar + title (with copy) + actions in front; row 2 = meta; rest below
             <div className="flex w-full flex-col gap-3">
-              {/* Row 1: avatar + main text + user details + badges */}
-              <div className="flex items-start gap-2 flex-1 min-w-0">
-                {showAvatarInCard && (
-                  <motion.div
-                    initial={disableAnimation ? false : { opacity: 0, scale: 0.8 }}
-                    animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
-                    transition={disableAnimation ? {} : { duration: 0.3 }}
-                    whileHover={disableAnimation ? undefined : { scale: 1.01, transition: { type: "spring", stiffness: 300, damping: 30 } }}
-                    className="shrink-0"
-                  >
-                    <RoleBasedAvatar
-                      schema={schema}
-                      data={data}
-                      size="xl"
-                      showBorder={true}
-                      showShadow={true}
-                    />
-                  </motion.div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start gap-1.5 flex-wrap w-full">
+              {/* Row 1: avatar + title+copy (attached) + action buttons in front; wraps on small screens */}
+              <div className="flex flex-wrap items-center justify-between gap-2 w-full">
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  {showAvatarInCard && (
+                    <motion.div
+                      initial={disableAnimation ? false : { opacity: 0, scale: 0.8 }}
+                      animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
+                      transition={disableAnimation ? {} : { duration: 0.3 }}
+                      whileHover={disableAnimation ? undefined : { scale: 1.01, transition: { type: "spring", stiffness: 300, damping: 30 } }}
+                      className="shrink-0"
+                    >
+                      <RoleBasedAvatar
+                        schema={schema}
+                        data={data}
+                        size="xl"
+                        showBorder={true}
+                        showShadow={true}
+                      />
+                    </motion.div>
+                  )}
+                  <div className="flex items-center gap-1.5 flex-wrap min-w-0 flex-1">
+                    {/* Code on top of title (list view) */}
+                    {hasCodeField && cardConfig.codeField && (
+                      <div className="w-full shrink-0 mb-1">
+                        <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
+                      </div>
+                    )}
                     <ForceIcon
                       isForce={isForce}
                       size="md"
@@ -1053,36 +1093,39 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       showTooltip={false}
                       className="shrink-0"
                     />
-                    <motion.h3
-                      initial={disableAnimation ? false : { opacity: 0, x: 5 }}
-                      animate={disableAnimation ? false : { opacity: 1, x: 0 }}
-                      transition={disableAnimation ? {} : { duration: 0.3 }}
-                      className={cn(
-                        "text-sm font-semibold text-gray-900 dark:text-gray-200 wrap-break-word flex-1 min-w-0 line-clamp-3",
-                        !disableAnimation && "group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors duration-100"
-                      )}
-                      whileHover={disableAnimation ? undefined : {
-                        x: 2,
-                        transition: { type: "spring", stiffness: 400, damping: 25 }
-                      }}
-                      title={title} // Show full title on hover
-                    >
-                      {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
-                    </motion.h3>
-                    <span
-                      onClick={(e) => e.stopPropagation()}
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onKeyDown={(e) => e.stopPropagation()}
-                      className="shrink-0"
-                    >
-                      <CopyContent content={cardConfig.title} />
-                    </span>
-                    {/* Incomplete Badge */}
+                    {/* Title + copy attached (same line) */}
+                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                      <motion.h3
+                        initial={disableAnimation ? false : { opacity: 0, x: 5 }}
+                        animate={disableAnimation ? false : { opacity: 1, x: 0 }}
+                        transition={disableAnimation ? {} : { duration: 0.3 }}
+                        className={cn(
+                          "text-sm font-semibold text-gray-900 dark:text-gray-200 wrap-break-word min-w-0 line-clamp-3",
+                          !disableAnimation && "group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors duration-100"
+                        )}
+                        whileHover={disableAnimation ? undefined : {
+                          x: 2,
+                          transition: { type: "spring", stiffness: 400, damping: 25 }
+                        }}
+                        title={title}
+                      >
+                        {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
+                      </motion.h3>
+                      <span
+                        onClick={(e) => e.stopPropagation()}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onKeyDown={(e) => e.stopPropagation()}
+                        className="shrink-0"
+                      >
+                        <CopyContent content={cardConfig.title} />
+                      </span>
+                    </div>
                     {cardConfig.isIncomplete && (
                       <motion.div
                         initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
                         animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
                         transition={disableAnimation ? {} : { duration: 0.2 }}
+                        className="shrink-0"
                       >
                         <Badge variant="warning" className="flex items-center gap-1 px-1.5 py-0.5 shadow-sm">
                           <IconRenderer iconName="AlertTriangle" className="h-3 w-3" />
@@ -1091,6 +1134,40 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       </motion.div>
                     )}
                   </div>
+                </div>
+                {/* Action buttons in front (right); wrap to next line on narrow screens */}
+                {(onView || onViewDetail || onEdit || onDelete || onDiscussions) && (
+                  <div
+                    className="flex items-center shrink-0"
+                    onClick={(e) => e.stopPropagation()}
+                    onMouseDown={(e) => e.stopPropagation()}
+                  >
+                    <HierarchyActionsMenu
+                      stopPropagation
+                      outOfEllipsis={['view', 'edit']}
+                      permissions={schema?.permissions}
+                      onView={
+                        onViewDetail || onView
+                          ? () => (onViewDetail ? onViewDetail(data) : onView?.(data))
+                          : undefined
+                      }
+                      onEdit={onEdit ? () => onEdit(data) : undefined}
+                      onDelete={onDelete ? () => onDelete(data) : undefined}
+                      onDiscussions={
+                        onDiscussions && schema?.id && data?.id
+                          ? () => onDiscussions(data)
+                          : undefined
+                      }
+                      discussionCount={
+                        data?.engagementCounts
+                          ? getDiscussionCount(data.engagementCounts)
+                          : undefined
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+                <div className="flex-1 min-w-0">
                   {cardConfig.subtitle && (
                     <motion.p
                       initial={disableAnimation ? false : { opacity: 0, x: 5 }}
@@ -1174,10 +1251,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     )}
                   </div>
                 </div>
-              </div>
 
-              {/* Row 2: assignee / due date / status and action buttons at the end */}
-              {(hasCodeField || hasRatingField || hasStatusField || hasEntityTypeField || hasDuedateField || hasPersonField || onView || onViewDetail || onEdit || onDelete) && (
+              {/* Row 2: assignee / due date / status badges (no action buttons; those are in row 1) */}
+              {(hasCodeField || hasRatingField || hasStatusField || hasEntityTypeField || hasDuedateField || hasPersonField) && (
                 <div className="flex flex-wrap items-center justify-between gap-2 ms-0 sm:ms-11 shrink-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     {hasPersonField && cardConfig.personField && (
@@ -1293,103 +1369,40 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         )}
                       </div>
                     )}
-
-                    {/* Action Buttons for List View at far right */}
-                    {(onView || onViewDetail || onEdit || onDelete) && (
-                      <div
-                        className="flex items-center"
-                        onClick={(e) => e.stopPropagation()}
-                        onMouseDown={(e) => e.stopPropagation()}
-                      >
-                        <DynamicActionButtons
-                          variant="minimal"
-                          discussionConfig={
-                            schema?.id && data?.id
-                              ? {
-                                  schemaId: schema.id,
-                                  instanceId: String(data.id),
-                                  currentUserId: useUserStore.getState().user?.id ?? undefined,
-                                }
-                              : undefined
-                          }
-                          engagementCounts={data?.engagementCounts}
-                          actions={[
-                            ...(onViewDetail || onView
-                              ? [
-                                  {
-                                    type: 'view' as const,
-                                    onClick: onViewDetail
-                                      ? () => onViewDetail(data)
-                                      : () => onView?.(data),
-                                    href:
-                                      data?.id && schema?.id
-                                        ? `/page/${schema.id}/${data.id}`
-                                        : undefined,
-                                    canOpenInNewTab: true,
-                                  },
-                                ]
-                              : []),
-                            ...(onEdit
-                              ? [
-                                  {
-                                    type: 'edit' as const,
-                                    onClick: () => onEdit(data),
-                                  },
-                                ]
-                              : []),
-                            ...(onDelete
-                              ? [
-                                  {
-                                    type: 'delete' as const,
-                                    onClick: () => onDelete(data),
-                                  },
-                                ]
-                              : []),
-                          ]}
-                        />
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
             </div>
           )}
 
-          {/* Action Buttons - Only for Grid View */}
-          {viewMode === 'grid' && (
+          {/* Action menu - Grid View */}
+          {viewMode === 'grid' && (onView || onViewDetail || onEdit || onDelete || onDiscussions) && (
             <div
-              className="mt-auto pt-4"
+              className="mt-auto pt-4 flex justify-end"
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
             >
-              <DynamicActionButtons
-                variant="expanded"
-                discussionConfig={
-                  schema?.id && data?.id
-                    ? {
-                        schemaId: schema.id,
-                        instanceId: String(data.id),
-                        currentUserId: useUserStore.getState().user?.id ?? undefined,
-                      }
+              <HierarchyActionsMenu
+                stopPropagation
+                outOfEllipsis={['view', 'edit']}
+                permissions={schema?.permissions}
+                onView={
+                  onViewDetail || onView
+                    ? () => (onViewDetail ? onViewDetail(data) : onView?.(data))
                     : undefined
                 }
-                engagementCounts={data?.engagementCounts}
-                actions={[
-                  ...(onViewDetail || onView ? [{
-                    type: 'view' as const,
-                    onClick: onViewDetail ? () => onViewDetail(data) : () => onView?.(data),
-                    href: data?.id && schema?.id ? `/page/${schema.id}/${data.id}` : undefined,
-                    canOpenInNewTab: true,
-                  }] : []),
-                  ...(onEdit ? [{
-                    type: 'edit' as const,
-                    onClick: () => onEdit(data),
-                  }] : []),
-                  ...(onDelete ? [{
-                    type: 'delete' as const,
-                    onClick: () => onDelete(data),
-                  }] : []),
-                ]}
+                onEdit={onEdit ? () => onEdit(data) : undefined}
+                onDelete={onDelete ? () => onDelete(data) : undefined}
+                onDiscussions={
+                  onDiscussions && schema?.id && data?.id
+                    ? () => onDiscussions(data)
+                    : undefined
+                }
+                discussionCount={
+                  data?.engagementCounts
+                    ? getDiscussionCount(data.engagementCounts)
+                    : undefined
+                }
               />
             </div>
           )}

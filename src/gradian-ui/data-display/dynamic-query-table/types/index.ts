@@ -48,6 +48,8 @@ export interface Schema {
   id: string;
   label: string;
   fields: SchemaField[];
+  /** Optional action permissions (e.g. from FormSchema); when set, only these actions are shown. */
+  permissions?: string[];
 }
 
 export interface NestedTableViewWrapperProps {

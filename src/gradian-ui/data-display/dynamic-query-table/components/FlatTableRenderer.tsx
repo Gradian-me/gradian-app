@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguageStore } from '@/stores/language.store';
 import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { TableColumn } from '../../table/types';
@@ -9,7 +10,8 @@ import { resolveColumnWidth } from '../../table/utils/column-config';
 import { cn } from '@/gradian-ui/shared/utils';
 import { FlatTableRendererProps, Schema, SchemaField, ColumnGroup } from '../types';
 import { parseFlattenedData, getSchemaInfoFromPath, getBorderColorClasses, getSchemaHeaderBorderColor, createColumnToGroupInfoMap, getActionButtonsForSchema } from '../utils';
-import { DynamicActionButtons } from '@/gradian-ui/data-display/components/DynamicActionButtons';
+import { HierarchyActionsMenu } from '@/gradian-ui/data-display/hierarchy/HierarchyActionsMenu';
+import type { ActionConfig } from '@/gradian-ui/data-display/components/action-types';
 
 // Helper to infer field component type from value structure
 function inferFieldComponent(fieldName: string, value: any): string {
@@ -97,6 +99,7 @@ function createSyntheticField(fieldName: string, value: any, schema: Schema): Sc
 }
 
 export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, onFlattenChange, showIds = false, onShowIdsChange, highlightQuery, dynamicQueryActions, dynamicQueryId, onEditEntity }: FlatTableRendererProps) {
+  const router = useRouter();
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const isRtl = isRTL(language);
   const schemaList = schemas || [];
@@ -429,12 +432,25 @@ export function FlatTableRenderer({ data, schemas, showFlattenSwitch, flatten, o
                         {/* Action buttons cell before each schema group that has actions */}
                         {isFirstColumnInGroup && groupSchema && (() => {
                           const groupRowId = getRowIdForSchema(groupSchema.id);
-                          const groupActionButtons = dynamicQueryId && dynamicQueryActions 
+                          const groupActionButtons: ActionConfig[] | null = dynamicQueryId && dynamicQueryActions
                             ? getActionButtonsForSchema(groupSchema, dynamicQueryActions, dynamicQueryId, groupRowId, onEditEntity)
                             : null;
-                          return groupActionButtons ? (
+                          if (!groupActionButtons?.length) return null;
+                          const viewAction = groupActionButtons.find((a) => a.type === 'view');
+                          const editAction = groupActionButtons.find((a) => a.type === 'edit');
+                          const deleteAction = groupActionButtons.find((a) => a.type === 'delete');
+                          const hasAny = viewAction || editAction || deleteAction;
+                          return hasAny ? (
                             <td className="p-2 text-center">
-                              <DynamicActionButtons actions={groupActionButtons} variant="minimal" />
+                              <HierarchyActionsMenu
+                                stopPropagation
+                                outOfEllipsis={['view', 'edit']}
+                                permissions={groupSchema?.permissions}
+                                viewHref={viewAction?.href}
+                                onView={viewAction && !viewAction.href ? () => viewAction.onClick() : undefined}
+                                onEdit={editAction ? () => editAction.onClick() : undefined}
+                                onDelete={deleteAction ? () => deleteAction.onClick() : undefined}
+                              />
                             </td>
                           ) : null;
                         })()}

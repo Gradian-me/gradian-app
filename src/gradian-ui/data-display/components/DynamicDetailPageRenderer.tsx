@@ -3,8 +3,9 @@
 
 import { motion } from 'framer-motion';
 import React from 'react';
-import { Edit, RefreshCw, Trash2, LayoutList, MessageCircle } from 'lucide-react';
+import { RefreshCw, LayoutList } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
+import { HierarchyActionsMenu } from '@/gradian-ui/data-display/hierarchy/HierarchyActionsMenu';
 import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
 import { AvatarUser } from './AvatarUser';
 import { Badge } from '../../../components/ui/badge';
@@ -417,8 +418,6 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   const labelViewList = getT(TRANSLATION_KEYS.BUTTON_VIEW_LIST, language ?? undefined, defaultLang);
   const labelRefresh = getT(TRANSLATION_KEYS.BUTTON_REFRESH, language ?? undefined, defaultLang);
   const labelRefreshing = getT(TRANSLATION_KEYS.MESSAGE_REFRESHING, language ?? undefined, defaultLang);
-  const labelEdit = getT(TRANSLATION_KEYS.BUTTON_EDIT, language ?? undefined, defaultLang);
-  const labelDelete = getT(TRANSLATION_KEYS.BUTTON_DELETE, language ?? undefined, defaultLang);
   const labelTags = getT(TRANSLATION_KEYS.LABEL_TAGS, language ?? undefined, defaultLang);
   const translatedPluralName = getSchemaTranslatedPluralName(schema, language ?? defaultLang, schema?.plural_name || schema?.title || schema?.name || 'Schema');
   const translatedSingularName = getSchemaTranslatedSingularName(schema, language ?? defaultLang, schema?.singular_name || schema?.name || 'Entity');
@@ -1201,53 +1200,40 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
               )}
 
               {showActions && (onEdit || onDelete || onRefreshData || schema?.id) && (
-                <div className="flex items-center space-x-2">
-                  {schema?.id && pageData?.id && (
-                    <Button
-                      variant="outline"
-                      onClick={() => setDiscussionOpen(true)}
-                      className="px-4 py-2 gap-2"
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                      <span className="hidden md:block">Discussions</span>
-                      {detailDiscussionCount > 0 && (
-                        <span className="min-w-5 h-5 px-1.5 inline-flex items-center justify-center rounded-full text-xs font-medium bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300 tabular-nums">
-                          {detailDiscussionCount > 99 ? '99+' : detailDiscussionCount}
-                        </span>
-                      )}
-                    </Button>
-                  )}
+                <div className="flex items-center gap-2">
                   {schema?.id && (
-                    <Button variant="outline" asChild className="px-4 py-2 gap-2">
+                    <Button variant="outline" asChild size="default" className="px-4 py-2 gap-2">
                       <Link href={`/page/${schema.id}`}>
                         <LayoutList className="h-4 w-4" />
-                        <span className="hidden md:block">{labelViewList}</span>
+                        <span className="hidden md:inline">{labelViewList}</span>
                       </Link>
                     </Button>
                   )}
                   {onRefreshData && (
                     <Button
                       variant="outline"
+                      size="default"
                       onClick={handleRefreshAction}
                       disabled={isRefreshing}
                       className="px-4 py-2 gap-2"
                     >
                       <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                      <span className="hidden md:block">{isRefreshing ? labelRefreshing : labelRefresh}</span>
+                      <span className="hidden md:inline">{isRefreshing ? labelRefreshing : labelRefresh}</span>
                     </Button>
                   )}
-                  {onEdit && (
-                    <Button variant="outline" onClick={handleEdit} className="px-4 py-2 gap-2">
-                      <Edit className="h-4 w-4  " />
-                      <span className='hidden md:block'>{labelEdit}</span>
-                    </Button>
-                  )}
-                  {onDelete && (
-                    <Button variant="outline" onClick={onDelete} className="text-red-600 hover:text-red-700 px-4 py-2 gap-2">
-                      <Trash2 className="h-4 w-4 " />
-                      <span className='hidden md:block'>{labelDelete}</span>
-                    </Button>
-                  )}
+                  <HierarchyActionsMenu
+                    showBig
+                    stopPropagation
+                    outOfEllipsis={['view', 'edit']}
+                    permissions={schema?.permissions}
+                    onView={undefined}
+                    onEdit={onEdit ? handleEdit : undefined}
+                    onDelete={onDelete ?? undefined}
+                    onDiscussions={
+                      schema?.id && pageData?.id ? () => setDiscussionOpen(true) : undefined
+                    }
+                    discussionCount={detailDiscussionCount ?? undefined}
+                  />
                 </div>
               )}
 

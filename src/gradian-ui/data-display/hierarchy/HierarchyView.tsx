@@ -7,7 +7,7 @@ import { useLanguageStore } from '@/stores/language.store';
 import { isRTL, getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Card, CardContent } from '@/components/ui/card';
-import { DynamicActionButtons } from '../components/DynamicActionButtons';
+import { getDiscussionCount } from '@/gradian-ui/data-display/utils';
 import { RoleBasedAvatar } from '@/gradian-ui/data-display/utils';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { getSingleValueByRole, getValueByRole, getArrayValuesByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
@@ -37,6 +37,8 @@ export interface HierarchyViewProps {
   onChangeParent?: (entity: any) => void;
   onView?: (entity: any) => void; // Callback for viewing entity details (opens card dialog)
   onViewDetail?: (entity: any) => void; // Callback for navigating to detail page (view button)
+  /** Called when user opens discussions; parent should open DiscussionsDialog for this instance */
+  onDiscussions?: (entity: any) => void;
   expandAllTrigger?: number;
   collapseAllTrigger?: number;
   isLoading?: boolean; // Loading state for skeleton display
@@ -83,6 +85,7 @@ interface HierarchyNodeProps {
   onChangeParent?: (entity: any) => void;
   onView?: (entity: any) => void; // Callback for viewing entity details (opens card dialog)
   onViewDetail?: (entity: any) => void; // Callback for navigating to detail page (view button)
+  onDiscussions?: (entity: any) => void;
   highlightQuery: string;
   index: number;
   schema: FormSchema;
@@ -101,6 +104,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
   onChangeParent,
   onView,
   onViewDetail,
+  onDiscussions,
   highlightQuery,
   index,
   schema,
@@ -365,37 +369,30 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
             "pe-2 flex gap-2 shrink-0",
             "flex-col sm:flex-row items-center justify-center"
           )} onClick={(e) => e.stopPropagation()}>
-            <DynamicActionButtons
-              variant="minimal"
-              actions={[
-                ...(onViewDetail || onView ? [{
-                  type: 'view' as const,
-                  onClick: () => {
-                    // Prefer onViewDetail (navigate to detail page) over onView (open dialog)
-                    if (onViewDetail) {
-                      onViewDetail(entity);
-                    } else if (onView) {
-                      onView(entity);
-                    }
-                  },
-                  href: entity?.id && schema?.id ? `/page/${schema.id}/${entity.id}` : undefined,
-                  canOpenInNewTab: true,
-                }] : []),
-                ...(onEdit ? [{
-                  type: 'edit' as const,
-                  onClick: () => {
-                    onEdit(entity);
-                  },
-                }] : []),
-              ]}
-              stopPropagation={true}
-            />
             <HierarchyActionsMenu
+              stopPropagation
+              outOfEllipsis={['view', 'edit']}
+              permissions={schema?.permissions}
+              onView={
+                onViewDetail || onView
+                  ? () => (onViewDetail ? onViewDetail(entity) : onView?.(entity))
+                  : undefined
+              }
               onAddChild={() => onAddChild(entity)}
               onEdit={() => onEdit(entity)}
               onDelete={() => onDelete(entity)}
               onChangeParent={onChangeParent ? () => onChangeParent(entity) : undefined}
               hasParent={hasParent}
+              onDiscussions={
+                onDiscussions && schema?.id && entity?.id
+                  ? () => onDiscussions(entity)
+                  : undefined
+              }
+              discussionCount={
+                entity?.engagementCounts
+                  ? getDiscussionCount(entity.engagementCounts)
+                  : undefined
+              }
             />
           </div>
         </Card>
@@ -425,6 +422,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                 onChangeParent={onChangeParent}
                 onView={onView}
                 onViewDetail={onViewDetail}
+                onDiscussions={onDiscussions}
                 highlightQuery={highlightQuery}
                 index={index + idx + 1}
                 schema={schema}
@@ -449,6 +447,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
   onChangeParent,
   onView,
   onViewDetail,
+  onDiscussions,
   expandAllTrigger,
   collapseAllTrigger,
   isLoading = false,
@@ -615,6 +614,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
               onChangeParent={onChangeParent}
               onView={onView}
               onViewDetail={onViewDetail}
+              onDiscussions={onDiscussions}
               highlightQuery={normalizedSearch}
               index={index}
               schema={schema}

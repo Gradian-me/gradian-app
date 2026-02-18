@@ -1,9 +1,14 @@
+import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import type { ApiResponse } from '@/gradian-ui/shared/types/common';
 import { getIndexedDbCacheKeys } from '@/gradian-ui/shared/configs/cache-config';
 import {
   readCompaniesFromCache,
   persistCompaniesToCache,
 } from './companies-cache';
+import {
+  readSchemasSummaryFromCache,
+  persistSchemasSummaryToCache,
+} from './schemas-summary-cache';
 import type { CompanyRecord } from './types';
 
 export interface CacheStrategyContext {
@@ -60,8 +65,33 @@ const companiesCacheStrategy: IndexedDbCacheStrategy<CompanyRecord[]> = {
   },
 };
 
+const schemasSummaryCacheStrategy: IndexedDbCacheStrategy<FormSchema[]> = {
+  async preRequest() {
+    const cacheResult = await readSchemasSummaryFromCache();
+    if (cacheResult.hit) {
+      return {
+        hit: true,
+        data: cacheResult.schemas,
+      };
+    }
+    return { hit: false };
+  },
+
+  async postRequest(_context, response) {
+    if (!response.success || !response.data) {
+      return response;
+    }
+    const schemas = response.data as unknown as FormSchema[];
+    if (Array.isArray(schemas)) {
+      await persistSchemasSummaryToCache(schemas);
+    }
+    return response;
+  },
+};
+
 const strategyImplementations: Record<string, IndexedDbCacheStrategy<any>> = {
   companies: companiesCacheStrategy,
+  'schemas-summary': schemasSummaryCacheStrategy,
 };
 
 const indexedDbStrategies = getIndexedDbCacheKeys().reduce<Record<string, IndexedDbCacheStrategy<any>>>(

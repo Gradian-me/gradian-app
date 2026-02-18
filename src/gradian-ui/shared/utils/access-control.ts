@@ -9,7 +9,7 @@ import { User } from '@/types';
 export interface AccessCheckResult {
   hasAccess: boolean;
   reason?: string;
-  code?: 'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_SCHEMA' | 'ROLE_REQUIRED' | 'COMPANY_ACCESS';
+  code?: 'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SYSTEM_SCHEMA' | 'ROLE_REQUIRED' | 'COMPANY_ACCESS' | 'VIEW_PERMISSION_REQUIRED';
   requiredRole?: string;
   requiredPermission?: string;
   schemaId?: string;
@@ -56,6 +56,18 @@ export function checkSchemaAccess(
   //     schemaId: schema.id,
   //   };
   // }
+
+  // If schema has permissions (e.g. from summary), require 'view' to access the page
+  const permissions = schema.permissions;
+  if (Array.isArray(permissions) && permissions.length > 0 && !permissions.includes('view')) {
+    return {
+      hasAccess: false,
+      reason: 'You do not have view permission for this schema.',
+      code: 'VIEW_PERMISSION_REQUIRED',
+      requiredPermission: 'view',
+      schemaId: schema.id,
+    };
+  }
 
   return {
     hasAccess: true,

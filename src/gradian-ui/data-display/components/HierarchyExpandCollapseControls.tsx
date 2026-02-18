@@ -50,14 +50,14 @@ export const ExpandCollapseControls: React.FC<ExpandCollapseControlsProps> = ({
   // Match ViewSwitcher button dimensions/roundness when using "nobackground"
   const buttonClassName =
     size === 'icon' && variant === 'nobackground'
-      ? 'h-full w-10 p-0 rounded-md'
+      ? 'h-full w-10 p-0 rounded-xl'
       : size === 'icon'
-        ? 'h-10 w-10 rounded-md'
+        ? 'h-10 w-10 rounded-xl'
         : size === 'sm'
-          ? 'h-8 rounded-md'
+          ? 'h-8 rounded-xl'
           : size === 'lg'
-            ? 'h-12 rounded-md'
-            : 'h-10 rounded-md';
+            ? 'h-12 rounded-xl'
+            : 'h-10 rounded-xl';
 
   return (
     <TooltipProvider delayDuration={200}>

@@ -177,7 +177,7 @@ export const DynamicFilterPane = ({
                 <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               </Button>
             )}
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl h-9 sm:h-10 flex items-center shrink-0">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl h-9 shadow-sm sm:h-10 flex items-center shrink-0">
               <ViewSwitcher
                 currentView={viewMode}
                 onViewChange={onViewModeChange}

@@ -7103,5 +7103,23 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000013",
+    "timestamp": "2026-02-18T00:00:00.000Z",
+    "version": "1.56.001",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "ENHANCE: Improved ForbiddenPage and access check redirection logic to provide more detailed permission error messages. Updated API response handling to include mock schema permissions, enhancing user experience and clarity in access control. This update also includes the removal of the DynamicActionButtons component, streamlining the action handling process across the application.",
+        "priority": "High",
+        "affectedDomains": [
+          "access-control",
+          "api",
+          "ui",
+          "data-display"
+        ]
+      }
+    ]
   }
 ]

@@ -2,7 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
-import { DynamicActionButtons, type ActionConfig } from '@/gradian-ui/data-display/components/DynamicActionButtons';
+import { HierarchyActionsMenu } from '@/gradian-ui/data-display/hierarchy/HierarchyActionsMenu';
 
 type RelationActionCellProps = {
   itemId: string | number;
@@ -13,12 +13,14 @@ type RelationActionCellProps = {
   onDeleted?: () => Promise<void> | void;
   onDeleteClick?: (relationId: string | number, itemId: string | number) => void;
   isDeletingLabel?: string;
+  /** When set, only these actions are shown (e.g. from schema.permissions). Omit = show all. */
+  permissions?: string[];
 };
 
 /**
  * Reusable action cell for relation-based repeating tables.
  * Renders view/edit/delete actions when callbacks are provided,
- * using DynamicActionButtons for consistent styling with main pages.
+ * using HierarchyActionsMenu (shared ellipsis menu) for consistency with main pages.
  */
 export function RelationActionCell({
   itemId,
@@ -29,6 +31,7 @@ export function RelationActionCell({
   onDeleted,
   onDeleteClick,
   isDeletingLabel = 'Deleting...',
+  permissions,
 }: RelationActionCellProps) {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -65,41 +68,22 @@ export function RelationActionCell({
     }
   }, [itemId, onDeleteClick, onDeleted, relationId]);
 
-  const actions: ActionConfig[] = [];
-
-  if (onView) {
-    actions.push({
-      type: 'view',
-      onClick: handleView,
-      href: schemaId && itemId ? `/page/${schemaId}/${itemId}?showBack=true` : undefined,
-      canOpenInNewTab: true,
-    });
-  }
-
-  if (onEdit) {
-    actions.push({
-      type: 'edit',
-      onClick: handleEdit,
-    });
-  }
-
-  if (relationId && onDeleted) {
-    actions.push({
-      type: 'delete',
-      onClick: handleDelete,
-      disabled: isDeleting,
-    });
-  }
-
-  if (actions.length === 0) {
-    return null;
-  }
+  const viewHref = schemaId && itemId ? `/page/${schemaId}/${itemId}?showBack=true` : undefined;
+  const hasView = Boolean(viewHref || onView);
+  const hasEdit = Boolean(onEdit);
+  const hasDelete = Boolean(relationId && (onDeleted || onDeleteClick));
+  const hasAny = hasView || hasEdit || hasDelete;
+  if (!hasAny) return null;
 
   return (
-    <DynamicActionButtons
-      actions={actions}
-      variant="minimal"
-      stopPropagation={true}
+    <HierarchyActionsMenu
+      stopPropagation
+      outOfEllipsis={['view', 'edit']}
+      permissions={permissions}
+      viewHref={viewHref}
+      onView={hasView && !viewHref ? handleView : undefined}
+      onEdit={hasEdit ? handleEdit : undefined}
+      onDelete={hasDelete && !isDeleting ? handleDelete : undefined}
     />
   );
 }

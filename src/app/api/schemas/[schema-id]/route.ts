@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { isDemoModeEnabled, proxySchemaRequest, normalizeSchemaData, ensurePasswordFieldsAreSensitive } from '../utils';
+import { applyMockSchemaPermissions } from '@/gradian-ui/shared/configs/mock-schema-permissions';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 import { clearCache as clearSharedSchemaCache } from '@/gradian-ui/shared/utils/data-loader';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -424,11 +425,11 @@ export async function GET(
               // Get related applications for this schema
               const relatedApplications = getRelatedApplications(schemaId, tenantIds);
               
-              // Add applications to response
-              const responseData = {
+              // Add applications and mock permissions to response
+              const responseData = applyMockSchemaPermissions({
                 ...schema,
                 applications: relatedApplications,
-              };
+              });
               
               const corsHeaders = getCorsHeaders(request);
               return NextResponse.json({
@@ -494,11 +495,11 @@ export async function GET(
     // Get related applications for this schema
     const relatedApplications = getRelatedApplications(schemaId, tenantIds);
     
-    // Add applications to response
-    const responseData = {
+    // Add applications and mock permissions to response
+    const responseData = applyMockSchemaPermissions({
       ...schema,
       applications: relatedApplications,
-    };
+    });
 
     // Get CORS headers
     const corsHeaders = getCorsHeaders(request);

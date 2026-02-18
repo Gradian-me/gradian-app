@@ -20,7 +20,7 @@ type RepeatingSectionButtonProps = {
 
 /**
  * Reusable launcher button for opening repeating section dialog / related tables.
- * Matches the table action button styling used by DynamicActionButtons.
+ * Matches the table action button styling used by the row actions menu.
  */
 export function RepeatingSectionButton({
   sectionId,

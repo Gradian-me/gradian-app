@@ -3,6 +3,7 @@
 
 import 'server-only';
 
+import { applyMockSchemaPermissions } from '@/gradian-ui/shared/configs/mock-schema-permissions';
 import { FormSchema } from '../types/form-schema';
 import { loadAllSchemas, loadSchemasAsRecord, loadSchemaById } from './schema-loader';
 
@@ -61,7 +62,7 @@ export const findSchemaById = async (schemaId: string): Promise<FormSchema | nul
     console.warn(`Schema with ID "${schemaId}" not found`);
     return null;
   }
-  return schema;
+  return applyMockSchemaPermissions(schema);
 };
 
 /**
@@ -80,7 +81,7 @@ export const getSchemaById = async (schemaId: string): Promise<FormSchema> => {
     throw new Error(`Schema with ID "${schemaId}" not found`);
   }
   
-  return schema;
+  return applyMockSchemaPermissions(schema);
 };
 
 /**

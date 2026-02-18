@@ -64,6 +64,11 @@ export interface DynamicCardDialogProps {
    * Callback when delete button is clicked
    */
   onDelete?: (data: any) => void;
+
+  /**
+   * Callback when discussions is opened from the actions menu
+   */
+  onDiscussions?: (data: any) => void;
 }
 
 /**
@@ -79,7 +84,8 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
   onView,
   onViewDetail,
   onEdit,
-  onDelete
+  onDelete,
+  onDiscussions,
 }) => {
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const defaultLang = getDefaultLanguage();
@@ -143,6 +149,7 @@ export const DynamicCardDialog: React.FC<DynamicCardDialogProps> = ({
               onViewDetail={onViewDetail}
               onEdit={onEdit}
               onDelete={onDelete}
+              onDiscussions={onDiscussions}
               className="shadow-none border-none"
               disableAnimation={true} // Disable card animation in dialog
               isInDialog={true}

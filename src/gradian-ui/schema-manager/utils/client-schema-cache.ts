@@ -11,11 +11,12 @@
  *       - The API route already decides between demo JSON vs live backend.
  *    3) If API returns a schema, store it back into IndexedDB.
  * - Clear flow:
- *    - `clearClientSchemaCache` only clears the client IndexedDB namespace.
- *    - `clearSchemaCacheEverywhere` clears both server-side caches + client IndexedDB.
+ *    - `clearClientSchemaCache` only clears the client IndexedDB namespace (per-schema).
+ *    - `clearSchemaCacheEverywhere` clears server-side + client IndexedDB (schemas + schemas-summary).
  */
 
 import type { FormSchema } from '../types/form-schema';
+import { clearSchemasSummaryCache } from '@/gradian-ui/indexdb-manager/schemas-summary-cache';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import {
   createIndexedDbStore,
@@ -96,8 +97,9 @@ export async function clearSchemaCacheEverywhere(): Promise<{ success: boolean }
       },
     });
 
-    // Clear client cache regardless of server response to avoid stale local data.
+    // Clear client IndexedDB caches regardless of server response.
     await clearClientSchemaCache();
+    await clearSchemasSummaryCache();
 
     if (!response.ok) {
       return { success: false };
@@ -105,8 +107,8 @@ export async function clearSchemaCacheEverywhere(): Promise<{ success: boolean }
 
     return { success: true };
   } catch {
-    // On network error, still clear local cache so UI can refetch fresh when available.
     await clearClientSchemaCache();
+    await clearSchemasSummaryCache();
     return { success: false };
   }
 }

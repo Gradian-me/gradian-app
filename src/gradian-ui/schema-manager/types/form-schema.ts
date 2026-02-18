@@ -487,6 +487,12 @@ export interface FormSchema {
    */
   entityTypeGroup?: any[];
   /**
+   * Optional action permissions for this schema (e.g. from summary=true).
+   * When set, only these actions are shown in list/card/hierarchy action menus.
+   * E.g. ['view', 'edit'] shows only View and Edit; omit or empty = show all actions.
+   */
+  permissions?: string[];
+  /**
    * Optional tenant scoping configuration. When applyToAllTenants is true,
    * the form applies to every tenant and relatedTenants should be ignored.
    * Otherwise, relatedTenants should contain tenant IDs selected via picker.
