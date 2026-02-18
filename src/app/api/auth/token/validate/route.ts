@@ -78,19 +78,24 @@ export async function POST(request: NextRequest) {
 }
 
 // GET endpoint for convenience (reads from cookies/header)
+// Used by AuthGuard: accepts access_token (header or cookie) or refresh_token (cookie) so session check works when only refresh cookie is present
 export async function GET(request: NextRequest) {
   try {
     // Try to get token from header or cookies
     let token: string | null = null;
+    const cookies = request.headers.get('cookie');
 
     // Try Authorization header
     const authHeader = request.headers.get('authorization');
     token = extractTokenFromHeader(authHeader);
 
     if (!token) {
-      // Try cookies
-      const cookies = request.headers.get('cookie');
       token = extractTokenFromCookies(cookies, AUTH_CONFIG.ACCESS_TOKEN_COOKIE);
+    }
+
+    // If no access token, try refresh token cookie (AuthGuard sends credentials; server may only have refresh_token set)
+    if (!token) {
+      token = extractTokenFromCookies(cookies, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
     }
 
     if (!token) {

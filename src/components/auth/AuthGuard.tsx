@@ -2,64 +2,59 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
-import { AUTH_CONFIG, PUBLIC_PAGES } from '@/gradian-ui/shared/configs/auth-config';
+import { PUBLIC_PAGES } from '@/gradian-ui/shared/configs/auth-config';
 import { REQUIRE_LOGIN } from '@/gradian-ui/shared/configs/env-config';
 import { encryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util';
+import { useUserStore } from '@/stores/user.store';
+import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
 
 /**
  * AuthGuard Component
- * 
- * Prevents layout flash by checking authentication BEFORE rendering children.
- * Shows loading spinner during auth check, then either:
- * - Renders children if authenticated
- * - Redirects to login if not authenticated (without showing layout)
- * 
- * This component checks auth status immediately on mount to prevent any content
- * from rendering before authentication is verified.
+ *
+ * - When REQUIRE_LOGIN is true: runs session check (GET /api/auth/token/validate with cookies).
+ *   If invalid or no refresh_token cookie, clears user store + in-memory token and redirects to login.
+ * - When REQUIRE_LOGIN is false: skips auth check; app never redirects to login (profile selector
+ *   still hides when user store is empty after clearing storage).
+ *
+ * UserProfileSelector visibility is driven only by useUserStore().user (persisted in localStorage).
+ * To get "force logout" (redirect to login when cookies/storage are cleared), set REQUIRE_LOGIN=true.
  */
 interface AuthGuardProps {
   children: React.ReactNode;
 }
 
 /**
- * Check if refresh token exists in cookies
- * Note: HttpOnly cookies are not accessible via JavaScript, so this is
- * a best-effort check. The actual validation happens server-side.
- */
-function hasRefreshToken(): boolean {
-  if (typeof document === 'undefined') return false;
-  
-  // HttpOnly cookies are not accessible via document.cookie
-  // We can only check if the cookie name exists in the cookie string
-  // This is a best-effort check - actual validation happens server-side
-  const cookies = document.cookie;
-  const refreshTokenCookieName = AUTH_CONFIG.REFRESH_TOKEN_COOKIE;
-  
-  // Check if cookie name appears in cookie string
-  // Note: This won't work for HttpOnly cookies, but it's better than nothing
-  return cookies.includes(`${refreshTokenCookieName}=`);
-}
-
-/**
  * Check authentication status via API
- * This provides a more reliable check than cookie inspection
+ * Validate endpoint accepts access_token (header/cookie) or refresh_token (cookie).
  */
 async function checkAuthViaAPI(): Promise<boolean> {
   try {
     const response = await fetch('/api/auth/token/validate', {
       method: 'GET',
-      credentials: 'include', // Include cookies
+      credentials: 'include', // Include cookies (refresh_token, etc.)
     });
-    
+
     if (response.ok) {
       const data = await response.json();
       return data.valid === true;
     }
-    
+
     return false;
   } catch (error) {
     console.error('[AuthGuard] Error checking auth via API:', error);
     return false;
+  }
+}
+
+/** Clear client auth state and redirect to login. Use when session is missing/invalid so UI and storage stay in sync. */
+function redirectToLogin(pathname: string) {
+  useUserStore.getState().clearUser();
+  authTokenManager.clearAccessToken();
+  const currentPath = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
+  const encryptedReturnUrl = encryptReturnUrl(currentPath);
+  const loginUrl = `/authentication/login?returnUrl=${encodeURIComponent(encryptedReturnUrl)}`;
+  if (typeof window !== 'undefined') {
+    window.location.href = loginUrl;
   }
 }
 
@@ -106,53 +101,21 @@ export function AuthGuard({ children }: AuthGuardProps) {
       return;
     }
 
-    // Perform auth check immediately
+    // Perform auth check: call validate API (with credentials) so server can see refresh_token cookie (including HttpOnly)
     const checkAuth = async () => {
       try {
-        // First, do a quick cookie check (synchronous)
-        const hasTokenInCookie = hasRefreshToken();
-        
-        // If no token in cookie, redirect immediately without API call
-        if (!hasTokenInCookie) {
-          const currentPath = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
-          const encryptedReturnUrl = encryptReturnUrl(currentPath);
-          const loginUrl = `/authentication/login?returnUrl=${encodeURIComponent(encryptedReturnUrl)}`;
-          
-          // Use window.location for immediate redirect (prevents any rendering)
-          if (typeof window !== 'undefined') {
-            window.location.href = loginUrl;
-          }
-          return;
-        }
-
-        // Token exists in cookie - verify via API for more reliable check
         const isValid = await checkAuthViaAPI();
-        
+
         if (!isValid) {
-          // Token invalid - redirect to login
-          const currentPath = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
-          const encryptedReturnUrl = encryptReturnUrl(currentPath);
-          const loginUrl = `/authentication/login?returnUrl=${encodeURIComponent(encryptedReturnUrl)}`;
-          
-          // Use window.location for immediate redirect
-          if (typeof window !== 'undefined') {
-            window.location.href = loginUrl;
-          }
+          redirectToLogin(pathname || '/');
           return;
         }
 
         // Authentication verified - allow rendering
         setIsAuthenticated(true);
       } catch (error) {
-        // On error, redirect to login to be safe
         console.error('[AuthGuard] Error during auth check:', error);
-        const currentPath = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
-        const encryptedReturnUrl = encryptReturnUrl(currentPath);
-        const loginUrl = `/authentication/login?returnUrl=${encodeURIComponent(encryptedReturnUrl)}`;
-        
-        if (typeof window !== 'undefined') {
-          window.location.href = loginUrl;
-        }
+        redirectToLogin(pathname || '/');
       } finally {
         setIsChecking(false);
       }

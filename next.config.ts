@@ -198,12 +198,16 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net",
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https:",
+              "base-uri 'self'",
+              "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+              "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+              "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://cdn.jsdelivr.net",
+              "connect-src 'self' blob: https://*.cinnagen.com https://cg-gr-app.cinnagen.com:5001 https://www.gstatic.com https://cdn.jsdelivr.net",
               `frame-ancestors ${loginModalFrameAncestors}`,
+              "object-src 'none'",
+              "media-src 'self' https: blob:",
+              "worker-src 'self' blob:",
             ].join('; ')
           }
         ],
@@ -245,12 +249,16 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net", // Allow CDN for Mermaid fallback
-              "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' data: https:",
+              "base-uri 'self'",
+              "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net", // Allow CDN for Mermaid fallback
+              "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+              "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' https://cdn.jsdelivr.net", // Allow CDN connections for fallback
+              "connect-src 'self' blob: https://*.cinnagen.com https://cg-gr-app.cinnagen.com:5001 https://www.gstatic.com https://cdn.jsdelivr.net", // Allow CDN and required backend connections
               "frame-ancestors 'self'",
+              "object-src 'none'",
+              "media-src 'self' https: blob:",
+              "worker-src 'self' blob:",
             ].join('; ')
           }
         ],

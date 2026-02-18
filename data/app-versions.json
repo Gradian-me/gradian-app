@@ -7121,5 +7121,24 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000014",
+    "timestamp": "2026-02-18T00:05:00.000Z",
+    "version": "1.56.002",
+    "changes": [
+      {
+        "changeType": "enhance",
+        "description": "ENHANCE: Enhanced Content Security Policy in next.config.ts to improve security by adding new directives for base-uri, object-src, media-src, and worker-src, and updating connect-src to allow specific backend connections. Updated cross-env configuration and HTTP header handling to support larger header sizes. Improved AuthGuard authentication flow with streamlined validation and redirect logic for invalid sessions. Updated translations for welcome messages and adjusted data-loader utility and cookie handling to improve security, user experience, and overall application reliability.",
+        "priority": "High",
+        "affectedDomains": [
+          "security",
+          "auth",
+          "ui",
+          "i18n",
+          "infrastructure"
+        ]
+      }
+    ]
   }
 ]

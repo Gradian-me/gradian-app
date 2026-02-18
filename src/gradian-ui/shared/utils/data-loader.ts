@@ -11,6 +11,7 @@ import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 import { extractTokenFromCookies } from '@/domains/auth';
 import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 import { getAccessToken } from '@/app/api/auth/helpers/server-token-cache';
+import { getCookieHeaderWithinLimit } from '@/gradian-ui/shared/utils/cookie-header-size.util';
 
 // Cache storage structure
 interface CacheEntry<T> {
@@ -470,8 +471,9 @@ export async function loadData<T = any>(
         const fetchHeaders: Record<string, string> = {
           'Content-Type': 'application/json',
         };
-        if (cookieHeader) {
-          fetchHeaders['cookie'] = cookieHeader;
+        const safeCookieHeader = getCookieHeaderWithinLimit(cookieHeader);
+        if (safeCookieHeader) {
+          fetchHeaders['cookie'] = safeCookieHeader;
         }
         if (authHeader) {
           fetchHeaders['authorization'] = authHeader;
@@ -652,8 +654,9 @@ export async function loadDataById<T = any>(
       const fetchHeaders: Record<string, string> = {
         'Content-Type': 'application/json',
       };
-      if (cookieHeader) {
-        fetchHeaders['cookie'] = cookieHeader;
+      const safeCookieHeader = getCookieHeaderWithinLimit(cookieHeader);
+      if (safeCookieHeader) {
+        fetchHeaders['cookie'] = safeCookieHeader;
       }
       if (authHeader) {
         fetchHeaders['authorization'] = authHeader;
@@ -787,8 +790,9 @@ export async function loadDataById<T = any>(
     const fetchHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
     };
-    if (cookieHeader) {
-      fetchHeaders['cookie'] = cookieHeader;
+    const safeCookieHeader = getCookieHeaderWithinLimit(cookieHeader);
+    if (safeCookieHeader) {
+      fetchHeaders['cookie'] = safeCookieHeader;
     }
     if (authHeader) {
       fetchHeaders['authorization'] = authHeader;

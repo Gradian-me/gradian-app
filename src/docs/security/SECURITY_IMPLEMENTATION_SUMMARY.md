@@ -70,6 +70,16 @@ Comprehensive security measures have been implemented to prevent sensitive data 
 - Complete security guidelines and best practices
 - Developer checklist and testing procedures
 
+### 9. ✅ Avoid "400 header or cookies too long"
+- **Cause**: Large Cookie/Authorization headers can exceed Node (default ~8KB) or nginx limits.
+- **Node**: `dev`, `start`, and `start:standalone` scripts set `NODE_OPTIONS=--max-http-header-size=32768` (32KB) via `cross-env`.
+- **Cookie trimming**: When forwarding cookies to internal APIs, the app uses `getCookieHeaderWithinLimit()` so only auth-needed cookies are sent if the full header would exceed ~6KB (see `src/gradian-ui/shared/utils/cookie-header-size.util.ts`).
+- **Nginx** (if used in front of the app): Increase buffer size so large headers are accepted:
+  ```nginx
+  client_header_buffer_size 16k;
+  large_client_header_buffers 4 32k;
+  ```
+
 ## Files Modified
 
 ### Core Security Files (New)
