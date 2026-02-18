@@ -15,7 +15,7 @@ variables:
 before_script:
   - echo "Authenticating with Docker Registry..."
   - echo "$nexus_password" | docker login -u "$nexus_user" --password-stdin reg.cinnagen.com:8083
-  - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  - echo $CI_JOB_TOKEN | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
   
 security_audit:
   stage: security
