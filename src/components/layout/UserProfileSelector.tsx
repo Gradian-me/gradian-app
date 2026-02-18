@@ -108,8 +108,7 @@ export function UserProfileSelector({
     isDarkVariant
       ? 'border-violet-300/60 bg-gray-900 text-violet-200 hover:bg-gray-800 focus-visible:ring-violet-500 focus-visible:ring-offset-gray-900'
       : 'border-violet-200 bg-white text-violet-700 hover:bg-violet-50 hover:border-violet-300 focus-visible:ring-violet-500 focus-visible:ring-offset-white',
-    fullWidth ? 'w-full justify-between' : '',
-    className
+    fullWidth ? 'w-full justify-between' : ''
   );
 
   const menuContentClasses = cn(
@@ -238,7 +237,7 @@ export function UserProfileSelector({
   ];
 
   return (
-    <div suppressHydrationWarning dir={isRTLLanguage ? 'rtl' : 'ltr'}>
+    <div className={cn(fullWidth && 'w-full', className)} suppressHydrationWarning dir={isRTLLanguage ? 'rtl' : 'ltr'}>
       <DropdownMenuPrimitive.Root
         open={isMenuOpen}
         onOpenChange={(open) => {

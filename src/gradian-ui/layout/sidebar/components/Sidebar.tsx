@@ -80,33 +80,31 @@ const SidebarComponent: React.FC<SidebarProps> = ({
         />
       </div>
 
-      {/* User Profile / Mode Toggle */}
+      {/* User Profile / Mode Toggle - same horizontal padding as company selector for full-width appearance */}
       {showUserControls && (
-        <div className="mt-auto border-t border-gray-800 p-4 sm:block lg:hidden">
-          <div className="flex items-center gap-3 overflow-hidden">
-            <UserProfileSelector
-              className="flex-1 min-w-0"
-              theme="dark"
-              config={{
-                layout: {
-                  variant: 'dropdown',
-                  size: 'sm',
-                  showAvatar: true,
-                  showName: true,
-                  showEmail: false,
-                  showRole: false,
-                  showStatus: false,
-                  fullWidth: true,
-                  popoverPlacement: 'auto',
-                },
-                styling: {
-                  variant: 'minimal',
-                  theme: 'dark',
-                  rounded: true,
-                },
-              }}
-            />
-          </div>
+        <div className="mt-auto border-t border-gray-800 px-4 py-3 sm:block lg:hidden">
+          <UserProfileSelector
+            className="w-full"
+            theme="dark"
+            config={{
+              layout: {
+                variant: 'dropdown',
+                size: 'sm',
+                showAvatar: true,
+                showName: true,
+                showEmail: false,
+                showRole: false,
+                showStatus: false,
+                fullWidth: true,
+                popoverPlacement: 'auto',
+              },
+              styling: {
+                variant: 'minimal',
+                theme: 'dark',
+                rounded: true,
+              },
+            }}
+          />
         </div>
       )}
 
