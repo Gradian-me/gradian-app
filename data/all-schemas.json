@@ -12018,6 +12018,24 @@
             "label": "Delete",
             "icon": "Trash2",
             "color": "red"
+          },
+          {
+            "id": "PRINT",
+            "label": "Print",
+            "icon": "Trash2",
+            "color": "purple"
+          },
+          {
+            "id": "ENGAGEMENT_DENY_VIEW",
+            "label": "Engagement Deny View",
+            "icon": "EyeOff",
+            "color": "gray"
+          },
+          {
+            "id": "ENGAGEMENT_DENY_CONTRIBUTE",
+            "label": "Engagement Deny Contribute",
+            "icon": "MinusCircle",
+            "color": "gray"
           }
         ],
         "colSpan": 1,

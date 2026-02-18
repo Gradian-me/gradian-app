@@ -138,6 +138,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
             disabled={disabled}
             readOnly={fieldReadOnly || (allowTranslation && !disabled)}
             autoComplete="off"
+            dir="auto"
             className={inputClasses}
             {...props}
           />

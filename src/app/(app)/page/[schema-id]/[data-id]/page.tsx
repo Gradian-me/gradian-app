@@ -62,15 +62,16 @@ export default async function DynamicDetailPage({ params }: PageProps) {
   const accessCheck = await checkDataAccess(schema, dataId, user);
   
   if (!accessCheck.hasAccess) {
+    // Missing view permission → app-level forbidden (clean URL); other denials → schema/data-level forbidden
+    if (accessCheck.code === 'VIEW_PERMISSION_REQUIRED') {
+      redirect('/forbidden');
+    }
     const searchParams = new URLSearchParams();
     if (accessCheck.code) searchParams.set('code', accessCheck.code);
     if (accessCheck.requiredPermission) searchParams.set('requiredPermission', accessCheck.requiredPermission);
+    if (accessCheck.reason) searchParams.set('reason', accessCheck.reason);
+    if (accessCheck.requiredRole) searchParams.set('requiredRole', accessCheck.requiredRole);
     const queryString = searchParams.toString();
-
-    // Missing view permission → app-level forbidden; other denials → schema/data-level forbidden
-    if (accessCheck.code === 'VIEW_PERMISSION_REQUIRED') {
-      redirect(`/forbidden${queryString ? `?${queryString}` : ''}`);
-    }
     redirect(`/page/${schemaId}/${dataId}/forbidden${queryString ? `?${queryString}` : ''}`);
   }
 

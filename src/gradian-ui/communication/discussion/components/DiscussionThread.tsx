@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/gradian-ui/shared/utils';
 import { DiscussionMessage, getDiscussionMessageCreator } from './DiscussionMessage';
 import { useLanguageStore } from '@/stores/language.store';
-import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import type { DiscussionMessage as DiscussionMessageType } from '../types';
 
@@ -53,7 +53,7 @@ function buildThreadTree(messages: DiscussionMessageType[]): ThreadNode[] {
 
 const REPLY_INDENT_PX = 20;
 
-/** Single message row: avatar + line on left, card on right */
+/** Single message row: avatar + line at start, card at end. Uses logical margin for RTL nesting. */
 function ThreadMessageRow({
   message,
   userResolver,
@@ -63,6 +63,7 @@ function ThreadMessageRow({
   depth,
   language,
   defaultLang,
+  isRtl,
 }: {
   message: DiscussionMessageType;
   userResolver?: (userId: string) => { name?: string; avatarUrl?: string };
@@ -72,6 +73,7 @@ function ThreadMessageRow({
   depth: number;
   language: string;
   defaultLang: string;
+  isRtl: boolean;
 }) {
   const { avatarUrl, fallback, displayName } = getDiscussionMessageCreator(
     message,
@@ -83,7 +85,7 @@ function ThreadMessageRow({
   return (
     <div
       className="flex gap-2 items-stretch"
-      style={depth > 0 ? { marginLeft: depth * REPLY_INDENT_PX } : undefined}
+      style={depth > 0 ? { marginInlineStart: depth * REPLY_INDENT_PX } : undefined}
     >
       {/* Avatar column with vertical line */}
       <div className="flex flex-col items-center w-9 shrink-0 pt-0.5">
@@ -124,6 +126,7 @@ function renderThreadNode(
     onReply?: (message: DiscussionMessageType) => void;
     language: string;
     defaultLang: string;
+    isRtl: boolean;
   }
 ): React.ReactNode[] {
   const hasChildren = node.children.length > 0;
@@ -139,6 +142,7 @@ function renderThreadNode(
       depth={depth}
       language={props.language}
       defaultLang={props.defaultLang}
+      isRtl={props.isRtl}
     />,
   ];
   node.children.forEach((child, idx) => {
@@ -165,11 +169,13 @@ export const DiscussionThread: React.FC<DiscussionThreadProps> = ({
   const t = (key: string) => getT(key, language, defaultLang);
   const defaultEmpty = t(TRANSLATION_KEYS.DISCUSSION_EMPTY_MESSAGE);
 
+  const rtl = isRTL(resolvedLang);
+
   if (isLoading) {
     const SkeletonRow = ({ nested = false }: { nested?: boolean }) => (
       <div
         className="flex gap-2 items-stretch"
-        style={nested ? { marginLeft: REPLY_INDENT_PX } : undefined}
+        style={nested ? { marginInlineStart: REPLY_INDENT_PX } : undefined}
       >
         <div className="flex flex-col items-center w-9 shrink-0 pt-0.5">
           <div className="h-7 w-7 rounded-full bg-gray-200 dark:bg-gray-700" />
@@ -228,14 +234,17 @@ export const DiscussionThread: React.FC<DiscussionThreadProps> = ({
   const tree = buildThreadTree(messages);
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div
+      className={cn('space-y-6', className)}
+      dir={rtl ? 'rtl' : 'ltr'}
+    >
       {tree.map((node, rootIdx) => (
         <div key={node.message.id} className="space-y-0">
           {renderThreadNode(
             node,
             0,
             rootIdx < tree.length - 1, // hasYoungerSibling for root
-            { userResolver, onReply, language: resolvedLang, defaultLang }
+            { userResolver, onReply, language: resolvedLang, defaultLang, isRtl: rtl }
           )}
         </div>
       ))}
