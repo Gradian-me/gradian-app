@@ -141,6 +141,55 @@
   /* Process hashtags and mentions via JavaScript after markdown renders */
 }
 
+/* Swagger UI dark mode overrides */
+.dark .swagger-ui {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+.dark .swagger-ui * {
+  color: hsl(var(--foreground));
+}
+
+.dark .swagger-ui .scheme-container,
+.dark .swagger-ui .opblock-tag-section,
+.dark .swagger-ui .opblock,
+.dark .swagger-ui .model-box,
+.dark .swagger-ui .info,
+.dark .swagger-ui .topbar {
+  background-color: hsl(var(--background));
+  border-color: hsl(var(--border));
+}
+
+.dark .swagger-ui .opblock-summary,
+.dark .swagger-ui .opblock-description-wrapper,
+.dark .swagger-ui .opblock-body,
+.dark .swagger-ui .parameters-col_description,
+.dark .swagger-ui .response-col_description,
+.dark .swagger-ui table,
+.dark .swagger-ui .model,
+.dark .swagger-ui .response,
+.dark .swagger-ui .responses-inner {
+  background-color: hsl(var(--card));
+}
+
+.dark .swagger-ui .btn,
+.dark .swagger-ui .opblock-summary-control,
+.dark .swagger-ui .opblock-summary-method {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
+
+.dark .swagger-ui a {
+  color: hsl(var(--primary));
+}
+
+.dark .swagger-ui .tab,
+.dark .swagger-ui .tab li {
+  background-color: hsl(var(--background));
+}
+
 :root {
   --background: 0 0% 100%;
   --foreground: 240 10% 3.9%;
@@ -167,11 +216,11 @@
 }
 
 .dark {
-  --background: 240 10% 3.9%;
+  --background: 219 42% 11%;
   --foreground: 0 0% 98%;
-  --card: 240 10% 3.9%;
+  --card: 219 42% 11;
   --card-foreground: 0 0% 98%;
-  --popover: 240 10% 3.9%;
+  --popover: 219 42% 11%;
   --popover-foreground: 0 0% 98%;
   --primary: 262 83% 58%;
   --primary-foreground: 0 0% 98%;

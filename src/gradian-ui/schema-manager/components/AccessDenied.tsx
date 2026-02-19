@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Loader2, OctagonMinus, RefreshCw } from 'lucide-react';
+import { LayoutDashboard, Loader2, LucideUser, OctagonMinus, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { getT } from '@/gradian-ui/shared/utils/translation-utils';
@@ -103,7 +103,7 @@ export function AccessDenied({
               </p>
             </motion.div>
 
-            {(showGoBackButton || showHomeButton || onRefresh) && (
+            {(showGoBackButton || showHomeButton || onRefresh || accessCheck?.code === 'UNAUTHORIZED') && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -134,6 +134,14 @@ export function AccessDenied({
                     )}
                     <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
                   </Button>
+                )}
+                {accessCheck?.code === 'UNAUTHORIZED' && (
+                  <Link href="/authentication/login">
+                    <Button className="flex items-center space-x-2 bg-violet-600 hover:bg-violet-700">
+                      <LucideUser className="h-4 w-4" />
+                      <span>Go to Login</span>
+                    </Button>
+                  </Link>
                 )}
                 {showHomeButton && (
                   <Link href={homeHref}>

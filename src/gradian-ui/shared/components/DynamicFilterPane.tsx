@@ -5,6 +5,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { DraggableCheckboxDialog } from '@/gradian-ui/data-display/components/DraggableCheckboxDialog';
+import { DataFilterDialog } from '@/gradian-ui/data-display/components/DataFilterDialog';
+import type { FilterItem } from '@/gradian-ui/data-display/types';
 import { SearchBar } from '@/gradian-ui/data-display/components/SearchBar';
 import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
@@ -42,6 +44,9 @@ interface DynamicFilterPaneProps {
   onGroupChange?: (columns: { column: string }[]) => void; // Callback when grouping changes
   schema?: FormSchema | null; // Schema for available columns
   excludedFieldIds?: Set<string>; // Field IDs to exclude from sort options
+  /** Filter conditions (column, operator, value). When set with onFilterChange, shows Filter button. */
+  filterConfig?: FilterItem[];
+  onFilterChange?: (filters: FilterItem[]) => void;
   showIds?: boolean; // Show IDs switch
   onShowIdsChange?: (showIds: boolean) => void; // Callback when show IDs changes
   showOnlyViews?: ('grid' | 'list' | 'table' | 'hierarchy')[]; // Only show specified views in ViewSwitcher
@@ -72,6 +77,8 @@ export const DynamicFilterPane = ({
   onGroupChange,
   schema,
   excludedFieldIds,
+  filterConfig = [],
+  onFilterChange,
   showIds,
   onShowIdsChange,
   showOnlyViews,
@@ -79,6 +86,7 @@ export const DynamicFilterPane = ({
 }: DynamicFilterPaneProps) => {
   const [isSortDialogOpen, setIsSortDialogOpen] = useState(false);
   const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
+  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
   const language = useLanguageStore((s) => s.language);
   const defaultLang = getDefaultLanguage();
   const defaultSearchPlaceholder = getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH, language ?? defaultLang, defaultLang);
@@ -115,6 +123,11 @@ export const DynamicFilterPane = ({
     return 'Group by: ' + groupConfig.map((g) => getFieldLabel(schema, g.column, language ?? undefined, defaultLang)).join(', ');
   }, [groupConfig, schema, language, defaultLang]);
 
+  const filterTooltipText = useMemo(() => {
+    if (!filterConfig?.length || !schema) return getT(TRANSLATION_KEYS.LABEL_FILTERS, language ?? defaultLang, defaultLang);
+    return `${getT(TRANSLATION_KEYS.LABEL_ACTIVE_FILTERS, language ?? defaultLang, defaultLang)} ${filterConfig.length}`;
+  }, [filterConfig, schema, language, defaultLang]);
+
   return (
     <>
       <motion.div
@@ -133,12 +146,27 @@ export const DynamicFilterPane = ({
             />
           </div>
           <div className="flex flex-row gap-1.5 sm:gap-2 items-center w-full lg:w-auto flex-wrap shrink-0">
-            <Button variant="outline" size="sm" className="hidden h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap">
-              <Filter className="h-4 w-4 sm:me-2" />
-              <span className="hidden sm:inline">Filters</span>
-            </Button>
-            {schema && (onSortChange || onGroupChange) && (
+            {schema && (onSortChange || onGroupChange || onFilterChange) && (
               <div className="flex items-center gap-1 shrink-0 flex-nowrap">
+                {onFilterChange && (
+                  <span className="relative inline-flex shrink-0">
+                    <Button
+                      variant="square"
+                      size="sm"
+                      onClick={() => setIsFilterDialogOpen(true)}
+                      title={filterTooltipText}
+                      className="h-9 sm:h-10"
+                    >
+                      <Filter className="h-4 w-4" />
+                    </Button>
+                    {filterConfig?.length > 0 && (
+                      <span
+                        className="absolute -top-0.5 -end-0.5 h-2 w-2 min-w-[8px] rounded-full bg-violet-500 ring-2 ring-white dark:ring-gray-900"
+                        aria-hidden
+                      />
+                    )}
+                  </span>
+                )}
                 {onSortChange && (
                   <span className="relative inline-flex shrink-0">
                     <Button
@@ -260,6 +288,19 @@ export const DynamicFilterPane = ({
           requireApply
           onApply={() => setIsGroupDialogOpen(false)}
           title="Group by"
+        />
+      )}
+      {/* Filter Dialog */}
+      {schema && onFilterChange && (
+        <DataFilterDialog
+          open={isFilterDialogOpen}
+          onOpenChange={setIsFilterDialogOpen}
+          schema={schema}
+          value={filterConfig}
+          onChange={onFilterChange}
+          excludedFieldIds={excludedFieldIds}
+          onApply={() => setIsFilterDialogOpen(false)}
+          title={getT(TRANSLATION_KEYS.LABEL_FILTERS, language ?? defaultLang, defaultLang)}
         />
       )}
     </>

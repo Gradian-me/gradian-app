@@ -354,3 +354,24 @@ export interface DataTableProps extends BaseComponentProps {
   loading?: boolean;
   emptyMessage?: string;
 }
+
+/** Single filter condition for DataFilterDialog. Output shape for filterArray. */
+export interface FilterItem {
+  id: string;
+  column: string;
+  operator: string;
+  value: unknown;
+}
+
+/** Operator option for filter strategy. */
+export interface FilterOperatorOption {
+  id: string;
+  label: string;
+  symbol?: string;
+}
+
+/** Filter strategy per component type: operators and default operator. */
+export interface FilterStrategy {
+  operators: FilterOperatorOption[];
+  defaultOperator: string;
+}

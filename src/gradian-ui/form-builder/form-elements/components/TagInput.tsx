@@ -9,6 +9,9 @@ import { cn, validateField } from '../../../shared/utils';
 import { getLabelClasses } from '../utils/field-styles';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface TagInputProps extends Omit<TextInputProps, 'value' | 'onChange'> {
   value?: string[] | string;
@@ -42,6 +45,8 @@ export const TagInput = forwardRef<FormElementRef, TagInputProps>(
     const inputRef = useRef<HTMLInputElement>(null);
     const [inputValue, setInputValue] = useState('');
     const [validationError, setValidationError] = useState<string | null>(null);
+    const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
 
     // Normalize value to array
     const tags = Array.isArray(value) ? value : (typeof value === 'string' && value.trim() ? [value] : []);
@@ -153,7 +158,7 @@ export const TagInput = forwardRef<FormElementRef, TagInputProps>(
 
     const fieldName = config?.name || 'unknown';
     const fieldLabel = config?.label;
-    const fieldPlaceholder = placeholder || config?.placeholder || 'Enter tags...';
+    const fieldPlaceholder = placeholder || config?.placeholder || getT(TRANSLATION_KEYS.PLACEHOLDER_ENTER_TAGS, language, defaultLang);
 
     return (
       <div className="w-full">

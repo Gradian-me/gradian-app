@@ -113,10 +113,11 @@ export function resolveSchemaFieldLabel(
 
 /**
  * Resolve field placeholder from field.placeholderTranslations or field.placeholder.
+ * Handles both: placeholder as string, or placeholder as translation array [{en:"..."}, {fa:"..."}].
  */
 export function resolveSchemaFieldPlaceholder(
   field: {
-    placeholder?: string;
+    placeholder?: string | Array<Record<string, string>>;
     placeholderTranslations?: Array<Record<string, string>>;
   },
   lang: string,
@@ -128,7 +129,31 @@ export function resolveSchemaFieldPlaceholder(
     defaultLang
   );
   if (resolved) return resolved;
-  return typeof field.placeholder === 'string' ? field.placeholder : '';
+  if (field.placeholder == null) return '';
+  if (typeof field.placeholder === 'string') return field.placeholder;
+  if (isTranslationArray(field.placeholder)) return resolveFromTranslationsArray(field.placeholder, lang, defaultLang);
+  return '';
+}
+
+/**
+ * Resolve field caption (subtitle under label) from field.captionTranslations or field.caption.
+ * Used when placeholder text is shown as caption instead of input placeholder.
+ */
+export function resolveSchemaFieldCaption(
+  field: {
+    caption?: string;
+    captionTranslations?: Array<Record<string, string>>;
+  },
+  lang: string,
+  defaultLang: string
+): string {
+  const resolved = resolveFromTranslationsArray(
+    field.captionTranslations,
+    lang,
+    defaultLang
+  );
+  if (resolved) return resolved;
+  return typeof field.caption === 'string' ? field.caption : '';
 }
 
 /** RTL language codes (e.g. Arabic, Persian). */

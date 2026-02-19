@@ -1,11 +1,15 @@
 // Header Search Component
+'use client';
 
 import React, { useState } from 'react';
 import { HeaderSearchProps } from '../types';
 import { cn } from '../../../shared/utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const HeaderSearch: React.FC<HeaderSearchProps> = ({
-  placeholder = 'Search...',
+  placeholder,
   onSearch,
   onClear,
   value = '',
@@ -14,6 +18,9 @@ export const HeaderSearch: React.FC<HeaderSearchProps> = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [searchValue, setSearchValue] = useState(value);
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const resolvedPlaceholder = placeholder ?? getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH, language, defaultLang);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -71,7 +78,7 @@ export const HeaderSearch: React.FC<HeaderSearchProps> = ({
           onKeyDown={handleKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           className={inputClasses}
         />
         

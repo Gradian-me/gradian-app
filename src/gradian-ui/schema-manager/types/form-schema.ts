@@ -9,11 +9,16 @@ export interface FormField {
   label: string;
   sectionId: string; // Reference to the section this field belongs to
   component: 'text' | 'email' | 'tel' | 'number' | 'password' | 'url' | 'textarea' | 'json' | 'select' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'datetime-local' | 'datetime' | 'file' | 'picker' | 'icon' | 'image-text' | 'image-viewer' | 'name' | 'avatar' | 'color-picker' | 'rating' | 'badge' | 'countdown' | 'code-viewer' | 'list-input' | 'tag-input' | 'toggle' | 'toggle-group' | 'switch' | 'formula' | 'checklist';
-  placeholder?: string;
-  /** Localized label: array of { langCode: string } (e.g. [{ en: "Schema ID" }, { fa: "شناسه schema" }]). Resolved by translation-utils. */
-  translations?: Array<Record<string, string>>;
+  /** Input placeholder: string or translation array [{ en: "..." }, { fa: "..." }]. */
+  placeholder?: string | Array<Record<string, string>>;
   /** Localized placeholder. Same format as translations. */
   placeholderTranslations?: Array<Record<string, string>>;
+  /** @deprecated Use placeholder instead. Kept for schema backward compatibility. */
+  caption?: string;
+  /** @deprecated Use placeholderTranslations instead. Kept for schema backward compatibility. */
+  captionTranslations?: Array<Record<string, string>>;
+  /** Localized label: array of { langCode: string } (e.g. [{ en: "Schema ID" }, { fa: "شناسه schema" }]). Resolved by translation-utils. */
+  translations?: Array<Record<string, string>>;
   icon?: string;
   displayType?: 'text' | 'number' | 'currency' | 'percentage' | 'array' | 'computed';
   truncate?: boolean;

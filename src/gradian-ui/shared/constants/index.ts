@@ -21,7 +21,14 @@ export const USER_ROLES = {
   ADMIN: 'admin',
   PROCUREMENT: 'procurement',
   VENDOR: 'vendor',
+  SUPER_ADMINISTRATOR: 'super_administrator',
 } as const;
+
+/** Role required to access API docs and other super-admin-only pages. */
+export const SUPER_ADMIN_ROLE = USER_ROLES.SUPER_ADMINISTRATOR;
+
+/** Entity type label required for API docs and other system-admin-only pages. */
+export const SYSTEM_ADMINISTRATOR_LABEL = 'System Administrator';
 
 export const VENDOR_STATUS = {
   ACTIVE: 'ACTIVE',
@@ -107,7 +114,7 @@ export {
 } from './translations';
 
 // Re-export from config files
-export { AUTH_CONFIG, EXCLUDED_LOGIN_ROUTES, FORBIDDEN_ROUTES_PRODUCTION } from '../configs/auth-config';
+export { AUTH_CONFIG, EXCLUDED_LOGIN_ROUTES, FORBIDDEN_ROUTES_PRODUCTION, SYSTEM_ADMIN_ROUTES } from '../configs/auth-config';
 export { UI_PARAMS, URL_HOME } from '../configs/ui-config';
 export { LOG_CONFIG, LogType } from '../configs/log-config';
 export { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '../configs/general-config';

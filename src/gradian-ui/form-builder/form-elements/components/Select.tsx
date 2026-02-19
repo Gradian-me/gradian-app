@@ -373,7 +373,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const selectLang = useLanguageStore((s) => s.getLanguage?.()) ?? getDefaultLanguage();
   const selectDefaultLang = getDefaultLanguage();
   const fieldLabel = resolveDisplayLabel(config?.label, selectLang, selectDefaultLang);
-  const fieldPlaceholder = placeholder || config?.placeholder || 'Select an option...';
+  const fieldPlaceholder = placeholder || config?.placeholder || getT(TRANSLATION_KEYS.PLACEHOLDER_SELECT_OPTION, selectLang, selectDefaultLang);
 
   const renderFieldLabel = () =>
     fieldLabel ? (

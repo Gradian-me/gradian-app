@@ -12,6 +12,9 @@ import { CopyContent } from './CopyContent';
 import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const PhoneInput = forwardRef<FormElementRef, TextInputProps>(
   (
@@ -35,6 +38,8 @@ export const PhoneInput = forwardRef<FormElementRef, TextInputProps>(
     ref
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
+    const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
 
     useImperativeHandle(ref, () => ({
       focus: () => inputRef.current?.focus(),
@@ -78,7 +83,7 @@ export const PhoneInput = forwardRef<FormElementRef, TextInputProps>(
 
     const fieldName = config?.name || 'unknown';
     const fieldLabel = config?.label;
-    const fieldPlaceholder = placeholder || config?.placeholder || 'Enter phone number';
+    const fieldPlaceholder = placeholder || config?.placeholder || getT(TRANSLATION_KEYS.PLACEHOLDER_ENTER_PHONE, language, defaultLang);
     const hasValue = value && typeof value === 'string' && value.trim() !== '';
 
     if (!config) {

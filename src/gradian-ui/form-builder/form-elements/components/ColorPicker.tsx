@@ -1,8 +1,12 @@
 // ColorPicker Component - Now uses Select with predefined Tailwind colors
+'use client';
 
 import React from 'react';
 import { Select, SelectOption } from './Select';
 import { cn } from '../../../shared/utils';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface ColorPickerProps {
   config?: {
@@ -69,9 +73,11 @@ export const ColorPicker: React.FC<ColorPickerProps> = ({
   required = false,
   placeholder,
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
   const fieldName = config?.name || id || 'color-picker';
   const fieldLabel = config?.label;
-  const fieldPlaceholder = placeholder || config?.placeholder || 'Select color';
+  const fieldPlaceholder = placeholder || config?.placeholder || getT(TRANSLATION_KEYS.PLACEHOLDER_SELECT_COLOR, language, defaultLang);
   const isRequired = required || config?.required || config?.validation?.required || false;
 
   // Use options from config if provided, otherwise use default Tailwind colors

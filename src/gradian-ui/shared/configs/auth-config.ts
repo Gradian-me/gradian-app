@@ -97,3 +97,12 @@ export const EXCLUDED_LOGIN_ROUTES: string[] = [
 // Routes forbidden in production environment
 export const FORBIDDEN_ROUTES_PRODUCTION: string[] = [];
 
+/**
+ * Routes that require System Administrator entity type (or admin/super_administrator role).
+ * Access is enforced by SystemAdminRouteGuard in the app layout.
+ * Use pathname prefix or exact path (e.g. '/api-docs' matches /api-docs and /api-docs/*).
+ */
+export const SYSTEM_ADMIN_ROUTES: string[] = [
+  '/api-docs',
+];
+

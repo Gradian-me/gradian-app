@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ConditionGroup as ConditionGroupType, Condition } from '../types';
-import { LogicalOperatorSelector } from './LogicalOperatorSelector';
+import { Select } from '@/gradian-ui/form-builder/form-elements/components/Select';
+import type { LogicalOperator } from '../types';
 import { ConditionForm } from './ConditionForm';
 import { SchemaFieldSelector } from './SchemaFieldSelector';
 import { ConditionItem } from './ConditionItem';
@@ -233,11 +234,17 @@ export function ConditionGroup({
         {!isCollapsed && (
           <CardContent className="space-y-4">
             <div className="flex items-center gap-2">
-              <LogicalOperatorSelector
+              <Select
+                options={[
+                  { id: 'and', value: 'and', label: 'AND' },
+                  { id: 'or', value: 'or', label: 'OR' },
+                  { id: 'not', value: 'not', label: 'NOT' },
+                ]}
                 value={group.logicalOperator}
-                onChange={(op) => onUpdateGroup({ logicalOperator: op })}
-                conditionCount={totalItems}
-                compact={true}
+                onValueChange={(op) => onUpdateGroup({ logicalOperator: op as LogicalOperator })}
+                placeholder="Operator..."
+                config={{ name: 'logicalOperator', label: '' }}
+                size="sm"
               />
               {totalItems > 0 && (
                 <span className="text-xs text-gray-500">

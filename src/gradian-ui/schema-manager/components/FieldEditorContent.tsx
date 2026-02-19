@@ -200,9 +200,11 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
               config={{ name: 'field-placeholder', label: labelPlaceholder }}
               value={
                 tempField.placeholderTranslations ??
-                (tempField.placeholder
-                  ? recordToTranslationArray({ [defaultLang]: tempField.placeholder })
-                  : [])
+                (isTranslationArray(tempField.placeholder)
+                  ? tempField.placeholder
+                  : tempField.placeholder
+                    ? recordToTranslationArray({ [defaultLang]: tempField.placeholder as string })
+                    : [])
               }
               onChange={(value) => {
                 if (isTranslationArray(value)) {

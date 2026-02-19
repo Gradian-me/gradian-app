@@ -70,6 +70,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { SortConfig } from '@/gradian-ui/shared/utils/sort-utils';
 import { getInitialSortConfig, getInitialGroupConfig } from '@/gradian-ui/shared/utils/default-settings-utils';
+import type { FilterItem } from '@/gradian-ui/data-display/types';
 import { buildSchemaGrouped, type SchemaGroupNode } from '@/gradian-ui/data-display/utils/grouping-display';
 import type { FormSchema as FormSchemaType } from '@/gradian-ui/schema-manager/types/form-schema';
 
@@ -341,6 +342,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const [showMetadataColumns, setShowMetadataColumns] = useState(false);
   const [sortConfig, setSortConfig] = useState<SortConfig[]>(() => getInitialSortConfig(schema?.defaultSettings));
   const [groupConfig, setGroupConfig] = useState<{ column: string }[]>(() => getInitialGroupConfig(schema?.defaultSettings));
+  const [filterConfig, setFilterConfig] = useState<FilterItem[]>([]);
 
   // Sync sort/group config from schema defaultSettings only when schema ID changes (e.g. navigation to another list).
   // Intentionally not depending on language so user's sort/group choices persist when switching language.
@@ -464,6 +466,9 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
 
   const handleGroupChange = useCallback((columns: { column: string }[]) => {
     setGroupConfig(columns);
+  }, []);
+  const handleFilterConfigChange = useCallback((filters: FilterItem[]) => {
+    setFilterConfig(filters);
   }, []);
 
   // Pagination handlers
@@ -1582,6 +1587,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           onSortChange={handleSortChange}
           groupConfig={groupConfig}
           onGroupChange={handleGroupChange}
+          filterConfig={filterConfig}
+          onFilterChange={handleFilterConfigChange}
           schema={schema}
           excludedFieldIds={repeatingSectionFieldIds}
           customActions={metadataToggleCustomActions}

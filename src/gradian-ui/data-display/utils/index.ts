@@ -64,3 +64,8 @@ export {
 // Engagement counts (from /api/data)
 export { getDiscussionCount, type EngagementCountItem } from './engagement-counts';
 
+// Filter strategy and renderer for DataFilterDialog
+export { getFilterStrategy, registerFilterStrategy, getComponentTypeFromField } from './filter-strategy';
+export { FilterPaneRenderer } from './filter-pane-renderer-utils';
+export type { FilterPaneRendererProps, NumberRangeValue } from './filter-pane-renderer-utils';
+

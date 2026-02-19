@@ -14,6 +14,9 @@ import { PopupPicker } from './PopupPicker';
 import { ClipboardCopy } from 'lucide-react';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface IconInputProps extends TextInputProps {}
 
@@ -40,6 +43,8 @@ export const IconInput = forwardRef<FormElementRef, IconInputProps>(
     const iconValue = typeof value === 'string' ? value : '';
     const isValid = isValidLucideIcon(iconValue);
     const isEmpty = !iconValue || iconValue.trim() === '';
+    const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
 
     useImperativeHandle(ref, () => ({
       focus: () => inputRef.current?.focus(),
@@ -82,7 +87,7 @@ export const IconInput = forwardRef<FormElementRef, IconInputProps>(
 
     const fieldName = config?.name || 'unknown';
     const fieldLabel = config?.label;
-    const fieldPlaceholder = placeholder || config?.placeholder || 'Enter Lucide Icon name (e.g., User, Home, Search)';
+    const fieldPlaceholder = placeholder || config?.placeholder || getT(TRANSLATION_KEYS.PLACEHOLDER_ENTER_ICON_NAME, language, defaultLang);
 
     const handleOpenPicker = () => {
       setIsPickerOpen(true);

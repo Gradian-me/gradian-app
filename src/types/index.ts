@@ -7,7 +7,7 @@ export interface User {
   name: LocalizedField;
   username?: string;
   lastname?: LocalizedField; // Last name field
-  role: 'admin' | 'procurement' | 'vendor';
+  role: 'admin' | 'procurement' | 'vendor' | 'super_administrator';
   department?: string;
   avatar?: string;
   status?: Array<{ id: string; icon?: string; color?: string; label?: string }>;

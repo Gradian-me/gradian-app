@@ -10,6 +10,9 @@ import { CopyContent } from './CopyContent';
 import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage, resolveSchemaFieldPlaceholder } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
   (
@@ -36,6 +39,8 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
     const inputRef = useRef<HTMLInputElement>(null);
     const [isFocused, setIsFocused] = useState(false);
     const [displayValue, setDisplayValue] = useState<string>('');
+    const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
 
     // Check if thousand separator formatting is enabled (default: true, can be disabled via config)
     const useThousandSeparator = (config as any)?.useThousandSeparator !== false;
@@ -160,7 +165,8 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
 
     const fieldName = config?.name || 'unknown';
     const fieldLabel = config?.label;
-    const fieldPlaceholder = placeholder || config?.placeholder || 'Enter number';
+    const resolvedConfigPlaceholder = resolveSchemaFieldPlaceholder(config as any, language, defaultLang);
+    const fieldPlaceholder = placeholder || resolvedConfigPlaceholder || getT(TRANSLATION_KEYS.PLACEHOLDER_ENTER_NUMBER, language, defaultLang);
 
     if (!config) {
       loggingCustom(LogType.CLIENT_LOG, 'error', 'NumberInput: config is required');

@@ -16,8 +16,11 @@ import {
   resolveFromTranslationsArray,
   isTranslationArray,
   getDefaultLanguage,
+  getT,
+  resolveSchemaFieldPlaceholder,
 } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const TextInput = forwardRef<FormElementRef, TextInputProps>(
   (
@@ -89,11 +92,14 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
       onChange?.(arr);
     };
 
-    const hasTrailingActions = canCopy || allowTranslation;
+    const showCopyButton =
+      canCopy && value != null && value !== '' && (!allowTranslation || !isTranslationArray(value));
+    const showTranslationButton = allowTranslation && !disabled;
+
     const paddingEndClass =
-      canCopy && allowTranslation
+      showCopyButton && showTranslationButton
         ? 'pe-20' /* space for copy + translation buttons (each h-7 w-7 + gap) */
-        : hasTrailingActions
+        : showCopyButton || showTranslationButton
           ? 'pe-10' /* space for one button */
           : '';
 
@@ -110,7 +116,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
 
     const fieldName = (config as any).name || 'unknown';
     const fieldLabel = (config as any).label;
-    const fieldPlaceholder = (config as any).placeholder;
+    const fieldPlaceholder = resolveSchemaFieldPlaceholder(config as any, language, defaultLang) || undefined;
     const fieldReadOnly = (config as any).readonly ?? (config as any).readOnly ?? false;
 
     if (!config) {
@@ -138,7 +144,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
             onChange={handleChange}
             onBlur={handleBlur}
             onFocus={handleFocus}
-            placeholder={placeholder || fieldPlaceholder}
+            placeholder={placeholder || fieldPlaceholder || getT(TRANSLATION_KEYS.PLACEHOLDER_ENTER_VALUE, language, defaultLang)}
             maxLength={allowTranslation ? undefined : (maxLength || (config as any).validation?.maxLength)}
             minLength={minLength || (config as any).validation?.minLength}
             pattern={pattern}
@@ -150,14 +156,16 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
             className={inputClasses}
             {...props}
           />
-          <div className="absolute end-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
-            {canCopy && (
-              <CopyContent content={displayValue ?? ''} />
-            )}
-            {allowTranslation && !disabled && (
-              <TranslationButton onClick={() => setTranslationDialogOpen(true)} mode="edit" />
-            )}
-          </div>
+          {(showCopyButton || showTranslationButton) && (
+            <div className="absolute end-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+              {showCopyButton && (
+                <CopyContent content={displayValue ?? ''} />
+              )}
+              {showTranslationButton && (
+                <TranslationButton onClick={() => setTranslationDialogOpen(true)} mode="edit" />
+              )}
+            </div>
+          )}
         </div>
         {error && (
           <p className={errorTextClasses} role="alert">

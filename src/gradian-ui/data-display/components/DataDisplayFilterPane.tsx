@@ -1,4 +1,5 @@
 // Data Display Filter Pane Component
+'use client';
 
 import React, { useState, useCallback } from 'react';
 import { DataDisplayFilterPaneProps } from '../types';
@@ -6,6 +7,9 @@ import { cn } from '../../shared/utils';
 import { Search, Filter, Plus, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 import { Checkbox } from '../../../components/ui/checkbox';
 import { SearchInput } from '../../form-builder/form-elements/components/SearchInput';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
   config,
@@ -27,6 +31,8 @@ export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
 
   const [isCollapsed, setIsCollapsed] = useState(layout?.filterPane?.defaultCollapsed || false);
   const [searchTerm, setSearchTerm] = useState(filters.search || '');
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
 
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
@@ -83,7 +89,7 @@ export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
             className={baseClasses}
             style={{ width: styling.width }}
           >
-            <option value="">{placeholder || `Select ${label}`}</option>
+            <option value="">{placeholder || getT(TRANSLATION_KEYS.PLACEHOLDER_SELECT, language, defaultLang)}</option>
             {options.map((option: any) => (
               <option key={option.value} value={option.value} disabled={option.disabled}>
                 {option.label}
@@ -143,7 +149,7 @@ export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
                   handleFilterChange(id, [e.target.value, currentRange[1]]);
                 }}
                 className={baseClasses}
-                placeholder="Start date"
+                placeholder={getT(TRANSLATION_KEYS.PLACEHOLDER_START_DATE, language, defaultLang)}
               />
               <input
                 type="date"
@@ -153,7 +159,7 @@ export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
                   handleFilterChange(id, [currentRange[0], e.target.value]);
                 }}
                 className={baseClasses}
-                placeholder="End date"
+                placeholder={getT(TRANSLATION_KEYS.PLACEHOLDER_END_DATE, language, defaultLang)}
               />
             </div>
           </div>
@@ -256,7 +262,7 @@ export const DataDisplayFilterPane: React.FC<DataDisplayFilterPaneProps> = ({
               <SearchInput
                 config={{ 
                   name: 'filter-search', 
-                  placeholder: search.placeholder || 'Search...',
+                  placeholder: search.placeholder || getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH, language, defaultLang),
                   label: 'Search'
                 }}
                 value={searchTerm}

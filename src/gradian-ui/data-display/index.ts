@@ -35,8 +35,13 @@ export { ComponentRenderer } from './components/ComponentRenderer';
 export { DynamicDetailPageRenderer } from './components/DynamicDetailPageRenderer';
 export { DynamicRepeatingTableViewer } from './components/DynamicRepeatingTableViewer';
 export { DynamicPageRenderer } from './components/DynamicPageRenderer';
+export { DataFilterDialog } from './components/DataFilterDialog';
+export type { DataFilterDialogProps } from './components/DataFilterDialog';
 export { AvatarUser } from './components/AvatarUser';
 export type { AvatarUserProps, UserData } from './components/AvatarUser';
+export { getFilterStrategy, registerFilterStrategy } from './utils/filter-strategy';
+export { FilterPaneRenderer } from './utils/filter-pane-renderer-utils';
+export type { FilterPaneRendererProps } from './utils/filter-pane-renderer-utils';
 
 // Table Components
 export * from './table';
@@ -71,4 +76,7 @@ export type {
   ModalProps,
   // TableColumn is excluded - use the one from ./table instead
   DataTableProps,
+  FilterItem,
+  FilterOperatorOption,
+  FilterStrategy,
 } from './types';

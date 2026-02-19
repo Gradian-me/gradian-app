@@ -498,7 +498,7 @@ const SortableListItem: React.FC<{
 export const ListInput: React.FC<ListInputProps> = ({
   value = [],
   onChange,
-  placeholder = 'Enter annotation...',
+  placeholder,
   addButtonText = 'Add Annotation',
   className,
   enableReordering = true,
@@ -516,6 +516,7 @@ export const ListInput: React.FC<ListInputProps> = ({
   const formContext = React.useContext(FormContext);
   const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
   const defaultLang = getDefaultLanguage();
+  const resolvedPlaceholder = placeholder ?? getT(TRANSLATION_KEYS.PLACEHOLDER_ENTER_ANNOTATION, language, defaultLang);
   const emptyClickToAddOne = getT(TRANSLATION_KEYS.EMPTY_CLICK_BUTTON_TO_ADD_ONE, language, defaultLang);
   // allowReorder takes precedence when provided (e.g. from config); otherwise use enableReordering
   const reorderingEnabled = allowReorder !== undefined ? allowReorder : enableReordering;

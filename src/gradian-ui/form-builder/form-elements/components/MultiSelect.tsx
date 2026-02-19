@@ -14,7 +14,8 @@ import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { useLanguageStore } from '@/stores/language.store';
-import { getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export interface MultiSelectFormOption {
   id?: string;
@@ -245,7 +246,8 @@ export const MultiSelect: React.FC<MultiSelectWithBadgesProps> = ({
 
   // Get field name and placeholder from config
   const fieldName = config?.name || config?.id || 'multi-select';
-  const fieldPlaceholder = placeholder || config?.placeholder || 'Select options...';
+  const defaultLang = getDefaultLanguage();
+  const fieldPlaceholder = placeholder || config?.placeholder || getT(TRANSLATION_KEYS.PLACEHOLDER_SELECT_OPTIONS, language, defaultLang);
   const fieldLabel = config?.label;
   const fieldError = error || config?.error;
   const fieldRequired = required ?? config?.required ?? config?.validation?.required ?? false;

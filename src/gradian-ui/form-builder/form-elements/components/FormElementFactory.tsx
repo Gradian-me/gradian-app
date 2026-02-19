@@ -14,6 +14,7 @@ import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { getLabelClasses } from '../utils/field-styles';
 import { TextInput } from './TextInput';
 import { Textarea } from './Textarea';
 import { JsonInput } from './JsonInput';
@@ -133,14 +134,45 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     return null;
   }
 
-  // Resolve label and placeholder from field translations (by current language)
+  // Resolve label and schema placeholder from field translations (by current language).
+  // In forms, schema placeholder is shown as a **caption under the label**, not as the HTML input placeholder.
   const resolvedLabel = resolveSchemaFieldLabel(config, language, defaultLang);
   const resolvedPlaceholder = resolveSchemaFieldPlaceholder(config, language, defaultLang);
   config = {
     ...config,
     label: resolvedLabel ?? config.label,
-    placeholder: resolvedPlaceholder ?? config.placeholder,
+    // Do not pass schema placeholder down as input placeholder; form elements use their own
+    // translated default placeholders. Schema placeholder is rendered as caption instead.
+    placeholder: undefined,
   };
+
+  // Config for child: no label (we render it above), no schema placeholder (children use defaults)
+  const configForChild = { ...config, label: '', placeholder: undefined };
+
+  const labelCaptionBlock =
+    resolvedLabel || resolvedPlaceholder ? (
+      <div className="mb-2">
+        {resolvedLabel && (
+          <label
+            htmlFor={config.name}
+            className={getLabelClasses({
+              required: config.required ?? (config as any).validation?.required,
+              error: Boolean(restProps.error),
+            })}
+          >
+            {resolvedLabel}
+          </label>
+        )}
+        {resolvedPlaceholder && (
+          <p
+            className="text-[11px] font-normal leading-snug text-gray-400 dark:text-gray-500 mt-0.5 opacity-90"
+            dir="auto"
+          >
+            {resolvedPlaceholder}
+          </p>
+        )}
+      </div>
+    ) : null;
 
   // Use component if available, otherwise fall back to type
   const elementType = (config as any).component || config.type;
@@ -165,11 +197,12 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     ...restPropsWithoutExtras,
   };
 
-  switch (elementType) {
-    case 'text':
-      return (
-        <TextInput
-          config={config}
+  const renderElement = () => {
+    switch (elementType) {
+      case 'text':
+        return (
+          <TextInput
+            config={configForChild}
           {...commonProps}
           canCopy={canCopy}
           allowTranslation={(config as any)?.allowTranslation}
@@ -178,23 +211,23 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         />
       );
     
-    case 'email':
-      return <EmailInput config={config} {...commonProps} canCopy={canCopy} />;
+      case 'email':
+        return <EmailInput config={configForChild} {...commonProps} canCopy={canCopy} />;
     
-    case 'url':
-      return <URLInput config={config} {...commonProps} canCopy={canCopy} />;
+      case 'url':
+        return <URLInput config={configForChild} {...commonProps} canCopy={canCopy} />;
     
-    case 'phone':
-    case 'tel':
-      return <PhoneInput config={config} {...commonProps} canCopy={canCopy} />;
+      case 'phone':
+      case 'tel':
+        return <PhoneInput config={configForChild} {...commonProps} canCopy={canCopy} />;
     
-    case 'password':
-      return <PasswordInput config={config} {...commonProps} />;
+      case 'password':
+        return <PasswordInput config={configForChild} {...commonProps} />;
 
-    case 'name':
-      return (
-        <NameInput
-          config={config}
+      case 'name':
+        return (
+          <NameInput
+            config={configForChild}
           {...commonProps}
           canCopy={canCopy}
           isCustomizable={(restProps as any)?.isCustomizable ?? (config as any)?.isCustomizable}
@@ -206,11 +239,11 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         />
       );
 
-    case 'otp':
-    case 'otp-input':
-      return (
-        <OTPInput
-          config={config}
+      case 'otp':
+      case 'otp-input':
+        return (
+          <OTPInput
+            config={configForChild}
           value={restProps.value}
           onChange={restProps.onChange}
           disabled={restProps.disabled}
@@ -226,21 +259,21 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         />
       );
     
-    case 'number':
-      // Merge componentTypeConfig into config for NumberInput
-      const numberConfig = {
-        ...config,
-        ...((config as any)?.componentTypeConfig || {}),
-      };
-      return <NumberInput config={numberConfig} {...commonProps} canCopy={canCopy} />;
+      case 'number':
+        // Merge componentTypeConfig into config for NumberInput
+        const numberConfig = {
+          ...configForChild,
+          ...((config as any)?.componentTypeConfig || {}),
+        };
+        return <NumberInput config={numberConfig} {...commonProps} canCopy={canCopy} />;
 
-    case 'slider': {
-      const sliderMin = (config as any)?.min ?? 0;
-      const sliderMax = (config as any)?.max ?? 100;
-      const sliderStep = (config as any)?.step ?? 1;
-      return (
-        <Slider
-          config={config}
+      case 'slider': {
+        const sliderMin = (config as any)?.min ?? 0;
+        const sliderMax = (config as any)?.max ?? 100;
+        const sliderStep = (config as any)?.step ?? 1;
+        return (
+          <Slider
+            config={configForChild}
           min={sliderMin}
           max={sliderMax}
           step={sliderStep}
@@ -251,11 +284,11 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           error={restProps.error}
           disabled={restProps.disabled}
           className={restProps.className}
-        />
-      );
-    }
+          />
+        );
+      }
     
-    case 'select':
+      case 'select':
       // Convert options to SelectOption[] format if they have icon/color
       const selectOptions = config.options
         ?.filter((opt: any) => opt?.id)
@@ -275,21 +308,21 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         }
       };
       
-      return (
-        <Select
-          config={config}
-          value={restProps.value}
-          onNormalizedChange={handleSelectNormalizedChange}
-          disabled={restProps.disabled}
-          options={selectOptions}
-          className={restProps.className}
-          error={restProps.error}
-          required={config.validation?.required ?? false}
-          placeholder={config.placeholder}
-        />
-      );
+        return (
+          <Select
+            config={configForChild}
+            value={restProps.value}
+            onNormalizedChange={handleSelectNormalizedChange}
+            disabled={restProps.disabled}
+            options={selectOptions}
+            className={restProps.className}
+            error={restProps.error}
+            required={config.validation?.required ?? false}
+            placeholder={configForChild.placeholder}
+          />
+        );
     
-    case 'multi-select-legacy':
+      case 'multi-select-legacy':
       // Debug: Verify component type is being matched
       if (process.env.NODE_ENV === 'development') {
         loggingCustom(LogType.CLIENT_LOG, 'log', `[FormElementFactory] Rendering MultiSelect component ${JSON.stringify({
@@ -298,13 +331,13 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           optionsCount: config.options?.length || 0,
         })}`);
       }
-      return (
-        <MultiSelect
-          config={config}
-          value={restProps.value}
-          onChange={restProps.onChange}
-          placeholder={config.placeholder}
-          error={restProps.error}
+        return (
+          <MultiSelect
+            config={configForChild}
+            value={restProps.value}
+            onChange={restProps.onChange}
+            placeholder={configForChild.placeholder}
+            error={restProps.error}
           required={config.validation?.required ?? false}
           disabled={restProps.disabled}
           className={restProps.className}
@@ -349,7 +382,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
 
       return (
         <Textarea
-          config={config}
+          config={configForChild}
           {...commonProps}
           canCopy={Boolean((config as any)?.canCopy ?? (restProps as any)?.canCopy ?? true)}
           allowTranslation={(config as any)?.allowTranslation}
@@ -392,7 +425,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
 
       return (
         <JsonInput 
-          config={config} 
+          config={configForChild} 
           {...commonProps} 
           canCopy={canCopy}
           rows={resolvedRows}
@@ -404,7 +437,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     case 'markdown':
       return (
         <MarkdownInput 
-          config={config} 
+          config={configForChild} 
           {...commonProps} 
           canCopy={canCopy} 
           aiAgentId={aiAgentId}
@@ -415,17 +448,17 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       );
     
     case 'checkbox':
-      return <Checkbox config={config} {...commonProps} />;
+      return <Checkbox config={configForChild} {...commonProps} />;
     
     case 'checkbox-list':
-      return <CheckboxList config={config} options={config.options || []} showSelectAll={config.showSelectAll} {...commonProps} />;
+      return <CheckboxList config={configForChild} options={config.options || []} showSelectAll={config.showSelectAll} {...commonProps} />;
 
     case 'switch': {
       // Filter out touched and other non-DOM props from commonProps
       const { touched, ...switchProps } = commonProps;
       return (
         <Switch
-          config={config}
+          config={configForChild}
           {...switchProps}
           checked={restProps.checked}
           required={
@@ -440,7 +473,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     case 'toggle':
       return (
         <Toggle
-          config={config}
+          config={configForChild}
           {...commonProps}
           required={
             restProps.required ??
@@ -474,7 +507,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
 
       return (
         <ToggleGroup
-          config={config}
+          config={configForChild}
           value={restProps.value}
           defaultValue={(restProps as any).defaultValue}
           disabled={restProps.disabled}
@@ -503,7 +536,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           ...opt,
           id: String(opt.id),
         }));
-      return <RadioGroup config={config} options={radioOptions} {...commonProps} />;
+      return <RadioGroup config={configForChild} options={radioOptions} {...commonProps} />;
     
     case 'date': 
     case 'date-input': 
@@ -540,8 +573,8 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
             const next = value instanceof Date ? format(value, 'yyyy-MM-dd') : '';
             restProps.onChange?.(next);
           }}
-          label={config?.label}
-          placeholder={config?.placeholder}
+          label={configForChild?.label}
+          placeholder={configForChild?.placeholder}
           error={restProps.error}
           disabled={restProps.disabled}
           required={restProps.required ?? config?.validation?.required ?? false}
@@ -594,8 +627,8 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
               restProps.onChange?.('');
             }
           }}
-          label={config?.label}
-          placeholder={config?.placeholder}
+          label={configForChild?.label}
+          placeholder={configForChild?.placeholder}
           error={restProps.error}
           disabled={restProps.disabled}
           required={restProps.required ?? config?.validation?.required ?? false}
@@ -610,24 +643,24 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     
     case 'file':
     case 'file-input':
-      return <FileInput config={config} {...commonProps} />;
+      return <FileInput config={configForChild} {...commonProps} />;
     
     case 'picker':
     case 'multi-select':
     case 'multiselect':
     case 'popup-picker':
-      return <PickerInput config={config} {...commonProps} />;
+      return <PickerInput config={configForChild} {...commonProps} />;
     
     case 'icon':
-      return <IconInput config={config} {...commonProps} canCopy={canCopy} />;
+      return <IconInput config={configForChild} {...commonProps} canCopy={canCopy} />;
     
     case 'image-text':
-      return <ImageText config={config} value={restProps.value} {...commonProps} />;
+      return <ImageText config={configForChild} value={restProps.value} {...commonProps} />;
     
     case 'image-viewer':
       return (
         <ImageViewer
-          config={config}
+          config={configForChild}
           value={restProps.value}
           sourceUrl={config?.sourceUrl || restProps.value?.url || restProps.value?.sourceUrl}
           content={config?.content || restProps.value?.b64_json || restProps.value?.content}
@@ -644,7 +677,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     case 'video-viewer':
       return (
         <VideoViewer
-          config={config}
+          config={configForChild}
           value={restProps.value}
           sourceUrl={config?.sourceUrl || restProps.value?.url || restProps.value?.sourceUrl || restProps.value?.file_path}
           content={config?.content || restProps.value?.content}
@@ -687,7 +720,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           value={restProps.value || ''}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => restProps.onChange?.(e.target.value)}
           disabled={restProps.disabled}
-          placeholder={(config as any).placeholder}
+          placeholder={(configForChild as any)?.placeholder}
           className={restProps.className}
           {...(restProps.onBlur ? { onBlur: restProps.onBlur } as any : {})}
           {...(restProps.onFocus ? { onFocus: restProps.onFocus } as any : {})}
@@ -709,7 +742,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     case 'color-picker':
       return (
         <ColorPicker
-          config={config}
+          config={configForChild}
           value={restProps.value || (config as any).defaultValue}
           onChange={(value: string) => restProps.onChange?.(value)}
           onBlur={restProps.onBlur}
@@ -731,7 +764,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           showValue={true}
           onChange={restProps.onChange ? (value: number) => restProps.onChange?.(value) : undefined}
           disabled={restProps.disabled}
-          label={(config as any).label}
+          label={configForChild?.label}
           required={restProps.required}
           error={restProps.error}
           className={restProps.className}
@@ -762,11 +795,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           showIcon={(config as any).showIcon !== false}
           size={(config as any).size || 'md'}
           className={restProps.className}
-          fieldLabel={resolveDisplayLabel(
-            (config as any).label ?? (config as any).name ?? '',
-            language,
-            defaultLang
-          )}
+          fieldLabel={configForChild?.label ?? ''}
         />
       );
     
@@ -777,18 +806,14 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         <ListInput
           value={listInputValue}
           onChange={(items) => restProps.onChange?.(listInputItemsToChecklist(items))}
-          placeholder={(config as any).placeholder || addItemFallback}
+          placeholder={(configForChild as any)?.placeholder || addItemFallback}
           addButtonText={(config as any).addButtonText || addItemFallback}
-          label={resolveDisplayLabel(
-            (config as any).label,
-            language,
-            defaultLang
-          )}
+          label={configForChild?.label ?? ''}
           disabled={restProps.disabled}
           error={restProps.error}
           required={restProps.required}
           className={restProps.className}
-          config={config}
+          config={configForChild}
           showCheckbox={true}
           allowReorder={true}
           commitOnBlur={true}
@@ -804,21 +829,17 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         <ListInput
           value={restProps.value || []}
           onChange={(items) => restProps.onChange?.(items)}
-          placeholder={(config as any).placeholder || 'Enter annotation...'}
+          placeholder={(configForChild as any)?.placeholder || getT(TRANSLATION_KEYS.PLACEHOLDER_ENTER_ANNOTATION, language, defaultLang)}
           addButtonText={
             (config as any).addButtonText ||
             getT(TRANSLATION_KEYS.BUTTON_ADD, language, defaultLang)
           }
           className={restProps.className}
-          label={resolveDisplayLabel(
-            (config as any).label,
-            language,
-            defaultLang
-          )}
+          label={configForChild?.label ?? ''}
           required={restProps.required}
           error={restProps.error}
           disabled={restProps.disabled}
-          config={config}
+          config={configForChild}
         />
       );
     
@@ -826,7 +847,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     case 'tag':
       return (
         <TagInput
-          config={config}
+          config={configForChild}
           {...commonProps}
           validateEmail={(config as any)?.validateEmail ?? false}
           maxTags={(config as any)?.maxTags}
@@ -837,7 +858,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     case 'language':
       return (
         <LanguageSelector
-          config={config}
+          config={configForChild}
           value={restProps.value}
           onChange={restProps.onChange}
           onBlur={restProps.onBlur}
@@ -846,7 +867,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           disabled={restProps.disabled}
           required={restProps.required}
           className={restProps.className}
-          placeholder={(config as any)?.placeholder}
+          placeholder={(configForChild as any)?.placeholder}
           defaultLanguage={(config as any)?.defaultLanguage}
         />
       );
@@ -854,7 +875,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
     case 'formula':
       return (
         <FormulaField
-          config={config}
+          config={configForChild}
           value={restProps.value}
           onChange={restProps.onChange}
           onBlur={restProps.onBlur}
@@ -866,10 +887,18 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         />
       );
     
-    default:
-      loggingCustom(LogType.CLIENT_LOG, 'warn', `Unknown form element type: ${elementType} ${JSON.stringify(config)}`);
-      return <UnknownControl config={config} componentType={elementType} {...commonProps} />;
-  }
+      default:
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `Unknown form element type: ${elementType} ${JSON.stringify(config)}`);
+        return <UnknownControl config={configForChild} componentType={elementType} {...commonProps} />;
+    }
+  };
+
+  return (
+    <div className="w-full">
+      {labelCaptionBlock}
+      {renderElement()}
+    </div>
+  );
 };
 
 FormElementFactory.displayName = 'FormElementFactory';

@@ -10,6 +10,9 @@ import { baseInputClasses, getLabelClasses } from '../utils/field-styles';
 import { Eye, EyeOff } from 'lucide-react';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
   (
@@ -33,6 +36,8 @@ export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
   ) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const [showPassword, setShowPassword] = useState(false);
+    const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
 
     useImperativeHandle(ref, () => ({
       focus: () => inputRef.current?.focus(),
@@ -71,7 +76,7 @@ export const PasswordInput = forwardRef<FormElementRef, TextInputProps>(
 
     const fieldName = config?.name || 'unknown';
     const fieldLabel = config?.label;
-    const fieldPlaceholder = placeholder || config?.placeholder || 'Enter password';
+    const fieldPlaceholder = placeholder || config?.placeholder || getT(TRANSLATION_KEYS.AUTH_PLACEHOLDER_PASSWORD, language, defaultLang);
 
     if (!config) {
       loggingCustom(LogType.CLIENT_LOG, 'error', 'PasswordInput: config is required');

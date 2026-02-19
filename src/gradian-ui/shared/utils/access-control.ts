@@ -5,6 +5,7 @@
 
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { User } from '@/types';
+import { SYSTEM_ADMINISTRATOR_LABEL, SUPER_ADMIN_ROLE, USER_ROLES } from '@/gradian-ui/shared/constants';
 
 export interface AccessCheckResult {
   hasAccess: boolean;
@@ -73,6 +74,35 @@ export function checkSchemaAccess(
     hasAccess: true,
     schemaId: schema.id,
   };
+}
+
+/**
+ * Check if user can access routes that require System Administrator
+ * (e.g. API docs). Allows access if user has entityType with label
+ * "System Administrator" or role admin/super_administrator.
+ */
+export function canAccessSystemAdminRoute(user: User | null): boolean {
+  if (!user) return false;
+  const hasEntityType =
+    Array.isArray(user.entityType) &&
+    user.entityType.some((et) => et?.label === SYSTEM_ADMINISTRATOR_LABEL);
+  const hasRole =
+    user.role === SUPER_ADMIN_ROLE || user.role === USER_ROLES.ADMIN;
+  return hasEntityType || hasRole;
+}
+
+/**
+ * Check if the current pathname is a system-admin-only route.
+ * Uses prefix match: pathname must equal or start with a route in SYSTEM_ADMIN_ROUTES.
+ */
+export function isSystemAdminRoute(
+  pathname: string | null,
+  systemAdminRoutes: string[]
+): boolean {
+  if (!pathname) return false;
+  return systemAdminRoutes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
 }
 
 /**

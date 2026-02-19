@@ -12,6 +12,9 @@ import { ProfessionalWritingModal } from '@/gradian-ui/communication/professiona
 import { IconRenderer } from '../../../shared/utils/icon-renderer';
 import { VoiceInputDialog } from '@/gradian-ui/communication/voice/components/VoiceInputDialog';
 import { Mic } from 'lucide-react';
+import { useLanguageStore } from '@/stores/language.store';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export const MarkdownInput = forwardRef<FormElementRef, TextareaProps>(
   (
@@ -41,6 +44,8 @@ export const MarkdownInput = forwardRef<FormElementRef, TextareaProps>(
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isVoiceDialogOpen, setIsVoiceDialogOpen] = useState(false);
+    const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
 
     useImperativeHandle(ref, () => ({
       focus: () => textareaRef.current?.focus(),
@@ -132,7 +137,7 @@ export const MarkdownInput = forwardRef<FormElementRef, TextareaProps>(
           onChange={handleChange}
           onBlur={handleBlur}
           onFocus={handleFocus}
-          placeholder={config.placeholder || 'Enter markdown content...'}
+          placeholder={config.placeholder || getT(TRANSLATION_KEYS.PLACEHOLDER_ENTER_MARKDOWN, language, defaultLang)}
           rows={rows}
           cols={cols}
           maxLength={maxLength || config.validation?.maxLength}
