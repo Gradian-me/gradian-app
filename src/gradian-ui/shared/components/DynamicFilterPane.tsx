@@ -4,17 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { DataSort } from '@/gradian-ui/data-display/components/DataSort';
+import { DraggableCheckboxDialog } from '@/gradian-ui/data-display/components/DraggableCheckboxDialog';
 import { SearchBar } from '@/gradian-ui/data-display/components/SearchBar';
 import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { SortConfig } from '@/gradian-ui/shared/utils/sort-utils';
 import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { getFieldLabel } from '@/gradian-ui/shared/utils/field-label';
 import { useLanguageStore } from '@/stores/language.store';
 import { motion } from 'framer-motion';
-import { ArrowUpDown, Filter, Plus, RefreshCw } from 'lucide-react';
+import { ArrowUpDown, Filter, Layers, Plus, RefreshCw } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 interface DynamicFilterPaneProps {
@@ -31,9 +31,15 @@ interface DynamicFilterPaneProps {
   onExpandAllHierarchy?: () => void;
   onCollapseAllHierarchy?: () => void;
   showHierarchy?: boolean; // Only show hierarchy view if enabled
+  /** When true, show expand/collapse all for schema-grouped accordions (and use onExpandAllGroups/onCollapseAllGroups) */
+  showGroupExpandCollapse?: boolean;
+  onExpandAllGroups?: () => void;
+  onCollapseAllGroups?: () => void;
   customActions?: React.ReactNode; // Custom actions/content to display in the filter pane
   sortConfig?: SortConfig[]; // Current sort configuration
   onSortChange?: (sortConfig: SortConfig[]) => void; // Callback when sort changes
+  groupConfig?: { column: string }[]; // Current grouping columns (order = group level)
+  onGroupChange?: (columns: { column: string }[]) => void; // Callback when grouping changes
   schema?: FormSchema | null; // Schema for available columns
   excludedFieldIds?: Set<string>; // Field IDs to exclude from sort options
   showIds?: boolean; // Show IDs switch
@@ -56,9 +62,14 @@ export const DynamicFilterPane = ({
   onExpandAllHierarchy,
   onCollapseAllHierarchy,
   showHierarchy = false,
+  showGroupExpandCollapse = false,
+  onExpandAllGroups,
+  onCollapseAllGroups,
   customActions,
   sortConfig = [],
   onSortChange,
+  groupConfig = [],
+  onGroupChange,
   schema,
   excludedFieldIds,
   showIds,
@@ -67,6 +78,7 @@ export const DynamicFilterPane = ({
   showAddButton = true, // Default to showing the button
 }: DynamicFilterPaneProps) => {
   const [isSortDialogOpen, setIsSortDialogOpen] = useState(false);
+  const [isGroupDialogOpen, setIsGroupDialogOpen] = useState(false);
   const language = useLanguageStore((s) => s.language);
   const defaultLang = getDefaultLanguage();
   const defaultSearchPlaceholder = getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH, language ?? defaultLang, defaultLang);
@@ -98,6 +110,11 @@ export const DynamicFilterPane = ({
     }).join('\n');
   }, [sortConfig, schema]);
 
+  const groupTooltipText = useMemo(() => {
+    if (!groupConfig?.length || !schema) return 'No grouping';
+    return 'Group by: ' + groupConfig.map((g) => getFieldLabel(schema, g.column, language ?? undefined, defaultLang)).join(', ');
+  }, [groupConfig, schema, language, defaultLang]);
+
   return (
     <>
       <motion.div
@@ -107,65 +124,59 @@ export const DynamicFilterPane = ({
         className={`flex flex-col gap-2 sm:gap-3 mb-2 ${className}`}
       >
         <div className="flex flex-col gap-2 sm:gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex-1 w-full flex gap-2">
+          <div className="flex-1 w-full min-w-0">
             <SearchBar
               placeholder={searchPlaceholder}
               value={searchTerm}
               onChange={onSearchChange}
-              className="h-9 sm:h-10 flex-1"
+              className="h-9 sm:h-10 w-full"
             />
-            {schema && onSortChange && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="square"
-                      size="sm"
-                      onClick={() => setIsSortDialogOpen(true)}
-                    >
-                      <ArrowUpDown className="h-4 w-4" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="max-w-xs">
-                    <div className="text-sm">
-                      <div className="font-semibold mb-1">Sort</div>
-                      {sortConfig.length > 0 ? (
-                        <div className="space-y-0.5">
-                          {sortConfig.map((sort, index) => {
-                            const direction = sort.isAscending ? '↑' : '↓';
-                            // Get proper label from schema or system fields
-                            const field = schema?.fields?.find((f: any) => f.id === sort.column);
-                            const systemFieldLabels: Record<string, string> = {
-                              status: 'Status',
-                              entityType: 'Type',
-                              updatedBy: 'Updated By',
-                              updatedAt: 'Updated At',
-                              createdBy: 'Created By',
-                              createdAt: 'Created At',
-                              companyId: 'Company',
-                            };
-                            const label = field?.label || field?.name || systemFieldLabels[sort.column] || sort.column;
-                            return (
-                              <div key={index} className="text-xs">
-                                {index + 1}. {label} {direction}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <div className="text-xs text-gray-500">No sort applied</div>
-                      )}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
           </div>
-          <div className="flex flex-row gap-1.5 sm:gap-2 items-center w-full lg:w-auto flex-wrap">
+          <div className="flex flex-row gap-1.5 sm:gap-2 items-center w-full lg:w-auto flex-wrap shrink-0">
             <Button variant="outline" size="sm" className="hidden h-9 sm:h-10 px-2 sm:px-3 flex-1 sm:flex-initial whitespace-nowrap">
               <Filter className="h-4 w-4 sm:me-2" />
               <span className="hidden sm:inline">Filters</span>
             </Button>
+            {schema && (onSortChange || onGroupChange) && (
+              <div className="flex items-center gap-1 shrink-0 flex-nowrap">
+                {onSortChange && (
+                  <span className="relative inline-flex shrink-0">
+                    <Button
+                      variant="square"
+                      size="sm"
+                      onClick={() => setIsSortDialogOpen(true)}
+                      title={sortTooltipText}
+                    >
+                      <ArrowUpDown className="h-4 w-4" />
+                    </Button>
+                    {sortConfig?.length > 0 && (
+                      <span
+                        className="absolute -top-0.5 -end-0.5 h-2 w-2 min-w-[8px] rounded-full bg-violet-500 ring-2 ring-white dark:ring-gray-900"
+                        aria-hidden
+                      />
+                    )}
+                  </span>
+                )}
+                <span className="relative inline-flex shrink-0">
+                  <Button
+                    variant="square"
+                    size="sm"
+                    onClick={() => onGroupChange && setIsGroupDialogOpen(true)}
+                    title={groupTooltipText}
+                    disabled={!onGroupChange}
+                    className="shrink-0"
+                  >
+                    <Layers className="h-4 w-4" />
+                  </Button>
+                  {groupConfig?.length > 0 && (
+                    <span
+                      className="absolute -top-0.5 -end-0.5 h-2 w-2 min-w-[8px] rounded-full bg-violet-500 ring-2 ring-white dark:ring-gray-900"
+                      aria-hidden
+                    />
+                  )}
+                </span>
+              </div>
+            )}
             {onRefresh && (
               <Button
                 type="button"
@@ -184,9 +195,9 @@ export const DynamicFilterPane = ({
                 className="h-full"
                 showHierarchy={showHierarchy}
                 showOnly={showOnlyViews}
-                onExpandAll={onExpandAllHierarchy}
-                onCollapseAll={onCollapseAllHierarchy}
-                showExpandCollapse={viewMode === 'hierarchy' && !!onExpandAllHierarchy && !!onCollapseAllHierarchy}
+                onExpandAll={showGroupExpandCollapse && onExpandAllGroups ? onExpandAllGroups : onExpandAllHierarchy}
+                onCollapseAll={showGroupExpandCollapse && onCollapseAllGroups ? onCollapseAllGroups : onCollapseAllHierarchy}
+                showExpandCollapse={(viewMode === 'hierarchy' && !!onExpandAllHierarchy && !!onCollapseAllHierarchy) || (showGroupExpandCollapse && !!onExpandAllGroups && !!onCollapseAllGroups)}
               />
             </div>
             {customActions && (
@@ -223,25 +234,33 @@ export const DynamicFilterPane = ({
 
       {/* Sort Dialog */}
       {schema && onSortChange && (
-        <Dialog open={isSortDialogOpen} onOpenChange={setIsSortDialogOpen}>
-          <DialogContent className="w-full h-full rounded-none sm:rounded-2xl lg:max-w-4xl lg:max-h-[85vh] lg:h-auto overflow-hidden flex flex-col">
-            <DialogHeader className="pb-3">
-              <DialogTitle>{getT(TRANSLATION_KEYS.TITLE_SORT_DATA, language ?? defaultLang, defaultLang)}</DialogTitle>
-            </DialogHeader>
-            <div className="flex-1 overflow-y-auto pr-1">
-              <DataSort
-                schema={schema}
-                value={sortConfig}
-                onChange={(newSortConfig) => onSortChange(newSortConfig)}
-                excludedFieldIds={excludedFieldIds}
-                className="border-0"
-                showHeader={false}
-                requireApply
-                onApply={() => setIsSortDialogOpen(false)}
-              />
-            </div>
-          </DialogContent>
-        </Dialog>
+        <DraggableCheckboxDialog
+          open={isSortDialogOpen}
+          onOpenChange={setIsSortDialogOpen}
+          componentType="sorting"
+          schema={schema}
+          value={sortConfig}
+          onChange={onSortChange}
+          excludedFieldIds={excludedFieldIds}
+          requireApply
+          onApply={() => setIsSortDialogOpen(false)}
+          title={getT(TRANSLATION_KEYS.TITLE_SORT_DATA, language ?? defaultLang, defaultLang)}
+        />
+      )}
+      {/* Group Dialog */}
+      {schema && onGroupChange && (
+        <DraggableCheckboxDialog
+          open={isGroupDialogOpen}
+          onOpenChange={setIsGroupDialogOpen}
+          componentType="grouping"
+          schema={schema}
+          value={groupConfig}
+          onChange={onGroupChange}
+          excludedFieldIds={excludedFieldIds}
+          requireApply
+          onApply={() => setIsGroupDialogOpen(false)}
+          title="Group by"
+        />
       )}
     </>
   );

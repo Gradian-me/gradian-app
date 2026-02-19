@@ -798,6 +798,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       );
     }
 
+    case 'list':
     case 'list-input':
       return (
         <ListInput
@@ -822,6 +823,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       );
     
     case 'tag-input':
+    case 'tag':
       return (
         <TagInput
           config={config}
@@ -832,6 +834,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       );
     
     case 'language-selector':
+    case 'language':
       return (
         <LanguageSelector
           config={config}

@@ -7009,7 +7009,10 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KEBGGFMFEYNAA45J8T928GAG",
       "createdAt": "2026-01-07T05:57:38.591Z",
-      "updatedAt": "2026-01-07T05:57:38.799Z"
+      "updatedAt": "2026-02-18T20:38:09.993Z",
+      "progressPercent": 49,
+      "definitionOfDone": [],
+      "actionsTaken": []
     },
     {
       "assignedTo": [
@@ -7040,7 +7043,10 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KEBX0709K2G44QVF3DKE7CC3",
       "createdAt": "2026-01-07T09:35:56.962Z",
-      "updatedAt": "2026-02-09T14:07:50.132Z"
+      "updatedAt": "2026-02-18T20:38:21.151Z",
+      "progressPercent": 27,
+      "definitionOfDone": [],
+      "actionsTaken": []
     },
     {
       "isForce": true,

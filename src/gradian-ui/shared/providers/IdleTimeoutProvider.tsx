@@ -45,22 +45,43 @@ type ProviderProps = {
   children: React.ReactNode;
 };
 
+const TOUCH_THROTTLE_MS = 1000;
+
 export function IdleTimeoutProvider({ idleTimeoutMs = DEFAULT_IDLE_TIMEOUT, children }: ProviderProps) {
   const [lastInteraction, setLastInteraction] = useState<number | null>(() => readLastInteraction());
+  const [isIdle, setIsIdle] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasDispatchedIdleLogoutRef = useRef(false);
+  const lastTouchRef = useRef(0);
 
   const touch = useCallback(() => {
     const now = Date.now();
+    lastTouchRef.current = now;
     setLastInteraction(now);
+    setIsIdle(false);
     writeLastInteraction(now);
   }, []);
 
-  // Track user interactions
+  // One-time init: set lastInteraction if never set (run once on mount, ref guards against double-invocation in Strict Mode)
+  const initDoneRef = useRef(false);
   useEffect(() => {
-    const handler = () => touch();
-    // Track various user interactions to extend session
-    // Includes clicks, touches, keyboard input, mouse movement, scrolling, and visibility changes
+    if (initDoneRef.current) return;
+    if (readLastInteraction() === null) {
+      initDoneRef.current = true;
+      touch();
+    }
+  }, [touch]);
+
+  // Track user interactions (throttled to avoid "Maximum update depth" when many events fire in quick succession)
+  useEffect(() => {
+    const handler = () => {
+      const now = Date.now();
+      if (now - lastTouchRef.current < TOUCH_THROTTLE_MS) return;
+      lastTouchRef.current = now;
+      setLastInteraction(now);
+      setIsIdle(false);
+      writeLastInteraction(now);
+    };
     const events = [
       'click',
       'touchstart',
@@ -74,54 +95,31 @@ export function IdleTimeoutProvider({ idleTimeoutMs = DEFAULT_IDLE_TIMEOUT, chil
     return () => {
       events.forEach((evt) => document.removeEventListener(evt, handler));
     };
-  }, [touch]);
+  }, []);
 
-  // Heartbeat to enforce idle logout even without new interactions
+  // Single heartbeat: enforce idle logout and periodically update isIdle (no per-second setState to avoid re-render cascade and "Maximum update depth")
   useEffect(() => {
-    // Initialize if absent
-    if (!lastInteraction) {
-      touch();
-    }
-
     timeoutRef.current = setInterval(() => {
-      if (typeof window === 'undefined') {
-        return;
-      }
+      if (typeof window === 'undefined') return;
 
       const onLoginPage = window.location.pathname.startsWith('/authentication/login');
-
       if (isIdleBeyondThreshold(idleTimeoutMs) && !onLoginPage) {
         if (!hasDispatchedIdleLogoutRef.current) {
           hasDispatchedIdleLogoutRef.current = true;
           dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, 'Idle timeout exceeded');
         }
       } else {
-        // Reset so we can trigger again after user becomes active and idle later
         hasDispatchedIdleLogoutRef.current = false;
       }
+      const now = Date.now();
+      const idle = lastInteraction !== null && now - lastInteraction > idleTimeoutMs;
+      setIsIdle(idle);
     }, HEARTBEAT_MS);
 
     return () => {
       if (timeoutRef.current) clearInterval(timeoutRef.current);
     };
-  }, [idleTimeoutMs, lastInteraction, touch]);
-
-  // Use state to track current time instead of calling Date.now() during render
-  const [currentTime, setCurrentTime] = useState(() => Date.now());
-  
-  useEffect(() => {
-    // Update current time periodically to check idle status
-    const interval = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000); // Update every second
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  const isIdle = useMemo(() => {
-    if (!lastInteraction) return false;
-    return currentTime - lastInteraction > idleTimeoutMs;
-  }, [lastInteraction, idleTimeoutMs, currentTime]);
+  }, [idleTimeoutMs, lastInteraction]);
 
   const value = useMemo<IdleContextValue>(
     () => ({

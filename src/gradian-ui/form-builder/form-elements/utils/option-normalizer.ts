@@ -81,10 +81,16 @@ export const normalizeOptionEntry = (input: OptionValueInput): NormalizedOption 
       (input as any).label ?? (input as any).name ?? (input as any).title ?? undefined;
     const lang = getLabelLanguage();
     const defaultLang = getDefaultLanguage();
-    const label =
+    let label =
       rawLabel !== undefined && rawLabel !== null
         ? resolveDisplayLabel(rawLabel, lang, defaultLang)
         : undefined;
+    // Person-style objects (e.g. assignedTo): build label from firstName + lastName (may be translation arrays)
+    if (label == null || String(label).trim() === '') {
+      const first = resolveDisplayLabel((input as any).firstName, lang, defaultLang).trim();
+      const last = resolveDisplayLabel((input as any).lastName, lang, defaultLang).trim();
+      if (first || last) label = [first, last].filter(Boolean).join(' ');
+    }
 
     return {
       ...(input ?? {}),

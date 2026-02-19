@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link as LinkIcon, Check, X, CheckSquare, Square, Languages } from 'lucide-react';
+import { Link as LinkIcon, Check, X, CheckSquare, Square } from 'lucide-react';
 import { formatCurrency, formatDate, formatNumber } from '@/gradian-ui/shared/utils';
 import { BadgeViewer } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
 import type { BadgeItem } from '@/gradian-ui/form-builder/form-elements/utils/badge-viewer';
@@ -10,6 +10,7 @@ import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/ut
 import {
   isTranslationArray,
   resolveFromTranslationsArray,
+  resolveDisplayLabel,
   getDefaultLanguage,
   resolveSchemaFieldLabel,
 } from '@/gradian-ui/shared/utils/translation-utils';
@@ -31,10 +32,10 @@ import { CodeBadge } from '@/gradian-ui/form-builder/form-elements/components/Co
 import { FormulaDisplay } from '@/gradian-ui/form-builder/form-elements/components/FormulaDisplay';
 import { replaceDynamicContext } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { TranslationDialog } from '@/gradian-ui/form-builder/form-elements/components/TranslationDialog';
+import { TranslationButton } from '@/gradian-ui/form-builder/form-elements/components/TranslationButton';
 import { getDefaultLanguage as getDefLang } from '@/gradian-ui/shared/utils/translation-utils';
 
 /** Schema field shape for resolving label by language. */
@@ -66,24 +67,7 @@ function TranslationViewCell({
       <span className="min-w-0 truncate leading-relaxed py-0.5" dir="auto" title={displayText}>
         {displayText}
       </span>
-      <Button
-        type="button"
-        variant="ghost"
-        size="xs"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setOpen(true);
-        }}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-        title="View translations"
-        aria-label="View translations"
-      >
-        <Languages className="h-4 w-4" />
-      </Button>
+      <TranslationButton onClick={() => setOpen(true)} mode="view" />
       <TranslationDialog
         open={open}
         onOpenChange={setOpen}
@@ -631,13 +615,13 @@ export const formatFieldValue = (
       );
     }
     
-    // Fallback: try to get display value
+    // Fallback: try to get display value (resolve translation arrays)
     const displayValue = typeof selectValue === 'object' && selectValue !== null
-      ? (selectValue.label || selectValue.name || selectValue.title || selectValue.value || selectValue.id)
+      ? (resolveDisplayLabel(selectValue.label, lang, defaultLang) || resolveDisplayLabel(selectValue.name, lang, defaultLang) || resolveDisplayLabel(selectValue.title, lang, defaultLang) || (selectValue.value != null ? String(selectValue.value) : '') || (selectValue.id != null ? String(selectValue.id) : '') || [resolveDisplayLabel(selectValue.firstName, lang, defaultLang), resolveDisplayLabel(selectValue.lastName, lang, defaultLang)].filter(Boolean).join(' ').trim())
       : String(selectValue);
-    
-    if (displayValue) {
-      return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(displayValue)}</span>, isForce, field, row);
+    const displayStr = typeof displayValue === 'string' ? displayValue.trim() : '';
+    if (displayStr) {
+      return wrapWithForceIcon(<span className="w-full block" dir="auto">{displayStr}</span>, isForce, field, row);
     }
   }
 
@@ -883,10 +867,23 @@ export const formatFieldValue = (
         return wrapWithForceIcon(<span className="w-full block" dir="auto">{pickerDisplay}</span>, isForce, field, row);
       }
       
-      // Fallback: try to extract label/name/title/id directly
-      const fallbackDisplay = value.label || value.name || value.title || value.value || value.id;
-      if (fallbackDisplay !== undefined && fallbackDisplay !== null) {
-        return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(fallbackDisplay)}</span>, isForce, field, row);
+      // Fallback: try to extract label/name/title/id (resolve translation arrays and firstName/lastName)
+      const fallbackDisplay =
+        resolveDisplayLabel(value.label, lang, defaultLang) ||
+        resolveDisplayLabel(value.name, lang, defaultLang) ||
+        resolveDisplayLabel(value.title, lang, defaultLang) ||
+        (value.value != null ? String(value.value) : '') ||
+        (value.id != null ? String(value.id) : '');
+      const fallbackStr = typeof fallbackDisplay === 'string' ? fallbackDisplay.trim() : '';
+      if (fallbackStr) {
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{fallbackStr}</span>, isForce, field, row);
+      }
+      // Person-style: firstName + lastName
+      const first = resolveDisplayLabel(value.firstName, lang, defaultLang).trim();
+      const last = resolveDisplayLabel(value.lastName, lang, defaultLang).trim();
+      const personDisplay = [first, last].filter(Boolean).join(' ');
+      if (personDisplay) {
+        return wrapWithForceIcon(<span className="w-full block" dir="auto">{personDisplay}</span>, isForce, field, row);
       }
       
       // If still no display value, show empty instead of [object Object]
@@ -1377,8 +1374,19 @@ export const formatFieldValue = (
     const person = normalizedValue[0];
     const normalizedPerson = normalizeOptionArray(person)[0];
     
-    // Get person details
-    const personLabel = normalizedPerson?.label || normalizedPerson?.normalized?.label || person?.label || person?.name || person?.email || 'Unknown';
+    // Get person details (resolve translation arrays for label/name and firstName/lastName)
+    const personLabel =
+      normalizedPerson?.label ||
+      (person?.label != null ? resolveDisplayLabel(person.label, lang, defaultLang) : '') ||
+      (person?.name != null ? resolveDisplayLabel(person.name, lang, defaultLang) : '') ||
+      (person?.firstName != null || person?.lastName != null
+        ? [resolveDisplayLabel(person.firstName, lang, defaultLang), resolveDisplayLabel(person.lastName, lang, defaultLang)]
+            .filter(Boolean)
+            .join(' ')
+            .trim()
+        : '') ||
+      person?.email ||
+      'Unknown';
     const personAvatar = normalizedPerson?.avatar || normalizedPerson?.normalized?.avatar || person?.avatar || person?.image || person?.avatarUrl || null;
     const personId = normalizedPerson?.id || normalizedPerson?.normalized?.id || person?.id || null;
     
@@ -1672,10 +1680,22 @@ export const formatFieldValue = (
       
       // Handle object values that weren't caught by picker field check
       if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-        // Try to extract a display value from the object
-        const objectDisplay = value.label || value.name || value.title || value.value || value.id;
-        if (objectDisplay !== undefined && objectDisplay !== null) {
-          return wrapWithForceIcon(<span className="w-full block" dir="auto">{String(objectDisplay)}</span>, isForce, field, row);
+        // Try to extract a display value (resolve translation arrays and firstName/lastName)
+        const objectDisplay =
+          resolveDisplayLabel(value.label, lang, defaultLang) ||
+          resolveDisplayLabel(value.name, lang, defaultLang) ||
+          resolveDisplayLabel(value.title, lang, defaultLang) ||
+          (value.value != null ? String(value.value) : '') ||
+          (value.id != null ? String(value.id) : '');
+        const objectStr = typeof objectDisplay === 'string' ? objectDisplay.trim() : '';
+        if (objectStr) {
+          return wrapWithForceIcon(<span className="w-full block" dir="auto">{objectStr}</span>, isForce, field, row);
+        }
+        const first = resolveDisplayLabel(value.firstName, lang, defaultLang).trim();
+        const last = resolveDisplayLabel(value.lastName, lang, defaultLang).trim();
+        const personStr = [first, last].filter(Boolean).join(' ');
+        if (personStr) {
+          return wrapWithForceIcon(<span className="w-full block" dir="auto">{personStr}</span>, isForce, field, row);
         }
         // If no display value found, show empty instead of [object Object]
         const emptyContent = <span className={cn("text-gray-400 w-full block", isTitle && "font-semibold")} dir="auto">—</span>;

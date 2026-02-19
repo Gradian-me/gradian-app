@@ -7140,5 +7140,22 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000015",
+    "timestamp": "2026-02-19T00:00:00.000Z",
+    "version": "1.57.001",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "REFACTOR: Removed DynamicQueryColumnConfigDialog and DynamicQueryGroupingDialog components to streamline the dynamic query builder. Replaced them with DraggableCheckboxDialog for improved column selection and grouping functionality. Updated DynamicQueryBuilderPage to integrate new dialog components and enhance user interaction. This update enhances overall usability and component functionality across the application.",
+        "priority": "High",
+        "affectedDomains": [
+          "dynamic-query-builder",
+          "data-display",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

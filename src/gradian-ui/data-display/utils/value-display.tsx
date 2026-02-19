@@ -1,6 +1,8 @@
 import React from 'react';
 import { Rating } from '@/gradian-ui/form-builder/form-elements';
 import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
+import { resolveDisplayLabel, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 export const getDisplayStrings = (value: any): string[] => {
   if (value === null || value === undefined || value === '') {
@@ -108,18 +110,19 @@ export const getPickerDisplayValue = (
     if (value._resolvedLabel) {
       return String(value._resolvedLabel);
     }
-    if (value.label) {
-      return String(value.label);
-    }
-    if (value.name) {
-      return String(value.name);
-    }
-    if (value.title) {
-      return String(value.title);
-    }
-    if (value.id) {
-      return String(value.id);
-    }
+    const lang = useLanguageStore.getState?.()?.language ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
+    const fromLabel = resolveDisplayLabel(value.label, lang, defaultLang);
+    if (fromLabel) return fromLabel.trim();
+    const fromName = resolveDisplayLabel(value.name, lang, defaultLang);
+    if (fromName) return fromName.trim();
+    const fromTitle = resolveDisplayLabel(value.title, lang, defaultLang);
+    if (fromTitle) return fromTitle.trim();
+    if (value.id != null) return String(value.id);
+    const first = resolveDisplayLabel(value.firstName, lang, defaultLang).trim();
+    const last = resolveDisplayLabel(value.lastName, lang, defaultLang).trim();
+    const personDisplay = [first, last].filter(Boolean).join(' ');
+    if (personDisplay) return personDisplay;
   }
 
   const resolvedKey = `_${field.name}_resolved`;

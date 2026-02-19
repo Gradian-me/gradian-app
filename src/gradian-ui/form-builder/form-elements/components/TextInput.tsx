@@ -8,6 +8,7 @@ import { cn, validateField } from '../../../shared/utils';
 import { baseInputClasses, getLabelClasses, errorTextClasses } from '../utils/field-styles';
 import { CopyContent } from './CopyContent';
 import { TranslationDialog } from './TranslationDialog';
+import { TranslationButton } from './TranslationButton';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
@@ -17,7 +18,6 @@ import {
   getDefaultLanguage,
 } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
-import { Languages } from 'lucide-react';
 
 export const TextInput = forwardRef<FormElementRef, TextInputProps>(
   (
@@ -89,13 +89,21 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
       onChange?.(arr);
     };
 
+    const hasTrailingActions = canCopy || allowTranslation;
+    const paddingEndClass =
+      canCopy && allowTranslation
+        ? 'pe-20' /* space for copy + translation buttons (each h-7 w-7 + gap) */
+        : hasTrailingActions
+          ? 'pe-10' /* space for one button */
+          : '';
+
     const inputClasses = cn(
       baseInputClasses,
       'direction-auto text-xs',
       error
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',
-      (canCopy || allowTranslation) && 'pe-10',
+      paddingEndClass,
       allowTranslation && 'read-only:bg-white read-only:border-gray-300 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-gray-600 read-only:dark:text-gray-300 read-only:cursor-default',
       className
     );
@@ -143,23 +151,11 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
             {...props}
           />
           <div className="absolute end-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
-            {canCopy && displayValue && (
-              <CopyContent content={displayValue} />
+            {canCopy && (
+              <CopyContent content={displayValue ?? ''} />
             )}
             {allowTranslation && !disabled && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setTranslationDialogOpen(true);
-                }}
-                className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                title="Edit translations"
-                aria-label="Edit translations"
-              >
-                <Languages className="h-4 w-4" />
-              </button>
+              <TranslationButton onClick={() => setTranslationDialogOpen(true)} mode="edit" />
             )}
           </div>
         </div>

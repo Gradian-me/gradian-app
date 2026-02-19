@@ -28,7 +28,7 @@ import {
 import { GraphDesignerWrapper } from '@/domains/graph-designer';
 import type { GraphNodeData, GraphEdgeData } from '@/domains/graph-designer/types';
 import { useSchemas as useSchemaSummaries } from '@/gradian-ui/schema-manager/hooks/use-schemas';
-import { DynamicQueryGroupingDialog } from './DynamicQueryGroupingDialog';
+import { DraggableCheckboxDialog } from '@/gradian-ui/data-display/components/DraggableCheckboxDialog';
 import { graphToPatterns, patternsToGraph } from '../utils/graph-pattern-convert';
 import type {
   DynamicQueryColumnDef,
@@ -193,6 +193,63 @@ export function DynamicQueryBuilderPage({
 
   const groupingCount = useMemo(
     () => columns.filter((c) => c.groupOrder !== undefined && c.groupOrder >= 0).length,
+    [columns]
+  );
+
+  const schemaIdsInGraph = useMemo(() => {
+    const set = new Set<string>();
+    for (const n of nodes) if (n.schemaId && n.schemaId !== 'parent') set.add(n.schemaId);
+    return Array.from(set);
+  }, [nodes]);
+
+  const selectColumnsValue = useMemo(
+    () => [...columns].sort((a, b) => a.selectOrder - b.selectOrder).map((c) => ({ column: `${c.schemaId}:${c.fieldId}` })),
+    [columns]
+  );
+
+  const groupingValue = useMemo(() => {
+    const withGroup = columns.filter(
+      (c): c is DynamicQueryColumnDef & { groupOrder: number } =>
+        c.groupOrder !== undefined && c.groupOrder >= 0
+    );
+    withGroup.sort((a, b) => (a.groupOrder ?? 0) - (b.groupOrder ?? 0));
+    return withGroup.map((c) => ({ column: `${c.schemaId}:${c.fieldId}` }));
+  }, [columns]);
+
+  const handleSelectColumnsChange = useCallback(
+    (value: { column: string }[]) => {
+      const existingByKey = new Map(columns.map((c) => [`${c.schemaId}:${c.fieldId}`, c]));
+      const updated: DynamicQueryColumnDef[] = value.map((item, index) => {
+        const idx = item.column.indexOf(':');
+        const schemaId = item.column.slice(0, idx);
+        const fieldId = item.column.slice(idx + 1);
+        const existing = existingByKey.get(item.column);
+        return {
+          schemaId,
+          fieldId,
+          selectOrder: index,
+          groupOrder: existing?.groupOrder,
+        };
+      });
+      setColumns(updated);
+      setOpenColumnsDialogTab(null);
+    },
+    [columns]
+  );
+
+  const handleGroupingChange = useCallback(
+    (value: { column: string }[]) => {
+      const orderMap = new Map(value.map((item, index) => [item.column, index]));
+      const updated: DynamicQueryColumnDef[] = columns.map((c) => {
+        const key = `${c.schemaId}:${c.fieldId}`;
+        const idx = orderMap.get(key);
+        if (idx !== undefined) return { ...c, groupOrder: idx };
+        const { groupOrder: _, ...rest } = c;
+        return rest as DynamicQueryColumnDef;
+      });
+      setColumns(updated);
+      setOpenColumnsDialogTab(null);
+    },
     [columns]
   );
 
@@ -554,14 +611,31 @@ export function DynamicQueryBuilderPage({
         )}
       </div>
 
-      <DynamicQueryGroupingDialog
-        open={openColumnsDialogTab !== null}
+      <DraggableCheckboxDialog
+        componentType="grouping"
+        open={openColumnsDialogTab === 'select'}
         onOpenChange={(open) => !open && setOpenColumnsDialogTab(null)}
-        initialTab={openColumnsDialogTab === null ? 'select' : openColumnsDialogTab}
-        nodes={nodes}
+        title="Select columns"
         schemas={schemas}
-        columns={columns}
-        onChange={setColumns}
+        schemaIdsInGraph={schemaIdsInGraph}
+        enableAccordion
+        value={selectColumnsValue}
+        onChange={handleSelectColumnsChange}
+        requireApply
+        onApply={() => setOpenColumnsDialogTab(null)}
+      />
+      <DraggableCheckboxDialog
+        componentType="grouping"
+        open={openColumnsDialogTab === 'grouping'}
+        onOpenChange={(open) => !open && setOpenColumnsDialogTab(null)}
+        title="Grouping"
+        schemas={schemas}
+        schemaIdsInGraph={schemaIdsInGraph}
+        enableAccordion
+        value={groupingValue}
+        onChange={handleGroupingChange}
+        requireApply
+        onApply={() => setOpenColumnsDialogTab(null)}
       />
 
       <Dialog open={saveAsOpen} onOpenChange={setSaveAsOpen}>

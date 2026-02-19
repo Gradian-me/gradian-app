@@ -6,6 +6,13 @@ import { getSchemaById } from '@/gradian-ui/schema-manager/utils/schema-registry
 import { upsertFieldValueRelations } from './relations-storage.util';
 import { upsertExternalNodeFromOption } from './external-nodes.util';
 import { replaceDynamicContext } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
+import {
+  isTranslationArray,
+  resolveFromTranslationsArray,
+  recordToTranslationArray,
+  translationArrayToRecord,
+  getDefaultLanguage,
+} from '@/gradian-ui/shared/utils/translation-utils';
 
 type NormalizedOptionLike = {
   id?: string | number;
@@ -339,10 +346,69 @@ export async function syncHasFieldValueRelationsForEntity(params: {
   return relations;
 }
 
+/** Translation array format: [{ en: "x" }, { fa: "y" }]. Used for label when entity has multi-lang data. */
+type LabelTranslationArray = Array<Record<string, string>>;
+
+/**
+ * Build display label as a translation array when the target entity has translatable fields
+ * (e.g. users with firstName/lastName as translation arrays).
+ * Returns null when no translation data is present so caller can fall back to string label.
+ */
+function buildLabelTranslationArray(
+  targetSchema: FormSchema,
+  targetEntity: Record<string, unknown>
+): LabelTranslationArray | null {
+  const defaultLang = getDefaultLanguage();
+  const fields = (targetSchema.fields || []) as Array<{ role?: string; name?: string; order?: number }>;
+  const titleFields = fields
+    .filter((f) => f.role === 'title' && f.name)
+    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+
+  if (titleFields.length > 0) {
+    const languages = new Set<string>();
+    for (const f of titleFields) {
+      const value = targetEntity[f.name!];
+      if (isTranslationArray(value)) {
+        const record = translationArrayToRecord(value);
+        Object.keys(record).forEach((lang) => languages.add(lang));
+      }
+    }
+    if (languages.size === 0) return null;
+    const record: Record<string, string> = {};
+    for (const lang of languages) {
+      const parts = titleFields.map((f) => {
+        const value = targetEntity[f.name!];
+        if (isTranslationArray(value)) return resolveFromTranslationsArray(value, lang, defaultLang);
+        if (typeof value === 'string' && value.trim()) return value.trim();
+        return '';
+      });
+      const combined = parts.filter(Boolean).join(' ').trim();
+      if (combined) record[lang] = combined;
+    }
+    if (Object.keys(record).length === 0) return null;
+    return recordToTranslationArray(record);
+  }
+
+  const labelRaw = targetEntity.label ?? targetEntity.name ?? targetEntity.title;
+  if (labelRaw != null && isTranslationArray(labelRaw)) return labelRaw;
+  if (labelRaw != null && typeof labelRaw === 'object' && !Array.isArray(labelRaw)) {
+    const entries = Object.entries(labelRaw).filter(
+      ([, v]) => v != null && typeof v === 'string' && String(v).trim() !== ''
+    );
+    if (entries.length > 0) {
+      const byLang = Object.fromEntries(entries.map(([k, v]) => [k, String(v).trim()]));
+      return recordToTranslationArray(byLang);
+    }
+  }
+  return null;
+}
+
 /**
  * Enrich entity picker fields with full data from HAS_FIELD_VALUE relations.
  * This converts minimal [{id}] format to full [{id, label, icon, color}] format
  * for display in tables and other views.
+ * When target entity has translatable fields (e.g. users firstName/lastName), label is
+ * set as a translation array [{ en: "..." }, { fa: "..." }] so the client can resolve by language.
  */
 export async function enrichEntityPickerFieldsFromRelations(params: {
   schemaId: string;
@@ -580,7 +646,9 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
           const targetSchema = schemaMap.get(rel.targetSchema);
 
           if (targetEntity && targetSchema) {
-            const label = getValueByRole(targetSchema, targetEntity, 'title') || targetEntity.name || targetEntity.title || rel.targetId;
+            const labelTranslationArray = buildLabelTranslationArray(targetSchema, targetEntity);
+            const labelFallback = getValueByRole(targetSchema, targetEntity, 'title') || targetEntity.name || targetEntity.title || rel.targetId;
+            const label = labelTranslationArray ?? (typeof labelFallback === 'string' ? labelFallback : String(labelFallback));
             const icon = getSingleValueByRole(targetSchema, targetEntity, 'icon') || targetEntity.icon;
             const color = getSingleValueByRole(targetSchema, targetEntity, 'color') || targetEntity.color;
 
@@ -600,7 +668,7 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
 
             return {
               id: rel.targetId,
-              label: typeof label === 'string' ? label : String(label),
+              label,
               icon: icon ? String(icon) : undefined,
               color: color ? String(color) : undefined,
               targetSchema: rel.targetSchema, // Include targetSchema from relation for badge navigation

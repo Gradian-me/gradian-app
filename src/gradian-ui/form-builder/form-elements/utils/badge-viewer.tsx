@@ -15,6 +15,8 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { normalizeOptionArray, NormalizedOption } from './option-normalizer';
 import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { resolveDisplayLabel, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 
 export type BadgeItem = {
   id: string;
@@ -373,6 +375,14 @@ const getBadgePresentation = (color?: string) => {
 
 BadgeRenderer.displayName = 'BadgeRenderer';
 
+/** Resolve label to string (handles translation arrays and person objects). */
+function toDisplayLabel(raw: unknown, lang: string, defaultLang: string): string {
+  if (raw == null) return '';
+  if (typeof raw === 'string') return raw.trim();
+  const resolved = resolveDisplayLabel(raw, lang, defaultLang);
+  return resolved != null ? String(resolved).trim() : '';
+}
+
 const convertValueToBadgeItems = (
   field: FormField,
   value: any
@@ -383,6 +393,8 @@ const convertValueToBadgeItems = (
     return [];
   }
 
+  const lang = useLanguageStore.getState?.()?.language ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
   const fieldOptions = Array.isArray(field.options) ? field.options : undefined;
 
   if (!fieldOptions) {
@@ -390,7 +402,8 @@ const convertValueToBadgeItems = (
       const normalized = normalizeOptionArray(entry);
       const firstEntry = normalized[0];
       const id = firstEntry?.id ?? String((entry as any)?.id ?? entry ?? idx);
-      const label = firstEntry?.label ?? String((entry as any)?.label ?? entry);
+      const rawLabel = firstEntry?.label ?? (entry as any)?.label ?? entry;
+      const label = toDisplayLabel(rawLabel, lang, defaultLang) || id;
       const icon = firstEntry?.icon;
       const color = firstEntry?.color;
       return {
@@ -415,8 +428,9 @@ const convertValueToBadgeItems = (
 
     if (option || normalizedValue || hasDirectLabel) {
       const id = option?.id ?? option?.value ?? normalizedValue?.id ?? normalizedValue?.value ?? (typeof optionValue === 'object' && optionValue?.id ? optionValue.id : `${idx}`);
-      // Prioritize: option label > normalizedValue label > direct optionValue label > fallback
-      const label = option?.label ?? normalizedValue?.label ?? (typeof optionValue === 'object' && optionValue?.label ? optionValue.label : String(optionValue));
+      // Prioritize: option label > normalizedValue label > direct optionValue label > fallback (resolve translation arrays)
+      const rawLabel = option?.label ?? normalizedValue?.label ?? (typeof optionValue === 'object' && optionValue?.label ? optionValue.label : String(optionValue));
+      const label = toDisplayLabel(rawLabel, lang, defaultLang) || id;
       const iconName = normalizedValue?.icon ?? metadata.icon ?? (typeof optionValue === 'object' && optionValue?.icon ? optionValue.icon : undefined);
       const color = normalizedValue?.color ?? metadata.color ?? (typeof optionValue === 'object' && optionValue?.color ? optionValue.color : undefined);
       return {
@@ -433,12 +447,9 @@ const convertValueToBadgeItems = (
       ? String(optionValue)
       : (() => {
           if (optionValue && typeof optionValue === 'object') {
-            if ('label' in optionValue && optionValue.label) {
-              return String(optionValue.label);
-            }
-            if ('id' in optionValue && optionValue.id) {
-              return String(optionValue.id);
-            }
+            const fromLabel = toDisplayLabel(optionValue.label, lang, defaultLang);
+            if (fromLabel) return fromLabel;
+            if ('id' in optionValue && optionValue.id) return String(optionValue.id);
           }
           return `${idx}`;
         })();

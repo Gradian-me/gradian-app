@@ -6,7 +6,6 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../../components/ui/select';
 import { cn } from '../../shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
@@ -106,27 +105,29 @@ export function DynamicPagination({
         {showPageSizeSelector && (
           <div className="flex items-center gap-1.5">
             <span className="text-xs text-gray-500 dark:text-gray-400">{labelRows}:</span>
-            <Select 
-              value={isAllSelected ? 'all' : pageSize.toString()} 
-              onValueChange={(value) => {
+            <select
+              aria-label={labelRows}
+              value={isAllSelected ? 'all' : pageSize.toString()}
+              onChange={(e) => {
+                const value = e.target.value;
                 if (value === 'all') {
                   onPageSizeChange('all');
                 } else {
                   onPageSizeChange(Number(value));
                 }
               }}
+              className={cn(
+                'w-20 h-7 text-xs rounded-md border border-gray-300 dark:border-gray-600',
+                'bg-background text-foreground px-2',
+                'focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-1 dark:focus:ring-offset-gray-900'
+              )}
             >
-              <SelectTrigger className="w-20 h-7 text-xs border-gray-300 dark:border-gray-600">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {pageSizeOptions.map((size) => (
-                  <SelectItem key={size === 'all' ? 'all' : size.toString()} value={size === 'all' ? 'all' : size.toString()}>
-                    {size === 'all' ? labelAll : size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {pageSizeOptions.map((size) => (
+                <option key={size === 'all' ? 'all' : size.toString()} value={size === 'all' ? 'all' : size.toString()}>
+                  {size === 'all' ? labelAll : size}
+                </option>
+              ))}
+            </select>
           </div>
         )}
         <span className="text-xs text-gray-500 dark:text-gray-400">

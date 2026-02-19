@@ -407,6 +407,12 @@ export interface DetailPageMetadata {
   };
 }
 
+/** Normalized default list/sort and grouping for list pages. Use normalizeDefaultSettings() when schema stores array shape. */
+export interface DefaultListSettings {
+  grouping?: { column: string }[];
+  sorting?: { column: string; isAscending: boolean }[];
+}
+
 // Main FormSchema interface - supports both naming conventions
 export interface FormSchema {
   id: string;
@@ -520,6 +526,8 @@ export interface FormSchema {
   cardMetadata?: CardSection[];
   cardConfig?: CardConfig; // Form-builder specific
   listMetadata?: ListMetadata; // Form-builder specific
+  /** Default list/sort and grouping behavior for list pages (e.g. DynamicPageRenderer). Stored as array in JSON; use normalizeDefaultSettings() to consume. */
+  defaultSettings?: DefaultListSettings | Array<Record<string, unknown>>;
   detailPageMetadata?: DetailPageMetadata;
   layout?: {
     direction?: 'column' | 'row';

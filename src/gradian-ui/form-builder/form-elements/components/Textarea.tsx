@@ -8,6 +8,7 @@ import { cn, validateField } from '../../../shared/utils';
 import { getLabelClasses, errorTextClasses, textareaBaseClasses } from '../utils/field-styles';
 import { CopyContent } from './CopyContent';
 import { TranslationDialog } from './TranslationDialog';
+import { TranslationButton } from './TranslationButton';
 import { ProfessionalWritingModal } from '@/gradian-ui/communication/professional-writing';
 import { VoiceInputDialog } from '@/gradian-ui/communication/voice/components/VoiceInputDialog';
 import { TextareaAiEnhanceButton } from './TextareaAiEnhanceButton';
@@ -20,7 +21,6 @@ import {
   getDefaultLanguage,
 } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
-import { Languages } from 'lucide-react';
 
 export const Textarea = forwardRef<FormElementRef, TextareaProps>(
   (
@@ -166,17 +166,12 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
               <CopyContent content={contentToCopy} className="shrink-0" />
             )}
             {allowTranslation && !disabled && (
-              <TextareaFloatingActionButton
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setTranslationDialogOpen(true);
-                }}
+              <TranslationButton
+                onClick={() => setTranslationDialogOpen(true)}
+                mode="edit"
                 disabled={disabled}
-                title="Edit translations"
-              >
-                <Languages className="h-3.5 w-3.5" />
-              </TextareaFloatingActionButton>
+                iconClassName="h-3.5 w-3.5"
+              />
             )}
             {aiAgentId && !allowTranslation && typeof value === 'string' && value.trim() && (
               <TextareaAiEnhanceButton

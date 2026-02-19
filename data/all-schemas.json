@@ -9957,6 +9957,7 @@
         "component": "text",
         "placeholder": "Enter parameter label",
         "description": "Human readable label shown in UI",
+        "allowTranslation": true,
         "translations": [
           {
             "en": "Label"
@@ -10323,6 +10324,7 @@
         "sectionId": "basic-information",
         "component": "text",
         "placeholder": "Enter parameter group title",
+        "allowTranslation": true,
         "translations": [
           {
             "en": "Title"
@@ -22064,6 +22066,7 @@
         "ru": "Задачи"
       }
     ],
+    "defaultSettings":[{"grouping":[{"column":"assignedTo"},{"column":"status"}]},{"sorting":[{"column":"dueDate","isAscending":true}]}],
     "fields": [
       {
         "id": "task-title",

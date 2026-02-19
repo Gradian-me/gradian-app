@@ -69,6 +69,157 @@ import { getInitials } from '../utils';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { SortConfig } from '@/gradian-ui/shared/utils/sort-utils';
+import { getInitialSortConfig, getInitialGroupConfig } from '@/gradian-ui/shared/utils/default-settings-utils';
+import { buildSchemaGrouped, type SchemaGroupNode } from '@/gradian-ui/data-display/utils/grouping-display';
+import type { FormSchema as FormSchemaType } from '@/gradian-ui/schema-manager/types/form-schema';
+
+interface SchemaGroupAccordionNodeProps {
+  node: SchemaGroupNode;
+  schema: FormSchemaType;
+  asFormSchema: (s: FormSchemaType) => FormSchemaType;
+  viewMode: 'grid' | 'list' | 'table' | 'hierarchy';
+  tableConfig: TableConfig;
+  tableColumns: TableColumn[];
+  isLoading: boolean;
+  isEditLoading: Record<string, boolean>;
+  onTableRowClick: (entity: any) => void;
+  highlightQuery: string;
+  onView: (entity: any) => void;
+  onViewDetail: (entity: any) => void;
+  onEdit: (entity: any) => void;
+  onDelete: (entity: any) => void;
+  onDiscussions: (data: any) => void;
+  showUserDetails: boolean;
+  /** Controlled accordion value so expand/collapse all works for nested accordions */
+  accordionValue?: string[];
+  onAccordionValueChange?: (value: string[]) => void;
+  labelItem?: string;
+  labelItems?: string;
+}
+
+function countEntitiesInNode(n: SchemaGroupNode): number {
+  const isEntityList = n.children.length > 0 && typeof (n.children[0] as any)?.id !== 'undefined';
+  if (isEntityList) return n.children.length;
+  return (n.children as SchemaGroupNode[]).reduce((acc, c) => acc + countEntitiesInNode(c), 0);
+}
+
+function SchemaGroupAccordionNode({
+  node,
+  schema,
+  asFormSchema,
+  viewMode,
+  tableConfig,
+  tableColumns,
+  isLoading,
+  isEditLoading,
+  onTableRowClick,
+  highlightQuery,
+  onView,
+  onViewDetail,
+  onEdit,
+  onDelete,
+  onDiscussions,
+  showUserDetails,
+  accordionValue,
+  onAccordionValueChange,
+  labelItem = 'item',
+  labelItems = 'items',
+}: SchemaGroupAccordionNodeProps) {
+  const isNested = node.children.length > 0 && typeof (node.children[0] as SchemaGroupNode).key === 'string' && typeof (node.children[0] as SchemaGroupNode).fieldLabel === 'string';
+  const entities = isNested ? [] : (node.children as any[]);
+  const childNodes = isNested ? (node.children as SchemaGroupNode[]) : [];
+  const count = isNested ? childNodes.reduce((acc, n) => acc + countEntitiesInNode(n), 0) : entities.length;
+  const title = `${node.fieldLabel}: ${node.label}`;
+  const countLabel = count === 1 ? labelItem : labelItems;
+
+  return (
+    <AccordionItem value={node.key} className="border border-gray-200 dark:border-gray-700 rounded-2xl px-2 md:px-4 bg-gray-50 dark:bg-gray-800/30">
+      <AccordionTrigger className="hover:no-underline py-3 [&>svg]:text-violet-600">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{title}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            ({count} {countLabel})
+          </span>
+        </div>
+      </AccordionTrigger>
+      <AccordionContent>
+        {isNested ? (
+          <Accordion type="multiple" value={accordionValue} onValueChange={onAccordionValueChange} className="w-full space-y-2 pt-2">
+            {childNodes.map((child) => (
+              <SchemaGroupAccordionNode
+                key={child.key}
+                node={child}
+                schema={schema}
+                asFormSchema={asFormSchema}
+                viewMode={viewMode}
+                tableConfig={tableConfig}
+                tableColumns={tableColumns}
+                isLoading={isLoading}
+                isEditLoading={isEditLoading}
+                onTableRowClick={onTableRowClick}
+                highlightQuery={highlightQuery}
+                onView={onView}
+                onViewDetail={onViewDetail}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onDiscussions={onDiscussions}
+                showUserDetails={showUserDetails}
+                accordionValue={accordionValue}
+                onAccordionValueChange={onAccordionValueChange}
+                labelItem={labelItem}
+                labelItems={labelItems}
+              />
+            ))}
+          </Accordion>
+        ) : viewMode === 'table' ? (
+          <div className="w-full pt-2 md:pt-4 mx-2">
+            <TableWrapper
+              tableConfig={{ ...tableConfig, id: `${tableConfig.id}-${node.key}`, data: entities }}
+              columns={tableColumns}
+              data={entities}
+              showCards={false}
+              disableAnimation={false}
+              index={0}
+              isLoading={isLoading}
+              onRowClick={onTableRowClick}
+              highlightQuery={highlightQuery}
+              schema={schema}
+            />
+          </div>
+        ) : (
+          <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4 pt-2 md:pt-4 mx-2' : 'space-y-4 pt-2 md:pt-4 mx-2'}>
+            {entities.map((entity: any) => (
+              <div key={entity.id} className="relative">
+                {isEditLoading[entity.id] && (
+                  <div className="absolute inset-0 bg-white/70 dark:bg-gray-800/30 flex items-center justify-center z-10 rounded-lg">
+                    <Spinner size="lg" variant="primary" />
+                    <span className="text-sm font-medium text-violet-600">Loading...</span>
+                  </div>
+                )}
+                <DynamicCardRenderer
+                  schema={asFormSchema(schema)}
+                  data={entity}
+                  index={0}
+                  viewMode={viewMode === 'hierarchy' ? 'list' : viewMode}
+                  maxBadges={3}
+                  maxMetrics={5}
+                  onView={onView}
+                  onViewDetail={onViewDetail}
+                  onEdit={(e: any) => { if (!isEditLoading[e.id]) onEdit(e); }}
+                  onDelete={onDelete}
+                  onDiscussions={onDiscussions}
+                  className={isEditLoading[entity.id] ? 'opacity-70' : ''}
+                  highlightQuery={highlightQuery}
+                  showUserDetails={showUserDetails}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </AccordionContent>
+    </AccordionItem>
+  );
+}
 
 interface DynamicPageRendererProps {
   schema: FormSchema;
@@ -188,8 +339,17 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     entityId: undefined,
   });
   const [showMetadataColumns, setShowMetadataColumns] = useState(false);
-  const [sortConfig, setSortConfig] = useState<SortConfig[]>([]);
-  
+  const [sortConfig, setSortConfig] = useState<SortConfig[]>(() => getInitialSortConfig(schema?.defaultSettings));
+  const [groupConfig, setGroupConfig] = useState<{ column: string }[]>(() => getInitialGroupConfig(schema?.defaultSettings));
+
+  // Sync sort/group config from schema defaultSettings only when schema ID changes (e.g. navigation to another list).
+  // Intentionally not depending on language so user's sort/group choices persist when switching language.
+  useEffect(() => {
+    if (schema?.defaultSettings == null) return;
+    setSortConfig(getInitialSortConfig(schema.defaultSettings));
+    setGroupConfig(getInitialGroupConfig(schema.defaultSettings));
+  }, [schema?.id]);
+
   // State for companies data and grouping
   const [companies, setCompanies] = useState<any[]>([]);
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
@@ -281,6 +441,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
 
   // Reset to page 1 when sort changes
   const prevSortRef = useRef<string>('');
+  const prevGroupRef = useRef<string>('');
   useEffect(() => {
     const sortKey = JSON.stringify(sortConfig);
     if (prevSortRef.current !== sortKey && prevSortRef.current !== '') {
@@ -288,10 +449,21 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     }
     prevSortRef.current = sortKey;
   }, [sortConfig]);
+  useEffect(() => {
+    const groupKey = JSON.stringify(groupConfig);
+    if (prevGroupRef.current !== groupKey && prevGroupRef.current !== '') {
+      setCurrentPage(1);
+    }
+    prevGroupRef.current = groupKey;
+  }, [groupConfig]);
 
   // Handle sort change
   const handleSortChange = useCallback((newSortConfig: SortConfig[]) => {
     setSortConfig(newSortConfig);
+  }, []);
+
+  const handleGroupChange = useCallback((columns: { column: string }[]) => {
+    setGroupConfig(columns);
   }, []);
 
   // Pagination handlers
@@ -674,9 +846,48 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const lastPageSizeRef = useRef<number | 'all'>(25);
   const lastSortRef = useRef<string>('');
 
-  // Fetch whenever derived filters, pagination, or sort change (includes initial mount and company/filter updates)
+  const buildFiltersRef = useRef(buildFilters);
+  const fetchEntitiesRef = useRef(fetchEntities);
+  const setFiltersRef = useRef(setFilters);
+  buildFiltersRef.current = buildFilters;
+  fetchEntitiesRef.current = fetchEntities;
+  setFiltersRef.current = setFilters;
+
+  // Value-based key for filters so effect doesn't re-run when hook returns new object ref with same content (avoids "Maximum update depth" loop)
+  const currentFiltersKey = useMemo(() => JSON.stringify(currentFilters ?? {}), [currentFilters]);
+
+  // Stable key so effect only runs when inputs that affect fetch actually change (avoids loop when buildFilters/fetchEntities/setFilters get new references)
+  const fetchInputKey = useMemo(
+    () =>
+      JSON.stringify({
+        currentPage,
+        pageSize,
+        sortConfig,
+        currentFiltersKey,
+        selectedCompanyId: selectedCompany?.id,
+        assignmentView,
+        assignmentUserId: assignmentSelectedUser?.id,
+        allowAssignmentSwitcher,
+        schemaNotCompanyBased: schema?.isNotCompanyBased,
+        availableCompanyIdsLength: availableCompanyIds.length,
+      }),
+    [
+      currentPage,
+      pageSize,
+      sortConfig,
+      currentFiltersKey,
+      selectedCompany?.id,
+      assignmentView,
+      assignmentSelectedUser?.id,
+      allowAssignmentSwitcher,
+      schema?.isNotCompanyBased,
+      availableCompanyIds.length,
+    ]
+  );
+
+  // Fetch whenever derived filters, pagination, or sort change (use refs for callbacks to avoid effect loop from unstable references)
   useEffect(() => {
-    const filters = buildFilters();
+    const filters = buildFiltersRef.current();
     if (!filters) {
       return;
     }
@@ -687,20 +898,18 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     const filtersChanged = lastFiltersRef.current !== filtersKey;
     const sortChanged = lastSortRef.current !== sortKey;
 
-    // Only skip if nothing changed
     if (!pageChanged && !pageSizeChanged && !filtersChanged && !sortChanged) {
       return;
     }
 
-    // Update refs
     lastFiltersRef.current = filtersKey;
     lastPageRef.current = currentPage;
     lastPageSizeRef.current = pageSize;
     lastSortRef.current = sortKey;
 
-    setFilters(filters);
-    fetchEntities(filters, { page: currentPage, limit: pageSize, sortArray: sortConfig });
-  }, [buildFilters, fetchEntities, setFilters, currentPage, pageSize, sortConfig]);
+    setFiltersRef.current(filters);
+    fetchEntitiesRef.current(filters, { page: currentPage, limit: pageSize, sortArray: sortConfig });
+  }, [fetchInputKey, currentPage, pageSize, sortConfig]);
 
   // Handle edit entity - set entity ID to trigger FormModal
   const handleEditEntity = useCallback(async (entity: any) => {
@@ -1154,6 +1363,72 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     return { grouped, ungrouped };
   }, [filteredEntities, selectedCompany, schema?.isNotCompanyBased]);
 
+  // Schema-based grouping (groupConfig): nested tree for accordions (empty values use translated label, field labels and values respect language)
+  const labelEmpty = getT(TRANSLATION_KEYS.LABEL_EMPTY, language, defaultLang);
+  const schemaGroupedData = useMemo(() => {
+    if (!groupConfig.length || !filteredEntities?.length || !schema) return null;
+    const nodes = buildSchemaGrouped(filteredEntities, schema, groupConfig, 0, language, defaultLang, labelEmpty);
+    return nodes.length > 0 ? nodes : null;
+  }, [filteredEntities, schema, groupConfig, language, defaultLang, labelEmpty]);
+
+  function flattenSchemaGroupKeys(nodes: SchemaGroupNode[]): string[] {
+    const keys: string[] = [];
+    for (const n of nodes) {
+      keys.push(n.key);
+      const isNested = n.children.length > 0 && typeof (n.children[0] as SchemaGroupNode).key === 'string';
+      if (isNested) keys.push(...flattenSchemaGroupKeys(n.children as SchemaGroupNode[]));
+    }
+    return keys;
+  }
+
+  const allSchemaGroupKeys = useMemo(
+    () => (schemaGroupedData ? flattenSchemaGroupKeys(schemaGroupedData) : []),
+    [schemaGroupedData]
+  );
+
+  const [schemaGroupAccordionValues, setSchemaGroupAccordionValues] = useState<string[]>([]);
+  const allSchemaGroupKeysJoined = useMemo(() => allSchemaGroupKeys.join(','), [allSchemaGroupKeys]);
+  const lastSyncedGroupKeysRef = useRef<string>('');
+  useEffect(() => {
+    if (!schemaGroupedData || allSchemaGroupKeys.length === 0) {
+      lastSyncedGroupKeysRef.current = '';
+      setSchemaGroupAccordionValues((prev) => (prev.length === 0 ? prev : []));
+      return;
+    }
+    if (allSchemaGroupKeysJoined === lastSyncedGroupKeysRef.current) return;
+    lastSyncedGroupKeysRef.current = allSchemaGroupKeysJoined;
+    setSchemaGroupAccordionValues([...allSchemaGroupKeys]);
+  // Only sync when group structure actually changes (allSchemaGroupKeysJoined); avoid re-running when allSchemaGroupKeys is new ref
+  }, [schemaGroupedData, allSchemaGroupKeysJoined]);
+
+  const expandAllSchemaGroup = useCallback(() => {
+    setSchemaGroupAccordionValues(allSchemaGroupKeys);
+  }, [allSchemaGroupKeys]);
+
+  const collapseAllSchemaGroup = useCallback(() => {
+    setSchemaGroupAccordionValues([]);
+  }, []);
+
+  // Memoize User Details toggle so Radix Switch refs stay stable when groupConfig/sortConfig change (avoids "Maximum update depth" loop)
+  const metadataToggleCustomActions = useMemo(
+    () => (
+      <div className="flex items-center gap-2 px-2">
+        <Label
+          htmlFor="metadata-toggle"
+          className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer whitespace-nowrap"
+        >
+          {labelUserDetails}
+        </Label>
+        <Switch
+          id="metadata-toggle"
+          checked={showMetadataColumns}
+          onCheckedChange={setShowMetadataColumns}
+        />
+      </div>
+    ),
+    [showMetadataColumns, labelUserDetails]
+  );
+
   // Calculate default values for accordion (all expanded initially)
   const accordionDefaultValues = useMemo(() => {
     if (!groupedEntities) return [];
@@ -1300,25 +1575,16 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           onExpandAllHierarchy={() => setHierarchyExpandToken((prev) => prev + 1)}
           onCollapseAllHierarchy={() => setHierarchyCollapseToken((prev) => prev + 1)}
           showHierarchy={schema?.allowHierarchicalParent === true}
+          showGroupExpandCollapse={!!schemaGroupedData}
+          onExpandAllGroups={expandAllSchemaGroup}
+          onCollapseAllGroups={collapseAllSchemaGroup}
           sortConfig={sortConfig}
           onSortChange={handleSortChange}
+          groupConfig={groupConfig}
+          onGroupChange={handleGroupChange}
           schema={schema}
           excludedFieldIds={repeatingSectionFieldIds}
-          customActions={
-            <div className="flex items-center gap-2 px-2">
-              <Label
-                htmlFor="metadata-toggle"
-                className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer whitespace-nowrap"
-              >
-                {labelUserDetails}
-              </Label>
-              <Switch
-                id="metadata-toggle"
-                checked={showMetadataColumns}
-                onCheckedChange={setShowMetadataColumns}
-              />
-            </div>
-          }
+          customActions={metadataToggleCustomActions}
         />
 
         {assignmentSwitcherEnabled && (
@@ -1383,8 +1649,37 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             isLoading={isLoading}
             showUserDetails={showMetadataColumns}
           />
+        ) : schemaGroupedData ? (
+          // Schema-based grouped view (groupConfig): nested accordions with "fieldLabel: value"
+          <Accordion type="multiple" value={schemaGroupAccordionValues} onValueChange={setSchemaGroupAccordionValues} className="w-full space-y-2">
+            {schemaGroupedData.map((node) => (
+              <SchemaGroupAccordionNode
+                key={node.key}
+                node={node}
+                schema={schema}
+                accordionValue={schemaGroupAccordionValues}
+                onAccordionValueChange={setSchemaGroupAccordionValues}
+                asFormSchema={asFormSchema}
+                viewMode={viewMode}
+                tableConfig={tableConfig}
+                tableColumns={tableColumns}
+                isLoading={isLoading}
+                isEditLoading={isEditLoading}
+                onTableRowClick={handleTableRowClick}
+                highlightQuery={debouncedSearchTerm}
+                onView={handleViewEntity}
+                onViewDetail={handleViewDetailPage}
+                onEdit={handleEditEntity}
+                onDelete={handleDeleteWithConfirmation}
+                onDiscussions={(data: any) => setOpenDiscussionForRowId(String(data.id))}
+                showUserDetails={showMetadataColumns}
+                labelItem={getT(TRANSLATION_KEYS.LABEL_ITEM, language, defaultLang)}
+                labelItems={getT(TRANSLATION_KEYS.LABEL_ITEMS, language, defaultLang)}
+              />
+            ))}
+          </Accordion>
         ) : groupedEntities ? (
-          // Grouped view with accordion
+          // Grouped view with accordion (by company)
           <Accordion type="multiple" defaultValue={accordionDefaultValues} className="w-full space-y-2">
             {/* Groups by Company */}
             {Object.entries(groupedEntities.grouped).map(([companyId, companyEntities]) => {
