@@ -6,7 +6,7 @@
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn, getDisplayNameFields, resolveLocalizedField } from '@/gradian-ui/shared/utils';
-import { Bot, Hash, AtSign, Clock, Info, Download, ChevronUp, ChevronDown } from 'lucide-react';
+import { Bot, Hash, AtSign, Clock, Info, Download, ChevronUp, ChevronDown, RefreshCw, Loader2 } from 'lucide-react';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
 import { AISearchResults } from '@/domains/ai-builder/components/AISearchResults';
 import type { SearchResult } from '@/domains/ai-builder/utils/ai-search-utils';
@@ -28,16 +28,41 @@ import { useLanguageStore } from '@/stores/language.store';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { formatRelativeTime, formatTime } from '@/gradian-ui/shared/utils/date-utils';
-import { processTextWithStyledHashtagsAndMentions } from '@/gradian-ui/shared/utils/text-utils';
 import { MessageMetadataDialog } from './MessageMetadataDialog';
 import type { ChatMessage as ChatMessageType } from '../types';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 import type { QuickAction, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { MaximizeButton } from '@/gradian-ui/layout/components/MaximizeButton';
+import { Modal } from '@/gradian-ui/data-display/components/Modal';
 
 export interface ChatMessageProps {
   message: ChatMessageType;
   index?: number;
   className?: string;
+  onRetryFailedMessage?: (messageId: string) => void | Promise<void>;
+}
+
+function convertHashtagsToMarkdownAnchors(content: string): string {
+  if (!content) return content;
+
+  const lines = content.split('\n');
+  let inCodeFence = false;
+
+  return lines
+    .map((line) => {
+      const trimmed = line.trimStart();
+      if (trimmed.startsWith('```')) {
+        inCodeFence = !inCodeFence;
+        return line;
+      }
+      if (inCodeFence) return line;
+
+      // Convert hashtags to in-doc anchors so markdown renders them consistently.
+      return line.replace(/(^|\s)#([a-zA-Z0-9_-]+)/g, (_match, prefix, tag) => {
+        return `${prefix}[#${tag}](#hashtag-${tag.toLowerCase()})`;
+      });
+    })
+    .join('\n');
 }
 
 // Error boundary component for MarkdownViewer
@@ -133,6 +158,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
   index = 0,
   className,
+  onRetryFailedMessage,
 }) => {
   const isUser = message.role === 'user';
   const isAssistant = message.role === 'assistant';
@@ -141,6 +167,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   const defaultLang = getDefaultLanguage();
   const aiGeneratedContentLabel = getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang);
   const [isMetadataDialogOpen, setIsMetadataDialogOpen] = useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [isRetryingFailedMessage, setIsRetryingFailedMessage] = useState(false);
+  const metadataActionClass =
+    'h-7 w-7 p-0 rounded-xl hover:bg-violet-100 hover:text-violet-600 dark:hover:bg-gray-800 dark:hover:text-violet-300 transition-all duration-200 relative focus:ring-0 focus-visible:ring-0 text-gray-500 dark:text-gray-400';
 
   // Get user display name and initials for avatar (support name/lastname and API variants by language)
   const displayName = useMemo(() => {
@@ -193,6 +223,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   const responseFormat = message.metadata?.responseFormat;
   const isTodoResponse = !!message.metadata?.todoId;
+  const isOrchestrator = message.agentId === 'orchestrator' || message.agentType === 'orchestrator';
+  const isSearchResponseFormat =
+    responseFormat === 'search-card' || responseFormat === 'search-results';
   
   // Helper function to parse JSON
   const tryParseJson = useCallback((content: string): any => {
@@ -284,6 +317,9 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   const markdownContentRef = useRef<HTMLDivElement>(null);
   const stringContentRef = useRef<HTMLDivElement>(null);
   const [stringContentHeight, setStringContentHeight] = useState<number | null>(null);
+  const isFailedUserMessage = isUser && message.metadata?.deliveryStatus === 'failed';
+  const isPendingUserMessage = isUser && message.metadata?.deliveryStatus === 'pending';
+  const failedMessageError = message.metadata?.errorMessage || 'Network error. Please check your connection and try again.';
 
   // Get raw content for copying (without HTML processing)
   const rawContent = message.content || '';
@@ -318,6 +354,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     ? (typeof parsedContent === 'string' ? parsedContent : JSON.stringify(parsedContent, null, 2))
     : '';
   const isStringLong = stringContent.length > 500 || stringContent.split('\n\n').length > 3;
+  const isOrchestratorStringMessage = isStringMessage && isOrchestrator;
+  const disableOrchestratorClamping = isOrchestrator;
   
   useEffect(() => {
     if (stringContentRef.current && isStringMessage) {
@@ -331,147 +369,29 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     }
   }, [stringContent, isStringMessage, isStringExpanded]);
   
-  const shouldTruncateString = isStringLong && !isStringExpanded && (stringContentHeight === null || stringContentHeight > 300);
+  const shouldTruncateString =
+    !isOrchestratorStringMessage &&
+    isStringLong &&
+    !isStringExpanded &&
+    (stringContentHeight === null || stringContentHeight > 300);
   
-  const shouldTruncate = isLongContent && !isExpanded && (contentHeight === null || contentHeight > maxCollapsedHeight);
+  const shouldTruncate =
+    !disableOrchestratorClamping &&
+    isLongContent &&
+    !isExpanded &&
+    (contentHeight === null || contentHeight > maxCollapsedHeight);
   const displayContent = cleanContent; // Always show full content, truncate with CSS
+  const displayContentWithStyledHashtags = useMemo(
+    () => convertHashtagsToMarkdownAnchors(displayContent),
+    [displayContent]
+  );
   
-  // Post-process markdown to add hashtag/mention styling
-  useEffect(() => {
-    if (!markdownContentRef.current || shouldRenderAgentContainer || renderData.type !== 'markdown') return;
-    
-    const processHashtagsAndMentions = (container: HTMLElement) => {
-      // Find all text nodes that contain # or @
-      const walker = document.createTreeWalker(
-        container,
-        NodeFilter.SHOW_TEXT,
-        null
-      );
-      
-      const textNodes: Text[] = [];
-      let node;
-      while (node = walker.nextNode()) {
-        if (node.nodeValue && (node.nodeValue.includes('#') || node.nodeValue.includes('@'))) {
-          textNodes.push(node as Text);
-        }
-      }
-      
-      // Process each text node
-      textNodes.forEach((textNode) => {
-        const parent = textNode.parentElement;
-        if (!parent || parent.classList.contains('hashtag-inline') || parent.classList.contains('mention-inline')) {
-          return; // Already processed
-        }
-        
-        const text = textNode.nodeValue || '';
-        const fragment = document.createDocumentFragment();
-        let lastIndex = 0;
-        
-        // Collect all matches (hashtags and mentions)
-        const matches: Array<{ type: 'hashtag' | 'mention'; start: number; end: number; text: string }> = [];
-        
-        // Process hashtags
-        const hashtagRegex = /(?:^|\s)(#([a-zA-Z0-9_-]+))/g;
-        let match: RegExpExecArray | null;
-        while ((match = hashtagRegex.exec(text)) !== null) {
-          matches.push({
-            type: 'hashtag',
-            start: match.index,
-            end: match.index + match[0].length,
-            text: match[0]
-          });
-        }
-        
-        // Process mentions
-        const mentionRegex = /@([a-zA-Z0-9_-]+)/g;
-        let mentionMatch: RegExpExecArray | null;
-        while ((mentionMatch = mentionRegex.exec(text)) !== null) {
-          // Check if this mention is already inside a hashtag match
-          const isInsideHashtag = matches.some(m => 
-            m.type === 'hashtag' && mentionMatch!.index >= m.start && mentionMatch!.index < m.end
-          );
-          if (!isInsideHashtag) {
-            matches.push({
-              type: 'mention',
-              start: mentionMatch.index,
-              end: mentionMatch.index + mentionMatch[0].length,
-              text: mentionMatch[0]
-            });
-          }
-        }
-        
-        // Sort matches by start position
-        matches.sort((a, b) => a.start - b.start);
-        
-        // Build fragment with styled elements
-        matches.forEach((m) => {
-          // Add text before match
-          if (m.start > lastIndex) {
-            fragment.appendChild(document.createTextNode(text.substring(lastIndex, m.start)));
-          }
-          
-          // Add styled element
-          const span = document.createElement('span');
-          span.className = m.type === 'hashtag' ? 'hashtag-inline' : 'mention-inline';
-          span.textContent = m.text;
-          fragment.appendChild(span);
-          
-          lastIndex = m.end;
-        });
-        
-        // Add remaining text
-        if (lastIndex < text.length) {
-          fragment.appendChild(document.createTextNode(text.substring(lastIndex)));
-        }
-        
-        // Replace text node with fragment
-        if (fragment.childNodes.length > 0) {
-          parent.replaceChild(fragment, textNode);
-        }
-      });
-    };
-    
-    // Process after markdown renders
-    const timer = setTimeout(() => {
-      if (markdownContentRef.current) {
-        processHashtagsAndMentions(markdownContentRef.current);
-      }
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, [displayContent, shouldRenderAgentContainer]);
-  
-  // Process content to add HTML spans for hashtags and mentions that will work with markdown
-  const processedMarkdownContent = useMemo(() => {
-    if (!displayContent) return displayContent;
-    
-    // Process hashtags and mentions to HTML spans that will be preserved in markdown
-    let processed = displayContent.replace(
-      /(?:^|\s)(#([a-zA-Z0-9_-]+))/g,
-      (match, fullMatch, hashtag) => {
-        const prefix = match.startsWith(' ') ? ' ' : '';
-        // Use HTML entity for # to avoid markdown header parsing
-        return `${prefix}<span class="hashtag-inline">#${hashtag}</span>`;
-      }
-    );
-    
-    // Replace mentions with styled spans
-    processed = processed.replace(
-      /@([a-zA-Z0-9_-]+)/g,
-      (match, mention) => {
-        return `<span class="mention-inline">@${mention}</span>`;
-      }
-    );
-    
-    return processed;
-  }, [displayContent]);
-
   // Check if message contains image or video
   const hasImageOrVideo = ['image', 'video', 'graph'].includes(renderData.type);
+  const showAgentBadge = isAssistant && !!message.agentId;
 
   // Get complexity for orchestrator messages
   const complexity = message.metadata?.complexity;
-  const isOrchestrator = message.agentId === 'orchestrator' || message.agentType === 'orchestrator';
   const showComplexity = isOrchestrator && complexity !== undefined && complexity !== null;
 
   // Determine complexity badge color based on value
@@ -642,20 +562,31 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           dir="auto"
           className={cn(
             'rounded-2xl overflow-x-hidden relative min-w-[120px]',
+            disableOrchestratorClamping && 'overflow-y-visible',
             hasImageOrVideo ? 'p-0' : 'px-4 py-3',
-            // Add extra padding-top for assistant messages with agent badge
-            isAssistant && message.agentId && !hasImageOrVideo && 'pt-12',
             isUser
               ? 'bg-violet-600 dark:bg-violet-700 text-white rounded-tr-none'
               : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-tl-none'
           )}
         >
-          {/* Agent ID Badge - Top Start */}
-          {isAssistant && message.agentId && (
+          {/* Agent ID Badge - floating for media cards only */}
+          {showAgentBadge && hasImageOrVideo && (
             <div className={cn(
               'absolute top-2 left-2 z-10',
               hasImageOrVideo && 'top-2 left-2'
             )}>
+              <Badge
+                color="cyan"
+                size="sm"
+                className="cursor-default"
+              >
+                {message.metadata?.todoTitle ? `${message.metadata.todoTitle} • ${message.agentId}` : message.agentId}
+              </Badge>
+            </div>
+          )}
+          {/* Agent ID Badge - inline for text/code cards to avoid overlap */}
+          {showAgentBadge && !hasImageOrVideo && (
+            <div className="mb-2">
               <Badge
                 color="cyan"
                 size="sm"
@@ -828,9 +759,17 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 
                 if (renderData.type === 'graph') {
                   // Use graphData from renderData
-                  const graphData = renderData.graphData || parsedContent;
-                  
-                  if (graphData && Array.isArray(graphData.nodes) && Array.isArray(graphData.edges)) {
+                  const rawGraphData = renderData.graphData || parsedContent;
+                  const normalizedGraphData =
+                    rawGraphData &&
+                    typeof rawGraphData === 'object' &&
+                    'graph' in rawGraphData &&
+                    (rawGraphData as any).graph &&
+                    typeof (rawGraphData as any).graph === 'object'
+                      ? (rawGraphData as any).graph
+                      : rawGraphData;
+
+                  if (normalizedGraphData && Array.isArray(normalizedGraphData.nodes) && Array.isArray(normalizedGraphData.edges)) {
                     return (
                       <div className={cn(
                         "flex justify-center items-center w-full relative",
@@ -839,11 +778,11 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                         <div className="w-full h-[600px] min-h-[400px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                           <GraphViewer
                             data={{
-                              nodes: graphData.nodes || [],
-                              edges: graphData.edges || [],
-                              nodeTypes: graphData.nodeTypes,
-                              relationTypes: graphData.relationTypes,
-                              schemas: graphData.schemas,
+                              nodes: normalizedGraphData.nodes || [],
+                              edges: normalizedGraphData.edges || [],
+                              nodeTypes: normalizedGraphData.nodeTypes,
+                              relationTypes: normalizedGraphData.relationTypes,
+                              schemas: normalizedGraphData.schemas,
                             }}
                             height="100%"
                           />
@@ -975,19 +914,22 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                           "chat-message-content text-sm leading-relaxed relative transition-all duration-300 ease-in-out",
                           shouldTruncateString ? "overflow-hidden" : ""
                         )}
-                        style={shouldTruncateString 
-                          ? { maxHeight: '300px' } 
-                          : { maxHeight: stringContentHeight ? `${stringContentHeight + 10}px` : '10000px' }
+                        style={
+                          disableOrchestratorClamping
+                            ? { maxHeight: 'none', overflow: 'visible' }
+                            : shouldTruncateString
+                              ? { maxHeight: '300px' }
+                              : { maxHeight: stringContentHeight ? `${stringContentHeight + 10}px` : '10000px' }
                         }
                       >
                         <MarkdownViewer 
-                          content={stringData}
+                          content={convertHashtagsToMarkdownAnchors(stringData)}
                           showToggle={false}
                           isEditable={false}
                           showEndLine={false}
                         />
                       </div>
-                      {isStringLong && (stringContentHeight === null || stringContentHeight > 300) && (
+                      {!isOrchestratorStringMessage && isStringLong && (stringContentHeight === null || stringContentHeight > 300) && (
                         <div className="mt-2 flex justify-end">
                           <button
                             onClick={() => setIsStringExpanded(!isStringExpanded)}
@@ -1031,11 +973,16 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                 ref={markdownContentRef}
                 className={cn(
                   "chat-message-content text-sm leading-relaxed relative transition-all duration-300 ease-in-out",
-                  shouldTruncate ? "overflow-hidden" : ""
+                  isUser ? "overflow-visible" : (shouldTruncate ? "overflow-hidden" : "")
                 )}
-                style={shouldTruncate 
-                  ? { maxHeight: `${maxCollapsedHeight}px` } 
-                  : { maxHeight: contentHeight ? `${contentHeight + 10}px` : '10000px' }
+                style={
+                  isUser
+                    ? { maxHeight: 'none', overflow: 'visible' }
+                    : disableOrchestratorClamping
+                    ? { maxHeight: 'none', overflow: 'visible' }
+                    : shouldTruncate
+                      ? { maxHeight: `${maxCollapsedHeight}px` }
+                      : { maxHeight: contentHeight ? `${contentHeight + 10}px` : '10000px' }
                 }
               >
                 {isUser ? (
@@ -1043,9 +990,19 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   <div className="whitespace-pre-line break-words">
                     {displayContent}
                   </div>
-                ) : renderData.type === 'search' && renderData.searchResults && renderData.searchResults.length > 0 ? (
-                  // For search agent responses, render search results component
-                  <AISearchResults results={renderData.searchResults} />
+                ) : (renderData.type === 'search' || isSearchResponseFormat) ? (
+                  // For search responses, never route through markdown renderer.
+                  // This avoids DOM reconciliation issues for large/structured search payloads.
+                  renderData.searchResults && renderData.searchResults.length > 0 ? (
+                    <AISearchResults results={renderData.searchResults} />
+                  ) : (
+                    <CodeViewer
+                      code={typeof message.content === 'string' ? message.content : JSON.stringify(message.content, null, 2)}
+                      programmingLanguage="json"
+                      title={message.metadata?.todoTitle || aiGeneratedContentLabel}
+                      initialLineNumbers={10}
+                    />
+                  )
                 ) : (
                   // For assistant messages, use SafeMarkdownViewer for markdown support
                   // Use stable key and mounted check to prevent DOM reconciliation issues
@@ -1053,12 +1010,16 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                     <SafeMarkdownViewer 
                       key={markdownKey}
                       componentKey={markdownKey}
-                      content={displayContent}
+                      content={displayContentWithStyledHashtags}
                     />
                   )
                 )}
               </div>
-              {renderData.type === 'markdown' && isLongContent && (contentHeight === null || contentHeight > maxCollapsedHeight) && (
+              {!isUser &&
+                renderData.type === 'markdown' &&
+                !disableOrchestratorClamping &&
+                isLongContent &&
+                (contentHeight === null || contentHeight > maxCollapsedHeight) && (
                 <div className="mt-2 flex justify-end">
                   <button
                     onClick={() => setIsExpanded(!isExpanded)}
@@ -1080,9 +1041,42 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   </button>
                 </div>
               )}
+
             </div>
           )}
         </div>
+
+        {/* Delivery status (outside bubble) */}
+        {isPendingUserMessage && (
+          <div className="mt-1 inline-flex items-center gap-1.5 text-[11px] text-violet-600 dark:text-violet-300">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <span>Sending...</span>
+          </div>
+        )}
+
+        {isFailedUserMessage && (
+          <div className="mt-1 inline-flex items-center gap-2 text-[11px] text-red-600 dark:text-red-300">
+            <span className="max-w-[260px] truncate">{failedMessageError}</span>
+            {onRetryFailedMessage && (
+              <button
+                type="button"
+                disabled={isRetryingFailedMessage}
+                onClick={async () => {
+                  try {
+                    setIsRetryingFailedMessage(true);
+                    await onRetryFailedMessage(message.id);
+                  } finally {
+                    setIsRetryingFailedMessage(false);
+                  }
+                }}
+                className="inline-flex shrink-0 items-center gap-1 rounded-md border border-red-300 bg-white px-2 py-0.5 text-[11px] font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-red-700 dark:bg-red-950/40 dark:text-red-200 dark:hover:bg-red-900/60"
+              >
+                <RefreshCw className={cn('h-3 w-3', isRetryingFailedMessage && 'animate-spin')} />
+                Retry
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Metadata */}
         {(message.createdAt || showComplexity || rawContent || (isAssistant && (message.metadata?.tokenUsage || message.metadata?.duration !== undefined || message.metadata?.cost !== undefined || message.metadata?.executionType))) && (
@@ -1119,10 +1113,19 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             {rawContent && (
               <CopyContent 
                 content={rawContent}
-                className={cn(
-                  'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
-                  'transition-colors'
-                )}
+                className={metadataActionClass}
+              />
+            )}
+            {/* Maximize message into modal */}
+            {rawContent && (
+              <MaximizeButton
+                layout="inline"
+                isMaximized={false}
+                onClick={() => setIsMessageModalOpen(true)}
+                transparentBackground={true}
+                className={metadataActionClass}
+                labelMaximize="Open message in modal"
+                labelMinimize="Close message modal"
               />
             )}
             {/* Info icon for assistant messages with metadata */}
@@ -1133,15 +1136,12 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
                   setIsMetadataDialogOpen(true);
                 }}
                 className={cn(
-                  'p-1 rounded transition-colors',
-                  'hover:bg-gray-200 dark:hover:bg-gray-700',
-                  'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500'
+                  metadataActionClass
                 )}
                 title="View message metadata"
                 aria-label="View message metadata"
               >
-                <Info className="w-3 h-3" />
+                <Info className="w-4 h-4 mx-auto" />
               </button>
             )}
           </div>
@@ -1156,6 +1156,53 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           onOpenChange={setIsMetadataDialogOpen}
         />
       )}
+
+      {/* Message Preview Modal */}
+      <Modal
+        isOpen={isMessageModalOpen}
+        onClose={() => setIsMessageModalOpen(false)}
+        title={message.metadata?.todoTitle || message.agentId || (isUser ? 'User Message' : 'Assistant Message')}
+        description={message.createdAt ? formatTime(message.createdAt, language || undefined) : undefined}
+        size="xl"
+        closeOnOutsideClick={true}
+        enableMaximize={true}
+        enableCopy={Boolean(rawContent)}
+        copyContent={rawContent}
+        headerBadges={
+          message.agentId
+            ? [
+                {
+                  id: `agent-${message.id}`,
+                  label: message.agentId,
+                  color: 'cyan',
+                  icon: 'Bot',
+                },
+              ]
+            : []
+        }
+      >
+        {(renderData.type === 'search' || isSearchResponseFormat) ? (
+          renderData.searchResults && renderData.searchResults.length > 0 ? (
+            <AISearchResults results={renderData.searchResults} />
+          ) : (
+            <CodeViewer
+              code={typeof rawContent === 'string' ? rawContent : JSON.stringify(rawContent, null, 2)}
+              programmingLanguage="json"
+              title={message.metadata?.todoTitle || aiGeneratedContentLabel}
+              initialLineNumbers={10}
+            />
+          )
+        ) : (
+          <div className="chat-message-content">
+            <MarkdownViewer
+              content={convertHashtagsToMarkdownAnchors(rawContent)}
+              showToggle={false}
+              isEditable={false}
+              showEndLine={false}
+            />
+          </div>
+        )}
+      </Modal>
     </motion.div>
   );
 };

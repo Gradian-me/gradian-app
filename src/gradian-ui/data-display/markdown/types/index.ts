@@ -50,6 +50,11 @@ export interface MarkdownViewerProps {
    * Callback fired when print is triggered
    */
   onPrint?: () => Promise<void>;
+  /**
+   * When true, Mermaid code blocks are shown as raw code instead of rendered.
+   * Use during streaming to avoid parse errors from incomplete diagram syntax.
+   */
+  deferMermaid?: boolean;
 }
 
 export interface TableParseResult {

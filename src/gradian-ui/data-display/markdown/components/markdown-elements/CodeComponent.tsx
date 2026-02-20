@@ -16,6 +16,8 @@ export interface CodeComponentProps {
   className?: string;
   children: any;
   markdownLoadedTimestamp?: number;
+  /** When true, render Mermaid as raw code to avoid parse errors from incomplete content (e.g. during streaming) */
+  deferMermaid?: boolean;
   [key: string]: any;
 }
 
@@ -25,6 +27,7 @@ export function CodeComponent({
   className, 
   children, 
   markdownLoadedTimestamp,
+  deferMermaid = false,
   ...props 
 }: CodeComponentProps) {
   const [isMounted, setIsMounted] = useState(false);
@@ -129,10 +132,17 @@ export function CodeComponent({
     }
   }
   
-  // Render Mermaid diagrams (case-insensitive check)
+  // Render Mermaid diagrams (case-insensitive check). Defer to raw code when streaming to avoid parse errors from incomplete syntax.
   if (!inline && normalizedLanguage === 'mermaid') {
     const diagram = codeContent.replace(/\n$/, '').trim();
     if (diagram) {
+      if (deferMermaid) {
+        return (
+          <div className="my-4">
+            <CodeViewer code={diagram} programmingLanguage="mermaid" title="mermaid" />
+          </div>
+        );
+      }
       return (
         <div className="my-6">
           <MermaidSimple 

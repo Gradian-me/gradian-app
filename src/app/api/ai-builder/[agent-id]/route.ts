@@ -5,7 +5,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { processAiAgent, AgentRequestData } from '@/domains/ai-builder/utils/ai-agent-utils';
+import { processAiAgent, AgentRequestData, isStreamingAgent } from '@/domains/ai-builder/utils/ai-agent-utils';
+import { buildChatRequestPayload } from '@/domains/ai-builder/utils/ai-chat-utils';
+import { createStreamingChatStream } from '@/domains/ai-builder/utils/ai-api-caller';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
@@ -143,7 +145,54 @@ export async function POST(
     const url = new URL(request.url);
     const baseUrl = `${url.protocol}//${url.host}`;
 
-    // Process the request via the generic router
+    // Streaming path: chat + string agents stream by default unless stream: false
+    const isStreamingChat = isStreamingAgent(agent);
+    const shouldStream = isStreamingChat && body?.stream !== false;
+
+    if (shouldStream) {
+      const buildResult = await buildChatRequestPayload(agent, requestData, baseUrl);
+      if (!buildResult.success) {
+        if (buildResult.validationErrors && buildResult.validationErrors.length > 0) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: buildResult.error || 'Validation failed',
+              validationErrors: buildResult.validationErrors,
+            },
+            { status: 400 }
+          );
+        }
+        return NextResponse.json(
+          { success: false, error: buildResult.error || 'Validation failed' },
+          { status: 400 }
+        );
+      }
+
+      const streamResult = await createStreamingChatStream({
+        agent,
+        systemPrompt: buildResult.payload.systemPrompt,
+        userPrompt: buildResult.payload.userPrompt,
+        model: buildResult.payload.model,
+        responseFormat: buildResult.payload.responseFormat,
+        signal: request.signal,
+      });
+
+      if ('error' in streamResult) {
+        return NextResponse.json(
+          { success: false, error: streamResult.error || 'Stream failed' },
+          { status: 500 }
+        );
+      }
+
+      return new Response(streamResult.stream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'X-Response-Mode': 'stream',
+        },
+      });
+    }
+
+    // Non-streaming path: process via generic router
     const result = await processAiAgent(agent, requestData, baseUrl);
 
     // Return appropriate HTTP status based on result

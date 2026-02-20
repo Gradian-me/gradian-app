@@ -333,6 +333,23 @@ export interface ModalProps extends BaseComponentProps {
    * Optional callback when maximize state changes.
    */
   onMaximizeChange?: (value: boolean) => void;
+  /**
+   * Show a copy button in modal header.
+   */
+  enableCopy?: boolean;
+  /**
+   * Content to copy when enableCopy is true.
+   */
+  copyContent?: string | number;
+  /**
+   * Optional header badges shown under title/description.
+   */
+  headerBadges?: Array<{
+    id: string;
+    label: string;
+    color?: string;
+    icon?: string;
+  }>;
 }
 
 // Data Table Component Types

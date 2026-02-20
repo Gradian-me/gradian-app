@@ -21,6 +21,7 @@ import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/
 import { LanguageSelector } from '@/gradian-ui/form-builder/form-elements/components/LanguageSelector';
 import { formatArrayFieldToToon } from '../utils/prompt-builder';
 import type { AiAgent } from '../types';
+import { isStreamingAgent } from '../utils/ai-common-utils';
 import { useBusinessRuleEffects, getFieldEffects } from '@/domains/business-rule-engine';
 import type { BusinessRuleWithEffects, BusinessRuleEffectsMap } from '@/domains/business-rule-engine';
 import { extractParametersBySectionId } from '../utils/ai-shared-utils';
@@ -1549,6 +1550,19 @@ export function AiBuilderForm({
                     </Button>
                   )}
                 </div>
+                {/* Stream Badge (teal, live-style with ping) after Do the magic when agent has stream: true */}
+                {isStreamingAgent(selectedAgent) && (
+                  <Badge
+                    variant="outline"
+                    className="flex items-center gap-1.5 shrink-0 self-center border-teal-500/50 bg-teal-50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-400 dark:border-teal-500/30"
+                  >
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500" />
+                    </span>
+                    <span className="text-xs font-medium">STREAM</span>
+                  </Badge>
+                )}
               </div>
             )}
           </div>

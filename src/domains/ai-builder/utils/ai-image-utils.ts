@@ -4114,7 +4114,7 @@ export async function processImageRequest(
 
     // Get image type and prepend the corresponding prompt if available
     // Check multiple sources for imageType (in order of priority)
-    let imageType: string = 'infographic'; // Default fallback
+    let imageType: string = 'standard'; // Default fallback
 
     // Priority 1: bodyParams (from requestData.body)
     if (bodyParams?.imageType && bodyParams.imageType !== 'none') {
@@ -4205,6 +4205,8 @@ export async function processImageRequest(
         loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-image-utils] Original prompt contains non-English characters. These will be translated to English in the generated image.`);
       }
     }
+
+    const baseUserPrompt = cleanPrompt;
 
     // Concatenate image type prompt before user prompt if prompt exists
     // IMPORTANT: This must happen BEFORE sanitization to preserve the full prompt
@@ -4304,14 +4306,31 @@ If you detect ANY non-English text in the user prompt, you MUST translate it to 
       extraBody: extraParams,
     });
 
-    if (!apiResult.success) {
+    // Some providers may return success HTTP with an empty data array for over-constrained prompts.
+    // Retry once with a compact fallback prompt before surfacing an error.
+    let finalApiResult = apiResult;
+    if (!apiResult.success && (apiResult.error || '').toLowerCase().includes('empty data array')) {
+      const compactPrompt = `Generate a high-quality image from this request. Keep any visible text in English only.\n\nUser Prompt: ${baseUserPrompt}`;
+      if (isDevelopment) {
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-image-utils] Empty image data received. Retrying with compact prompt (len=${compactPrompt.length}).`);
+      }
+      finalApiResult = await callImageApi({
+        agent,
+        prompt: sanitizePrompt(compactPrompt) || compactPrompt,
+        model,
+        bodyParams: bodyParamsWithoutImageTypeAndPrompt,
+        extraBody: extraParams,
+      });
+    }
+
+    if (!finalApiResult.success) {
       return {
         success: false,
-        error: apiResult.error || 'Image generation failed',
+        error: finalApiResult.error || 'Image generation failed',
       };
     }
 
-    const imageData = apiResult.data;
+    const imageData = finalApiResult.data;
 
     // Return image URL or base64 content
     // Handle both OpenAI format (b64_json) and Gemini format (data field)

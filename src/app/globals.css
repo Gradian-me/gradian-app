@@ -75,6 +75,34 @@
   color: #2563eb; /* blue-600 */
 }
 
+.dark .hashtag-inline {
+  color: #60a5fa; /* blue-400 */
+}
+
+.dark .hashtag-inline:hover {
+  color: #93c5fd; /* blue-300 */
+}
+
+/* Hashtags rendered as markdown anchors inside chat bubbles */
+.chat-message-content a[href^="#hashtag-"] {
+  color: #3b82f6;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.chat-message-content a[href^="#hashtag-"]:hover {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.dark .chat-message-content a[href^="#hashtag-"] {
+  color: #60a5fa;
+}
+
+.dark .chat-message-content a[href^="#hashtag-"]:hover {
+  color: #93c5fd;
+}
+
 .mention-inline {
   display: inline-flex;
   align-items: center;
@@ -251,8 +279,8 @@ button {
   cursor: pointer;
 }
 
-/* Hide all elements with IDs starting with dmermaid-simple- */
-[id^="dmermaid-simple-"] {
+/* Hide all elements with IDs starting with dmermaid- */
+[id^="dmermaid-"] {
   display: none !important;
 }
 

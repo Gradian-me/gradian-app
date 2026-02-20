@@ -11,6 +11,9 @@ import React from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
 import { cn } from '../../shared/utils';
 import { ModalProps } from '../types';
+import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
+import { Badge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
+import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 
 export const Modal: React.FC<ModalProps> = ({
   isOpen,
@@ -30,6 +33,9 @@ export const Modal: React.FC<ModalProps> = ({
   enableMaximize,
   defaultMaximized,
   onMaximizeChange,
+  enableCopy = false,
+  copyContent,
+  headerBadges = [],
   ...props
 }) => {
   const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
@@ -78,7 +84,7 @@ export const Modal: React.FC<ModalProps> = ({
           <DialogTitle className="sr-only absolute w-0 h-0 overflow-hidden pointer-events-none">
             {titleContent}
           </DialogTitle>
-        ) : (title || description || headerActions || enableMaximize) && (
+        ) : (title || description || headerActions || enableMaximize || (enableCopy && copyContent !== undefined && copyContent !== null) || headerBadges.length > 0) && (
           <DialogHeader className="px-6 pt-2 pb-2 shrink-0">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 gap-2 flex flex-col">
@@ -91,8 +97,21 @@ export const Modal: React.FC<ModalProps> = ({
                   <DialogDescription>{description}</DialogDescription>
                 )}
               </div>
-              {(headerActions || enableMaximize) && (
-                <div className="flex items-center gap-2 shrink-0">
+              {(headerActions || enableMaximize || (enableCopy && copyContent !== undefined && copyContent !== null) || headerBadges.length > 0) && (
+                <div className="flex items-center justify-end gap-2 shrink-0 flex-wrap">
+                  {headerBadges.length > 0 && (
+                    <>
+                      {headerBadges.map((badge) => (
+                        <Badge key={badge.id} size="sm" color={badge.color || 'cyan'}>
+                          {badge.icon && <IconRenderer iconName={badge.icon} className="h-3 w-3 me-1" />}
+                          {badge.label}
+                        </Badge>
+                      ))}
+                    </>
+                  )}
+                  {enableCopy && copyContent !== undefined && copyContent !== null && (
+                    <CopyContent content={copyContent} className="h-8 w-8" />
+                  )}
                   {headerActions}
                   {enableMaximize && (
                     // By default show on large screens; callers can further control with wrapper classes.

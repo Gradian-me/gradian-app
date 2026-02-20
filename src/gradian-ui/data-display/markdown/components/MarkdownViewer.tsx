@@ -82,7 +82,8 @@ export function MarkdownViewer({
   showEndLine = true,
   enablePrint = false,
   printConfig,
-  onPrint
+  onPrint,
+  deferMermaid = false,
 }: MarkdownViewerProps) {
   const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'raw'>('preview');
   const [headings, setHeadings] = useState<Array<{ id: string; text: string; level: number }>>([]);
@@ -267,8 +268,8 @@ export function MarkdownViewer({
   // Create components with sticky headings configuration (memoized)
   const markdownComponents = useMemo(() => {
     const levels = stickyHeadingsKey ? JSON.parse(stickyHeadingsKey) : [];
-    return createMarkdownComponents(levels, markdownLoadedTimestamp);
-  }, [stickyHeadingsKey, markdownLoadedTimestamp]);
+    return createMarkdownComponents(levels, markdownLoadedTimestamp, deferMermaid);
+  }, [stickyHeadingsKey, markdownLoadedTimestamp, deferMermaid]);
 
   // SECURITY: enforce safe link behavior (no javascript:/data: XSS, no reverse tabnabbing)
   const secureMarkdownComponents = useMemo(() => {

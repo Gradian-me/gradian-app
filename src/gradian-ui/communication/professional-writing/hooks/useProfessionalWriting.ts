@@ -109,13 +109,51 @@ ${request.text.trim()}`;
         },
         body: JSON.stringify({
           userPrompt,
+          stream: true,
         }),
         signal: abortController.signal,
       });
 
-      const data = await response.json();
+      if (!response.ok) {
+        const contentType = response.headers.get('content-type') || '';
+        const isJsonResponse = contentType.includes('application/json');
+        const errorPayload = isJsonResponse ? await response.json() : null;
+        const textFallback = isJsonResponse ? '' : await response.text();
+        throw new Error(
+          errorPayload?.error ||
+            textFallback ||
+            'Failed to enhance text'
+        );
+      }
 
-      if (!response.ok || !data.success) {
+      const responseMode = response.headers.get('x-response-mode');
+      if (responseMode === 'stream' && response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let combinedText = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          if (!value) continue;
+
+          const chunk = decoder.decode(value, { stream: true });
+          combinedText += chunk;
+          setEnhancedText(combinedText);
+        }
+
+        // Flush any remaining buffered bytes.
+        combinedText += decoder.decode();
+        setEnhancedText(combinedText);
+        setTokenUsage(null);
+        return;
+      }
+
+      const contentType = response.headers.get('content-type') || '';
+      const isJsonResponse = contentType.includes('application/json');
+      const data = isJsonResponse ? await response.json() : { success: false, error: await response.text() };
+
+      if (!data.success) {
         throw new Error(data.error || 'Failed to enhance text');
       }
 

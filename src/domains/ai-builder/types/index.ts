@@ -13,6 +13,7 @@ export interface AiAgent {
   agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'graph-generation' | 'orchestrator' | 'search'; // Type of AI agent
   requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph' | 'search-results' | 'search-card';
   model?: string;
+  stream?: boolean; // When true, chat agent responses are streamed to the client
   systemPrompt?: string;
   loadingTextSwitches?: string | string[];
   showInAgentMenu?: boolean; // Whether to show this agent in the agent selector menu (default: true)

@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { userPrompt, chatId, agentId, ...rest } = body;
+    const streamRequested = body?.stream === true;
 
     if (!userPrompt) {
       return NextResponse.json(
@@ -91,6 +92,28 @@ export async function POST(request: NextRequest) {
         },
         { status: result.error?.includes('timeout') ? 504 : 500 }
       );
+    }
+
+    // Stream direct/guidance text responses when requested.
+    // Complex orchestration responses (todo/chain) remain JSON.
+    const executionType = result.data?.executionType;
+    const streamableExecutionType = executionType === 'direct' || executionType === 'guidance';
+    const streamableText = typeof result.data?.response === 'string' ? result.data.response : '';
+    if (streamRequested && streamableExecutionType && streamableText) {
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(encoder.encode(streamableText));
+          controller.close();
+        },
+      });
+
+      return new Response(stream, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'X-Response-Mode': 'stream',
+        },
+      });
     }
 
     return NextResponse.json({

@@ -1,1 +1,174 @@
-[]
+[
+  {
+    "id": "01KHXBPAHQBP8V808AXPD4FA4H",
+    "title": "Hello! How can I assist you today? If you have questions about our",
+    "createdAt": "2026-02-20T11:06:52.348Z",
+    "updatedAt": "2026-02-20T11:48:22.566Z",
+    "userId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "messages": [
+      {
+        "id": "01KHXBPGA860NEFQCK2MRK7W0J",
+        "role": "user",
+        "content": "hi",
+        "createdAt": "2026-02-20T11:06:58.252Z"
+      },
+      {
+        "id": "01KHXBPPFHGFFQ2Y7QK2EGF15A",
+        "role": "assistant",
+        "content": "Hello! How can I help you today?\n\nI am your AI orchestrator assistant. I can answer general questions, provide guidance on how to use this system, or connect you with specialized agents for specific tasks.\n\nWhether you need to **generate content** (using the `professional-writing` or `image-generator` agents), **analyze complex data** (via the `data-analysis-expert` or `general-assistant`), **build applications** (with the `app-builder`), or **document business processes** (using the `process-analyst`), I am here to guide you to the right tool.\n\nWhat is on your mind?\n\n#help #guidance #capabilities #agents",
+        "agentId": "orchestrator",
+        "agentType": "orchestrator",
+        "hashtags": [
+          "help",
+          "guidance",
+          "capabilities",
+          "agents"
+        ],
+        "metadata": {
+          "responseFormat": "string"
+        },
+        "createdAt": "2026-02-20T11:07:04.607Z"
+      },
+      {
+        "id": "01KHXBQA651SQZ0N76S6XXZ17N",
+        "role": "user",
+        "content": "what are the biggest challenges in iran",
+        "createdAt": "2026-02-20T11:07:24.744Z"
+      },
+      {
+        "id": "01KHXBQGEQ8Z6DZWQ3WSTF0VFE",
+        "role": "assistant",
+        "content": "[\n  {\n    \"title\": \"Big promises, bigger problems: governance after the Islamic Republic | Iran International\",\n    \"url\": \"https://www.iranintl.com/en/202602194843\",\n    \"snippet\": \"Section Title: Big promises, bigger problems: governance after the Islamic Republic\\nContent:\\nIran’s recent nationwide protests, which were met with a deadly crackdown unmatched in the country’s modern history, stem directly from five decades of Islamic Republic rule.\\nMore than half the population lives near or below the $3-a-day abject poverty line. The national currency is in free fall, with hyperinflation and famine in sight. The state seeks to control every aspect of citizens’ lives. Add to this systemic corruption, international isolation, apocalyptic environmental devastation, and a catastrophic brain drain that has driven more than 5% of Iranians to live outside the country.\\nSection Title: Big promises, bigger problems: governance after the Islamic Republic\\nContent:\\nDuring a period when most developing countries achieved major gains in living standards, Iran’s GDP per capita under the Islamic Republic has remained below its pre-revolution level for nearly half a century. Once competitive among middle-income nations, Iran’s per capita income has fallen behind war-torn Iraq and now more closely resembles that of low-income neighbors such as Pakistan.\\nThe rulers in Tehran have p...\",\n    \"date\": null,\n    \"last_updated\": null,\n    \"source_host\": \"iranintl.com\",\n    \"source_title\": \"Big promises, bigger problems: governance after the Islamic Republic | Iran International\",\n    \"source_link\": \"https://www.iranintl.com/en/202602194843\"\n  },\n  {\n    \"title\": \"The Islamic Republic of Iran: A Dangerous Regime - United States Department of State\",\n    \"url\": \"https://2017-2021.state.gov/the-islamic-republic-of-iran-a-dangerous-regime/\",\n    \"snippet\": \"Section Title: **2017-2021 ARCHIVED CONTENT**\\nContent:\\n**You are viewing ARCHIVED CONTENT released online from January 20, 2017 to January 20, 2021.**\\n**Content in this archive site is NOT UPDATED, and links may not function.**\\n**For current information, go to www.state.gov .**\\nClose\\n ... \\nSection Title: **2017-2021 ARCHIVED CONTENT** > The Islamic Republic of Iran > A Dangerous Regime\\nContent:\\nThe Islamic Republic of Iran, also known as Iran and previously known as Persia, is a paradox in the Middle East. It is home to a proud and ancient culture whose ideals of freedom and democracy under Cyrus the Great helped form some of the foundations of the U.S. Constitution, while Iran itself has struggled to reach democracy. The Iranian people have been fighting to reach toward freedom throughout the 20th and 21st centuries. The Iranian people are largely pro-Western but are brutally subjugated by an anti-Western religious theocracy. Iran is an anomaly in the Middle East as the Iranian people do not speak Arabic, but rather Persian or “Farsi.” While there is diversity in Iran, the majority of the Iranian people are culturally, ethnically, and religiously unique from their surrounding neig...\",\n    \"date\": null,\n    \"last_updated\": null,\n    \"source_host\": \"2017-2021.state.gov\",\n    \"source_title\": \"The Islamic Republic of Iran: A Dangerous Regime - United States Department of State\",\n    \"source_link\": \"https://2017-2021.state.gov/the-islamic-republic-of-iran-a-dangerous-regime/\"\n  },\n  {\n    \"title\": \"Iran’s Internal Challenges and Confrontations Abroad | Al Jazeera Centre for Studies\",\n    \"url\": \"http://studies.aljazeera.net/en/analyses/iran%E2%80%99s-internal-challenges-and-confrontations-abroad\",\n    \"snippet\": \"Section Title: Iran’s Internal Challenges and Confrontations Abroad\\nContent:\\nStrikes began in Tehran’s bazaar over currency fluctuations and spread to other cities amid inflation and falling purchasing power. After ten days of peaceful protests for better living conditions, violence rarely witnessed in the country erupted, with slogans targeting the regime, national security and stability.\\nHassan Ahmadian\\nSection Title: Iran’s Internal Challenges and Confrontations Abroad > Hassan Ahmadian\\nContent:\\nResearcher and Professor at the University of Tehran.\\n5 February 2026\\nPrint\\nSHARE\\n[](https://www.linkedin.com/shareArticle?mini=true&url=http://studies.aljazeera.net/en/analyses/iran%E2%80%99s-internal-challenges-and-confrontations-abroad)\\n[](https://www.facebook.com/sharer/sharer.php?app_id=1488972164731309&u=http://studies.aljazeera.net/en/analyses/iran%E2%80%99s-internal-challenges-and-confrontations-abroad)\\n[](https://twitter.com/share?text=\\nIran’s Internal Challenges and Confrontations Abroad\\n&url=http://studies.aljazeera.net/en/analyses/iran%E2%80%99s-internal-challenges-and-confrontations-abroad&via=AJStudies)\\nProtests have been a recurring feature in contemporary Iran. [Associate...\",\n    \"date\": null,\n    \"last_updated\": null,\n    \"source_host\": \"studies.aljazeera.net\",\n    \"source_title\": \"Iran’s Internal Challenges and Confrontations Abroad | Al Jazeera Centre for Studies\",\n    \"source_link\": \"http://studies.aljazeera.net/en/analyses/iran%E2%80%99s-internal-challenges-and-confrontations-abroad\"\n  },\n  {\n    \"title\": \"Iran: What challenges face the country in 2026? - House of Commons Library\",\n    \"url\": \"https://commonslibrary.parliament.uk/research-briefings/cbp-10456/\",\n    \"snippet\": \"UK Parliament\\nHouse of Commons Library\\nResearch Briefing\\nIran: What challenges face the country in 2026?\\n ... \\nSection Title: Iran: What challenges face the country in 2026?\\nContent:\\nIran’s regional position also worsened. Established leaders of many Iran-backed armed and proscribed terrorist groups have been eliminated, and their strength weakened in the regional conflict that has been ongoing since 2023 . Some Iran-backed groups are facing renewed local and international calls to disarm.\\nThis briefing surveys the situation in Iran, including the challenges facing its government; the status of Iran’s nuclear programme and the potential for further strikes in 2026; and pressures on Iran-backed groups in the region.\\nSection Title: Iran: What challenges face the country in 2026? > 1.1 Fresh protests in 2026\\nContent:\\nBeginning on 28 December 2025, protests initially spurred by Iran’s deteriorating economy and rising inflation have been held in all 31 of Iran’s provinces. They have included areas considered typically loyal to the state.\\nIran’s Supreme Leader, Ali Khamenei, said that the government would speak with protesters but that “ rioters should be put in their place ”.\\nSection Ti...\",\n    \"date\": null,\n    \"last_updated\": null,\n    \"source_host\": \"commonslibrary.parliament.uk\",\n    \"source_title\": \"Iran: What challenges face the country in 2026? - House of Commons Library\",\n    \"source_link\": \"https://commonslibrary.parliament.uk/research-briefings/cbp-10456/\"\n  },\n  {\n    \"title\": \"The Iran Threat - FBI\",\n    \"url\": \"https://www.fbi.gov/investigate/counterintelligence/the-iran-threat\",\n    \"snippet\": \"An official website of the United States government. Here's how you know\\n\\n##### Official websites use **.gov**\\n\\nA **.gov** website belongs to an official government organization in the United States.\\n\\n##### Secure **.gov** websites use HTTPS\\n\\nA lock () or _https://_ means you've safely connected to the **.gov** website. Share sensitive information only on official, secure websites.\\n\\n# The Iran Threat\\n\\n## The Iran Threat\\n\\nThe Iranian regime presents a threat from many angles: Cyber. Foreign intelligence. Terrorism.\\n\\nThreats from the Iranian regime and its terrorist partners can reach across the globe. The FBI is committed to identifying and disrupting all Iranian intelligence and military operations that threaten American citizens or our nation's security and critical infrastructure.\\n\\nWorking with our intelligence and law enforcement partners worldwide, the FBI has countered a diverse set of threats directed by the Iranian regime, including attempted terrorist attacks and kidnappings, espionage and foreign influence operations, cyber attacks, sanctions evasion, and illicit procurement of sensitive technology to support Iran’s military capability and nuclear program.\\n\\nThe Iranian reg...\",\n    \"date\": null,\n    \"last_updated\": null,\n    \"source_host\": \"fbi.gov\",\n    \"source_title\": \"The Iran Threat - FBI\",\n    \"source_link\": \"https://www.fbi.gov/investigate/counterintelligence/the-iran-threat\"\n  }\n]",
+        "agentId": "orchestrator",
+        "agentType": "orchestrator",
+        "metadata": {
+          "responseFormat": "string"
+        },
+        "createdAt": "2026-02-20T11:07:31.163Z"
+      },
+      {
+        "id": "01KHXBRAZSWSQXBJCESHPC4ZWJ",
+        "role": "user",
+        "content": "summarize them",
+        "createdAt": "2026-02-20T11:07:58.331Z"
+      },
+      {
+        "id": "01KHXBRHR7C2QDYVB74KB326X8",
+        "role": "assistant",
+        "content": "The provided documentation establishes a comprehensive framework for professional text processing, focusing on enhancement, adaptation, and specialized modes such as translation and solution advisory. At its core, the system prioritizes linguistic precision and structural integrity, offering capabilities to transform content between professional and casual tones while ensuring rigorous grammar and style correction. A significant portion of the instructions is dedicated to a sophisticated translation mode, which mandates a complete linguistic shift into target languages like Persian, Arabic, or Spanish without any English artifacts, and a summarizer mode that requires a deep, narrative synthesis of information into flowing paragraphs rather than a simple condensation of points.\n\nBeyond basic editing, the framework includes a structured Solution Advisor protocol that guides the generation of professional proposals through expanded context, research-based best practices, and actionable recommendations. The instructions also enforce strict formatting standards, including the use of high-quality markdown elements, specific rules for citing external references in a tabular format, and the integration of organizational context from companies like CinnaGen and AryoGen when relevant. Furthermore, the system incorporates detailed requirements for generating various Mermaid diagrams—such as flowcharts and state diagrams—while maintaining technical constraints to ensure error-free rendering. Collectively, these guidelines serve as a rigorous blueprint for producing high-quality, context-aware, and professionally formatted content across diverse communication needs.",
+        "agentId": "orchestrator",
+        "agentType": "orchestrator",
+        "metadata": {
+          "responseFormat": "string"
+        },
+        "createdAt": "2026-02-20T11:08:05.264Z"
+      },
+      {
+        "id": "01KHXBTEVT7PT5CVFSMNFXMHMW",
+        "role": "user",
+        "content": "create cinematic image of iran from top view",
+        "createdAt": "2026-02-20T11:09:07.837Z"
+      },
+      {
+        "id": "01KHXBX2YXHNB6499PM5GJQBGJ",
+        "role": "user",
+        "content": "create cinematic image of iran from top view",
+        "createdAt": "2026-02-20T11:10:33.951Z"
+      },
+      {
+        "id": "01KHXBXG23GPMY05R44S43KJGX",
+        "role": "assistant",
+        "content": "{\n  \"image\": {\n    \"url\": \"/api/images/Gradian_Image_01KHXBXFW951WJ51Z1MP3W2AS1.png\",\n    \"b64_json\": null,\n    \"revised_prompt\": null,\n    \"mimeType\": null\n  },\n  \"format\": \"url\",\n  \"model\": \"gemini-2.5-flash-image\"\n}",
+        "agentId": "image-generator",
+        "metadata": {
+          "responseFormat": "image",
+          "tokenUsage": null,
+          "timing": null
+        },
+        "createdAt": "2026-02-20T11:10:47.370Z"
+      },
+      {
+        "id": "01KHXC2X445993X08ZSN9GAY13",
+        "role": "user",
+        "content": "create cinematic image of iran from top view, lion and sun iran flag,",
+        "createdAt": "2026-02-20T11:13:44.586Z"
+      },
+      {
+        "id": "01KHXC35D3E3JYY2CGH3K8DPJA",
+        "role": "assistant",
+        "content": "{\n  \"image\": {\n    \"url\": \"/api/images/Gradian_Image_01KHXC35B6FD0GMQVFD5YXS2PV.png\",\n    \"b64_json\": null,\n    \"revised_prompt\": null,\n    \"mimeType\": null\n  },\n  \"format\": \"url\",\n  \"model\": \"gemini-2.5-flash-image\"\n}",
+        "agentId": "image-generator",
+        "metadata": {
+          "responseFormat": "image",
+          "tokenUsage": null,
+          "timing": null
+        },
+        "createdAt": "2026-02-20T11:13:53.062Z"
+      },
+      {
+        "id": "01KHXDS1R9R37A46R4E7RH0TEN",
+        "role": "user",
+        "content": "{\n  \"action\": \"dalle.text2im\",\n  \"action_input\": \"{ \\\"prompt\\\": \\\"A breathtaking cinematic wide-angle top-down aerial view of the Iranian plateau. In the center, the majestic landscape of mountains and deserts subtly transitions into the form of the historical Persian Lion and Sun flag. The golden lion is sculpted from the Alborz mountain ranges, holding a shimmering sword made of frozen rivers, with a glowing golden sun rising behind its back. The colors of the landscape—vibrant green forests in the north, white snow-capped peaks, and red earth in the south—perfectly mirror the tricolor of the flag. Cinematic lighting, 8k resolution, ethereal atmosphere, epic scale, hyper-realistic textures.\\\", \\\"size\\\": \\\"1024x1024\\\" }\",\n  \"thought\": \"I will generate a high-quality, cinematic aerial image that artistically integrates the geography of Iran with the historical Lion and Sun motif and the traditional colors of the flag.\"\n}",
+        "createdAt": "2026-02-20T11:43:18.813Z"
+      },
+      {
+        "id": "01KHXDSJ0H12TKCN8VDB7BE9Q7",
+        "role": "assistant",
+        "content": "{\n  \"image\": {\n    \"url\": \"/api/images/Gradian_Image_01KHXDSHV18Y76KSQ5CFV43HGB.png\",\n    \"b64_json\": null,\n    \"revised_prompt\": null,\n    \"mimeType\": null\n  },\n  \"format\": \"url\",\n  \"model\": \"gemini-2.5-flash-image\"\n}",
+        "agentId": "orchestrator",
+        "agentType": "orchestrator",
+        "metadata": {
+          "responseFormat": "string"
+        },
+        "createdAt": "2026-02-20T11:43:35.454Z"
+      },
+      {
+        "id": "01KHXE1JEE6742MS8JGKHR0W75",
+        "role": "user",
+        "content": "rhanks",
+        "createdAt": "2026-02-20T11:47:58.042Z"
+      },
+      {
+        "id": "01KHXE1PSTSE9XTX9BBV8BF392",
+        "role": "assistant",
+        "content": "You are very welcome! I am here to help you navigate the system and make the most of our specialized agents. Whether you need to build an application schema with the **App Builder**, generate professional content with the **Professional Writing** agent, or analyze complex data with the **Data Analysis Expert**, I can guide you to the right tool.\n\nFeel free to ask if you have any questions about how to use a specific agent or if you need assistance with a new task!\n\n#help #guidance #agents",
+        "agentId": "orchestrator",
+        "agentType": "orchestrator",
+        "hashtags": [
+          "help",
+          "guidance",
+          "agents"
+        ],
+        "metadata": {
+          "responseFormat": "string"
+        },
+        "createdAt": "2026-02-20T11:48:02.508Z"
+      },
+      {
+        "id": "01KHXE28DRTPBKV23FKDVWTC6V",
+        "role": "user",
+        "content": "thanks",
+        "createdAt": "2026-02-20T11:48:20.545Z"
+      },
+      {
+        "id": "01KHXE2ACYEMNHXRH902Y6S8T9",
+        "role": "assistant",
+        "content": "I couldn't reach the AI provider right now due to a network timeout.\n\nPlease try again in a few seconds. If this keeps happening, check internet/proxy connectivity and API endpoint availability.\n\n#network #retry #orchestrator",
+        "agentId": "orchestrator",
+        "agentType": "orchestrator",
+        "hashtags": [
+          "network",
+          "retry",
+          "orchestrator"
+        ],
+        "metadata": {
+          "responseFormat": "string"
+        },
+        "createdAt": "2026-02-20T11:48:22.566Z"
+      }
+    ],
+    "selectedAgentId": null,
+    "lastMessage": "I couldn't reach the AI provider right now due to a network timeout.\n\nPlease try again in a few seco",
+    "lastMessageAt": "2026-02-20T11:48:22.566Z"
+  }
+]

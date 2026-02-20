@@ -43,7 +43,7 @@ export interface UseChatResult {
   error: string | null;
   selectChat: (chatId: string) => void;
   createNewChat: () => Promise<Chat | null>;
-  sendMessage: (content: string, agentId?: string, agentType?: string) => Promise<void>;
+  sendMessage: (content: string, agentId?: string, agentType?: string, existingMessageId?: string) => Promise<void>;
   stop: () => void; // Stop ongoing requests
   updateTodos: (todos: Todo[]) => void;
   refreshChats: () => Promise<void>;
@@ -51,6 +51,7 @@ export interface UseChatResult {
   updateMessageTodos: (messageId: string, todos: Todo[]) => void; // Update todos in a specific message
   loadMoreMessages: () => Promise<void>; // Load older messages (pagination)
   deleteChat: (chatId: string) => Promise<boolean>; // Delete a chat
+  retryFailedMessage: (messageId: string) => Promise<void>; // Retry sending a failed user message
 }
 
 export function useChat(): UseChatResult {
@@ -302,7 +303,8 @@ export function useChat(): UseChatResult {
   const sendMessage = useCallback(async (
     content: string,
     agentId?: string,
-    agentType?: string
+    agentType?: string,
+    existingMessageId?: string
   ) => {
     if (!currentChat) {
       console.error('useChat: No current chat selected');
@@ -333,7 +335,7 @@ export function useChat(): UseChatResult {
       // Add user message first - optimistically add to UI immediately
       // Create optimistic user message for immediate UI update
       // Use a predictable ID format that can be updated in place
-      const optimisticId = `user-${Date.now()}`;
+      const optimisticId = existingMessageId || `user-${Date.now()}`;
       const optimisticUserMessage: ChatMessage = {
         id: optimisticId,
         role: 'user',
@@ -341,25 +343,66 @@ export function useChat(): UseChatResult {
         createdAt: new Date().toISOString(),
         hashtags: hashtags,
         mentions: mentions,
+        metadata: {
+          deliveryStatus: 'pending',
+        },
       };
 
-      // Add optimistic message to UI immediately - use startTransition to batch updates
-      startTransition(() => {
-        setMessages((prev) => [...prev, optimisticUserMessage]);
-        // Update chat list item without full refresh
-        setChats((prev) => {
-          const filtered = prev.filter((chat) => chat.id !== currentChat.id);
-          const updatedChat = prev.find((chat) => chat.id === currentChat.id);
-          return [
-            {
-              ...(updatedChat || currentChat),
-              lastMessage: content.trim().substring(0, 100),
-              lastMessageAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            },
-            ...filtered,
-          ];
+      const markOptimisticMessageFailed = (errorMessage: string) => {
+        startTransition(() => {
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === optimisticUserMessage.id
+                ? {
+                    ...msg,
+                    metadata: {
+                      ...(msg.metadata || {}),
+                      deliveryStatus: 'failed',
+                      errorMessage,
+                    },
+                  }
+                : msg
+            )
+          );
         });
+      };
+
+      // Add optimistic message to UI immediately.
+      // If this is a retry, update the existing failed bubble in place.
+      // Avoid startTransition here so the bubble paints without delay.
+      setMessages((prev) => {
+        if (existingMessageId) {
+          return prev.map((msg) =>
+            msg.id === existingMessageId
+              ? {
+                  ...msg,
+                  content: content.trim(),
+                  hashtags,
+                  mentions,
+                  createdAt: new Date().toISOString(),
+                  metadata: {
+                    ...(msg.metadata || {}),
+                    deliveryStatus: 'pending',
+                    errorMessage: undefined,
+                  },
+                }
+              : msg
+          );
+        }
+        return [...prev, optimisticUserMessage];
+      });
+      setChats((prev) => {
+        const filtered = prev.filter((chat) => chat.id !== currentChat.id);
+        const updatedChat = prev.find((chat) => chat.id === currentChat.id);
+        return [
+          {
+            ...(updatedChat || currentChat),
+            lastMessage: content.trim().substring(0, 100),
+            lastMessageAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          ...filtered,
+        ];
       });
 
       // Now send to API
@@ -393,7 +436,9 @@ export function useChat(): UseChatResult {
           });
           return;
         }
-        setError(fetchError instanceof Error ? fetchError.message : 'Network error - failed to send message');
+        const sendError = fetchError instanceof Error ? fetchError.message : 'Network error - failed to send message';
+        setError(sendError);
+        markOptimisticMessageFailed(sendError);
         return;
       }
 
@@ -434,7 +479,8 @@ export function useChat(): UseChatResult {
         }
         
         setError(errorMessage);
-        // Keep optimistic message but mark it as failed
+        // Keep optimistic message and mark it as failed for retry.
+        markOptimisticMessageFailed(errorMessage);
         return;
       }
 
@@ -443,7 +489,9 @@ export function useChat(): UseChatResult {
       if (!contentType || !contentType.includes('application/json')) {
         const errorText = await userMessageResponse.text();
         console.error('Non-JSON response from API:', errorText.substring(0, 200));
-        setError('Server returned invalid response format');
+        const invalidFormatError = 'Server returned invalid response format';
+        setError(invalidFormatError);
+        markOptimisticMessageFailed(invalidFormatError);
         return;
       }
 
@@ -452,18 +500,42 @@ export function useChat(): UseChatResult {
         userMessageResult = await userMessageResponse.json();
       } catch (parseError) {
         console.error('Failed to parse JSON response:', parseError);
-        setError('Failed to parse server response');
+        const parseResponseError = 'Failed to parse server response';
+        setError(parseResponseError);
+        markOptimisticMessageFailed(parseResponseError);
         return;
       }
 
       if (!userMessageResult.success) {
-        setError(userMessageResult.error || 'Failed to send message');
+        const sendError = userMessageResult.error || 'Failed to send message';
+        setError(sendError);
+        markOptimisticMessageFailed(sendError);
         return;
       }
+
+      const returnedChatTitle = typeof userMessageResult?.meta?.chatTitle === 'string'
+        ? userMessageResult.meta.chatTitle.trim()
+        : '';
 
       // Update optimistic message with server data, keeping the same ID to avoid DOM reconciliation issues
       if (userMessageResult.success && userMessageResult.data) {
         startTransition(() => {
+          if (returnedChatTitle && currentChat?.id) {
+            setCurrentChat((prev) => prev ? {
+              ...prev,
+              title: returnedChatTitle,
+            } : prev);
+
+            setChats((prev) => prev.map((chat) => (
+              chat.id === currentChat.id
+                ? {
+                    ...chat,
+                    title: returnedChatTitle,
+                  }
+                : chat
+            )));
+          }
+
           setMessages((prev) => {
             // Find the optimistic message and merge server data into it
             const optimisticIndex = prev.findIndex((msg) => msg.id === optimisticUserMessage.id);
@@ -474,11 +546,24 @@ export function useChat(): UseChatResult {
               updated[optimisticIndex] = {
                 ...userMessageResult.data,
                 id: optimisticUserMessage.id, // Keep the same ID to maintain DOM stability
+                metadata: {
+                  ...(userMessageResult.data?.metadata || {}),
+                  deliveryStatus: 'sent',
+                },
               };
               return updated;
             } else {
               // Fallback: if optimistic message not found, just add the real one
-              return [...prev, userMessageResult.data];
+              return [
+                ...prev,
+                {
+                  ...userMessageResult.data,
+                  metadata: {
+                    ...(userMessageResult.data?.metadata || {}),
+                    deliveryStatus: 'sent',
+                  },
+                },
+              ];
             }
           });
         });
@@ -520,6 +605,7 @@ export function useChat(): UseChatResult {
       // Add chatId for orchestrator to track todos
       if (isOrchestrator) {
         requestBody.chatId = currentChat.id;
+        requestBody.stream = true;
         // Pass orchestrator agentId if explicitly set
         if (agentId && agentId === 'orchestrator') {
           requestBody.agentId = agentId;
@@ -539,17 +625,18 @@ export function useChat(): UseChatResult {
         return;
       }
 
-      const aiResult = await aiResponse.json();
+      const isStreamResponse =
+        aiResponse.headers.get('X-Response-Mode') === 'stream' ||
+        (aiResponse.headers.get('Content-Type') ?? '').startsWith('text/plain');
 
-      if (!aiResult.success) {
-        setError(aiResult.error || 'Failed to get AI response');
-        // Remove thinking message on error
+      let responseData: any;
+
+      if (isStreamResponse && !aiResponse.ok) {
+        const errText = await aiResponse.text();
+        setError(errText || aiResponse.statusText || 'Request failed');
         startTransition(() => {
           setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageId));
-          setMessagesPagination((prev) => ({
-            ...prev,
-            totalMessages: Math.max(0, prev.totalMessages - 1),
-          }));
+          setMessagesPagination((prev) => ({ ...prev, totalMessages: Math.max(0, prev.totalMessages - 1) }));
           thinkingMessageIdRef.current = null;
         });
         setIsLoading(false);
@@ -558,7 +645,86 @@ export function useChat(): UseChatResult {
         return;
       }
 
-      const responseData = aiResult.data;
+      if (isStreamResponse && aiResponse.ok) {
+        // Consume stream and update thinking message with streamed content
+        let accumulated = '';
+        let scheduled = false;
+        const reader = aiResponse.body?.getReader();
+        const decoder = new TextDecoder();
+        if (!reader) {
+          setError('No response body');
+          startTransition(() => {
+            setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageId));
+            thinkingMessageIdRef.current = null;
+          });
+          setIsLoading(false);
+          setIsActive(false);
+          return;
+        }
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (abortController.signal.aborted) return;
+            if (done) break;
+            accumulated += decoder.decode(value, { stream: true });
+            if (!scheduled) {
+              scheduled = true;
+              queueMicrotask(() => {
+                scheduled = false;
+                startTransition(() => {
+                  setMessages((prev) =>
+                    prev.map((msg) =>
+                      msg.id === thinkingMessageId ? { ...msg, content: accumulated } : msg
+                    )
+                  );
+                });
+              });
+            }
+          }
+          // Final update
+          startTransition(() => {
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === thinkingMessageId ? { ...msg, content: accumulated } : msg
+              )
+            );
+          });
+        } catch (streamErr) {
+          if (streamErr instanceof Error && streamErr.name === 'AbortError') return;
+          setError(streamErr instanceof Error ? streamErr.message : 'Stream read error');
+          startTransition(() => {
+            setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageId));
+            thinkingMessageIdRef.current = null;
+          });
+          setIsLoading(false);
+          setIsActive(false);
+          return;
+        }
+        responseData = { response: accumulated, format: 'string' };
+      } else {
+        // JSON response (orchestrator or non-stream agent)
+        const aiResult = await aiResponse.json();
+
+        if (!aiResult.success) {
+          setError(aiResult.error || 'Failed to get AI response');
+          startTransition(() => {
+            setMessages((prev) => prev.filter((msg) => msg.id !== thinkingMessageId));
+            setMessagesPagination((prev) => ({
+              ...prev,
+              totalMessages: Math.max(0, prev.totalMessages - 1),
+            }));
+            thinkingMessageIdRef.current = null;
+          });
+          setIsLoading(false);
+          setIsActive(false);
+          abortControllerRef.current = null;
+          return;
+        }
+
+        responseData = aiResult.data;
+      }
+
+      if (abortController.signal.aborted) return;
 
           // Handle orchestrator response
           if (isOrchestrator) {
@@ -815,19 +981,63 @@ export function useChat(): UseChatResult {
               const contentString = typeof responseContent === 'string' 
                 ? responseContent 
                 : JSON.stringify(responseContent, null, 2);
+              const extractSearchResults = (value: any): any[] | null => {
+                if (!value) return null;
+                if (Array.isArray(value) && value.length > 0) {
+                  const first = value[0];
+                  if (first && typeof first === 'object' && ('title' in first || 'url' in first || 'snippet' in first)) {
+                    return value;
+                  }
+                }
+                if (typeof value === 'string') {
+                  try {
+                    const parsed = JSON.parse(value);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                      const first = parsed[0];
+                      if (first && typeof first === 'object' && ('title' in first || 'url' in first || 'snippet' in first)) {
+                        return parsed;
+                      }
+                    }
+                  } catch {
+                    // ignore parse errors
+                  }
+                }
+                return null;
+              };
+
+              // Prefer search results from the latest completed search todo in chain metadata.
+              const latestCompletedSearchTodo = Array.isArray(responseData.todos)
+                ? [...responseData.todos]
+                    .reverse()
+                    .find((todo: any) =>
+                      todo?.status === 'completed' &&
+                      (todo?.responseFormat === 'search-card' || todo?.responseFormat === 'search-results')
+                    )
+                : null;
+
+              const searchResults =
+                extractSearchResults(latestCompletedSearchTodo?.output) ||
+                extractSearchResults(responseData.searchResults) ||
+                extractSearchResults(responseData.data?.searchResults) ||
+                extractSearchResults(responseContent);
+
+              const isSearchCard = Array.isArray(searchResults) && searchResults.length > 0;
               const hashtags = typeof responseContent === 'string' 
                 ? extractHashtags(responseContent) 
                 : [];
               const mentions = typeof responseContent === 'string' 
                 ? extractMentions(responseContent) 
                 : [];
+              const contentForStorage = isSearchCard
+                ? `Found ${searchResults.length} search results.`
+                : contentString;
 
               const assistantMessageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   role: 'assistant',
-                  content: contentString,
+                  content: contentForStorage,
                   agentId: agentId || 'orchestrator',
                   hashtags: hashtags.length > 0 ? hashtags : undefined,
                   mentions: mentions.length > 0 ? mentions : undefined,
@@ -835,7 +1045,8 @@ export function useChat(): UseChatResult {
                     complexity: responseData.complexity,
                     executionType: responseData.executionType,
                     todos: responseData.todos,
-                    responseFormat: typeof responseContent === 'string' ? 'string' : 'json',
+                    responseFormat: isSearchCard ? 'search-card' : (typeof responseContent === 'string' ? 'string' : 'json'),
+                    ...(isSearchCard ? { searchResults } : {}),
                   },
                 }),
                 signal: abortController.signal,
@@ -1145,6 +1356,15 @@ export function useChat(): UseChatResult {
     }
   }, [currentChat, stop]);
 
+  const retryFailedMessage = useCallback(async (messageId: string): Promise<void> => {
+    const failedMessage = messages.find((msg) => msg.id === messageId);
+    if (!failedMessage || failedMessage.role !== 'user') return;
+    if (failedMessage.metadata?.deliveryStatus !== 'failed') return;
+
+    // Retry in-place: keep the same message bubble/ID and move it to pending.
+    await sendMessage(failedMessage.content, undefined, undefined, messageId);
+  }, [messages, sendMessage]);
+
   // Update todos
   const updateTodos = useCallback((newTodos: Todo[]) => {
     setTodos(newTodos);
@@ -1296,6 +1516,7 @@ export function useChat(): UseChatResult {
         updateMessageTodos,
     loadMoreMessages,
     deleteChat,
+    retryFailedMessage,
       };
 }
 

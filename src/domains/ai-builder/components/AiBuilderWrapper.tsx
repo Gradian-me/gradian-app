@@ -25,7 +25,6 @@ import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { useLanguageStore } from '@/stores/language.store';
-import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AiBuilderLoadingIndicator } from './AiBuilderLoadingIndicator';
 import { extractParametersBySectionId } from '../utils/ai-shared-utils';
@@ -728,47 +727,40 @@ export function AiBuilderWrapper({
         </div>
       )}
 
-      <AnimatePresence mode="wait">
-        {(aiResponse || isMainLoading || imageResponse || isImageLoading || searchResults || searchError || isSearchLoading || (error && selectedAgent && (selectedAgent.id === 'graph-generator' || selectedAgent.requiredOutputFormat === 'graph'))) && selectedAgent ? (
-          <motion.div
-            key="ai-response"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          >
-            <AiBuilderResponse
-              response={aiResponse || ''}
-              agent={selectedAgent}
-              tokenUsage={tokenUsage}
-              videoUsage={videoUsage}
-              duration={duration}
-              isApproving={isApproving}
-              isLoading={isMainLoading}
-              isImageLoading={isImageLoading}
-              isSearchLoading={isSearchLoading}
-              onApprove={handleApprove}
-              onCardClick={handleCardClick}
-              annotations={annotationsArray}
-              onAnnotationsChange={handleAnnotationChange}
-              onRemoveSchema={handleRemoveSchema}
-              onApplyAnnotations={handleApplyAnnotations}
-              selectedLanguage={selectedLanguage}
-              imageResponse={imageResponse}
-              imageError={imageError}
-              imageType={currentImageType}
-              imageModel={imageModel}
-              graphWarnings={graphWarnings}
-              searchResults={searchResults}
-              searchError={searchError}
-              searchDuration={searchDuration}
-              searchUsage={searchUsage}
-              summarizedPrompt={summarizedPrompt}
-              hideNextActionButton={hideNextActionButton}
-            />
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {(aiResponse || isMainLoading || imageResponse || isImageLoading || searchResults || searchError || isSearchLoading || (error && selectedAgent && (selectedAgent.id === 'graph-generator' || selectedAgent.requiredOutputFormat === 'graph'))) && selectedAgent ? (
+        <div>
+          <AiBuilderResponse
+            response={aiResponse || ''}
+            agent={selectedAgent}
+            tokenUsage={tokenUsage}
+            videoUsage={videoUsage}
+            duration={duration}
+            isApproving={isApproving}
+            isLoading={isMainLoading}
+            isImageLoading={isImageLoading}
+            isSearchLoading={isSearchLoading}
+            onApprove={handleApprove}
+            onCardClick={handleCardClick}
+            annotations={annotationsArray}
+            onAnnotationsChange={handleAnnotationChange}
+            onRemoveSchema={handleRemoveSchema}
+            onApplyAnnotations={handleApplyAnnotations}
+            selectedLanguage={selectedLanguage}
+            imageResponse={imageResponse}
+            imageError={imageError}
+            imageType={currentImageType}
+            imageModel={imageModel}
+            graphWarnings={graphWarnings}
+            searchResults={searchResults}
+            searchError={searchError}
+            searchDuration={searchDuration}
+            searchUsage={searchUsage}
+            summarizedPrompt={summarizedPrompt}
+            hideNextActionButton={hideNextActionButton}
+            animatedTextLoading={true}
+          />
+        </div>
+      ) : null}
 
       {/* Preview Form Modal with Annotations */}
       {previewSchema && (

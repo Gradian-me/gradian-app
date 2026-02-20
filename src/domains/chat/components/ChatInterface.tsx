@@ -21,6 +21,7 @@ import { extractHashtags, extractMentions } from '@/gradian-ui/shared/utils/text
 import { BotMessageSquare, Plus } from 'lucide-react';
 import type { Chat, Todo } from '../types';
 import { formatSearchResultsToToon } from '@/domains/ai-builder/utils/ai-search-utils';
+import { truncateMessageContent } from '@/domains/chat/utils/validation-utils';
 
 export interface ChatInterfaceProps {
   className?: string;
@@ -35,6 +36,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const router = useRouter();
   const chatIdFromUrl = params['chat-id'] as string | undefined;
   const [chatListVisible, setChatListVisible] = useState(showChatList);
+  const [chatInputFocusTrigger, setChatInputFocusTrigger] = useState(0);
 
   const {
     chats,
@@ -57,10 +59,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     addMessage,
     updateMessageTodos,
     deleteChat,
+    retryFailedMessage,
   } = useChat();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isExecutingTodos, setIsExecutingTodos] = useState(false);
+  const [todoExecutionError, setTodoExecutionError] = useState<string | null>(null);
+  const [lastApprovedTodos, setLastApprovedTodos] = useState<Todo[] | null>(null);
   const executeAbortControllerRef = useRef<AbortController | null>(null);
   const [expandedExecutionPlans, setExpandedExecutionPlans] = useState<Set<string>>(new Set());
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -68,6 +73,16 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const addedMessageIdsRef = useRef<Set<string>>(new Set());
   const messagesRef = useRef(messages);
+  const lastPersistedTodosSignatureRef = useRef<Record<string, string>>({});
+
+  const scrollMessagesToBottom = useCallback((behavior: ScrollBehavior = 'auto') => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior,
+    });
+  }, []);
   
   // Keep messages ref in sync
   useEffect(() => {
@@ -97,21 +112,24 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     const isChatChanged = currentChat?.id && currentChat.id !== prevChatIdRef.current;
     if (isChatChanged) {
       prevChatIdRef.current = currentChat?.id ?? null;
-      // Small delay to ensure messages are rendered
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-      return;
+      // Ensure we land at the true bottom after async message/layout rendering.
+      const timeouts = [0, 80, 180, 320, 500].map((delay) =>
+        setTimeout(() => scrollMessagesToBottom('auto'), delay)
+      );
+      setShowScrollToBottom(false);
+      return () => {
+        timeouts.forEach((id) => clearTimeout(id));
+      };
     }
     
     // Always scroll to bottom when messages change (new message sent or received)
     if (messages && messages.length > 0) {
-      // Small delay to ensure new message is rendered
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      const timeoutId = setTimeout(() => {
+        scrollMessagesToBottom('smooth');
+      }, 80);
+      return () => clearTimeout(timeoutId);
     }
-  }, [messages, currentChat]);
+  }, [messages, currentChat?.id, scrollMessagesToBottom]);
 
   // Load more messages when scrolling near the top (infinite scroll)
   const handleMessagesScroll = useCallback(() => {
@@ -185,6 +203,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       console.error('ChatInterface: No current chat selected');
       return;
     }
+
+    // Auto-close chat list sidebar when sending the first user message in a chat.
+    // This gives more room for the conversation after chat start.
+    const isFirstUserMessage = !messages.some((msg) => msg.role === 'user');
+    if (chatListVisible && isFirstUserMessage) {
+      setChatListVisible(false);
+    }
+
     await sendMessage(content, agentId);
   };
 
@@ -205,6 +231,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     try {
       const newChat = await createNewChat();
       if (newChat && newChat.id) {
+        setChatInputFocusTrigger((prev) => prev + 1);
         router.push(`/chat/${newChat.id}`);
       } else {
         console.error('Failed to create chat: No chat returned or missing ID', newChat);
@@ -276,7 +303,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         
         // Format search results as markdown text content for the message
         // This provides a rigid AI response that can be displayed in chat
-        const searchContent = formatSearchResultsToToon(searchResults);
+        const searchContent = truncateMessageContent(formatSearchResultsToToon(searchResults));
         
         // Add message to chat with search results and formatted content
         const messageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
@@ -332,6 +359,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         : [];
 
       // Add message to chat
+      content = truncateMessageContent(content);
       const messageResponse = await fetch(`/api/chat/${currentChat.id}/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -426,6 +454,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     const abortController = new AbortController();
     executeAbortControllerRef.current = abortController;
 
+    setTodoExecutionError(null);
+    setLastApprovedTodos(approvedTodos);
     setIsExecutingTodos(true);
     try {
       // Get the last user message as initial input
@@ -448,7 +478,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         return;
       }
 
-      const result = await response.json();
+      let result: any = null;
+      try {
+        result = await response.json();
+      } catch {
+        result = null;
+      }
+
+      if (!response.ok) {
+        const message =
+          result?.error ||
+          `Server error: ${response.status} ${response.statusText || 'Failed to execute todos'}`;
+        throw new Error(message);
+      }
 
       if (result.success && result.data) {
         const responseData = result.data;
@@ -462,7 +504,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         // We only update todos here to avoid duplicate messages
         // The final output message is already created by the orchestrator response handler
       } else {
-        console.error('Failed to execute todos:', result.error);
+        const message = result?.error || 'Failed to execute todos';
+        setTodoExecutionError(message);
+        console.error('Failed to execute todos:', message);
       }
     } catch (error) {
       // Check if error is due to abort
@@ -470,6 +514,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         // Request was aborted - just reset state
         return;
       }
+      const message = error instanceof Error ? error.message : 'Error executing todos';
+      setTodoExecutionError(message);
       console.error('Error executing todos:', error);
     } finally {
       setIsExecutingTodos(false);
@@ -478,7 +524,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className={cn('flex h-full bg-white dark:bg-gray-900', className)}>
+    <div className={cn('flex h-full min-h-0 bg-white dark:bg-gray-900', className)}>
       {/* Chat List Sidebar with Animation */}
       <AnimatePresence initial={false}>
         {chatListVisible && (
@@ -488,9 +534,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             animate={{ width: 320, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="overflow-hidden shrink-0"
+            className="overflow-hidden shrink-0 h-full min-h-0"
           >
-            <div className="w-80 h-full">
+            <div className="w-80 h-full min-h-0">
               <ChatList
                 chats={chats}
                 selectedChatId={currentChat?.id}
@@ -506,15 +552,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </AnimatePresence>
 
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
         {/* Chat Header with Toggle Button */}
-        <div className="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 px-3 py-2">
+        <div className="shrink-0 sticky top-0 z-20 flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-3 py-2">
           <Button
-            variant="outline"
-            size="icon"
+            variant="square"
+            size="sm"
             onClick={() => setChatListVisible((prev) => !prev)}
             title={chatListVisible ? 'Hide chat list' : 'Show chat list'}
-            className="h-8 w-8"
+            className="h-10 w-10"
           >
             <SidebarIcon
               className={cn(
@@ -539,13 +585,29 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         {/* Key prop ensures React updates this container when chat changes */}
         <div
           key={currentChat?.id || 'no-chat'}
-          className="flex-1 overflow-y-auto p-4 relative"
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 relative"
           ref={messagesContainerRef}
           onScroll={handleMessagesScroll}
         >
           {error && (
             <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm">
               {error}
+            </div>
+          )}
+          {todoExecutionError && (
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400 text-sm flex items-center justify-between gap-3">
+              <span>{todoExecutionError}</span>
+              {lastApprovedTodos && lastApprovedTodos.length > 0 && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleExecuteTodos(lastApprovedTodos)}
+                  disabled={isExecutingTodos}
+                  className="shrink-0"
+                >
+                  Retry
+                </Button>
+              )}
             </div>
           )}
 
@@ -610,6 +672,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                     <ChatMessage
                       message={message}
                       index={index}
+                      onRetryFailedMessage={retryFailedMessage}
                     />
                     {/* Show execution plan inline after its related message */}
                     {hasTodos && currentChat && (
@@ -621,10 +684,20 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         onTodosUpdate={async (updatedTodos) => {
                           // Update todos in the specific message
                           updateMessageTodos(message.id, updatedTodos);
+
+                          // Persist only for the latest execution plan to avoid sync loops
+                          // from historical TodoList instances re-normalizing dependencies.
+                          if (!isLatestExecutionPlan) return;
                           
                           // Persist to backend
                           if (currentChat) {
                             try {
+                              const signature = JSON.stringify(updatedTodos);
+                              if (lastPersistedTodosSignatureRef.current[message.id] === signature) {
+                                return; // No meaningful change; skip redundant PUT
+                              }
+                              lastPersistedTodosSignatureRef.current[message.id] = signature;
+
                               const response = await fetch(`/api/chat/${currentChat.id}/todos`, {
                                 method: 'PUT',
                                 headers: { 'Content-Type': 'application/json' },
@@ -632,9 +705,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                               });
                               
                               if (!response.ok) {
+                                delete lastPersistedTodosSignatureRef.current[message.id];
                                 console.error('Failed to save todos:', await response.text());
                               }
                             } catch (error) {
+                              delete lastPersistedTodosSignatureRef.current[message.id];
                               console.error('Error saving todos:', error);
                             }
                           }
@@ -679,14 +754,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   type="button"
                   onClick={handleScrollToBottom}
                   className={cn(
-                    'pointer-events-auto flex items-center gap-2 rounded-full px-3 py-2',
+                    'pointer-events-auto flex items-center gap-1.5 rounded-full px-2.5 py-1.5',
                     'bg-white/95 dark:bg-gray-800/95 border border-violet-200 dark:border-violet-800',
                     'shadow-2xl hover:shadow-xl transition-all duration-200',
-                    'text-sm font-medium text-gray-800 dark:text-gray-100'
+                    'text-xs font-medium text-gray-800 dark:text-gray-100'
                   )}
                 >
-                  <div className="flex items-center justify-center w-6 h-6 rounded-full bg-violet-50 dark:bg-violet-900/40 border border-violet-200 dark:border-violet-700 text-violet-600 dark:text-violet-200">
-                    <ChevronDown className="w-4 h-4" />
+                  <div className="flex items-center justify-center w-5 h-5 rounded-full bg-violet-50 dark:bg-violet-900/40 border border-violet-200 dark:border-violet-700 text-violet-600 dark:text-violet-200">
+                    <ChevronDown className="w-3.5 h-3.5" />
                   </div>
                   Go to bottom
                 </button>
@@ -697,13 +772,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
         {/* Input Area */}
         {currentChat && (
-          <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+          <div className="shrink-0 border-t border-gray-200 dark:border-gray-800 p-4">
             <ChatInput
               onSend={handleSendMessage}
               onStop={handleStop}
               selectedAgentId={currentChat.selectedAgentId}
               isLoading={isLoading}
               isActive={isActive || isExecutingTodos}
+              focusTrigger={chatInputFocusTrigger}
             />
           </div>
         )}

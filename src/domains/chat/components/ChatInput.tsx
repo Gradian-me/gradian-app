@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Select } from '@/gradian-ui/form-builder/form-elements/components/Select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { useAiAgents } from '@/domains/ai-builder';
 import { VoiceInputDialog } from '@/gradian-ui/communication/voice/components/VoiceInputDialog';
 import { ProfessionalWritingModal } from '@/gradian-ui/communication/professional-writing/components/ProfessionalWritingModal';
@@ -20,6 +21,7 @@ export interface ChatInputProps {
   selectedAgentId?: string | null;
   isLoading?: boolean;
   isActive?: boolean; // True when thinking or executing
+  focusTrigger?: number; // Increment to programmatically focus input
   className?: string;
 }
 
@@ -29,6 +31,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   selectedAgentId,
   isLoading = false,
   isActive = false,
+  focusTrigger,
   className,
 }) => {
   const [value, setValue] = useState('');
@@ -37,6 +40,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const [isVoiceDialogOpen, setIsVoiceDialogOpen] = useState(false);
   const [isWritingModalOpen, setIsWritingModalOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { agents: aiAgents, loading: isLoadingAgents } = useAiAgents({ summary: true });
 
@@ -84,6 +88,15 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   useEffect(() => {
     adjustTextareaHeight();
   }, [value, adjustTextareaHeight]);
+
+  // Programmatic focus trigger (used after creating a new chat).
+  useEffect(() => {
+    if (focusTrigger === undefined) return;
+    const id = window.setTimeout(() => {
+      textareaRef.current?.focus();
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, [focusTrigger]);
 
   // Handle voice input transcript
   const handleVoiceTranscript = useCallback((text: string) => {
@@ -144,15 +157,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Handle Ctrl+Enter (or Cmd+Enter on Mac) to send message
-    // Enter by default creates a new line
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+    // Enter sends message, Shift+Enter creates a new line.
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if (value.trim() && !isLoading && !isActive) {
         handleSend();
       }
     }
-    // Allow Enter to create new lines by default (no preventDefault)
   };
 
   const handleAgentChange = (agentId: string) => {
@@ -253,73 +264,68 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   )}
 
                   {/* Voice Input Button */}
-                  <button
-                    type="button"
+                  <Button
                     onClick={() => setIsVoiceDialogOpen(true)}
+                    variant="square"
+                    size="sm"
                     disabled={isLoading || isActive}
                     className={cn(
-                      'rounded-lg p-2 bg-white dark:bg-gray-800/50',
-                      'hover:bg-gray-100 dark:hover:bg-gray-700',
-                      'border border-gray-200 dark:border-gray-700',
-                      'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100',
-                      'transition-colors',
+                      'h-10 w-10',
                       'disabled:opacity-50 disabled:cursor-not-allowed'
                     )}
                     aria-label="Voice input"
                     title="Voice input"
                   >
                     <Mic className="w-4 h-4" />
-                  </button>
+                  </Button>
+
+                  {/* Attachment Button */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    disabled={isLoading || isActive}
+                  />
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    variant="square"
+                    size="sm"
+                    disabled={isLoading || isActive}
+                    className={cn(
+                      'h-10 w-10',
+                      'disabled:opacity-50 disabled:cursor-not-allowed'
+                    )}
+                    aria-label="Attach file"
+                    title="Attach file"
+                  >
+                    <Paperclip className="w-4 h-4 block transition-colors" />
+                  </Button>
 
                   {/* Professional Writing Button */}
-                  <button
-                    type="button"
+                  <Button
                     onClick={() => setIsWritingModalOpen(true)}
+                    variant="square"
+                    size="sm"
                     disabled={isLoading || isActive || !value.trim()}
                     className={cn(
-                      'rounded-lg p-2 bg-white dark:bg-gray-800/50',
-                      'hover:bg-gray-100 dark:hover:bg-gray-700',
-                      'border border-gray-200 dark:border-gray-700',
-                      'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100',
-                      'transition-colors',
+                      'h-10 w-10',
                       'disabled:opacity-50 disabled:cursor-not-allowed'
                     )}
                     aria-label="Professional writing"
                     title="Enhance text with AI"
                   >
                     <PenTool className="w-4 h-4" />
-                  </button>
-
-                  {/* Attachment Button */}
-                  <label
-                    className={cn(
-                      'rounded-lg p-2 bg-white dark:bg-gray-800/50 cursor-pointer',
-                      'hover:bg-gray-100 dark:hover:bg-gray-700',
-                      'border border-gray-200 dark:border-gray-700',
-                      'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100',
-                      'transition-colors',
-                      (isLoading || isActive) && 'opacity-50 cursor-not-allowed'
-                    )}
-                    aria-label="Attach file"
-                  >
-                    <input type="file" className="hidden" disabled={isLoading || isActive} />
-                    <Paperclip className="w-4 h-4 transition-colors" />
-                  </label>
+                  </Button>
                 </div>
 
                 {/* Right Side - Send/Stop Button */}
                 {isActive && onStop ? (
-                  <button
-                    type="button"
+                  <Button
                     dir="auto"
+                    variant="square"
+                    size="sm"
                     className={cn(
-                      'rounded-full w-10 h-10 flex items-center justify-center shadow-sm relative',
-                      'bg-white dark:bg-gray-800',
-                      'border-2 border-gray-200 dark:border-gray-700',
-                      'hover:bg-gray-50 dark:hover:bg-gray-700',
-                      'focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-gray-500',
-                      'text-gray-700 dark:text-gray-300',
-                      'transition-all duration-200',
+                      'relative h-10 w-10',
                       'overflow-visible'
                     )}
                     aria-label="Stop"
@@ -331,18 +337,16 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                       style={{ animationDuration: '2s' }}
                     />
                     <Square className="w-4 h-4 relative z-10 fill-current" />
-                  </button>
+                  </Button>
                 ) : (
-                  <button
+                  <Button
                     type="button"
+                    variant="squareGradient"
+                    size="sm"
                     className={cn(
-                      'rounded-full w-10 h-10 flex items-center justify-center shadow-sm',
-                      'bg-gradient-to-r from-violet-600 to-purple-600',
-                      'hover:from-violet-700 hover:to-purple-700',
-                      'focus-visible:ring-1 focus-visible:ring-offset-0 focus-visible:ring-violet-500',
+                      'h-10 w-10',
                       'disabled:opacity-30 disabled:cursor-not-allowed',
-                      'text-white',
-                      'transition-all duration-200'
+                      'text-white'
                     )}
                     aria-label="Send message"
                     disabled={isLoading || isActive || !value.trim()}
@@ -354,7 +358,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                         value.trim() ? 'opacity-100' : 'opacity-50'
                       )}
                     />
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>

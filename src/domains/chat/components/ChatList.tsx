@@ -15,7 +15,7 @@ import { formatRelativeTime } from '@/gradian-ui/shared/utils/date-utils';
 import { useLanguageStore } from '@/stores/language.store';
 import type { Chat } from '../types';
 import { CardWrapper, CardContent } from '@/gradian-ui/data-display/card/components/CardWrapper';
-import { Button } from '@/gradian-ui/form-builder/form-elements';
+import { Button } from '@/components/ui/button';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
 
 export interface ChatListProps {
@@ -103,9 +103,9 @@ const ChatListComponent: React.FC<ChatListProps> = ({
             <Button
               onClick={onRefresh}
               disabled={isLoading}
-              variant="outline"
+              variant="square"
               size="sm"
-              className="w-10 h-10 p-0 flex items-center justify-center"
+              className="w-10 h-10 p-0"
             >
               <RefreshCw 
                 className={cn(

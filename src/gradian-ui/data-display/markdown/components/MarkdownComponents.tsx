@@ -12,13 +12,14 @@ import { getStickyHeadingsChecker } from '../hooks/useStickyHeadings';
  * Create custom components for ReactMarkdown with sticky headings support
  * @param stickyHeadings - Array of heading levels to make sticky (e.g., ['#', '##'])
  * @param markdownLoadedTimestamp - Timestamp when markdown finished loading (for triggering mermaid refresh)
+ * @param deferMermaid - When true, show Mermaid blocks as raw code (avoids parse errors during streaming)
  */
-export function createMarkdownComponents(stickyHeadings: string[] = [], markdownLoadedTimestamp?: number) {
+export function createMarkdownComponents(stickyHeadings: string[] = [], markdownLoadedTimestamp?: number, deferMermaid?: boolean) {
   const { isSticky } = getStickyHeadingsChecker(stickyHeadings);
 
   return {
     code: (props: any) => (
-      <CodeComponent {...props} markdownLoadedTimestamp={markdownLoadedTimestamp} />
+      <CodeComponent {...props} markdownLoadedTimestamp={markdownLoadedTimestamp} deferMermaid={deferMermaid} />
     ),
     h1: createHeadingComponent({ level: 1, isSticky }),
     h2: createHeadingComponent({ level: 2, isSticky }),

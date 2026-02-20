@@ -19,6 +19,20 @@ interface MermaidSimpleProps {
 let initialized = false;
 let currentTheme = '';
 
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'Unknown Mermaid rendering error';
+}
+
+function isKnownMermaidLayoutError(message: string): boolean {
+  return (
+    message.includes('Could not find a suitable point for the given distance') ||
+    message.includes('calcLabelPosition') ||
+    message.includes('positionEdgeLabel')
+  );
+}
+
 /**
  * Detect if content contains RTL characters (Arabic, Persian/Farsi, Hebrew, etc.)
  */
@@ -54,6 +68,7 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
     if (!initialized || currentTheme !== theme) {
       mermaid.initialize({
         startOnLoad: false,
+        logLevel: 'fatal',
         theme: theme,
         themeVariables: {
           // Violet-based color scheme for readability in both modes
@@ -227,7 +242,8 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
 
         img.onerror = (error) => {
           clearTimeout(timeout);
-          console.error('SVG image load error:', error);
+          // Avoid noisy console errors in development overlays for recoverable failures
+          console.warn('SVG image load warning:', error);
           reject(new Error('Failed to load SVG image. Make sure the SVG is valid.'));
         };
 
@@ -505,13 +521,23 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
             });
           }
         } catch (err) {
-          console.error('Failed to convert SVG to canvas:', err);
-          setError('Failed to render diagram');
+          const errorMessage = getErrorMessage(err);
+          setError(
+            isKnownMermaidLayoutError(errorMessage)
+              ? 'Unable to render this Mermaid layout. Showing diagram source is recommended.'
+              : 'Failed to render diagram'
+          );
         }
       }
       }).catch((err) => {
-        console.error('Mermaid render error:', err);
-        setError(err.message || 'Failed to render diagram');
+        const errorMessage = getErrorMessage(err);
+        // Known Mermaid layout bug: keep UI stable and avoid console error spam
+        if (isKnownMermaidLayoutError(errorMessage)) {
+          setError('Unable to render this Mermaid layout. Showing diagram source is recommended.');
+        } else {
+          console.warn('Mermaid render warning:', err);
+          setError(errorMessage || 'Failed to render diagram');
+        }
         // Check if canvas still exists before accessing it
         const currentCanvas = canvasRef.current;
         if (currentCanvas) {

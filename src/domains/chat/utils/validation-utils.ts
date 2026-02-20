@@ -7,6 +7,7 @@
  * Maximum message content length (10,000 characters)
  */
 export const MAX_MESSAGE_LENGTH = 20000;
+export const MESSAGE_TRUNCATION_SUFFIX = '\n\n...[truncated due to message length limit]';
 
 /**
  * Maximum chat title length (200 characters)
@@ -55,6 +56,17 @@ export function validateMessageContent(content: string): { valid: boolean; error
   }
 
   return { valid: true };
+}
+
+/**
+ * Truncate message content to max length while preserving readability.
+ */
+export function truncateMessageContent(content: string): string {
+  if (typeof content !== 'string') return '';
+  if (content.length <= MAX_MESSAGE_LENGTH) return content;
+
+  const maxBodyLength = Math.max(0, MAX_MESSAGE_LENGTH - MESSAGE_TRUNCATION_SUFFIX.length);
+  return `${content.slice(0, maxBodyLength)}${MESSAGE_TRUNCATION_SUFFIX}`;
 }
 
 /**

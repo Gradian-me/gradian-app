@@ -11,6 +11,7 @@ import { useAiPrompts } from '@/domains/ai-prompts/hooks/useAiPrompts';
 import { useUserStore } from '@/stores/user.store';
 import { useTenantStore } from '@/stores/tenant.store';
 import { useAiAgents } from './useAiAgents';
+import { isStreamingAgent } from '../utils/ai-common-utils';
 import {
   extractDataByPath,
   formatPreloadRouteResult,
@@ -343,6 +344,48 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
       
       // Load agent config to build prompt
       const agent = effectiveAgents.find(a => a.id === agentId);
+
+      const isStreamResponse = (res: Response): boolean =>
+        res.headers.get('X-Response-Mode') === 'stream' ||
+        (res.headers.get('Content-Type') || '').startsWith('text/plain');
+
+      async function consumeStreamResponse(res: Response): Promise<void> {
+        setAiResponse('');
+        let buffer = '';
+        let scheduled = false;
+        const flush = () => {
+          if (buffer) {
+            setAiResponse((prev) => prev + buffer);
+            buffer = '';
+          }
+          scheduled = false;
+        };
+        const scheduleFlush = () => {
+          if (!scheduled) {
+            scheduled = true;
+            setTimeout(flush, 50);
+          }
+        };
+        const reader = res.body!.getReader();
+        const decoder = new TextDecoder();
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            scheduleFlush();
+          }
+        } catch (err) {
+          if (!(err instanceof Error && err.name === 'AbortError')) {
+            setError(err instanceof Error ? err.message : 'Stream read error');
+          }
+        } finally {
+          flush();
+          setIsMainLoading(false);
+          setTokenUsage(null);
+          setDuration(null);
+        }
+      }
 
       // For image-generator: prefer userPrompt when it contains substantive record content
       // (e.g. from quick actions with selectedFields). buildStandardizedPrompt from formValues
@@ -953,6 +996,11 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
                 setDuration(null);
                 abortControllerRef.current = null;
               } else {
+                if (isStreamingAgent(agent ?? null) && isStreamResponse(response)) {
+                  await consumeStreamResponse(response);
+                  setError(null);
+                  return;
+                }
                 let data: any;
                 try {
                   const responseText = await response.text();
@@ -1213,6 +1261,11 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
         abortControllerRef.current = null;
         
         throw new Error(detailedError);
+      }
+
+      if (isStreamingAgent(agent ?? null) && isStreamResponse(response)) {
+        await consumeStreamResponse(response);
+        return;
       }
 
       let data: any;

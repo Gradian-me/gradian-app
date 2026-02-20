@@ -4,7 +4,7 @@
  * Handles error handling, timeout, abort signals, and response parsing
  */
 
-import { getApiUrlForAgentType } from './ai-agent-url';
+import { getApiUrlForAgentType, type AgentType } from './ai-agent-url';
 import { getApiKey, sanitizeErrorMessage, safeJsonParse } from './ai-security-utils';
 import { createAbortController, parseErrorResponse, buildTimingInfo } from './ai-common-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -523,6 +523,137 @@ export async function callChatApi(params: {
     tokenUsage,
     timing,
   };
+}
+
+/** Params for creating a streaming chat response (OpenAI-compatible SSE) */
+export interface StreamChatApiParams {
+  agent: { agentType?: string };
+  systemPrompt: string;
+  userPrompt: string;
+  model: string;
+  responseFormat?: { type: string };
+  signal?: AbortSignal;
+}
+
+/**
+ * Create a ReadableStream of LLM text chunks (UTF-8) for streaming chat.
+ * Fetches LLM with stream: true, parses SSE, forwards only delta.content.
+ * Uses getApiKey, getApiUrlForAgentType, and enforceRateLimit. Server-only.
+ */
+export async function createStreamingChatStream(
+  params: StreamChatApiParams
+): Promise<{ stream: ReadableStream<Uint8Array> } | { error: string }> {
+  const { agent, systemPrompt, userPrompt, model, responseFormat, signal } = params;
+
+  const apiKeyResult = getApiKey();
+  if (!apiKeyResult.key) {
+    return { error: apiKeyResult.error || 'LLM_API_KEY is not configured' };
+  }
+
+  const apiUrl = getApiUrlForAgentType((agent?.agentType || 'chat') as AgentType);
+  await enforceRateLimit(apiUrl);
+
+  const requestBody: Record<string, unknown> = {
+    model,
+    messages: [
+      { role: 'system' as const, content: systemPrompt },
+      { role: 'user' as const, content: userPrompt },
+    ],
+    stream: true,
+  };
+  if (responseFormat) {
+    requestBody.response_format = responseFormat;
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKeyResult.key}`,
+      },
+      body: JSON.stringify(requestBody),
+      signal,
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    if (message.includes('abort') || (err as Error & { name?: string })?.name === 'AbortError') {
+      return { error: 'Request was cancelled' };
+    }
+    return { error: sanitizeErrorMessage(message, isDevelopment) };
+  }
+
+  if (!response.ok) {
+    const errorMessage = await parseErrorResponse(response);
+    return { error: errorMessage };
+  }
+
+  const body = response.body;
+  if (!body) {
+    return { error: 'No response body' };
+  }
+
+  const stream = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const reader = body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() ?? '';
+          for (const line of lines) {
+            if (!line.startsWith('data: ')) continue;
+            const data = line.slice(6).trim();
+            if (data === '[DONE]') continue;
+            try {
+              const parseResult = safeJsonParse(data);
+              if (parseResult.success && parseResult.data && typeof parseResult.data === 'object') {
+                const obj = parseResult.data as { choices?: Array<{ delta?: { content?: string } }> };
+                const content = obj?.choices?.[0]?.delta?.content;
+                if (typeof content === 'string' && content) {
+                  controller.enqueue(new TextEncoder().encode(content));
+                }
+              }
+            } catch {
+              // Ignore parse errors for single line
+            }
+          }
+        }
+        if (buffer.startsWith('data: ')) {
+          const data = buffer.slice(6).trim();
+          if (data !== '[DONE]') {
+            try {
+              const parseResult = safeJsonParse(data);
+              if (parseResult.success && parseResult.data && typeof parseResult.data === 'object') {
+                const obj = parseResult.data as { choices?: Array<{ delta?: { content?: string } }> };
+                const content = obj?.choices?.[0]?.delta?.content;
+                if (typeof content === 'string' && content) {
+                  controller.enqueue(new TextEncoder().encode(content));
+                }
+              }
+            } catch {
+              // Ignore
+            }
+          }
+        }
+      } catch (err) {
+        if ((err as Error & { name?: string })?.name !== 'AbortError') {
+          if (isDevelopment) {
+            loggingCustom(LogType.INFRA_LOG, 'error', `Stream read error: ${err instanceof Error ? err.message : String(err)}`);
+          }
+        }
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return { stream };
 }
 
 /**

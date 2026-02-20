@@ -2,10 +2,148 @@
 // Handles adding and retrieving messages for a chat
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getChatById, addMessageToChat } from '@/domains/chat/utils/chat-storage.util';
+import fs from 'fs';
+import path from 'path';
+import { getChatById, addMessageToChat, updateChat } from '@/domains/chat/utils/chat-storage.util';
 import { requireChatOwnership } from '@/domains/chat/utils/auth-utils';
-import { validateChatId, validateMessageContent, validateMessageRole, validateAgentType, validateRequestBodySize } from '@/domains/chat/utils/validation-utils';
+import { validateChatId, validateMessageContent, validateMessageRole, validateAgentType, validateRequestBodySize, truncateMessageContent, MAX_MESSAGE_LENGTH } from '@/domains/chat/utils/validation-utils';
+import { processAiAgent } from '@/domains/ai-builder/utils/ai-agent-utils';
 import type { AddMessageRequest } from '@/domains/chat/types';
+
+const TITLE_GENERATOR_AGENT_ID = 'title-generator';
+const MAX_GENERATED_TITLE_LENGTH = 80;
+type AddMessagePayload = AddMessageRequest & { stream?: boolean };
+
+function truncateStructuredAssistantContent(content: string, responseFormat?: string): string {
+  if (typeof content !== 'string' || content.length <= MAX_MESSAGE_LENGTH) {
+    return content;
+  }
+
+  const isGraphLike = responseFormat === 'graph';
+
+  // Preserve valid graph JSON instead of appending a truncation suffix that breaks parsing.
+  if (isGraphLike) {
+    try {
+      const parsed = JSON.parse(content);
+      const hasGraphWrapper = parsed && typeof parsed === 'object' && parsed.graph && typeof parsed.graph === 'object';
+      const graphRoot = hasGraphWrapper ? parsed.graph : parsed;
+      const nodes = Array.isArray(graphRoot?.nodes) ? graphRoot.nodes : null;
+      const edges = Array.isArray(graphRoot?.edges) ? graphRoot.edges : null;
+
+      if (nodes && edges) {
+        // First attempt: minify without dropping data.
+        const minified = JSON.stringify(parsed);
+        if (minified.length <= MAX_MESSAGE_LENGTH) {
+          return minified;
+        }
+
+        // Second attempt: keep a valid, reduced graph payload under size limit.
+        const reducedNodes: any[] = [];
+        const reducedEdges: any[] = [];
+        const nodeIds = new Set<string>();
+
+        for (const node of nodes) {
+          const nodeId = node?.id;
+          if (typeof nodeId !== 'string' || !nodeId) continue;
+          reducedNodes.push(node);
+          nodeIds.add(nodeId);
+          const linkedEdges = edges.filter((edge: any) => nodeIds.has(edge?.source) && nodeIds.has(edge?.target));
+          reducedEdges.splice(0, reducedEdges.length, ...linkedEdges);
+
+          const reducedGraph = {
+            ...graphRoot,
+            nodes: reducedNodes,
+            edges: reducedEdges,
+            truncated: true,
+          };
+          const reducedPayload = hasGraphWrapper ? { ...parsed, graph: reducedGraph } : reducedGraph;
+          const serialized = JSON.stringify(reducedPayload);
+          if (serialized.length > MAX_MESSAGE_LENGTH) {
+            // Revert last node if we exceeded limit.
+            reducedNodes.pop();
+            nodeIds.delete(nodeId);
+            const revertedEdges = edges.filter((edge: any) => nodeIds.has(edge?.source) && nodeIds.has(edge?.target));
+            reducedEdges.splice(0, reducedEdges.length, ...revertedEdges);
+            break;
+          }
+        }
+
+        const finalGraph = {
+          ...graphRoot,
+          nodes: reducedNodes,
+          edges: reducedEdges,
+          truncated: true,
+        };
+        const finalPayload = hasGraphWrapper ? { ...parsed, graph: finalGraph } : finalGraph;
+        const finalSerialized = JSON.stringify(finalPayload);
+        if (finalSerialized.length <= MAX_MESSAGE_LENGTH) {
+          return finalSerialized;
+        }
+      }
+    } catch {
+      // Fallback below
+    }
+  }
+
+  // For other oversized assistant payloads keep existing behavior.
+  return truncateMessageContent(content);
+}
+
+function normalizeGeneratedTitle(rawTitle: string): string {
+  const singleLine = rawTitle.split('\n')[0] || '';
+  const cleaned = singleLine
+    .replace(/[`*_#]/g, '')
+    .replace(/^["'\s]+|["'\s]+$/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (cleaned.length <= MAX_GENERATED_TITLE_LENGTH) {
+    return cleaned;
+  }
+
+  const clipped = cleaned.slice(0, MAX_GENERATED_TITLE_LENGTH);
+  const lastSpace = clipped.lastIndexOf(' ');
+  return (lastSpace > 12 ? clipped.slice(0, lastSpace) : clipped).trim();
+}
+
+function loadAgentById(agentId: string): any | null {
+  try {
+    const dataPath = path.join(process.cwd(), 'data', 'ai-agents.json');
+    const resolvedPath = path.resolve(dataPath);
+    const dataDir = path.resolve(process.cwd(), 'data');
+    if (!resolvedPath.startsWith(dataDir) || !fs.existsSync(resolvedPath)) {
+      return null;
+    }
+
+    const fileContents = fs.readFileSync(resolvedPath, 'utf8');
+    const agents = JSON.parse(fileContents);
+    if (!Array.isArray(agents)) return null;
+
+    return agents.find((agent: any) => agent?.id === agentId) || null;
+  } catch {
+    return null;
+  }
+}
+
+async function generateAiChatTitle(content: string, requestUrl: string): Promise<string | null> {
+  const agent = loadAgentById(TITLE_GENERATOR_AGENT_ID);
+  if (!agent) return null;
+
+  const baseUrl = new URL(requestUrl).origin;
+  const result = await processAiAgent(agent, { userPrompt: content }, baseUrl);
+  if (!result.success) return null;
+
+  const responseText =
+    typeof result.data?.response === 'string'
+      ? result.data.response
+      : typeof result.data === 'string'
+        ? result.data
+        : '';
+  if (!responseText) return null;
+
+  const normalized = normalizeGeneratedTitle(responseText);
+  return normalized.length >= 3 ? normalized : null;
+}
 
 /**
  * GET - Get messages for a chat (with pagination)
@@ -99,7 +237,7 @@ export async function POST(
     }
 
     // Parse request body with error handling
-    let body: AddMessageRequest;
+    let body: AddMessagePayload;
     try {
       const contentType = request.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
@@ -152,6 +290,15 @@ export async function POST(
       );
     }
 
+    // Auto-truncate oversized assistant messages to avoid hard failures for large tool outputs.
+    // User messages remain strictly validated without mutation.
+    if (body.role === 'assistant' && typeof body.content === 'string') {
+      body.content = truncateStructuredAssistantContent(
+        body.content,
+        body.metadata?.responseFormat
+      );
+    }
+
     // Validate message content
     const contentValidation = validateMessageContent(body.content);
     if (!contentValidation.valid) {
@@ -183,12 +330,61 @@ export async function POST(
 
     // Check if chat exists (should already be validated by requireChatOwnership)
     const chat = getChatById(chatId);
+    const shouldGenerateAiTitle =
+      chat?.title === 'New Chat' &&
+      body.role === 'user' &&
+      !chat.messages.some((message) => message.role === 'user');
 
     const message = addMessageToChat(chatId, body);
+
+    // Enhance first user message title using title-generator.
+    // Fallback remains the existing substring logic inside addMessageToChat.
+    if (shouldGenerateAiTitle) {
+      try {
+        const aiTitle = await generateAiChatTitle(body.content, request.url);
+        if (aiTitle) {
+          updateChat(chatId, { title: aiTitle });
+        }
+      } catch (titleError) {
+        console.warn('AI title generation failed, keeping fallback title:', titleError);
+      }
+    }
+    const updatedChat = getChatById(chatId);
+
+    const streamRequested = body.stream === true;
+    const shouldStreamChatAssistantMessage =
+      streamRequested &&
+      body.role === 'assistant' &&
+      body.agentType === 'chat' &&
+      typeof message.content === 'string' &&
+      message.content.length > 0;
+
+    if (shouldStreamChatAssistantMessage) {
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(encoder.encode(message.content));
+          controller.close();
+        },
+      });
+
+      return new Response(stream, {
+        status: 201,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'X-Response-Mode': 'stream',
+          'X-Message-Id': message.id,
+          'X-Chat-Title': updatedChat?.title || chat?.title || 'New Chat',
+        },
+      });
+    }
 
     return NextResponse.json({
       success: true,
       data: message,
+      meta: {
+        chatTitle: updatedChat?.title || chat?.title || 'New Chat',
+      },
     }, { status: 201 });
   } catch (error) {
     console.error('Error in POST /api/chat/[chat-id]/messages:', error);

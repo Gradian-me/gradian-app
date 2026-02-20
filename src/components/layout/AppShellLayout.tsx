@@ -18,18 +18,22 @@ interface AppShellLayoutProps {
  */
 export function AppShellLayout({ children }: AppShellLayoutProps) {
   const pathname = usePathname();
+  const transitionKey =
+    pathname === '/chat' || pathname?.startsWith('/chat/')
+      ? '/chat'
+      : (pathname ?? 'root');
 
   return (
     <LayoutPropsProvider>
       <MainLayout>
         <AnimatePresence mode="wait">
           <motion.div
-            key={pathname ?? 'root'}
+            key={transitionKey}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="w-full min-h-0"
+            className="w-full h-full min-h-0"
           >
             <SystemAdminRouteGuard>{children}</SystemAdminRouteGuard>
           </motion.div>

@@ -452,6 +452,86 @@ function buildAgentMetadata(agent: AgentConfig) {
 // Main Processing Function
 // ============================================================================
 
+/** Payload built for chat API (streaming or non-streaming) */
+export interface ChatRequestPayload {
+  systemPrompt: string;
+  userPrompt: string;
+  model: string;
+  responseFormat?: { type: 'json_object' };
+}
+
+/** Result of building chat request payload (success or validation error) */
+export type BuildChatRequestPayloadResult =
+  | { success: true; payload: ChatRequestPayload }
+  | { success: false; error: string; validationErrors?: Array<{ field: string; message: string }> };
+
+/**
+ * Build chat request payload (validation + prompts + model).
+ * Used for both non-streaming (processChatRequest) and streaming (API route).
+ * Does not call the LLM.
+ */
+export async function buildChatRequestPayload(
+  agent: AgentConfig,
+  requestData: AgentRequestData,
+  baseUrl?: string
+): Promise<BuildChatRequestPayloadResult> {
+  // Step 1: Validate request
+  const validation = validateRequest(agent, requestData);
+  if (!validation.valid) {
+    return {
+      success: false,
+      error: validation.error || 'Validation failed',
+      validationErrors: validation.validationErrors,
+    };
+  }
+
+  // Step 2: Build user prompt
+  let userPrompt = buildUserPrompt(agent, requestData);
+
+  // Step 3: Validate and sanitize prompt
+  const promptValidation = validateAndSanitizePrompt(userPrompt);
+  if (!promptValidation.valid) {
+    return {
+      success: false,
+      error: promptValidation.error || 'Invalid prompt',
+    };
+  }
+  userPrompt = promptValidation.prompt!;
+
+  // Step 4: Append option descriptions if needed
+  const bodyParams = requestData.body || {};
+  userPrompt = appendOptionDescriptions(userPrompt, agent, bodyParams);
+
+  // Step 5: Build system prompt
+  const { systemPrompt } = await buildSystemPrompt({
+    agent,
+    formValues: requestData.formValues,
+    bodyParams,
+    baseUrl,
+    preloadedContext: requestData.preloadedContext,
+  });
+
+  // Step 6: Format annotations if present
+  if (requestData.annotations && requestData.previousAiResponse) {
+    userPrompt = formatAnnotationsForPrompt(
+      userPrompt,
+      requestData.annotations,
+      requestData.previousAiResponse
+    );
+  }
+
+  // Step 7: Model and response format
+  const model = agent.model || DEFAULT_MODEL;
+  const responseFormat = shouldUseJsonResponseFormat(agent.requiredOutputFormat)
+    ? { type: 'json_object' as const }
+    : undefined;
+
+  return {
+    success: true,
+    payload: { systemPrompt, userPrompt, model, responseFormat },
+  };
+}
+
 /**
  * Process chat request
  * Handles validation, prompt building, API calls, and response formatting
@@ -464,63 +544,23 @@ export async function processChatRequest(
   const isDevelopment = process.env.NODE_ENV === 'development';
 
   try {
-    // Step 1: Validate request
-    const validation = validateRequest(agent, requestData);
-    if (!validation.valid) {
+    // Step 1–7: Build payload (reuse shared logic)
+    const buildResult = await buildChatRequestPayload(agent, requestData, baseUrl);
+    if (!buildResult.success) {
       return {
         success: false,
-        error: validation.error,
-        validationErrors: validation.validationErrors,
+        error: buildResult.error,
+        validationErrors: buildResult.validationErrors,
       };
     }
-
-    // Step 2: Build user prompt
-    let userPrompt = buildUserPrompt(agent, requestData);
-
-    // Step 3: Validate and sanitize prompt
-    const promptValidation = validateAndSanitizePrompt(userPrompt);
-    if (!promptValidation.valid) {
-      return {
-        success: false,
-        error: promptValidation.error,
-      };
-    }
-    userPrompt = promptValidation.prompt!;
-
-    // Step 4: Append option descriptions if needed
-    const bodyParams = requestData.body || {};
-    userPrompt = appendOptionDescriptions(userPrompt, agent, bodyParams);
-
-    // Step 5: Build system prompt
-    const { systemPrompt } = await buildSystemPrompt({
-      agent,
-      formValues: requestData.formValues,
-      bodyParams,
-      baseUrl,
-      preloadedContext: requestData.preloadedContext,
-    });
-
-    // Step 6: Format annotations if present
-    if (requestData.annotations && requestData.previousAiResponse) {
-      userPrompt = formatAnnotationsForPrompt(
-        userPrompt,
-        requestData.annotations,
-        requestData.previousAiResponse
-      );
-    }
-
-    // Step 7: Get model and call API
-    const model = agent.model || DEFAULT_MODEL;
-    const responseFormat = shouldUseJsonResponseFormat(agent.requiredOutputFormat)
-      ? { type: 'json_object' as const }
-      : undefined;
+    const { payload } = buildResult;
 
     const apiResult = await callChatApi({
       agent,
-      systemPrompt,
-      userPrompt,
-      model,
-      responseFormat,
+      systemPrompt: payload.systemPrompt,
+      userPrompt: payload.userPrompt,
+      model: payload.model,
+      responseFormat: payload.responseFormat,
     });
 
     if (!apiResult.success) {
@@ -533,7 +573,7 @@ export async function processChatRequest(
     // Step 8: Build response with token usage and pricing
     const tokenUsage = await buildTokenUsageResponse(
       apiResult.tokenUsage,
-      model
+      payload.model
     );
 
     return {

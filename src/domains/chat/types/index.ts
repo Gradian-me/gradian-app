@@ -32,6 +32,8 @@ export interface ChatMessageMetadata {
   todos?: Todo[];
   tokenUsage?: TokenUsage;
   responseFormat?: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph' | 'search-card' | 'search-results';
+  deliveryStatus?: 'pending' | 'sent' | 'failed';
+  errorMessage?: string;
   isThinking?: boolean;
   complexity?: number; // Complexity score (0.0-1.0) from orchestrator analysis
   todoId?: string; // ID of the todo that generated this response

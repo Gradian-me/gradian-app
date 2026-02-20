@@ -89,16 +89,16 @@ function MainLayoutContent(initialProps: MainLayoutProps) {
     title: titleProp,
     subtitle: subtitleProp,
     icon: iconProp,
-    showActionButtons: showActionButtonsProp = true,
-    showCreateButton: showCreateButtonProp = false,
+    showActionButtons: showActionButtonsProp,
+    showCreateButton: showCreateButtonProp,
     createButtonText: createButtonTextProp = 'Create',
     onCreateClick: onCreateClickProp,
     editSchemaPath: editSchemaPathProp,
-    isAdmin: isAdminProp = false,
+    isAdmin: isAdminProp,
     navigationSchemas: navigationSchemasProp,
     customHeaderActions: customHeaderActionsProp,
-    showEndLine: showEndLineProp = true,
-    hidePadding: hidePaddingProp = false,
+    showEndLine: showEndLineProp,
+    hidePadding: hidePaddingProp,
   } = initialProps;
 
   const { layoutProps: contextProps } = useLayoutProps();
@@ -677,7 +677,7 @@ function MainLayoutContent(initialProps: MainLayoutProps) {
         {/* Page Content */}
         {/* Use stable key for chat pages to prevent remounting when chat-id changes */}
         <motion.main
-          key={pathname?.startsWith('/chat/') ? '/chat/[chat-id]' : pathname}
+          key={(pathname === '/chat' || pathname?.startsWith('/chat/')) ? '/chat' : pathname}
           initial={!hasMountedBefore ? { opacity: 0, y: 10 } : false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, ease: "easeOut" }}

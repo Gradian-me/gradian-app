@@ -36,6 +36,23 @@ import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
+import { useAnimatedStreamedText } from '../hooks/useAnimatedStreamedText';
+
+function normalizeStreamingMarkdown(content: string, isStreaming: boolean): string {
+  if (!isStreaming || !content) return content;
+
+  let normalized = content;
+
+  // If a fenced code block is opened but not yet closed, temporarily close it
+  // so markdown renders progressively during stream.
+  const fenceMatches = normalized.match(/```/g);
+  const fenceCount = fenceMatches ? fenceMatches.length : 0;
+  if (fenceCount % 2 === 1) {
+    normalized = `${normalized}\n\`\`\``;
+  }
+
+  return normalized;
+}
 
 interface AiBuilderResponseProps {
   response: string;
@@ -66,6 +83,8 @@ interface AiBuilderResponseProps {
   searchUsage?: { cost: number; tool: string } | null; // Search usage (cost and tool)
   summarizedPrompt?: string | null; // Summarized version of the prompt (for search/image)
   hideNextActionButton?: boolean; // Hide the nextAction Apply button (e.g. form-filler uses footer only)
+  /** When true, animate streamed text reveal (typewriter-style) while loading */
+  animatedTextLoading?: boolean;
 }
 
 // Utility function to generate table columns from JSON data
@@ -245,10 +264,12 @@ export function AiBuilderResponse({
   searchUsage,
   summarizedPrompt,
   hideNextActionButton = false,
+  animatedTextLoading = false,
 }: AiBuilderResponseProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const prevIsLoadingRef = useRef<boolean>(isLoading);
   const lastResponseRef = useRef<string>('');
+  const streamScrollAnchorRef = useRef<HTMLDivElement>(null);
   const showModelBadge = LOG_CONFIG[LogType.AI_MODEL_LOG] === true;
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const defaultLang = getDefaultLanguage();
@@ -343,7 +364,16 @@ export function AiBuilderResponse({
 
   // Use unified detection function
   const renderData = useMemo(() => detectMessageRenderType(mockMessage), [mockMessage]);
-  
+
+  // Animate streamed text reveal when enabled and loading (hook returns full text when disabled)
+  const isStreaming = isMainLoading ?? isLoading;
+  const animatedContent = useAnimatedStreamedText(displayContent, Boolean(animatedTextLoading && isStreaming));
+  const shouldAnimatePlainText = Boolean(animatedTextLoading && isStreaming && !displayContent.includes('```'));
+  const displayContentForMarkdown = useMemo(
+    () => normalizeStreamingMarkdown(shouldAnimatePlainText ? animatedContent : displayContent, isStreaming),
+    [shouldAnimatePlainText, animatedContent, displayContent, isStreaming]
+  );
+
   // Get store actions
   const saveResponse = useAiResponseStore((state) => state.saveResponse);
   const updateResponse = useAiResponseStore((state) => state.updateResponse);
@@ -423,6 +453,18 @@ export function AiBuilderResponse({
     }
     prevIsLoadingRef.current = isLoading;
   }, [isLoading, response]);
+
+  // Scroll to bottom when streaming so the latest content is visible
+  useEffect(() => {
+    if (!(isMainLoading ?? isLoading) || !displayContent?.trim() || !streamScrollAnchorRef.current) {
+      return;
+    }
+    const el = streamScrollAnchorRef.current;
+    const id = requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: 'auto', block: 'end' });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [displayContent, isMainLoading, isLoading]);
 
   // Helper function to format image type label
   const getImageTypeLabel = (type?: string): string => {
@@ -1818,7 +1860,7 @@ export function AiBuilderResponse({
             )}
           </div>
         ) : null
-      ) : !(isMainLoading ?? isLoading) && agent?.requiredOutputFormat === 'string' ? (
+      ) : displayContent && agent?.requiredOutputFormat === 'string' ? (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
@@ -1826,6 +1868,12 @@ export function AiBuilderResponse({
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 {aiGeneratedContentLabel}
               </h3>
+              {(isMainLoading ?? isLoading) && (
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-violet-600 dark:text-violet-400 animate-pulse">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500 dark:bg-violet-400" />
+                  Streaming
+                </span>
+              )}
               {showModelBadge && agent?.model && (
                 <Badge
                   variant="outline"
@@ -1839,12 +1887,13 @@ export function AiBuilderResponse({
           </div>
           <div className="w-full">
             <div className="p-4">
-              <MarkdownViewer 
-                content={cleanMarkdownResponse(displayContent)}
+              <MarkdownViewer
+                content={cleanMarkdownResponse(displayContentForMarkdown)}
                 showToggle={true}
-                isEditable={true}
+                isEditable={!(isMainLoading ?? isLoading)}
                 onChange={handleContentChange}
                 enablePrint={true}
+                deferMermaid={isMainLoading ?? isLoading}
                 printConfig={{
                   includeHeader: true,
                   documentTitle: agent?.label || aiGeneratedContentLabel,
@@ -1854,8 +1903,8 @@ export function AiBuilderResponse({
             </div>
           </div>
         </div>
-      ) : !(isMainLoading ?? isLoading) && (renderData.type === 'markdown' || (displayContent && displayContent.trim() && agentFormat !== 'json' && agentFormat !== 'string' && !shouldRenderTable && !shouldRenderGraph)) ? (
-        // Show markdown content (for agents that use search as a tool, this shows after search results)
+      ) : displayContent && (renderData.type === 'markdown' || (displayContent.trim() && agentFormat !== 'json' && agentFormat !== 'string' && !shouldRenderTable && !shouldRenderGraph)) ? (
+        // Show markdown content (for agents that use search as a tool, or while streaming)
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
@@ -1863,6 +1912,12 @@ export function AiBuilderResponse({
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 {agent?.label || 'AI Response'}
               </h3>
+              {(isMainLoading ?? isLoading) && (
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-violet-600 dark:text-violet-400 animate-pulse">
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500 dark:bg-violet-400" />
+                  Streaming
+                </span>
+              )}
               {showModelBadge && agent?.model && (
                 <Badge
                   variant="outline"
@@ -1876,12 +1931,13 @@ export function AiBuilderResponse({
           </div>
           <div className="w-full">
             <div className="p-4">
-              <MarkdownViewer 
-                content={cleanMarkdownResponse(displayContent)}
+              <MarkdownViewer
+                content={cleanMarkdownResponse(displayContentForMarkdown)}
                 showToggle={true}
-                isEditable={true}
+                isEditable={!(isMainLoading ?? isLoading)}
                 onChange={handleContentChange}
                 enablePrint={true}
+                deferMermaid={isMainLoading ?? isLoading}
                 printConfig={{
                   includeHeader: true,
                   documentTitle: agent?.label || aiGeneratedContentLabel,
@@ -1891,7 +1947,7 @@ export function AiBuilderResponse({
             </div>
           </div>
         </div>
-      ) : !(isMainLoading ?? isLoading) ? (
+      ) : displayContent ? (
         <CodeViewer
           code={displayContent}
           programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
@@ -1903,6 +1959,10 @@ export function AiBuilderResponse({
           initialLineNumbers={10}
         />
       ) : null}
+      {/* Scroll anchor: scroll into view when streaming so latest content is visible */}
+      {(isMainLoading ?? isLoading) && displayContent && (
+        <div ref={streamScrollAnchorRef} className="h-0 w-full" aria-hidden="true" />
+      )}
     </div>
   );
 }

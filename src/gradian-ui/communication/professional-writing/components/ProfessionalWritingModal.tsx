@@ -5,7 +5,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -40,6 +40,8 @@ export function ProfessionalWritingModal({
   const [inputText, setInputText] = useState(initialText);
   const [writingStyle, setWritingStyle] = useState<WritingStyle>('extended');
   const [targetLanguage, setTargetLanguage] = useState<string>('');
+  const modalBodyRef = useRef<HTMLDivElement>(null);
+  const enhancedTextContainerRef = useRef<HTMLDivElement>(null);
   
   const {
     enhancedText,
@@ -60,6 +62,21 @@ export function ProfessionalWritingModal({
       clearError();
     }
   }, [initialText, isOpen, clearResponse, clearError]);
+
+  // Keep the enhanced text panel pinned to bottom while streaming.
+  useEffect(() => {
+    if (!isLoading) return;
+    if (!enhancedText) return;
+
+    const modalBodyEl = modalBodyRef.current;
+    if (modalBodyEl) {
+      modalBodyEl.scrollTop = modalBodyEl.scrollHeight;
+    }
+
+    const el = enhancedTextContainerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
+  }, [enhancedText, isLoading]);
 
   const handleGenerate = () => {
     generateEnhancedText({
@@ -121,7 +138,7 @@ export function ProfessionalWritingModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col items-center space-y-6 px-6 pb-6 overflow-y-auto flex-1 min-h-0">
+        <div ref={modalBodyRef} className="flex flex-col items-center space-y-6 px-6 pb-6 overflow-y-auto flex-1 min-h-0">
           {/* Style Selector */}
           <div className="w-full">
             <Select
@@ -220,7 +237,10 @@ export function ProfessionalWritingModal({
                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Enhanced Text
                 </label>
-                <div className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-4 min-h-[200px] max-h-[400px] overflow-y-auto">
+                <div
+                  ref={enhancedTextContainerRef}
+                  className="w-full rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50 p-4 min-h-[200px] max-h-[400px] overflow-y-auto"
+                >
                   <MarkdownViewer
                     content={enhancedText}
                     showToggle={false}

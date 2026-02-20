@@ -42,6 +42,43 @@ export interface SearchApiResponse {
   results: SearchResult[];
 }
 
+const MAX_SNIPPET_LENGTH = 1200;
+
+/**
+ * Normalize noisy crawler snippets so cards stay readable.
+ * - Removes markdown links and decorative bullets.
+ * - Collapses excessive whitespace/newlines.
+ * - Trims repetitive nav/footer noise and caps length.
+ */
+function normalizeSearchSnippet(snippet: string): string {
+  if (!snippet || typeof snippet !== 'string') return '';
+
+  let cleaned = snippet;
+
+  // Convert markdown links to plain text labels.
+  cleaned = cleaned.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1');
+
+  // Remove empty/ornamental bullet-only lines.
+  cleaned = cleaned.replace(/^\s*[*•-]\s*$/gm, '');
+
+  // Collapse huge whitespace blocks while keeping paragraph breaks.
+  cleaned = cleaned
+    .replace(/\r/g, '')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+
+  // Remove common footer/nav boilerplate tails.
+  cleaned = cleaned
+    .replace(/All rights reserved[\s\S]*$/i, '')
+    .replace(/AP News Code of Conduct[\s\S]*$/i, '')
+    .replace(/Privacy \/ Do Not Sell My Info[\s\S]*$/i, '')
+    .trim();
+
+  if (cleaned.length <= MAX_SNIPPET_LENGTH) return cleaned;
+  return `${cleaned.slice(0, MAX_SNIPPET_LENGTH).trimEnd()}...`;
+}
+
 /**
  * Extract host from URL
  */
@@ -323,6 +360,7 @@ export async function processSearchRequest(
         // Enrich search results with source metadata
         const searchResults: SearchResult[] = rawSearchResults.map((result) => ({
           ...result,
+          snippet: normalizeSearchSnippet(result.snippet || ''),
           source_host: result.source_host || extractHostFromUrl(result.url || ''),
           source_title: result.source_title || result.title || '',
           source_link: result.source_link || result.url || '',

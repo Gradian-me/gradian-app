@@ -58,6 +58,24 @@ async function retryWithBackoff<T>(
   throw lastError || new Error('Retry failed');
 }
 
+function isUpstreamConnectivityError(error: unknown): boolean {
+  if (!error) return false;
+
+  const message = error instanceof Error ? error.message : String(error);
+  const lowerMessage = message.toLowerCase();
+  if (
+    lowerMessage.includes('fetch failed') ||
+    lowerMessage.includes('connect timeout') ||
+    lowerMessage.includes('timeout')
+  ) {
+    return true;
+  }
+
+  const cause = (error as any)?.cause;
+  const code = (cause?.code || (error as any)?.code || '').toString().toUpperCase();
+  return code === 'UND_ERR_CONNECT_TIMEOUT' || code === 'ECONNRESET' || code === 'ETIMEDOUT';
+}
+
 /**
  * Load AI agents from JSON file with caching
  */
@@ -1108,13 +1126,31 @@ async function executeAgentChain(
       }
       
       if (unmetDeps.length > 0) {
-        throw new Error(`Todo ${todo.id} has unmet dependencies: ${unmetDeps.join(', ')}`);
+        const errorMessage = `Todo ${todo.id} blocked by unmet dependencies: ${unmetDeps.join(', ')}`;
+        todo.status = 'failed';
+        todo.output = errorMessage;
+        todo.chainMetadata = {
+          ...(todo.chainMetadata || {}),
+          input: currentInput,
+          executedAt: new Date().toISOString(),
+          error: errorMessage,
+        };
+        return null;
       }
     }
 
     const agent = availableAgents.find(a => a.id === todo.agentId);
     if (!agent) {
-      throw new Error(`Agent ${todo.agentId} not found`);
+      const errorMessage = `Agent ${todo.agentId} not found`;
+      todo.status = 'failed';
+      todo.output = errorMessage;
+      todo.chainMetadata = {
+        ...(todo.chainMetadata || {}),
+        input: currentInput,
+        executedAt: new Date().toISOString(),
+        error: errorMessage,
+      };
+      return null;
     }
 
     // Store execution metadata in todo
@@ -1147,7 +1183,7 @@ async function executeAgentChain(
         todo.status = 'failed';
         todo.output = errorMessage; // Save error as output for tooltip
         todo.chainMetadata.error = errorMessage;
-        throw new Error(errorMessage);
+        return null;
       }
 
       // Extract token usage, duration, cost, and response format from result
@@ -1177,7 +1213,7 @@ async function executeAgentChain(
       todo.status = 'failed';
       todo.output = errorMessage; // Save error as output for tooltip
       todo.chainMetadata.error = errorMessage;
-      throw error;
+      return null;
     }
   };
 
@@ -1449,6 +1485,24 @@ Please try rephrasing your request or be more specific about what you'd like to 
     };
   } catch (error) {
     console.error('Error in orchestrator:', error);
+
+    // Graceful degradation when upstream LLM API is temporarily unreachable.
+    // This prevents hard 500s and gives users an actionable retry message.
+    if (isUpstreamConnectivityError(error)) {
+      return {
+        success: true,
+        data: {
+          complexity: 0,
+          executionType: 'guidance',
+          response: `I couldn't reach the AI provider right now due to a network timeout.
+
+Please try again in a few seconds. If this keeps happening, check internet/proxy connectivity and API endpoint availability.
+
+#network #retry #orchestrator`,
+        },
+      };
+    }
+
     return {
       success: false,
       error: sanitizeErrorMessage(error),

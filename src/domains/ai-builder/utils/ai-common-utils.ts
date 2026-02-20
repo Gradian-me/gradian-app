@@ -1,7 +1,24 @@
 /**
  * AI Builder Common Utilities
  * Shared functions used across multiple AI agent types
+ * Client-safe: no Node.js modules (fs, path) - safe to import from client components
  */
+
+/**
+ * Whether this agent should use streaming responses.
+ * Chat agents with requiredOutputFormat "string" stream by default unless stream: false.
+ */
+export function isStreamingAgent(agent: {
+  agentType?: string;
+  requiredOutputFormat?: string;
+  stream?: boolean;
+} | null | undefined): boolean {
+  if (!agent) return false;
+  const isChat = agent.agentType === 'chat' || !agent.agentType;
+  const isString = agent.requiredOutputFormat === 'string';
+  if (!isChat || !isString) return false;
+  return agent.stream !== false;
+}
 
 /**
  * Format field name from camelCase to Title Case

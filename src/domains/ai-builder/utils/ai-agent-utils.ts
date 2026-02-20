@@ -44,6 +44,7 @@ export interface AgentResponse {
 
 // Re-export getApiUrlForAgentType for backward compatibility
 export { getApiUrlForAgentType };
+export { isStreamingAgent } from './ai-common-utils';
 
 /**
  * Process AI agent request - routes to appropriate utility based on agent type

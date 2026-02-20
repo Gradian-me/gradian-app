@@ -5,7 +5,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, Clock, Play, Loader2, Eye, Timer, AlertCircle, GripVertical, Edit2, Trash2, Network, Plus } from 'lucide-react';
+import { Check, X, Clock, Play, Loader2, Eye, Timer, AlertCircle, GripVertical, Edit2, Trash2, Network, Plus, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -303,7 +303,10 @@ export const TodoList: React.FC<TodoListProps> = ({
   // Confirm delete
   const handleConfirmDelete = useCallback(() => {
     if (!todoToDelete) return;
-    
+
+    // Close dialog first to avoid portal/animation race when list becomes empty.
+    setIsDeleteDialogOpen(false);
+
     // Remove the deleted todo
     const todosAfterDelete = localTodos.filter(t => t.id !== todoToDelete.id);
     
@@ -317,7 +320,6 @@ export const TodoList: React.FC<TodoListProps> = ({
       onTodosUpdate(updatedTodos);
     }
     
-    setIsDeleteDialogOpen(false);
     setTodoToDelete(null);
   }, [todoToDelete, localTodos, onTodosUpdate, updateDependenciesBasedOnOrder]);
 
@@ -466,6 +468,75 @@ export const TodoList: React.FC<TodoListProps> = ({
       await onExecute(workingTodos);
     }
   }, [chatId, initialInput, sortedTodos, onExecute, onTodosUpdate, onTodoExecuted, localTodos]);
+
+  const handleRetrySingleTodo = useCallback(async (todo: Todo) => {
+    if (!chatId || !initialInput || !todo?.id) return;
+
+    setExecutingTodoId(todo.id);
+
+    const inProgressTodo: Todo = {
+      ...todo,
+      status: 'in_progress',
+      chainMetadata: {
+        ...todo.chainMetadata,
+        input: todo.chainMetadata?.input ?? initialInput,
+        executedAt: todo.chainMetadata?.executedAt ?? new Date().toISOString(),
+        error: undefined,
+      },
+    };
+    const inProgressTodos = localTodos.map((t) => (t.id === todo.id ? inProgressTodo : t));
+    setLocalTodos(inProgressTodos);
+    onTodosUpdate?.(inProgressTodos);
+
+    try {
+      const response = await fetch(`/api/chat/${chatId}/execute-todo/${todo.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ initialInput }),
+      });
+
+      let result: any = null;
+      try {
+        result = await response.json();
+      } catch {
+        result = null;
+      }
+
+      if (!response.ok || !result?.success || !result?.data?.todo) {
+        const errorMessage =
+          result?.error ||
+          (response.status ? `Server error: ${response.status} ${response.statusText}` : 'Failed to execute todo');
+        throw new Error(errorMessage);
+      }
+
+      const updatedTodo: Todo = result.data.todo;
+      const updatedTodos = localTodos.map((t) => (t.id === todo.id ? updatedTodo : t));
+      setLocalTodos(updatedTodos);
+      onTodosUpdate?.(updatedTodos);
+
+      if (onTodoExecuted && updatedTodo.status === 'completed') {
+        await onTodoExecuted(updatedTodo, result.data);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to execute todo';
+      const failedTodo: Todo = {
+        ...todo,
+        status: 'failed',
+        output: errorMessage,
+        chainMetadata: {
+          ...todo.chainMetadata,
+          input: initialInput,
+          executedAt: new Date().toISOString(),
+          error: errorMessage,
+        },
+      };
+      const failedTodos = localTodos.map((t) => (t.id === todo.id ? failedTodo : t));
+      setLocalTodos(failedTodos);
+      onTodosUpdate?.(failedTodos);
+    } finally {
+      setExecutingTodoId(null);
+    }
+  }, [chatId, initialInput, localTodos, onTodoExecuted, onTodosUpdate]);
 
   const handleApprove = () => {
     if (onApprove) {
@@ -675,57 +746,56 @@ export const TodoList: React.FC<TodoListProps> = ({
     setLocalExpanded(isExpanded);
   }, [isExpanded]);
 
-  if (localTodos.length === 0) {
-    return null;
-  }
+  const hasLocalTodos = localTodos.length > 0;
 
   const accordionValue = localExpanded ? 'execution-plan' : '';
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={cn('mb-4', className)}
-      >
-        <Accordion 
-          type="single" 
-          collapsible 
-          value={accordionValue}
-          onValueChange={(value) => {
-            const expanded = value === 'execution-plan';
-            setLocalExpanded(expanded);
-            onExpandedChange?.(expanded);
-          }}
-          className="w-full"
+      {hasLocalTodos && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={cn('mb-4', className)}
         >
-          <AccordionItem value="execution-plan" className="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
-            <AccordionTrigger className="px-3 py-2 hover:no-underline bg-gray-50 dark:bg-gray-900/50 rounded-t-lg">
-              <div className="flex items-center justify-between w-full pr-4">
-                <div className="flex items-center gap-2">
-                  {/* Execution Plan Status Icon */}
-                  {getExecutionPlanStatusIcon()}
-                  <div>
-                    <div className="text-xs font-semibold text-gray-900 dark:text-gray-100 text-start">
-                      Execution Plan
+          <Accordion 
+            type="single" 
+            collapsible 
+            value={accordionValue}
+            onValueChange={(value) => {
+              const expanded = value === 'execution-plan';
+              setLocalExpanded(expanded);
+              onExpandedChange?.(expanded);
+            }}
+            className="w-full"
+          >
+            <AccordionItem value="execution-plan" className="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+              <AccordionTrigger className="px-3 py-2 hover:no-underline bg-gray-50 dark:bg-gray-900/50 rounded-t-lg">
+                <div className="flex items-center justify-between w-full pr-4">
+                  <div className="flex items-center gap-2">
+                    {/* Execution Plan Status Icon */}
+                    {getExecutionPlanStatusIcon()}
+                    <div>
+                      <div className="text-xs font-semibold text-gray-900 dark:text-gray-100 text-start">
+                        Execution Plan
+                      </div>
+                      <p className="text-[10px] text-gray-600 dark:text-gray-400 mt-0 text-start">
+                        {localTodos.length} step{localTodos.length !== 1 ? 's' : ''} to execute
+                      </p>
                     </div>
-                    <p className="text-[10px] text-gray-600 dark:text-gray-400 mt-0 text-start">
-                      {localTodos.length} step{localTodos.length !== 1 ? 's' : ''} to execute
-                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {totalDuration > 0 && (
+                      <Badge variant="outline" className="flex items-center gap-1 shrink-0 text-[10px] px-1.5 py-0 h-4">
+                        <Timer className="w-2.5 h-2.5" />
+                        {formatDuration(totalDuration)}
+                      </Badge>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  {totalDuration > 0 && (
-                    <Badge variant="outline" className="flex items-center gap-1 shrink-0 text-[10px] px-1.5 py-0 h-4">
-                      <Timer className="w-2.5 h-2.5" />
-                      {formatDuration(totalDuration)}
-                    </Badge>
-                  )}
-                </div>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-0 pb-0">
-              <div className="p-2">
+              </AccordionTrigger>
+              <AccordionContent className="px-0 pb-0">
+                <div className="p-2">
                 {/* Add Todo Button */}
                 <div className="mb-2 flex justify-end">
                   <Button
@@ -782,6 +852,7 @@ export const TodoList: React.FC<TodoListProps> = ({
                         getStatusIcon={getStatusIcon}
                         onEdit={handleEditTodo}
                         onDelete={handleDeleteTodo}
+                        onRetry={handleRetrySingleTodo}
                         onShowResponse={handleShowResponse}
                         formatDuration={formatDuration}
                         isOver={overId === todo.id && activeId !== todo.id}
@@ -861,11 +932,12 @@ export const TodoList: React.FC<TodoListProps> = ({
                     </div>
                   </div>
                 )}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </motion.div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </motion.div>
+      )}
 
       {/* Floating executing badge near chat input area */}
       {(isExecuting || executingTodoId) && executingTodoTitle && (
@@ -1022,6 +1094,7 @@ interface SortableTodoItemProps {
   getStatusIcon: (todo: Todo) => React.ReactNode;
   onEdit: (todo: Todo) => void;
   onDelete: (todo: Todo) => void;
+  onRetry: (todo: Todo) => void;
   onShowResponse: (todo: Todo) => void;
   formatDuration: (ms: number) => string;
   isOver?: boolean; // Whether this item is being dragged over
@@ -1087,6 +1160,7 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
   getStatusIcon,
   onEdit,
   onDelete,
+  onRetry,
   onShowResponse,
   formatDuration,
   isOver = false,
@@ -1202,6 +1276,15 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
             {/* Action Buttons - Show on hover */}
             {!isCompleted && todo.status !== 'in_progress' && (
               <div className="flex items-center gap-1 opacity-30 group-hover:opacity-100 transition-opacity">
+                {todo.status === 'failed' && (
+                  <ButtonMinimal
+                    icon={RotateCcw}
+                    title="Retry todo"
+                    color="orange"
+                    size="sm"
+                    onClick={() => onRetry(todo)}
+                  />
+                )}
                 <ButtonMinimal
                   icon={Edit2}
                   title="Edit todo"
@@ -1278,6 +1361,11 @@ const SortableTodoItem: React.FC<SortableTodoItemProps> = ({
         {todo.dependencies && todo.dependencies.length > 0 && (
           <div className="mt-0.5 text-[10px] text-gray-500 dark:text-gray-500">
             Depends on: {todo.dependencies.length} step{todo.dependencies.length !== 1 ? 's' : ''}
+          </div>
+        )}
+        {todo.status === 'failed' && (
+          <div className="mt-1 text-[11px] text-red-600 dark:text-red-400">
+            {todo.chainMetadata?.error || (typeof todo.output === 'string' ? todo.output : 'Todo execution failed')}
           </div>
         )}
         {isCompleted && todo.output && (
