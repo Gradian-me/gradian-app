@@ -42,7 +42,7 @@ export function DynamicQueryPageClient({
   // Sync viewMode with flatten state: hierarchy for flatten=false, table for flatten=true
   const viewMode: 'hierarchy' | 'table' = flatten ? 'table' : 'hierarchy';
   
-  const handleViewModeChange = useCallback((mode: 'grid' | 'list' | 'table' | 'hierarchy') => {
+  const handleViewModeChange = useCallback((mode: 'grid' | 'list' | 'table' | 'hierarchy' | 'kanban') => {
     // Only allow hierarchy and table for dynamic queries
     if (mode === 'hierarchy') {
       setFlatten(false);

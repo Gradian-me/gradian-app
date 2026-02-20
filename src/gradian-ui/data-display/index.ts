@@ -14,6 +14,7 @@ export * from './card';
 
 // List Components
 export * from './list';
+export * from './kanban';
 
 // New Components
 export { EmptyState } from './components/EmptyState';

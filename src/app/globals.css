@@ -947,6 +947,31 @@ input.bg-transparent:-webkit-autofill:active {
   animation: shimmer 2s infinite;
 }
 
+/* Kanban drop feedback: two clear violet pulses */
+@keyframes kanbanDropPulse {
+  0% {
+    background-color: transparent;
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+  }
+  50% {
+    background-color: rgba(139, 92, 246, 0.16);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.35);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+  }
+}
+
+.dark .kanban-drop-pulse {
+  animation: kanbanDropPulse 0.45s cubic-bezier(0.22, 1, 0.36, 1) 2;
+  background-color: rgba(139, 92, 246, 0.18);
+}
+
+.kanban-drop-pulse {
+  animation: kanbanDropPulse 0.45s cubic-bezier(0.22, 1, 0.36, 1) 2;
+}
+
 /* KaTeX Math Rendering Styles */
 .katex {
   font-size: 1.1em;

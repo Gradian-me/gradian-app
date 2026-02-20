@@ -58,6 +58,7 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
   const buttonCancel = getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang);
   const optionNone = getT(TRANSLATION_KEYS.LABEL_NONE, language, defaultLang);
   const labelAddToReferenceMetadata = getT(TRANSLATION_KEYS.FIELD_LABEL_ADD_TO_REFERENCE_METADATA, language, defaultLang);
+  const labelAllowKanbanView = 'Allow Kanban View';
   const labelColumnSpan = getT(TRANSLATION_KEYS.DETAIL_LABEL_COLUMN_SPAN, language, defaultLang);
   const labelOrder = getT(TRANSLATION_KEYS.FIELD_LABEL_ORDER, language, defaultLang);
   const labelRequired = getT(TRANSLATION_KEYS.FIELD_LABEL_REQUIRED, language, defaultLang);
@@ -297,6 +298,11 @@ export function FieldEditorContent({ field, onUpdate, onDelete, sections }: Fiel
                 config={{ name: `addToReferenceMetadata-${field.id}`, label: labelAddToReferenceMetadata }}
                 value={tempField.addToReferenceMetadata || false}
                 onChange={(checked: boolean) => setTempField({ ...tempField, addToReferenceMetadata: checked })}
+              />
+              <Switch
+                config={{ name: `allowKanbanView-${field.id}`, label: labelAllowKanbanView }}
+                value={tempField.allowKanbanView || false}
+                onChange={(checked: boolean) => setTempField({ ...tempField, allowKanbanView: checked })}
               />
             </div>
           </div>

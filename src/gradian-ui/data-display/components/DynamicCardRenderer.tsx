@@ -56,6 +56,9 @@ export interface DynamicCardRendererProps {
    * When true, shows user details (created/updated metadata)
    */
   showUserDetails?: boolean;
+  cardVariant?: 'default' | 'kanban';
+  kanbanDragHandle?: React.ReactNode;
+  kanbanDragging?: boolean;
 }
 
 export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
@@ -75,6 +78,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   highlightQuery = '',
   isInDialog = false,
   showUserDetails = false,
+  cardVariant = 'default',
+  kanbanDragHandle,
+  kanbanDragging = false,
 }) => {
   const router = useRouter();
   const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
@@ -516,6 +522,105 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
     'flex gap-4',
     viewMode === 'grid' ? 'flex-col' : 'flex-row items-center'
   );
+
+  if (cardVariant === 'kanban') {
+    return (
+      <motion.div
+        initial={disableAnimation ? false : { opacity: 0, y: 8 }}
+        animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+        transition={disableAnimation ? {} : { duration: 0.2 }}
+        className={cn(
+          'rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900',
+          kanbanDragging && 'border-violet-300 bg-violet-50/80 dark:border-violet-500 dark:bg-violet-900/30',
+          className
+        )}
+      >
+        <div
+          role={isInDialog ? undefined : 'button'}
+          tabIndex={isInDialog ? -1 : 0}
+          className={cn(!isInDialog && 'cursor-pointer')}
+          onClick={() => {
+            if (!isInDialog && onView) {
+              onView(data);
+            }
+          }}
+          onKeyDown={(e: KeyboardEvent) => {
+            if (isInDialog) return;
+            if ((e.key === 'Enter' || e.key === ' ') && onView) {
+              e.preventDefault();
+              onView(data);
+            }
+          }}
+        >
+          <div className="mb-1 flex items-start justify-between gap-2">
+            <div className="flex min-w-0 items-start gap-2">
+              {kanbanDragHandle}
+              <h4 className="line-clamp-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
+              </h4>
+            </div>
+            {hasCodeField && cardConfig.codeField ? (
+              <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
+            ) : null}
+          </div>
+          {cardConfig.subtitle ? (
+            <p className="mb-2 line-clamp-2 text-xs text-gray-500 dark:text-gray-400">
+              {renderHighlightedText(cardConfig.subtitle, normalizedHighlightQuery)}
+            </p>
+          ) : null}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            {cardConfig.badgeField && Array.isArray(cardConfig.badgeValues) && cardConfig.badgeValues.length > 0 ? (
+              <BadgeViewer
+                field={cardConfig.badgeField}
+                value={cardConfig.badgeValues}
+                maxBadges={2}
+                className="w-full"
+                badgeVariant="outline"
+                enforceVariant={false}
+                animate={!disableAnimation}
+                onBadgeClick={badgeValueTargetSchema.size > 0 ? handleBadgeClick : undefined}
+                isItemClickable={isBadgeItemClickable}
+              />
+            ) : null}
+          </div>
+          {(onView || onViewDetail || onEdit || onDelete || onDiscussions) && (
+            <div
+              className="mt-2 flex justify-end"
+              onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <HierarchyActionsMenu
+                stopPropagation
+                outOfEllipsis={['view', 'edit']}
+                permissions={schema?.permissions}
+                onView={
+                  onViewDetail || onView
+                    ? () => (onViewDetail ? onViewDetail(data) : onView?.(data))
+                    : undefined
+                }
+                onEdit={onEdit ? () => onEdit(data) : undefined}
+                onDelete={onDelete ? () => onDelete(data) : undefined}
+                onDiscussions={
+                  onDiscussions && schema?.id && data?.id
+                    ? () => onDiscussions(data)
+                    : undefined
+                }
+                discussionCount={
+                  data?.engagementCounts
+                    ? getDiscussionCount(data.engagementCounts)
+                    : undefined
+                }
+              />
+            </div>
+          )}
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div

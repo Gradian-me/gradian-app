@@ -1,5 +1,5 @@
 // Dynamic CRUD API Routes for Single Entity
-// Handles GET, PUT, DELETE operations for a specific entity
+// Handles GET, PUT, PATCH, DELETE operations for a specific entity
 
 import { NextRequest, NextResponse } from 'next/server';
 import { BaseRepository } from '@/gradian-ui/shared/domain/repositories/base.repository';
@@ -247,12 +247,12 @@ export async function GET(
 }
 
 /**
- * PUT - Update entity
- * Example: PUT /api/data/vendors/123
+ * Shared update handler for PUT and PATCH
  */
-export async function PUT(
+async function handleUpdateRequest(
   request: NextRequest,
-  { params }: { params: Promise<{ 'schema-id': string; id: string }> }
+  { params }: { params: Promise<{ 'schema-id': string; id: string }> },
+  method: 'PUT' | 'PATCH'
 ) {
   // Check authentication (unless route is excluded)
   const authResult = await requireApiAuth(request);
@@ -266,7 +266,7 @@ export async function PUT(
     const body = await request.json();
     return proxyDataRequest(request, targetPath, {
       body,
-      method: 'PUT',
+      method,
       headers: { 'content-type': 'application/json' },
     });
   }
@@ -337,7 +337,7 @@ export async function PUT(
         loggingCustom(
           LogType.INFRA_LOG,
           'warn',
-          `[PUT /api/data/:id] Failed to check tenant visibility: ${error instanceof Error ? error.message : String(error)}`,
+          `[${method} /api/data/:id] Failed to check tenant visibility: ${error instanceof Error ? error.message : String(error)}`,
         );
         // Continue with update if visibility check fails (fail open for now)
       }
@@ -351,7 +351,7 @@ export async function PUT(
       loggingCustom(
         LogType.INFRA_LOG,
         'warn',
-        `[PUT /api/data/:id] Failed to parse request body: ${error instanceof Error ? error.message : String(error)}`,
+        `[${method} /api/data/:id] Failed to parse request body: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
 
@@ -377,7 +377,7 @@ export async function PUT(
         loggingCustom(
           LogType.INFRA_LOG,
           'warn',
-          `[PUT /api/data/:id] Failed to extract picker values and repeating section values: ${error instanceof Error ? error.message : String(error)}`,
+          `[${method} /api/data/:id] Failed to extract picker values and repeating section values: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }
@@ -400,7 +400,7 @@ export async function PUT(
       loggingCustom(
         LogType.INFRA_LOG,
         'warn',
-        `[PUT /api/data/:id] Failed to parse update response JSON: ${error instanceof Error ? error.message : String(error)}`,
+        `[${method} /api/data/:id] Failed to parse update response JSON: ${error instanceof Error ? error.message : String(error)}`,
       );
       responseData = null;
     }
@@ -442,7 +442,7 @@ export async function PUT(
               loggingCustom(
                 LogType.INFRA_LOG,
                 'warn',
-                `[PUT /api/data/:id] Failed to sync HAS_FIELD_VALUE relations: ${error instanceof Error ? error.message : String(error)}`,
+                `[${method} /api/data/:id] Failed to sync HAS_FIELD_VALUE relations: ${error instanceof Error ? error.message : String(error)}`,
               );
             }
           }
@@ -462,7 +462,7 @@ export async function PUT(
             loggingCustom(
               LogType.INFRA_LOG,
               'warn',
-              `[PUT /api/data/:id] Failed to sync repeating section relations: ${error instanceof Error ? error.message : String(error)}`,
+              `[${method} /api/data/:id] Failed to sync repeating section relations: ${error instanceof Error ? error.message : String(error)}`,
             );
           }
         }
@@ -470,7 +470,7 @@ export async function PUT(
         loggingCustom(
           LogType.INFRA_LOG,
           'warn',
-          `[PUT /api/data/:id] Failed to sync relations: ${error instanceof Error ? error.message : String(error)}`,
+          `[${method} /api/data/:id] Failed to sync relations: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }
@@ -487,7 +487,7 @@ export async function PUT(
         loggingCustom(
           LogType.INFRA_LOG,
           'warn',
-          `[PUT /api/data/:id] Failed to enrich response: ${error instanceof Error ? error.message : String(error)}`,
+          `[${method} /api/data/:id] Failed to enrich response: ${error instanceof Error ? error.message : String(error)}`,
         );
         return NextResponse.json(responseData, { status: response.status });
       }
@@ -507,6 +507,28 @@ export async function PUT(
       { status: 500 }
     );
   }
+}
+
+/**
+ * PUT - Update entity
+ * Example: PUT /api/data/vendors/123
+ */
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ 'schema-id': string; id: string }> }
+) {
+  return handleUpdateRequest(request, { params }, 'PUT');
+}
+
+/**
+ * PATCH - Partial update entity
+ * Example: PATCH /api/data/vendors/123
+ */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ 'schema-id': string; id: string }> }
+) {
+  return handleUpdateRequest(request, { params }, 'PATCH');
 }
 
 /**

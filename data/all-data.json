@@ -6981,20 +6981,14 @@
     },
     {
       "isForce": false,
-      "assignedTo": [
-        {
-          "id": "01KCPC8YBMRYB3X846103R11MH"
-        }
-      ],
+      "assignedTo": [],
       "dueDate": "2026-01-29",
-      "status": [
-        {
-          "id": "01KBSVZ3N828YPGRXFDY84D15W",
-          "label": "In Progress",
-          "icon": "Loader",
-          "color": "blue"
-        }
-      ],
+      "status": {
+        "id": "01KBSVZ3N828YPGRXFDY84D15W",
+        "label": "In Progress",
+        "color": "blue",
+        "icon": "Loader"
+      },
       "entityType": [
         {
           "id": "01KCDZTASK001WORK000000000001",
@@ -7006,29 +7000,116 @@
       "taskTitle": "test task 1",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "createdBy": {
+        "username": "abidim",
+        "name": "Mahyar",
+        "lastname": "Abidi",
+        "email": "abidi.mahyar@gmail.com",
+        "gender": "male",
+        "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+        "id": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+        "createdAt": "2025-11-05T15:49:06.366Z",
+        "updatedAt": "2026-02-15T14:01:45.203Z",
+        "avatarUrl": "https://media.licdn.com/dms/image/v2/D4D03AQFqEf1NfTjObg/profile-displayphoto-crop_800_800/B4DZlbvgWeJMAM-/0/1758180806291?e=1764201600&v=beta&t=9qdjZhqjahZqjMh_oT9QKsjgz6bbTb5Bw0BvmXu9Rag",
+        "firstName": [
+          {
+            "en": "Mahyar"
+          },
+          {
+            "fa": "مهیار"
+          }
+        ],
+        "lastName": [
+          {
+            "en": "Abidi"
+          },
+          {
+            "fa": "عبیدی"
+          }
+        ],
+        "postTitle": [
+          {
+            "en": "CAO"
+          },
+          {
+            "fa": "معاون تحلیل کسب و کار"
+          }
+        ],
+        "company": "CinnaGen",
+        "authenticationType": [
+          {
+            "id": "form-based"
+          }
+        ],
+        "status": [
+          {
+            "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+            "label": "Active",
+            "icon": "CheckCheck",
+            "color": "emerald"
+          }
+        ],
+        "incomplete": false,
+        "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+        "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+        "relatedTenants": [
+          {
+            "id": "01KBFBGV9151FQN481NB2CT4MX",
+            "label": "Development Environment"
+          },
+          {
+            "id": "01KBFBD109G6CYRT7RA04TMMXC",
+            "label": "AryoGen"
+          },
+          {
+            "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+            "label": "Supply Chain Management"
+          },
+          {
+            "id": "01KH39DYCW17SXF2APAV1KZZQT",
+            "label": "Gradian App"
+          },
+          {
+            "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+            "label": "Local Development"
+          }
+        ],
+        "entityType": [
+          {
+            "id": "01KCXDKF6JJ392P4HMGC8T19TC",
+            "label": "System Administrator",
+            "icon": "Shield",
+            "color": "rose"
+          }
+        ],
+        "relatedCompanies": [
+          {
+            "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+            "label": "AryoGen"
+          },
+          {
+            "id": "01K94V4PJSFKCXS6AVX07P86N5",
+            "label": "CinnaGen"
+          }
+        ],
+        "employeeCode": "841"
+      },
       "id": "01KEBGGFMFEYNAA45J8T928GAG",
       "createdAt": "2026-01-07T05:57:38.591Z",
-      "updatedAt": "2026-02-18T20:38:09.993Z",
+      "updatedAt": "2026-02-20T16:42:30.932Z",
       "progressPercent": 49,
       "definitionOfDone": [],
       "actionsTaken": []
     },
     {
-      "assignedTo": [
-        {
-          "id": "01KDG66XCHTD0GGQX3A2E69T85"
-        }
-      ],
+      "assignedTo": [],
       "dueDate": "2026-02-24",
-      "status": [
-        {
-          "id": "01KBSVZ3N828YPGRXFDY84D15W",
-          "label": "In Progress",
-          "icon": "Loader",
-          "color": "blue"
-        }
-      ],
+      "status": {
+        "id": "01KBSVZHFGX0F3YKHV44J3H2QM",
+        "label": "Cancelled",
+        "color": "red",
+        "icon": "XCircle"
+      },
       "entityType": [
         {
           "id": "01KCDZTASK004HEALTH0000000004",
@@ -7043,7 +7124,7 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KEBX0709K2G44QVF3DKE7CC3",
       "createdAt": "2026-01-07T09:35:56.962Z",
-      "updatedAt": "2026-02-18T20:38:21.151Z",
+      "updatedAt": "2026-02-20T17:32:28.248Z",
       "progressPercent": 27,
       "definitionOfDone": [],
       "actionsTaken": []
@@ -7092,25 +7173,19 @@
         }
       ],
       "dueDate": "2026-03-02",
-      "assignedTo": [
-        {
-          "id": "01KDFEG5Z10VPAMAG3E76KJMCG"
-        }
-      ],
-      "status": [
-        {
-          "id": "01KBSVYXHRWPMBAACHKSBQ1E4R",
-          "label": "Not Started",
-          "icon": "Circle",
-          "color": "slate"
-        }
-      ],
+      "assignedTo": [],
+      "status": {
+        "id": "01KBSVZ3N828YPGRXFDY84D15W",
+        "label": "In Progress",
+        "color": "blue",
+        "icon": "Loader"
+      },
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KHJGYKSJH06ZNCD867SG7S47",
       "createdAt": "2026-02-16T06:07:08.085Z",
-      "updatedAt": "2026-02-16T06:07:08.210Z"
+      "updatedAt": "2026-02-20T17:32:07.462Z"
     }
   ],
   "change-procedure": [

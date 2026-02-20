@@ -320,7 +320,11 @@ export function SchemaManagerWrapper() {
             <div className="border border-gray-300 dark:border-gray-500 rounded-md h-10 flex items-center shrink-0">
               <ViewSwitcher
                 currentView={viewMode}
-                onViewChange={setViewMode}
+                onViewChange={(nextView) => {
+                  if (nextView !== 'kanban') {
+                    setViewMode(nextView);
+                  }
+                }}
                 className="h-full"
               />
             </div>

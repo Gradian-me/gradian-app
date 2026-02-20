@@ -11,7 +11,7 @@ import {
   Star
 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Spinner } from '@/components/ui/spinner';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -69,16 +69,24 @@ import { getInitials } from '../utils';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { SortConfig } from '@/gradian-ui/shared/utils/sort-utils';
-import { getInitialSortConfig, getInitialGroupConfig } from '@/gradian-ui/shared/utils/default-settings-utils';
+import { getInitialSortConfig, getInitialGroupConfig, getInitialDataViews } from '@/gradian-ui/shared/utils/default-settings-utils';
 import type { FilterItem } from '@/gradian-ui/data-display/types';
 import { buildSchemaGrouped, type SchemaGroupNode } from '@/gradian-ui/data-display/utils/grouping-display';
 import type { FormSchema as FormSchemaType } from '@/gradian-ui/schema-manager/types/form-schema';
+import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
+import type { NormalizedOption } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
+import { KanbanWrapper, type KanbanColumnMeta } from '@/gradian-ui/data-display/kanban';
+import { fetchOptionsFromSchemaOrUrl } from '@/gradian-ui/form-builder/form-elements/utils/fetch-options-utils';
+import { buildReferenceFilterUrl } from '@/gradian-ui/form-builder/utils/reference-filter-builder';
+import { replaceDynamicContext } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
+
+type DisplayViewMode = 'grid' | 'list' | 'table' | 'hierarchy' | 'kanban';
 
 interface SchemaGroupAccordionNodeProps {
   node: SchemaGroupNode;
   schema: FormSchemaType;
   asFormSchema: (s: FormSchemaType) => FormSchemaType;
-  viewMode: 'grid' | 'list' | 'table' | 'hierarchy';
+  viewMode: DisplayViewMode;
   tableConfig: TableConfig;
   tableColumns: TableColumn[];
   isLoading: boolean;
@@ -201,7 +209,7 @@ function SchemaGroupAccordionNode({
                   schema={asFormSchema(schema)}
                   data={entity}
                   index={0}
-                  viewMode={viewMode === 'hierarchy' ? 'list' : viewMode}
+                  viewMode={viewMode === 'grid' || viewMode === 'list' ? viewMode : 'list'}
                   maxBadges={3}
                   maxMetrics={5}
                   onView={onView}
@@ -258,6 +266,7 @@ function reconstructRegExp(obj: any): any {
 
 export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationSchemas }: DynamicPageRendererProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const defaultLang = getDefaultLanguage();
   const localeCode = language || undefined;
@@ -271,8 +280,36 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const toastSelectCompanyToCreateDescription = getT(TRANSLATION_KEYS.TOAST_SELECT_COMPANY_TO_CREATE_DESCRIPTION, language, defaultLang);
   const emptySelectUserToViewTasks = getT(TRANSLATION_KEYS.EMPTY_SELECT_USER_TO_VIEW_TASKS, language, defaultLang);
   const emptySelectUserToViewTasksDescription = getT(TRANSLATION_KEYS.EMPTY_SELECT_USER_TO_VIEW_TASKS_DESCRIPTION, language, defaultLang);
-  // Reconstruct RegExp objects in the schema
-  const schema = reconstructRegExp(rawSchema) as FormSchema;
+  const kanbanMoveErrorLabel = getT(TRANSLATION_KEYS.TOAST_FAILED_TO_REFRESH, language, defaultLang);
+  const kanbanCardHandleLabel = useMemo(() => {
+    const labels: Record<string, string> = {
+      en: 'Move card',
+      fa: 'جابجایی کارت',
+      ar: 'تحريك البطاقة',
+      es: 'Mover tarjeta',
+      fr: 'Déplacer la carte',
+      de: 'Karte verschieben',
+      it: 'Sposta scheda',
+      ru: 'Переместить карточку',
+    };
+    return labels[language ?? 'en'] ?? labels.en;
+  }, [language]);
+  const kanbanColumnHandleLabel = useMemo(() => {
+    const labels: Record<string, string> = {
+      en: 'Move column',
+      fa: 'جابجایی ستون',
+      ar: 'تحريك العمود',
+      es: 'Mover columna',
+      fr: 'Déplacer la colonne',
+      de: 'Spalte verschieben',
+      it: 'Sposta colonna',
+      ru: 'Переместить столбец',
+    };
+    return labels[language ?? 'en'] ?? labels.en;
+  }, [language]);
+  // Reconstruct RegExp objects in the schema once per input change.
+  // Keeping this stable prevents effect dependency loops.
+  const schema = useMemo(() => reconstructRegExp(rawSchema) as FormSchema, [rawSchema]);
   const reconstructedNavigationSchemas = useMemo(
     () => (navigationSchemas ?? []).map((navSchema) => reconstructRegExp(navSchema) as FormSchema),
     [navigationSchemas]
@@ -293,19 +330,45 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     };
   }, [pluralName]);
   
-  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table' | 'hierarchy'>(
-    schema?.allowHierarchicalParent === true ? 'hierarchy' : 'table'
-  );
+  const initialViewModeFromQuery = useMemo<DisplayViewMode | null>(() => {
+    const rawViewType = searchParams.get('viewType');
+    if (!rawViewType) return null;
+    const normalized = rawViewType.toLowerCase();
+    if (
+      normalized === 'grid' ||
+      normalized === 'list' ||
+      normalized === 'table' ||
+      normalized === 'hierarchy' ||
+      normalized === 'kanban'
+    ) {
+      return normalized;
+    }
+    return null;
+  }, [searchParams]);
+
+  const [viewMode, setViewMode] = useState<DisplayViewMode>(initialViewModeFromQuery ?? 'table');
 
   // Prevent hierarchy view if not enabled
-  const handleViewModeChange = useCallback((mode: 'grid' | 'list' | 'table' | 'hierarchy') => {
+  const handleViewModeChange = useCallback((mode: DisplayViewMode) => {
+    const hasStatusGroup = Array.isArray(schema?.statusGroup) && schema.statusGroup.length > 0;
+    const hasEntityTypeGroup = Array.isArray(schema?.entityTypeGroup) && schema.entityTypeGroup.length > 0;
+    const hasKanbanInDataViews = getInitialDataViews(schema?.defaultSettings)?.includes('kanban') ?? false;
+    const hasKanbanEligibility =
+      hasStatusGroup ||
+      hasEntityTypeGroup ||
+      hasKanbanInDataViews;
+
     if (mode === 'hierarchy' && schema?.allowHierarchicalParent !== true) {
       // If hierarchy is not enabled, switch to table view instead
       setViewMode('table');
       return;
     }
+    if (mode === 'kanban' && !hasKanbanEligibility) {
+      setViewMode('table');
+      return;
+    }
     setViewMode(mode);
-  }, [schema?.allowHierarchicalParent]);
+  }, [schema?.allowHierarchicalParent, schema?.statusGroup, schema?.entityTypeGroup, schema?.defaultSettings]);
   const [formError, setFormError] = useState<string | null>(null);
   const [isEditLoading, setIsEditLoading] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -343,6 +406,75 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const [sortConfig, setSortConfig] = useState<SortConfig[]>(() => getInitialSortConfig(schema?.defaultSettings));
   const [groupConfig, setGroupConfig] = useState<{ column: string }[]>(() => getInitialGroupConfig(schema?.defaultSettings));
   const [filterConfig, setFilterConfig] = useState<FilterItem[]>([]);
+  const configuredDataViews = useMemo(
+    () => getInitialDataViews(schema?.defaultSettings),
+    [schema?.defaultSettings]
+  );
+  const [kanbanFieldOptions, setKanbanFieldOptions] = useState<NormalizedOption[] | null>(null);
+  const [isKanbanColumnsLoading, setIsKanbanColumnsLoading] = useState(false);
+  const [kanbanOptionsRefreshToken, setKanbanOptionsRefreshToken] = useState(0);
+  const statusGroupEnabled = Array.isArray(schema?.statusGroup) && schema.statusGroup.length > 0;
+  const entityTypeGroupEnabled = Array.isArray(schema?.entityTypeGroup) && schema.entityTypeGroup.length > 0;
+  const selectedGroupingColumn = groupConfig[0]?.column ?? null;
+  const kanbanEligibleFieldByKey = useMemo(() => {
+    const m = new Map<string, FormSchema['fields'][number]>();
+    for (const field of schema?.fields ?? []) {
+      if (!field.allowKanbanView) continue;
+      if (field.id) m.set(field.id, field as any);
+      if (field.name) m.set(field.name, field as any);
+    }
+    return m;
+  }, [schema?.fields]);
+  const statusRoleField = useMemo(
+    () => schema?.fields?.find((f) => f.role === 'status') ?? null,
+    [schema?.fields]
+  );
+  const entityTypeRoleField = useMemo(
+    () => schema?.fields?.find((f) => f.role === 'entityType') ?? null,
+    [schema?.fields]
+  );
+  const canUseStatusKanban = statusGroupEnabled;
+  const canUseEntityTypeKanban = entityTypeGroupEnabled;
+  const isSelectedGroupingKanbanAllowed = useMemo(() => {
+    if (!selectedGroupingColumn) return false;
+    if (selectedGroupingColumn === 'status') return statusGroupEnabled;
+    if (selectedGroupingColumn === 'entityType') return entityTypeGroupEnabled;
+    if (kanbanEligibleFieldByKey.has(selectedGroupingColumn)) return true;
+    return false;
+  }, [selectedGroupingColumn, kanbanEligibleFieldByKey, statusGroupEnabled, entityTypeGroupEnabled]);
+
+  const canShowKanban = useMemo(() => {
+    const hasStatusGroup = Array.isArray(schema?.statusGroup) && schema.statusGroup.length > 0;
+    const hasEntityTypeGroup = Array.isArray(schema?.entityTypeGroup) && schema.entityTypeGroup.length > 0;
+    const hasKanbanInDataViews = configuredDataViews?.includes('kanban') ?? false;
+    return hasStatusGroup || hasEntityTypeGroup || hasKanbanInDataViews;
+  }, [schema?.statusGroup, schema?.entityTypeGroup, configuredDataViews]);
+
+  const availableViewModes = useMemo<DisplayViewMode[]>(() => {
+    const defaults: DisplayViewMode[] = schema?.allowHierarchicalParent
+      ? ['hierarchy', 'table', 'list', 'grid']
+      : ['table', 'list', 'grid'];
+
+    if (!configuredDataViews || configuredDataViews.length === 0) {
+      return canShowKanban ? [...defaults, 'kanban'] : defaults;
+    }
+
+    const result: DisplayViewMode[] = [];
+    for (const view of configuredDataViews) {
+      if (view === 'hierarchy' && schema?.allowHierarchicalParent !== true) continue;
+      if (view === 'kanban' && !canShowKanban) continue;
+      result.push(view);
+    }
+
+    if (canShowKanban && !result.includes('kanban')) {
+      result.push('kanban');
+    }
+
+    if (!result.includes('table')) {
+      result.push('table');
+    }
+    return result;
+  }, [configuredDataViews, schema?.allowHierarchicalParent, canShowKanban]);
 
   // Sync sort/group config from schema defaultSettings only when schema ID changes (e.g. navigation to another list).
   // Intentionally not depending on language so user's sort/group choices persist when switching language.
@@ -351,6 +483,20 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     setSortConfig(getInitialSortConfig(schema.defaultSettings));
     setGroupConfig(getInitialGroupConfig(schema.defaultSettings));
   }, [schema?.id]);
+
+  useEffect(() => {
+    if (!availableViewModes.length) {
+      setViewMode('table');
+      return;
+    }
+    setViewMode((prev) => (availableViewModes.includes(prev) ? prev : availableViewModes[0]));
+  }, [schema?.id, availableViewModes]);
+
+  useEffect(() => {
+    if (!initialViewModeFromQuery) return;
+    if (!availableViewModes.includes(initialViewModeFromQuery)) return;
+    setViewMode(initialViewModeFromQuery);
+  }, [initialViewModeFromQuery, availableViewModes]);
 
   // State for companies data and grouping
   const [companies, setCompanies] = useState<any[]>([]);
@@ -362,7 +508,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const initialPageSize = schema?.allowHierarchicalParent === true ? 500 : DEFAULT_LIMIT;
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState<number | 'all'>(initialPageSize);
-  const prevViewModeRef = useRef<'grid' | 'list' | 'table' | 'hierarchy'>(viewMode);
+  const prevViewModeRef = useRef<DisplayViewMode>(viewMode);
   
   // Update page size when view mode changes
   useEffect(() => {
@@ -470,6 +616,226 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const handleFilterConfigChange = useCallback((filters: FilterItem[]) => {
     setFilterConfig(filters);
   }, []);
+
+  useEffect(() => {
+    if (viewMode !== 'kanban') return;
+    const groupingColumn = selectedGroupingColumn
+      ? (isSelectedGroupingKanbanAllowed ? selectedGroupingColumn : null)
+      : (canUseStatusKanban ? 'status' : canUseEntityTypeKanban ? 'entityType' : null);
+    if (!groupingColumn) {
+      setKanbanFieldOptions([]);
+      setIsKanbanColumnsLoading(false);
+      return;
+    }
+
+    const field = schema?.fields?.find((f) => {
+      if (f.id === groupingColumn || f.name === groupingColumn) return true;
+      if (groupingColumn === 'status' && f.role === 'status') return true;
+      if (groupingColumn === 'entityType' && f.role === 'entityType') return true;
+      return false;
+    }) ?? null;
+
+    let cancelled = false;
+    const dynamicContext = { formSchema: schema, formData: {} as Record<string, unknown> };
+    const sanitizeDynamicValue = (value?: string): string | undefined => {
+      if (!value || typeof value !== 'string') return undefined;
+      const replaced = replaceDynamicContext(value, dynamicContext as any).trim();
+      if (!replaced || (replaced.includes('{{') && replaced.includes('}}'))) return undefined;
+      return replaced;
+    };
+
+    const loadKanbanOptions = async () => {
+      setKanbanFieldOptions(null);
+      setIsKanbanColumnsLoading(true);
+
+      try {
+        const isStatusGrouping = groupingColumn === 'status' || field?.role === 'status';
+        // For status grouping, load full status-items set from relations API (not just schema.statusGroup itself).
+        if (isStatusGrouping && Array.isArray(schema?.statusGroup) && schema.statusGroup.length > 0) {
+          const statusGroupId = schema.statusGroup[0]?.id;
+          if (!statusGroupId) {
+            if (!cancelled) setKanbanFieldOptions([]);
+            return;
+          }
+
+          const statusResponse = await apiRequest<any>('/api/data/all-relations', {
+            params: {
+              schema: 'status-groups',
+              direction: 'both',
+              relationTypeId: 'HAS_STATUS_ITEM',
+              id: String(statusGroupId),
+              otherSchema: 'status-items',
+              page: '1',
+              limit: '200',
+            },
+            disableCache: true,
+          });
+
+          if (!statusResponse.success) {
+            throw new Error(statusResponse.error || 'Failed to load status options');
+          }
+
+          const payload = statusResponse.data as any;
+          const relationItems = Array.isArray(payload)
+            ? (Array.isArray(payload[0]?.data) ? payload[0].data : payload)
+            : Array.isArray(payload?.data?.[0]?.data)
+              ? payload.data[0].data
+              : Array.isArray(payload?.data)
+                ? payload.data
+                : [];
+
+          const normalizedStatusItems = normalizeOptionArray(
+            relationItems.map((item: any) => {
+              const id = item?.id ?? item?.otherEntityId ?? item?.value ?? '';
+              const label = item?.label ?? item?.name ?? item?.title ?? item?.otherEntityLabel ?? id;
+              return {
+                id: String(id),
+                label: String(label),
+                color: item?.color,
+                icon: item?.icon,
+                value: item?.value ?? id,
+              };
+            })
+          );
+
+          if (!cancelled) setKanbanFieldOptions(normalizedStatusItems);
+          return;
+        }
+        const isEntityTypeGrouping = groupingColumn === 'entityType' || field?.role === 'entityType';
+        if (isEntityTypeGrouping && Array.isArray(schema?.entityTypeGroup) && schema.entityTypeGroup.length > 0) {
+          const entityTypeGroupId = schema.entityTypeGroup[0]?.id;
+          if (!entityTypeGroupId) {
+            if (!cancelled) setKanbanFieldOptions([]);
+            return;
+          }
+
+          const entityTypeResponse = await apiRequest<any>('/api/data/all-relations', {
+            params: {
+              schema: 'entity-type-groups',
+              direction: 'both',
+              relationTypeId: 'HAS_ENTITY_TYPE_ITEM',
+              id: String(entityTypeGroupId),
+              otherSchema: 'entity-type-items',
+              page: '1',
+              limit: '200',
+            },
+            disableCache: true,
+          });
+
+          if (!entityTypeResponse.success) {
+            throw new Error(entityTypeResponse.error || 'Failed to load entity type options');
+          }
+
+          const payload = entityTypeResponse.data as any;
+          const relationItems = Array.isArray(payload)
+            ? (Array.isArray(payload[0]?.data) ? payload[0].data : payload)
+            : Array.isArray(payload?.data?.[0]?.data)
+              ? payload.data[0].data
+              : Array.isArray(payload?.data)
+                ? payload.data
+                : [];
+
+          const normalizedEntityTypeItems = normalizeOptionArray(
+            relationItems.map((item: any) => {
+              const id = item?.id ?? item?.otherEntityId ?? item?.value ?? '';
+              const label = item?.label ?? item?.name ?? item?.title ?? item?.otherEntityLabel ?? id;
+              return {
+                id: String(id),
+                label: String(label),
+                color: item?.color,
+                icon: item?.icon,
+                value: item?.value ?? id,
+              };
+            })
+          );
+
+          if (!cancelled) setKanbanFieldOptions(normalizedEntityTypeItems);
+          return;
+        }
+
+        if (!field) {
+          if (!cancelled) setKanbanFieldOptions([]);
+          return;
+        }
+
+        const staticOptions = normalizeOptionArray(field.options ?? []);
+        if (staticOptions.length > 0) {
+          if (!cancelled) setKanbanFieldOptions(staticOptions);
+          return;
+        }
+
+        const resolvedTargetSchema = sanitizeDynamicValue(field.targetSchema);
+        const resolvedSourceUrl = sanitizeDynamicValue(field.sourceUrl);
+        const referenceSourceUrl =
+          !resolvedSourceUrl &&
+          field.referenceSchema &&
+          field.referenceRelationTypeId &&
+          field.referenceEntityId
+            ? buildReferenceFilterUrl({
+                referenceSchema: field.referenceSchema,
+                referenceRelationTypeId: field.referenceRelationTypeId,
+                referenceEntityId: field.referenceEntityId,
+                targetSchema: resolvedTargetSchema,
+                schema,
+              })
+            : '';
+
+        const sourceUrl = resolvedSourceUrl || (referenceSourceUrl || undefined);
+        const schemaId = sourceUrl ? undefined : resolvedTargetSchema;
+        if (!sourceUrl && !schemaId) {
+          if (!cancelled) setKanbanFieldOptions([]);
+          return;
+        }
+
+        const queryParams: Record<string, string | number> = {};
+        if (field.pageSize && Number(field.pageSize) > 0) {
+          queryParams.limit = Number(field.pageSize);
+        }
+
+        const result = await fetchOptionsFromSchemaOrUrl({
+          schemaId,
+          sourceUrl,
+          queryParams,
+          sortType: (field.sortType ?? null) as 'ASC' | 'DESC' | null,
+          columnMap: field.columnMap,
+        });
+
+        const normalized = normalizeOptionArray(
+          (result.data ?? []).map((item: any) => {
+            const id = item.id ?? item.value ?? String(item._id ?? '');
+            const label = item.label ?? item.name ?? item.title ?? item.singular_name ?? item.plural_name ?? id;
+            return {
+              id: String(id),
+              label: String(label),
+              icon: item.icon,
+              color: item.color,
+              disabled: item.disabled,
+              value: item.value ?? id,
+            };
+          })
+        );
+
+        if (!cancelled) setKanbanFieldOptions(normalized);
+      } catch {
+        if (!cancelled) setKanbanFieldOptions([]);
+      } finally {
+        if (!cancelled) setIsKanbanColumnsLoading(false);
+      }
+    };
+
+    void loadKanbanOptions();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    viewMode,
+    schema,
+    selectedGroupingColumn,
+    isSelectedGroupingKanbanAllowed,
+    canUseStatusKanban,
+    canUseEntityTypeKanban,
+    kanbanOptionsRefreshToken,
+  ]);
 
   // Pagination handlers
   const handlePageChange = useCallback((page: number) => {
@@ -746,6 +1112,9 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   }, [entityForParentChange, schema?.id, fetchEntities, buildFilters, sortConfig, currentPage, pageSize]);
 
   const handleManualRefresh = useCallback(async () => {
+    if (viewMode === 'kanban') {
+      setKanbanOptionsRefreshToken((prev) => prev + 1);
+    }
     const filters = buildFilters();
     if (!filters) {
       const lang = useLanguageStore.getState().language ?? 'en';
@@ -783,7 +1152,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       manualRefreshToastIdRef.current = null;
       setIsManualRefresh(false);
     }
-  }, [buildFilters, fetchEntities, pluralName, currentPage, pageSize, sortConfig, allowAssignmentSwitcher, assignmentSelectedUser?.id]);
+  }, [buildFilters, fetchEntities, pluralName, currentPage, pageSize, sortConfig, allowAssignmentSwitcher, assignmentSelectedUser?.id, viewMode]);
 
   // Update loading toast message when language changes during manual refresh
   useEffect(() => {
@@ -892,6 +1261,9 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
 
   // Fetch whenever derived filters, pagination, or sort change (use refs for callbacks to avoid effect loop from unstable references)
   useEffect(() => {
+    if (viewMode === 'kanban' && (isKanbanColumnsLoading || kanbanFieldOptions === null)) {
+      return;
+    }
     const filters = buildFiltersRef.current();
     if (!filters) {
       return;
@@ -914,7 +1286,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
 
     setFiltersRef.current(filters);
     fetchEntitiesRef.current(filters, { page: currentPage, limit: pageSize, sortArray: sortConfig });
-  }, [fetchInputKey, currentPage, pageSize, sortConfig]);
+  }, [fetchInputKey, currentPage, pageSize, sortConfig, viewMode, isKanbanColumnsLoading, kanbanFieldOptions]);
 
   // Handle edit entity - set entity ID to trigger FormModal
   const handleEditEntity = useCallback(async (entity: any) => {
@@ -1376,6 +1748,173 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     return nodes.length > 0 ? nodes : null;
   }, [filteredEntities, schema, groupConfig, language, defaultLang, labelEmpty]);
 
+  const kanbanGroupingColumn = useMemo(() => {
+    if (selectedGroupingColumn) {
+      if (isSelectedGroupingKanbanAllowed) return selectedGroupingColumn;
+      return null;
+    }
+    if (canUseStatusKanban) return 'status';
+    if (canUseEntityTypeKanban) return 'entityType';
+    return null;
+  }, [selectedGroupingColumn, isSelectedGroupingKanbanAllowed, canUseStatusKanban, canUseEntityTypeKanban]);
+
+  const kanbanGroupingField = useMemo(() => {
+    if (!kanbanGroupingColumn) return null;
+    return schema?.fields?.find(
+      (f) =>
+        f.id === kanbanGroupingColumn ||
+        f.name === kanbanGroupingColumn ||
+        (kanbanGroupingColumn === 'status' && f.role === 'status') ||
+        (kanbanGroupingColumn === 'entityType' && f.role === 'entityType')
+    ) ?? null;
+  }, [schema?.fields, kanbanGroupingColumn]);
+
+  const hasKanbanOptionSource = useMemo(() => {
+    if (!kanbanGroupingColumn) return false;
+    if (kanbanGroupingColumn === 'status' && Array.isArray(schema?.statusGroup) && schema.statusGroup.length > 0) return true;
+    if (kanbanGroupingColumn === 'entityType' && Array.isArray(schema?.entityTypeGroup) && schema.entityTypeGroup.length > 0) return true;
+    return Boolean(
+      kanbanGroupingField?.options?.length ||
+      kanbanGroupingField?.targetSchema ||
+      kanbanGroupingField?.sourceUrl ||
+      (kanbanGroupingField?.referenceSchema && kanbanGroupingField?.referenceRelationTypeId && kanbanGroupingField?.referenceEntityId)
+    );
+  }, [kanbanGroupingColumn, kanbanGroupingField, schema?.statusGroup, schema?.entityTypeGroup]);
+
+  const kanbanColumns = useMemo<KanbanColumnMeta[]>(() => {
+    if (!kanbanGroupingColumn || kanbanFieldOptions === null) return [];
+    const dedup = new Map<string, KanbanColumnMeta>();
+    const optionOrder = new Map<string, number>();
+
+    if (kanbanFieldOptions.length > 0) {
+      for (const [index, option] of kanbanFieldOptions.entries()) {
+        const optionId = option.id ?? option.value;
+        if (!optionId) continue;
+        const id = String(optionId);
+        optionOrder.set(id, index);
+        dedup.set(id, {
+          id,
+          label: resolveDisplayLabel(option.label, language, defaultLang) || id,
+          color: option.color,
+          icon: option.icon,
+        });
+      }
+    }
+    if (dedup.size === 0 && !hasKanbanOptionSource) {
+      for (const entity of filteredEntities as any[]) {
+        let rawValue: any;
+        if (kanbanGroupingColumn === 'status') {
+          rawValue = kanbanGroupingField ? entity?.[kanbanGroupingField.name] : entity?.status;
+        } else if (kanbanGroupingColumn === 'entityType') {
+          rawValue = kanbanGroupingField ? entity?.[kanbanGroupingField.name] : entity?.entityType;
+        } else if (kanbanGroupingField) {
+          rawValue = entity?.[kanbanGroupingField.name];
+        } else {
+          rawValue = entity?.[kanbanGroupingColumn];
+        }
+
+        const normalized = normalizeOptionArray(rawValue)[0];
+        if (normalized?.id) {
+          const id = String(normalized.id);
+          if (!dedup.has(id)) {
+            dedup.set(id, {
+              id,
+              label: resolveDisplayLabel(normalized.label, language, defaultLang) || id,
+              color: normalized.color,
+              icon: normalized.icon,
+            });
+          }
+        } else if (typeof rawValue === 'string' || typeof rawValue === 'number') {
+          const id = String(rawValue);
+          if (!dedup.has(id)) {
+            dedup.set(id, { id, label: id });
+          }
+        }
+      }
+    }
+
+    return Array.from(dedup.values()).sort((a, b) => {
+      const ai = optionOrder.get(a.id);
+      const bi = optionOrder.get(b.id);
+      if (ai != null && bi != null) return ai - bi;
+      if (ai != null) return -1;
+      if (bi != null) return 1;
+      return a.label.localeCompare(b.label);
+    });
+  }, [kanbanGroupingColumn, kanbanGroupingField, kanbanFieldOptions, filteredEntities, language, defaultLang, hasKanbanOptionSource]);
+
+  const canRenderKanban = viewMode === 'kanban' && kanbanGroupingColumn && kanbanColumns.length > 0;
+  const showKanbanGroupingMessage =
+    viewMode === 'kanban' &&
+    (!kanbanGroupingColumn || (Boolean(selectedGroupingColumn) && !isSelectedGroupingKanbanAllowed));
+  const kanbanStorageKey = useMemo(
+    () => (schema?.id && kanbanGroupingColumn ? `kanban-order:${schema.id}:${kanbanGroupingColumn}` : null),
+    [schema?.id, kanbanGroupingColumn]
+  );
+  const [kanbanColumnOrder, setKanbanColumnOrder] = useState<string[]>([]);
+  useEffect(() => {
+    if (!kanbanStorageKey || typeof window === 'undefined') {
+      setKanbanColumnOrder([]);
+      return;
+    }
+    try {
+      const raw = window.localStorage.getItem(kanbanStorageKey);
+      const parsed = raw ? JSON.parse(raw) : [];
+      setKanbanColumnOrder(Array.isArray(parsed) ? parsed.filter((x) => typeof x === 'string') : []);
+    } catch {
+      setKanbanColumnOrder([]);
+    }
+  }, [kanbanStorageKey]);
+
+  const kanbanFieldName = kanbanGroupingField?.name ?? kanbanGroupingColumn ?? null;
+  const kanbanAllowedColumnIds = useMemo(() => new Set(kanbanColumns.map((c) => c.id)), [kanbanColumns]);
+  const getKanbanItemColumnId = useCallback((entity: any): string | null => {
+    if (!kanbanGroupingColumn || !kanbanFieldName) return null;
+    const rawValue = entity?.[kanbanFieldName] ?? entity?.[kanbanGroupingColumn];
+    const normalized = normalizeOptionArray(rawValue)[0];
+    if (normalized?.id) return String(normalized.id);
+    if (typeof rawValue === 'string' || typeof rawValue === 'number') return String(rawValue);
+    return null;
+  }, [kanbanFieldName, kanbanGroupingColumn]);
+
+  const handleKanbanCardMove = useCallback(async (entity: any, targetColumnId: string) => {
+    if (!schema?.id || !kanbanFieldName) {
+      throw new Error('Kanban move is not available.');
+    }
+    if (!kanbanAllowedColumnIds.has(targetColumnId)) {
+      throw new Error('Invalid target column.');
+    }
+
+    const targetColumn = kanbanColumns.find((c) => c.id === targetColumnId);
+    const nextValue = {
+      id: targetColumnId,
+      label: targetColumn?.label || targetColumnId,
+      color: targetColumn?.color,
+      icon: targetColumn?.icon,
+    };
+
+    const updateResponse = await apiRequest(`/api/data/${schema.id}/${String(entity.id)}`, {
+      method: 'PATCH',
+      body: {
+        [kanbanFieldName]: nextValue,
+      },
+    });
+
+    if (!updateResponse.success) {
+      throw new Error(updateResponse.error || 'Failed to move card.');
+    }
+  }, [schema?.id, kanbanFieldName, kanbanAllowedColumnIds, kanbanColumns]);
+
+  const handleKanbanColumnOrderChange = useCallback((orderedIds: string[]) => {
+    setKanbanColumnOrder(orderedIds);
+    if (!kanbanStorageKey || typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(kanbanStorageKey, JSON.stringify(orderedIds));
+    } catch {
+      // Ignore localStorage write failures in private mode.
+    }
+  }, [kanbanStorageKey]);
+
   function flattenSchemaGroupKeys(nodes: SchemaGroupNode[]): string[] {
     const keys: string[] = [];
     for (const n of nodes) {
@@ -1503,6 +2042,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   useSetLayoutProps({
     title: pluralName,
     icon: schema.icon,
+    showEndLine: false,
     editSchemaPath: schema.id ? `/builder/schemas/${schema.id}` : undefined,
     isAdmin,
     navigationSchemas: reconstructedNavigationSchemas,
@@ -1579,7 +2119,8 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           addButtonText={`${labelAdd} ${singularName}`}
           onExpandAllHierarchy={() => setHierarchyExpandToken((prev) => prev + 1)}
           onCollapseAllHierarchy={() => setHierarchyCollapseToken((prev) => prev + 1)}
-          showHierarchy={schema?.allowHierarchicalParent === true}
+          showHierarchy={availableViewModes.includes('hierarchy')}
+          showOnlyViews={availableViewModes}
           showGroupExpandCollapse={!!schemaGroupedData}
           onExpandAllGroups={expandAllSchemaGroup}
           onCollapseAllGroups={collapseAllSchemaGroup}
@@ -1656,6 +2197,80 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             isLoading={isLoading}
             showUserDetails={showMetadataColumns}
           />
+        ) : viewMode === 'kanban' && showKanbanGroupingMessage ? (
+          <EmptyState
+            icon={<IconRenderer iconName="Columns3" className="h-12 w-12 text-gray-400" />}
+            title={getT(TRANSLATION_KEYS.TITLE_GROUP_BY, language, defaultLang)}
+            description={getT(TRANSLATION_KEYS.MESSAGE_SELECT_COLUMNS_FROM_LEFT_GROUP, language, defaultLang)}
+          />
+        ) : viewMode === 'kanban' && !canRenderKanban && !isKanbanColumnsLoading ? (
+          <EmptyState
+            icon={<IconRenderer iconName="Columns3" className="h-12 w-12 text-gray-400" />}
+            title={getT(TRANSLATION_KEYS.LABEL_EMPTY, language, defaultLang)}
+            description={getT(TRANSLATION_KEYS.MESSAGE_SELECT_COLUMNS_FROM_LEFT_GROUP, language, defaultLang)}
+          />
+        ) : viewMode === 'kanban' ? (
+          <div className="h-[calc(100vh-320px)] min-h-[480px]" dir={isRTL(language) ? 'rtl' : 'ltr'}>
+            {isLoading || isKanbanColumnsLoading ? (
+              <div className="flex h-full w-full gap-4 overflow-x-auto pb-2">
+                {(kanbanColumns.length > 0 ? kanbanColumns : [1, 2, 3, 4]).map((col, idx) => (
+                  <div
+                    key={typeof col === 'number' ? col : col.id || idx}
+                    className="flex h-full min-w-[300px] max-w-[360px] flex-col rounded-2xl border border-gray-200 bg-gray-50/70 p-3 dark:border-gray-700 dark:bg-gray-800/50"
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <Skeleton className="h-5 w-36 rounded-md" />
+                      <Skeleton className="h-6 w-16 rounded-full" />
+                    </div>
+                    <div className="space-y-2">
+                      <Skeleton className="h-28 w-full rounded-xl" />
+                      <Skeleton className="h-24 w-full rounded-xl" />
+                      <Skeleton className="h-20 w-full rounded-xl" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <KanbanWrapper
+                columns={kanbanColumns}
+                items={filteredEntities}
+                getItemColumnId={getKanbanItemColumnId}
+                onCardMove={handleKanbanCardMove}
+                onCardMoveError={() => {
+                  toast.error(kanbanMoveErrorLabel);
+                }}
+                onColumnOrderChange={handleKanbanColumnOrderChange}
+                allowColumnReorder={false}
+                initialColumnOrder={kanbanColumnOrder}
+                cardHandleLabel={kanbanCardHandleLabel}
+                columnHandleLabel={kanbanColumnHandleLabel}
+                emptyColumnLabel={getT(TRANSLATION_KEYS.LABEL_EMPTY, language, defaultLang)}
+                renderCard={(entity: any, index: number) => (
+                  <DynamicCardRenderer
+                    schema={asFormSchema(schema)}
+                    data={entity}
+                    index={index}
+                    viewMode="list"
+                    cardVariant="kanban"
+                    maxBadges={2}
+                    maxMetrics={3}
+                    onView={handleViewEntity}
+                    onViewDetail={handleViewDetailPage}
+                    onEdit={(e) => {
+                      if (!isEditLoading[e.id]) {
+                        handleEditEntity(e);
+                      }
+                    }}
+                    onDelete={handleDeleteWithConfirmation}
+                    onDiscussions={(data) => setOpenDiscussionForRowId(String(data.id))}
+                    className={isEditLoading[entity.id] ? "opacity-70" : ""}
+                    highlightQuery={debouncedSearchTerm}
+                    showUserDetails={false}
+                  />
+                )}
+              />
+            )}
+          </div>
         ) : schemaGroupedData ? (
           // Schema-based grouped view (groupConfig): nested accordions with "fieldLabel: value"
           <Accordion type="multiple" value={schemaGroupAccordionValues} onValueChange={setSchemaGroupAccordionValues} className="w-full space-y-2">

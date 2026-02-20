@@ -63,9 +63,9 @@ export function AiAgentManagerWrapper() {
     return result;
   };
 
-  const handleViewChange = (view: 'grid' | 'list' | 'table' | 'hierarchy') => {
+  const handleViewChange = (view: 'grid' | 'list' | 'table' | 'hierarchy' | 'kanban') => {
     // Only accept valid view modes, ignore hierarchy
-    if (view !== 'hierarchy') {
+    if (view !== 'hierarchy' && view !== 'kanban') {
       setViewMode(view);
     }
   };

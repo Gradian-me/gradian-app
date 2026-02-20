@@ -93,6 +93,7 @@ export function FieldEditor({
   const labelInactive = getT(TRANSLATION_KEYS.LABEL_INACTIVE, language, defaultLang);
   const labelAddToReferenceMetadata = getT(TRANSLATION_KEYS.FIELD_LABEL_ADD_TO_REFERENCE_METADATA, language, defaultLang);
   const labelIsSensitive = getT(TRANSLATION_KEYS.FIELD_LABEL_IS_SENSITIVE, language, defaultLang);
+  const labelAllowKanbanView = 'Allow Kanban View';
   const msgLoadingComponents = getT(TRANSLATION_KEYS.FIELD_MSG_LOADING_COMPONENTS, language, defaultLang);
   const msgErrorLoadingComponents = getT(TRANSLATION_KEYS.FIELD_MSG_ERROR_LOADING_COMPONENTS, language, defaultLang);
   const buttonCancel = getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang);
@@ -614,6 +615,11 @@ export function FieldEditor({
                   config={{ name: `addToReferenceMetadata-${field.id}`, label: labelAddToReferenceMetadata }}
                   checked={tempField.addToReferenceMetadata || false}
                   onChange={(checked) => setTempField({ ...tempField, addToReferenceMetadata: checked })}
+                />
+                <Switch
+                  config={{ name: `allowKanbanView-${field.id}`, label: labelAllowKanbanView }}
+                  checked={tempField.allowKanbanView || false}
+                  onChange={(checked) => setTempField({ ...tempField, allowKanbanView: checked })}
                 />
                 <Switch
                   config={{ name: `isSensitive-${field.id}`, label: labelIsSensitive }}

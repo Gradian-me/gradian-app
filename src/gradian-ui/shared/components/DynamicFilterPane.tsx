@@ -22,8 +22,8 @@ import { useMemo, useState } from 'react';
 interface DynamicFilterPaneProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
-  viewMode: 'grid' | 'list' | 'table' | 'hierarchy';
-  onViewModeChange: (mode: 'grid' | 'list' | 'table' | 'hierarchy') => void;
+  viewMode: 'grid' | 'list' | 'table' | 'hierarchy' | 'kanban';
+  onViewModeChange: (mode: 'grid' | 'list' | 'table' | 'hierarchy' | 'kanban') => void;
   onAddNew: () => void;
   onRefresh?: () => void;
   isRefreshing?: boolean;
@@ -49,7 +49,7 @@ interface DynamicFilterPaneProps {
   onFilterChange?: (filters: FilterItem[]) => void;
   showIds?: boolean; // Show IDs switch
   onShowIdsChange?: (showIds: boolean) => void; // Callback when show IDs changes
-  showOnlyViews?: ('grid' | 'list' | 'table' | 'hierarchy')[]; // Only show specified views in ViewSwitcher
+  showOnlyViews?: ('grid' | 'list' | 'table' | 'hierarchy' | 'kanban')[]; // Only show specified views in ViewSwitcher
   showAddButton?: boolean; // Show/hide the Add button
 }
 

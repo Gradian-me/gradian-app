@@ -27,6 +27,8 @@ export interface FormField {
   hidden?: boolean;
   readonly?: boolean;
   canCopy?: boolean;
+  /** When true, this field can be used as Kanban grouping column. */
+  allowKanbanView?: boolean;
   /** When true, text/textarea store value as [{ en: "..." }, { fa: "..." }] and show translation icon. */
   allowTranslation?: boolean;
   inactive?: boolean;
@@ -416,6 +418,7 @@ export interface DetailPageMetadata {
 export interface DefaultListSettings {
   grouping?: { column: string }[];
   sorting?: { column: string; isAscending: boolean }[];
+  dataViews?: Array<'hierarchy' | 'table' | 'list' | 'grid' | 'kanban'>;
 }
 
 // Main FormSchema interface - supports both naming conventions

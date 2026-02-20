@@ -3,15 +3,15 @@
 import React from 'react';
 import { Button } from '../../../components/ui/button';
 import { cn } from '../../shared/utils';
-import { Grid3X3, List, ListTree, Table2 } from 'lucide-react';
+import { Columns3, Grid3X3, List, ListTree, Table2 } from 'lucide-react';
 import { HierarchyExpandCollapseControls } from './HierarchyExpandCollapseControls';
 
 export interface ViewSwitcherProps {
-  currentView: 'grid' | 'list' | 'table' | 'hierarchy';
-  onViewChange: (view: 'grid' | 'list' | 'table' | 'hierarchy') => void;
+  currentView: 'grid' | 'list' | 'table' | 'hierarchy' | 'kanban';
+  onViewChange: (view: 'grid' | 'list' | 'table' | 'hierarchy' | 'kanban') => void;
   className?: string;
   showHierarchy?: boolean; // Only show hierarchy view if enabled
-  showOnly?: ('grid' | 'list' | 'table' | 'hierarchy')[]; // Only show specified views
+  showOnly?: ('grid' | 'list' | 'table' | 'hierarchy' | 'kanban')[]; // Only show specified views
   onExpandAll?: () => void;
   onCollapseAll?: () => void;
   showExpandCollapse?: boolean; // Show expand/collapse controls
@@ -28,7 +28,7 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
   showExpandCollapse = false,
 }) => {
   // Determine which views to show
-  const shouldShowView = (view: 'grid' | 'list' | 'table' | 'hierarchy') => {
+  const shouldShowView = (view: 'grid' | 'list' | 'table' | 'hierarchy' | 'kanban') => {
     if (showOnly) {
       return showOnly.includes(view);
     }
@@ -99,6 +99,21 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
           )}
         >
           <Grid3X3 className="h-4 w-4" />
+        </Button>
+      )}
+      {shouldShowView('kanban') && (
+        <Button
+          variant={currentView === 'kanban' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => onViewChange('kanban')}
+          className={cn(
+            'h-full w-10 p-0 rounded-xl',
+            currentView === 'kanban'
+              ? 'bg-violet-500 hover:bg-violet-600 text-white shadow-sm'
+              : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'
+          )}
+        >
+          <Columns3 className="h-4 w-4" />
         </Button>
       )}
       {showExpandCollapse && onExpandAll && onCollapseAll && (
