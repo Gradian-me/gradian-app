@@ -1,15 +1,14 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
-import { Avatar } from '@/gradian-ui/form-builder/form-elements';
-import { useUserProfile, userProfileToSections, getUserInitials, ProfileCard } from '@/gradian-ui/profile';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Edit, Mail, Share2, Loader2 } from 'lucide-react';
+import { useUserProfile, userProfileToSections, ProfileCardHologram } from '@/gradian-ui/profile';
+import { getDefaultLanguage } from '@/gradian-ui/shared/utils';
+import { Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useUserStore } from '@/stores/user.store';
+import { useLanguageStore } from '@/stores/language.store';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -28,8 +27,23 @@ export default function ProfilePage() {
   }, [userId, user, router]);
   
   const { profile, loading, error } = useUserProfile(userId || '');
+  const language = useLanguageStore((state) => state.language) ?? getDefaultLanguage();
   const layoutTitle = loading || error || !profile ? 'User Profile' : profile.fullName;
-  useSetLayoutProps({ title: layoutTitle });
+  useSetLayoutProps({ title: layoutTitle, showEndLine: false });
+
+  const handleShare = useCallback(() => {
+    if (typeof navigator !== 'undefined' && navigator.share && profile) {
+      navigator
+        .share({
+          title: profile.fullName,
+          text: profile.bio ?? `${profile.fullName} - ${profile.jobTitle ?? profile.role}`,
+          url: typeof window !== 'undefined' ? window.location.href : ''
+        })
+        .catch(() => {});
+    } else if (typeof window !== 'undefined') {
+      void navigator.clipboard?.writeText(window.location.href);
+    }
+  }, [profile]);
 
   if (loading) {
     return (
@@ -48,101 +62,40 @@ export default function ProfilePage() {
     );
   }
 
-  const sections = userProfileToSections(profile);
+  const sections = userProfileToSections(profile, { language, defaultLang: getDefaultLanguage() });
+
+  const AVATAR_OVERRIDE: Record<string, string> = {
+    '01K9ABA6MQ9K64MY7M4AEBCAP2': 'https://media.licdn.com/dms/image/v2/D4D03AQFqEf1NfTjObg/profile-displayphoto-scale_200_200/B4DZlbvgWeJMAc-/0/1758180806403?e=2147483647&v=beta&t=fx8fWBxcUl4Mpozqj9Hl-PEiM13AxJVC6Da_UexzHYE'
+  };
+  const avatarUrl = profile.id && AVATAR_OVERRIDE[profile.id] ? AVATAR_OVERRIDE[profile.id] : profile.avatar;
 
   return (
-      <div className="space-y-6">
-        {/* Profile Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="relative overflow-hidden rounded-2xl border border-gray-200 shadow-lg p-8 dark:border-gray-800 bg-white dark:bg-gray-900 isolate"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 via-sky-500/10 to-transparent dark:from-violet-500/20 dark:via-sky-500/15" />
-          <div className="absolute -top-16 -right-14 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl" />
-          <div className="absolute -bottom-24 -left-10 h-40 w-40 rounded-full bg-sky-500/10 blur-3xl" />
-          <div className="relative z-10">
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Avatar */}
-            <div className="shrink-0">
-              <Avatar
-                src={profile.avatar}
-                alt={profile.fullName}
-                fallback={getUserInitials(profile)}
-                size="3xl"
-                variant="primary"
-                className="border-4 border-white shadow-lg dark:border-gray-900"
-              />
-            </div>
-            
-            {/* User Info */}
-            <div className="flex-1 space-y-4">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-50">{profile.fullName}</h1>
-                {profile.jobTitle && (
-                  <p className="text-lg text-gray-600 dark:text-gray-300 mt-1">{profile.jobTitle}</p>
-                )}
-              </div>
-              
-              {profile.bio && (
-                <p className="text-gray-700 dark:text-gray-300 max-w-2xl">{profile.bio}</p>
-              )}
-              
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-2 pt-2">
-                <Button variant="outline" size="sm" className="dark:border-gray-700 dark:text-gray-200">
-                  <Mail className="h-4 w-4 me-2" />
-                  Message
-                </Button>
-                <Button variant="outline" size="sm" className="dark:border-gray-700 dark:text-gray-200">
-                  <Share2 className="h-4 w-4 me-2" />
-                  Share
-                </Button>
-                <Button variant="outline" size="sm" className="dark:border-gray-700 dark:text-gray-200">
-                  <Edit className="h-4 w-4 me-2" />
-                  Edit Profile
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-                <div className="rounded-xl border border-gray-200 bg-white/70 p-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-900/70">
-                  <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Projects</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">{profile.metrics?.projects ?? 12}</p>
-                </div>
-                <div className="rounded-xl border border-gray-200 bg-white/70 p-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-900/70">
-                  <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Experience</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white">{profile.metrics?.experience ?? 8}<span className="text-sm font-medium text-gray-500 dark:text-gray-300 ms-1">yrs</span></p>
-                </div>
-                <div className="rounded-xl border border-gray-200 bg-white/70 p-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-900/70">
-                  <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Rating</p>
-                  <p className="text-2xl font-semibold text-gray-900 dark:text-white flex items-center justify-center gap-1">{profile.metrics?.rating ?? 4.8}<span className="text-xs text-amber-500">★</span></p>
-                </div>
-                <div className="rounded-xl border border-gray-200 bg-white/70 p-4 text-center shadow-sm dark:border-gray-700 dark:bg-gray-900/70">
-                  <p className="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Availability</p>
-                  <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">{profile.availability ?? 'I am not available'}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>
-        </motion.div>
-        
-        {/* Profile Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {sections.map((section, index) => (
-            <motion.div
-              key={section.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-              className={section.colSpan === 2 ? "lg:col-span-2" : ""}
-            >
-              <ProfileCard section={section} />
-            </motion.div>
-          ))}
-        </div>
-      </div>
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="flex flex-col items-center gap-6"
+    >
+      <ProfileCardHologram
+        avatarUrl={avatarUrl}
+        iconUrl={"/logo/Gradian_Pattern.png"}
+        name={profile.fullName}
+        title={profile.jobTitle ?? profile.role}
+        status={profile.availability ?? 'Online'}
+        email={profile.email}
+        entityType={profile.entityType}
+        showUserInfo
+        sections={sections}
+        onContactClick={
+          profile.email
+            ? () => {
+                window.location.href = `mailto:${profile.email}`;
+              }
+            : undefined
+        }
+        onShareClick={handleShare}
+      />
+    </motion.div>
   );
 }
 

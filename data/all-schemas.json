@@ -129,6 +129,7 @@
         "name": "singular_name",
         "label": "Singular Name",
         "sectionId": "basic-information",
+        "allowTranslation": true,
         "component": "text",
         "validation": {
           "required": true
@@ -1061,6 +1062,7 @@
         "sectionId": "basic-information",
         "component": "text",
         "role": "title",
+        "allowTranslation": true,
         "translations": [
           {
             "en": "Company Name"
@@ -2519,6 +2521,7 @@
         "sectionId": "basic-information",
         "component": "text",
         "role": "title",
+        "allowTranslation": true,
         "translations": [
           {
             "en": "Application Name"
@@ -3556,6 +3559,7 @@
         "sectionId": "basic-information",
         "component": "text",
         "role": "title",
+        "allowTranslation": true,
         "translations": [
           {
             "en": "Business Area Title"

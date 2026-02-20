@@ -1,7 +1,20 @@
 // Profile Utilities
 
 import { UserProfile, ProfileField, ProfileSection } from '../types';
-import { formatDate, formatCurrency, formatNumber } from '../../shared/utils';
+import { formatCurrency, formatNumber, getT, getDefaultLanguage } from '../../shared/utils';
+import { formatDate as formatDateWithLocale } from '../../shared/utils/date-utils';
+import { getSupportedLocaleByCode } from '../../shared/utils/language-availables';
+import { TRANSLATION_KEYS } from '../../shared/constants/translations';
+
+export interface UserProfileToSectionsOptions {
+  language?: string;
+  defaultLang?: string;
+}
+
+export interface FormatProfileFieldValueOptions {
+  /** Language code (e.g. 'en', 'fa') – dates are formatted using that locale's calendarLocale/locale. */
+  language?: string;
+}
 
 /**
  * Get user initials from full name
@@ -28,16 +41,29 @@ export const getUserInitials = (user: UserProfile): string => {
 };
 
 /**
- * Format profile field value based on type
+ * Resolve locale for date formatting from language (uses calendarLocale when set, else locale).
  */
-export const formatProfileFieldValue = (field: ProfileField): string => {
+function getDateLocaleCode(language?: string): string | undefined {
+  const supported = language ? getSupportedLocaleByCode(language) : undefined;
+  return supported?.calendarLocale ?? supported?.locale;
+}
+
+/**
+ * Format profile field value based on type.
+ * Pass options.language so dates use that locale's calendar (e.g. Jalali for fa via calendarLocale).
+ */
+export const formatProfileFieldValue = (
+  field: ProfileField,
+  options?: FormatProfileFieldValueOptions
+): string => {
   const { value, type, format } = field;
-  
+
   if (value === null || value === undefined || value === '') {
     return 'N/A';
   }
-  
-  // Handle different formats
+
+  const localeCode = getDateLocaleCode(options?.language);
+
   switch (format) {
     case 'currency':
       return formatCurrency(typeof value === 'number' ? value : parseFloat(value) || 0);
@@ -48,11 +74,7 @@ export const formatProfileFieldValue = (field: ProfileField): string => {
       try {
         const dateValue = typeof value === 'string' ? new Date(value) : value;
         if (dateValue instanceof Date && !isNaN(dateValue.getTime())) {
-          return formatDate(dateValue, { 
-            month: 'short', 
-            day: 'numeric', 
-            year: 'numeric' 
-          });
+          return formatDateWithLocale(dateValue, localeCode ?? undefined);
         }
         return String(value);
       } catch {
@@ -69,25 +91,25 @@ export const formatProfileFieldValue = (field: ProfileField): string => {
 };
 
 /**
- * Convert UserProfile to ProfileSections
+ * Convert UserProfile to ProfileSections.
+ * Pass options.language (and optional options.defaultLang) to get translated section titles and field labels.
  */
-export const userProfileToSections = (user: UserProfile): ProfileSection[] => {
+export const userProfileToSections = (
+  user: UserProfile,
+  options?: UserProfileToSectionsOptions
+): ProfileSection[] => {
+  const lang = options?.language ?? getDefaultLanguage();
+  const defaultLang = options?.defaultLang ?? getDefaultLanguage();
+  const t = (key: string) => getT(key, lang, defaultLang);
+
   const sections: ProfileSection[] = [];
-  
+
   // Basic Information Section
   const basicFields: ProfileField[] = [
     {
-      id: 'full-name',
-      name: 'fullName',
-      label: 'Full Name',
-      value: user.fullName,
-      type: 'text' as const,
-      format: 'default'
-    },
-    {
       id: 'email',
       name: 'email',
-      label: 'Email',
+      label: t(TRANSLATION_KEYS.PROFILE_LABEL_EMAIL),
       value: user.email,
       type: 'email' as const,
       format: 'email'
@@ -95,31 +117,31 @@ export const userProfileToSections = (user: UserProfile): ProfileSection[] => {
     {
       id: 'phone',
       name: 'phone',
-      label: 'Phone',
+      label: t(TRANSLATION_KEYS.PROFILE_LABEL_PHONE),
       value: user.phone,
       type: 'tel' as const,
       format: 'phone'
     }
-  ].filter(field => field.value) as ProfileField[]; // Only include fields with values
-  
+  ].filter(field => field.value) as ProfileField[];
+
   if (basicFields.length > 0) {
     sections.push({
       id: 'basic-info',
-      title: 'Basic Information',
+      title: t(TRANSLATION_KEYS.PROFILE_SECTION_BASIC_INFO),
       icon: 'User',
       fields: basicFields,
       colSpan: 1,
       layout: { columns: 1, gap: 4 }
     });
   }
-  
+
   // Professional Information Section
   if (user.jobTitle || user.department || user.role) {
     const professionalFields: ProfileField[] = [
       {
         id: 'job-title',
         name: 'jobTitle',
-        label: 'Job Title',
+        label: t(TRANSLATION_KEYS.PROFILE_LABEL_JOB_TITLE),
         value: user.jobTitle,
         type: 'text' as const,
         format: 'default'
@@ -127,7 +149,7 @@ export const userProfileToSections = (user: UserProfile): ProfileSection[] => {
       {
         id: 'department',
         name: 'department',
-        label: 'Department',
+        label: t(TRANSLATION_KEYS.PROFILE_LABEL_DEPARTMENT),
         value: user.department,
         type: 'text' as const,
         format: 'default'
@@ -135,17 +157,17 @@ export const userProfileToSections = (user: UserProfile): ProfileSection[] => {
       {
         id: 'role',
         name: 'role',
-        label: 'Role',
+        label: t(TRANSLATION_KEYS.PROFILE_LABEL_ROLE),
         value: user.role,
         type: 'badge' as const,
         format: 'default'
       }
     ].filter(field => field.value) as ProfileField[];
-    
+
     if (professionalFields.length > 0) {
       sections.push({
         id: 'professional-info',
-        title: 'Professional',
+        title: t(TRANSLATION_KEYS.PROFILE_SECTION_PROFESSIONAL),
         icon: 'Briefcase',
         fields: professionalFields,
         colSpan: 1,
@@ -153,17 +175,17 @@ export const userProfileToSections = (user: UserProfile): ProfileSection[] => {
       });
     }
   }
-  
+
   // Location Section
   if (user.location) {
     sections.push({
       id: 'location',
-      title: 'Location',
+      title: t(TRANSLATION_KEYS.PROFILE_SECTION_LOCATION),
       icon: 'MapPin',
       fields: [{
         id: 'location',
         name: 'location',
-        label: 'Location',
+        label: t(TRANSLATION_KEYS.PROFILE_SECTION_LOCATION),
         value: user.location,
         type: 'text' as const,
         format: 'default',
@@ -173,17 +195,17 @@ export const userProfileToSections = (user: UserProfile): ProfileSection[] => {
       layout: { columns: 1, gap: 4 }
     });
   }
-  
+
   // Bio Section
   if (user.bio) {
     sections.push({
       id: 'bio',
-      title: 'About',
+      title: t(TRANSLATION_KEYS.PROFILE_SECTION_ABOUT),
       icon: 'UserCircle',
       fields: [{
         id: 'bio',
         name: 'bio',
-        label: 'Bio',
+        label: t(TRANSLATION_KEYS.PROFILE_LABEL_BIO),
         value: user.bio,
         type: 'text' as const,
         format: 'default'
@@ -192,13 +214,13 @@ export const userProfileToSections = (user: UserProfile): ProfileSection[] => {
       layout: { columns: 1, gap: 4 }
     });
   }
-  
+
   // Activity Section
   const activityFields: ProfileField[] = [
     {
       id: 'joined-at',
       name: 'joinedAt',
-      label: 'Joined',
+      label: t(TRANSLATION_KEYS.PROFILE_LABEL_JOINED),
       value: user.joinedAt,
       type: 'date' as const,
       format: 'date'
@@ -206,24 +228,24 @@ export const userProfileToSections = (user: UserProfile): ProfileSection[] => {
     {
       id: 'last-login',
       name: 'lastLogin',
-      label: 'Last Login',
+      label: t(TRANSLATION_KEYS.PROFILE_LABEL_LAST_LOGIN),
       value: user.lastLogin,
       type: 'date' as const,
       format: 'date'
     }
   ].filter(field => field.value) as ProfileField[];
-  
+
   if (activityFields.length > 0) {
     sections.push({
       id: 'activity',
-      title: 'Activity',
+      title: t(TRANSLATION_KEYS.PROFILE_SECTION_ACTIVITY),
       icon: 'Activity',
       fields: activityFields,
       colSpan: 1,
       layout: { columns: 1, gap: 4 }
     });
   }
-  
+
   return sections;
 };
 

@@ -14,7 +14,8 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { SearchInput } from '@/gradian-ui/form-builder/form-elements';
+import { IconBox } from '@/gradian-ui/form-builder/form-elements';
+import { SearchBar } from '@/gradian-ui/data-display/components/SearchBar';
 import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
@@ -479,44 +480,37 @@ export function AppListWrapper() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="flex flex-col gap-3 rounded-2xl border border-gray-200 bg-white/80 p-3 shadow-sm backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/80 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-4"
+          className="flex min-w-0 flex-col gap-3 overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-3 shadow-sm backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/80 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-4"
         >
-          <div className="flex flex-1 items-center gap-3">
-            <div className="hidden h-9 w-9 items-center justify-center rounded-xl bg-violet-600/10 text-violet-600 dark:bg-violet-500/15 dark:text-violet-200 sm:flex">
-              <AppWindow className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <IconBox
+              name="AppWindow"
+              variant="squircle"
+              color="violet"
+              size="sm"
+              iconClassName="h-5 w-5"
+              className="hidden shrink-0 sm:flex"
+            />
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <p className="truncate text-sm font-medium text-gray-900 dark:text-gray-100">
                 {getT(TRANSLATION_KEYS.APPS_COUNT_AVAILABLE, language, defaultLang).replace('{count}', String(apps.length))}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="line-clamp-2 text-xs text-gray-500 dark:text-gray-400">
                 {getT(TRANSLATION_KEYS.APPS_SEARCH_HINT, language, defaultLang)}
               </p>
             </div>
           </div>
-          <div className="flex flex-row items-center gap-2">
-            <div className="flex-1 min-w-0">
-              <SearchInput
-                config={{
-                  name: 'search',
-                  placeholder: getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH_APPS, language, defaultLang),
-                }}
-                value={searchQuery}
-                onChange={setSearchQuery}
-                onClear={() => setSearchQuery('')}
-                className="[&_input]:h-9"
-              />
-            </div>
-            <div className="flex items-center space-x-1 shrink-0 border border-gray-300 dark:border-gray-500 rounded-md h-9">
+          <div className="flex min-w-0 shrink-0 flex-row flex-wrap items-center justify-end gap-1.5 sm:gap-2">
+            <div className="flex h-8 shrink-0 items-center rounded-xl bg-gray-50 shadow-sm dark:bg-gray-700 sm:h-9">
               <Button
                 variant={viewMode === 'list' ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('list')}
                 className={cn(
-                  'h-full w-10 p-0 rounded-md',
+                  'h-full w-10 p-0 rounded-xl',
                   viewMode === 'list'
                     ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-sm'
-                    : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'
+                    : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-gray-600'
                 )}
                 aria-label="List view"
               >
@@ -527,27 +521,33 @@ export function AppListWrapper() {
                 size="sm"
                 onClick={() => setViewMode('grid')}
                 className={cn(
-                  'h-full w-10 p-0 rounded-md',
+                  'h-full w-10 p-0 rounded-xl',
                   viewMode === 'grid'
                     ? 'bg-violet-500 hover:bg-violet-600 text-white shadow-sm'
-                    : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50'
+                    : 'text-gray-500 hover:text-violet-600 hover:bg-violet-50 dark:hover:bg-gray-600'
                 )}
                 aria-label="Grid view"
               >
                 <Grid3X3 className="h-4 w-4" />
               </Button>
             </div>
+            <div className="w-full min-w-0 shrink-0 sm:w-40 md:w-52">
+              <SearchBar
+                placeholder={getT(TRANSLATION_KEYS.PLACEHOLDER_SEARCH_APPS, language, defaultLang)}
+                value={searchQuery}
+                onChange={setSearchQuery}
+                className="h-8 w-full sm:h-9"
+              />
+            </div>
             <Button
-              variant="outline"
-              size="icon"
+              variant="square"
+              size="sm"
               onClick={handleRefresh}
               disabled={isLoading || refreshing}
-              className="h-9 w-9 shrink-0"
+              className="h-8 shrink-0 sm:h-9"
               title="Refresh apps"
             >
-              <RefreshCw
-                className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`}
-              />
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </motion.div>

@@ -43,7 +43,7 @@ const gradientClasses: Record<string, string> = {
   blue: 'from-blue-50 via-cyan-50 to-sky-50 dark:from-blue-950/30 dark:via-cyan-950/30 dark:to-sky-950/30 border-blue-200/50 dark:border-blue-800/50',
   indigo: 'from-indigo-50 via-blue-50 to-purple-50 dark:from-indigo-950/30 dark:via-blue-950/30 dark:to-purple-950/30 border-indigo-200/50 dark:border-indigo-800/50',
   // Purples
-  violet: 'from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border-violet-200/50 dark:border-violet-800/50',
+  violet: 'from-violet-200/90 via-purple-100/85 to-indigo-100/85 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border-violet-200/50 dark:border-violet-800/50',
   purple: 'from-purple-50 via-pink-50 to-rose-50 dark:from-purple-950/30 dark:via-pink-950/30 dark:to-rose-950/30 border-purple-200/50 dark:border-purple-800/50',
   fuchsia: 'from-fuchsia-50 via-pink-50 to-purple-50 dark:from-fuchsia-950/30 dark:via-pink-950/30 dark:to-purple-950/30 border-fuchsia-200/50 dark:border-fuchsia-800/50',
   pink: 'from-pink-50 via-rose-50 to-fuchsia-50 dark:from-pink-950/30 dark:via-rose-950/30 dark:to-fuchsia-950/30 border-pink-200/50 dark:border-pink-800/50',
@@ -126,17 +126,28 @@ const getInitials = (name: string): string => {
 
 const getBadgeColorClasses = (color: TailwindColor = 'violet'): string => {
   const colorMap: Record<string, string> = {
-    violet: 'bg-violet-50 text-violet-700 border border-violet-100 dark:bg-violet-500/15 dark:text-violet-100 dark:border-violet-500/40',
-    emerald: 'bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-500/15 dark:text-emerald-100 dark:border-emerald-500/40',
-    indigo: 'bg-indigo-50 text-indigo-700 border border-indigo-100 dark:bg-indigo-500/15 dark:text-indigo-100 dark:border-indigo-500/40',
-    blue: 'bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-500/15 dark:text-blue-100 dark:border-blue-500/40',
-    green: 'bg-green-50 text-green-700 border border-green-100 dark:bg-green-500/15 dark:text-green-100 dark:border-green-500/40',
-    red: 'bg-red-50 text-red-700 border border-red-100 dark:bg-red-500/15 dark:text-red-100 dark:border-red-500/40',
-    orange: 'bg-orange-50 text-orange-700 border border-orange-100 dark:bg-orange-500/15 dark:text-orange-100 dark:border-orange-500/40',
-    amber: 'bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-500/15 dark:text-amber-100 dark:border-amber-500/40',
-    yellow: 'bg-yellow-50 text-yellow-700 border border-yellow-100 dark:bg-yellow-500/15 dark:text-yellow-100 dark:border-yellow-500/40',
-    pink: 'bg-pink-50 text-pink-700 border border-pink-100 dark:bg-pink-500/15 dark:text-pink-100 dark:border-pink-500/40',
-    purple: 'bg-purple-50 text-purple-700 border border-purple-100 dark:bg-purple-500/15 dark:text-purple-100 dark:border-purple-500/40',
+    violet:
+      'bg-violet-50 text-violet-700 border border-violet-100 dark:bg-violet-500/15 dark:text-violet-100 dark:border-violet-500/40 dark:hover:bg-violet-500/25',
+    emerald:
+      'bg-emerald-50 text-emerald-700 border border-emerald-100 dark:bg-emerald-500/15 dark:text-emerald-100 dark:border-emerald-500/40 dark:hover:bg-emerald-500/25',
+    indigo:
+      'bg-indigo-50 text-indigo-700 border border-indigo-100 dark:bg-indigo-500/15 dark:text-indigo-100 dark:border-indigo-500/40 dark:hover:bg-indigo-500/25',
+    blue:
+      'bg-blue-50 text-blue-700 border border-blue-100 dark:bg-blue-500/15 dark:text-blue-100 dark:border-blue-500/40 dark:hover:bg-blue-500/25',
+    green:
+      'bg-green-50 text-green-700 border border-green-100 dark:bg-green-500/15 dark:text-green-100 dark:border-green-500/40 dark:hover:bg-green-500/25',
+    red:
+      'bg-red-50 text-red-700 border border-red-100 dark:bg-red-500/15 dark:text-red-100 dark:border-red-500/40 dark:hover:bg-red-500/25',
+    orange:
+      'bg-orange-50 text-orange-700 border border-orange-100 dark:bg-orange-500/15 dark:text-orange-100 dark:border-orange-500/40 dark:hover:bg-orange-500/25',
+    amber:
+      'bg-amber-50 text-amber-700 border border-amber-100 dark:bg-amber-500/15 dark:text-amber-100 dark:border-amber-500/40 dark:hover:bg-amber-500/25',
+    yellow:
+      'bg-yellow-50 text-yellow-700 border border-yellow-100 dark:bg-yellow-500/15 dark:text-yellow-100 dark:border-yellow-500/40 dark:hover:bg-yellow-500/25',
+    pink:
+      'bg-pink-50 text-pink-700 border border-pink-100 dark:bg-pink-500/15 dark:text-pink-100 dark:border-pink-500/40 dark:hover:bg-pink-500/25',
+    purple:
+      'bg-purple-50 text-purple-700 border border-purple-100 dark:bg-purple-500/15 dark:text-purple-100 dark:border-purple-500/40 dark:hover:bg-purple-500/25',
   };
   return colorMap[color] || colorMap.violet;
 };

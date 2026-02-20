@@ -26,6 +26,7 @@ function convertUserToProfile(user: any, language: string): UserProfile {
   const fullName = lastName 
     ? `${firstName} ${lastName}`.trim()
     : firstName;
+  const postTitleResolved = resolveLocalizedField(user?.postTitle, language, 'en').trim();
 
   return {
     id: user.id,
@@ -35,20 +36,21 @@ function convertUserToProfile(user: any, language: string): UserProfile {
     email: user.email || '',
     phone: user.phone || undefined,
     avatar: user.avatar || user.avatarUrl || undefined,
-    initials: getUserInitials({ 
-      firstName, 
-      lastName, 
+    initials: getUserInitials({
+      firstName,
+      lastName,
       fullName,
       email: user.email || ''
     } as UserProfile),
-    role: user.role || 'user',
+    role: user.role || Array.isArray(user.entityType) ? user.entityType[0].label : 'User',
     department: user.department || undefined,
-    jobTitle: user.jobTitle || undefined,
+    jobTitle: user.jobTitle || postTitleResolved || undefined,
     location: user.location || undefined,
     bio: user.bio || undefined,
     joinedAt: user.createdAt ? new Date(user.createdAt) : undefined,
     lastLogin: user.lastLogin ? new Date(user.lastLogin) : undefined,
-    metadata: user.metadata || {}
+    metadata: user.metadata || {},
+    entityType: Array.isArray(user.entityType) ? user.entityType : undefined
   };
 }
 

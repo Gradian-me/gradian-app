@@ -1,5 +1,15 @@
 // Profile Types
 
+/** Label can be a plain string or localized array e.g. [{ en: "x" }, { fa: "y" }] */
+export type EntityTypeLabel = string | Array<Record<string, string>>;
+
+export interface UserProfileEntityType {
+  id: string;
+  icon?: string;
+  color?: string;
+  label: EntityTypeLabel;
+}
+
 export interface UserProfile {
   id: string;
   firstName: string;
@@ -23,6 +33,7 @@ export interface UserProfile {
     rating?: number;
   };
   availability?: string;
+  entityType?: UserProfileEntityType[];
 }
 
 export interface ProfileSection {

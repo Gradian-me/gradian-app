@@ -12,11 +12,13 @@ import { motion } from 'framer-motion';
 export interface ProfileCardProps {
   section: ProfileSection;
   className?: string;
+  /** Language code for date formatting (uses calendarLocale from language-availables when set). */
+  language?: string;
 }
 
 const MotionCard = motion(Card);
 
-export const ProfileCard: React.FC<ProfileCardProps> = ({ section, className }) => {
+export const ProfileCard: React.FC<ProfileCardProps> = ({ section, className, language }) => {
   const { title, description, icon, fields, layout } = section;
   
   const gridClasses = cn(
@@ -63,7 +65,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({ section, className }) 
                 {field.label}
               </label>
               <div className="text-sm text-gray-900 dark:text-gray-100">
-                {formatProfileFieldValue(field)}
+                {formatProfileFieldValue(field, { language })}
               </div>
             </div>
           ))}
