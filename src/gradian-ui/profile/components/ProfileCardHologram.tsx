@@ -744,7 +744,8 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                 gridArea: '1 / -1',
                 borderRadius: cardRadius,
                 pointerEvents: 'none',
-                backfaceVisibility: 'hidden'
+                backfaceVisibility: 'visible',
+                WebkitBackfaceVisibility: 'visible'
               }}
             >
               {showMainAvatar && (
@@ -753,7 +754,6 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                     absolute 
                     bottom-30 
                     shadow-2xl 
-                    will-change-transform 
                     transition-transform 
                     duration-[120ms] 
                     end-6
@@ -762,7 +762,10 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                     w-32 lg:w-38
                   "
                   style={{
-                    backfaceVisibility: 'hidden'
+                    backfaceVisibility: 'visible',
+                    WebkitBackfaceVisibility: 'visible',
+                    transform: 'translateZ(0.5px)',
+                    imageRendering: 'auto'
                   }}
                   src={avatarUrl}
                   alt={`${displayName} avatar`}
@@ -772,7 +775,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
               )}
               {showUserInfo && (
                 <div
-                  className="absolute z-2 flex items-center justify-between backdrop-blur-[30px] border border-white/10 pointer-events-none select-none"
+                  className="absolute z-2 flex items-center justify-between backdrop-blur-[8px] border border-white/10 pointer-events-none select-none"
                   style={
                     {
                       '--ui-inset': '20px',
@@ -780,7 +783,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                       bottom: 'var(--ui-inset)',
                       left: 'var(--ui-inset)',
                       right: 'var(--ui-inset)',
-                      background: 'rgba(255, 255, 255, 0.1)',
+                      background: 'rgba(255, 255, 255, 0.16)',
                       borderRadius: 'calc(max(0px, var(--card-radius) - var(--ui-inset) + var(--ui-radius-bias)))',
                       padding: '12px 14px'
                     } as React.CSSProperties
@@ -797,7 +800,14 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                           src={miniAvatarUrl || avatarUrl}
                           alt={`${displayName} mini avatar`}
                           loading="lazy"
-                          style={{ display: 'block', gridArea: 'auto', borderRadius: '50%', pointerEvents: 'auto' }}
+                          style={{
+                            display: 'block',
+                            gridArea: 'auto',
+                            borderRadius: '50%',
+                            pointerEvents: 'auto',
+                            imageRendering: 'auto',
+                            backfaceVisibility: 'visible'
+                          }}
                           onError={() => setMiniAvatarError(true)}
                         />
                       </div>
@@ -847,11 +857,13 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
               className="max-h-full overflow-hidden text-center relative z-5 flex flex-col select-none"
               style={{
                 transform:
-                  'translate3d(calc(var(--pointer-from-left) * -6px + 3px), calc(var(--pointer-from-top) * -6px + 3px), 0.1px)',
-                mixBlendMode: 'luminosity',
+                  'translate3d(calc(var(--pointer-from-left) * -6px + 3px), calc(var(--pointer-from-top) * -6px + 3px), 1px)',
                 gridArea: '1 / -1',
                 borderRadius: cardRadius,
-                pointerEvents: 'none'
+                pointerEvents: 'none',
+                backfaceVisibility: 'visible',
+                WebkitBackfaceVisibility: 'visible',
+                WebkitFontSmoothing: 'antialiased'
               }}
             >
               <div

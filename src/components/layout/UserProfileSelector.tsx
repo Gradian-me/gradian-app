@@ -6,7 +6,7 @@ import { ChevronDown, KeyRound, LogOut, Settings, User as UserIcon } from 'lucid
 import { AnimatePresence, motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from '@/gradian-ui/form-builder/form-elements/components/Avatar';
 import { cn, getDisplayNameFields, resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { Badge as FormBadge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
 import { useUserStore } from '@/stores/user.store';
@@ -93,13 +93,18 @@ export function UserProfileSelector({
   const initials = useMemo(() => {
     if (!isMounted) return '--';
     const source = displayName || user?.email || 'User';
-    return source
+    const raw = source
       .split(' ')
       .map((word) => word[0])
       .join('')
       .substring(0, 2)
       .toUpperCase();
-  }, [isMounted, displayName, user]);
+    // RTL: insert ZWNJ (semi-space) between initials so they don't join or reverse
+    if (isRTLLanguage && raw.length > 0) {
+      return raw.split('').join('\u200C');
+    }
+    return raw;
+  }, [isMounted, displayName, user, isRTLLanguage]);
 
   const isSystemAdministrator = isMounted && user ? canAccessSystemAdminRoute(user) : false;
 
@@ -172,12 +177,11 @@ export function UserProfileSelector({
           suppressHydrationWarning
         >
           <Avatar
-            className="h-8 w-8 border border-gray-100 rounded-full bg-violet-100 text-violet-800 shrink-0 m-0"
-          >
-            <AvatarFallback className="bg-violet-100 text-violet-800 text-xs">
-              --
-            </AvatarFallback>
-          </Avatar>
+            fallback="--"
+            size="sm"
+            variant="primary"
+            className="h-8 w-8 border border-gray-100 rounded-full shrink-0 m-0"
+          />
           <div
             className={cn(
               'flex flex-col leading-tight text-start mx-2',
@@ -263,22 +267,17 @@ export function UserProfileSelector({
             suppressHydrationWarning
             id="user-profile-trigger"
           >
-            <Avatar
-              className={cn(
-                'h-8 w-8 border rounded-full bg-violet-100 text-violet-800 shrink-0 m-0',
-                isDarkVariant ? 'border-gray-700' : 'border-gray-100'
-              )}
-            >
-              {user?.avatar ? (
-                <AvatarImage
-                  src={user.avatar}
-                  alt={displayName}
-                />
-              ) : null}
-              <AvatarFallback className="bg-violet-100 text-violet-800 text-xs">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+          <Avatar
+            src={user?.avatar}
+            alt={displayName}
+            fallback={initials}
+            size="sm"
+            variant="primary"
+            className={cn(
+              'shrink-0 m-0 border rounded-full',
+              isDarkVariant ? 'border-gray-700' : 'border-gray-100'
+            )}
+          />
             <div
               className={cn(
                 'flex flex-col leading-tight text-start mx-2 min-w-0',
