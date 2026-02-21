@@ -23,7 +23,7 @@ import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { useOptionsFromSchemaOrUrl } from '../hooks/useOptionsFromSchemaOrUrl';
 import { getLabelClasses, errorTextClasses, selectTriggerBaseClasses, selectErrorBorderClasses } from '../utils/field-styles';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
-import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
+import { buildReferenceFilterUrl, buildLookupOptionsUrl } from '../../utils/reference-filter-builder';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { replaceDynamicContext } from '../../utils/dynamic-context-replacer';
@@ -273,17 +273,27 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
   // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
   const referenceBasedSourceUrl = React.useMemo(() => {
-    if (!referenceSchema || !referenceRelationTypeId || !referenceEntityId || sourceUrl) {
+    if (!referenceEntityId || sourceUrl) {
       return null;
     }
-    
-    // For static IDs, we can build the URL immediately without waiting for dynamic context
-    // For dynamic IDs, we need the context to be ready
     const shouldUseContext = !isStaticReferenceId;
     const contextSchema = shouldUseContext ? dynamicContext.formSchema : undefined;
     const contextValues = shouldUseContext ? dynamicContext.formData : undefined;
-    
-    // Build the sourceUrl using reference fields
+
+    // Lookup options: targetSchema=lookups and referenceEntityId=lookup id → GET /api/lookups/options/[id]
+    if (targetSchemaFromConfig === 'lookups') {
+      const url = buildLookupOptionsUrl({
+        referenceEntityId,
+        schema: contextSchema,
+        values: contextValues,
+      });
+      return url && url.trim() !== '' ? url : null;
+    }
+
+    // Relation-based: referenceSchema + referenceRelationTypeId + referenceEntityId
+    if (!referenceSchema || !referenceRelationTypeId) {
+      return null;
+    }
     const url = buildReferenceFilterUrl({
       referenceSchema,
       referenceRelationTypeId,
@@ -292,8 +302,6 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       schema: contextSchema,
       values: contextValues,
     });
-    
-    // If URL is empty (e.g., dynamic context not ready for dynamic IDs), return null to allow fallback to schemaId
     return url && url.trim() !== '' ? url : null;
   }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, schemaId, sourceUrl, isStaticReferenceId, dynamicContext.formSchema, dynamicContext.formData]);
 
@@ -312,16 +320,18 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     return undefined;
   }, [schemaId, targetSchemaFromConfig, referenceSchema, referenceBasedSourceUrl, sourceUrl]);
 
-  // Default columnMap for API responses that nest data under data[0].data
+  // Default columnMap: lookups options return { data: options }; relations return { data: [{ data: items }] } → data.0.data
   const defaultColumnMap: ColumnMapConfig = React.useMemo(() => ({
-    response: { data: 'data.0.data' },
+    response: {
+      data: targetSchemaFromConfig === 'lookups' ? 'data' : 'data.0.data',
+    },
     item: {
       id: 'id',
       label: 'label',
       icon: 'icon',
       color: 'color',
     },
-  }), []);
+  }), [targetSchemaFromConfig]);
 
   // Get columnMap from config if provided
   const configColumnMap = (config as any)?.columnMap as ColumnMapConfig | undefined;
@@ -329,23 +339,19 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   // Use provided columnMap or fallback to default when using reference-based filtering
   const effectiveColumnMap = React.useMemo(() => {
     if (configColumnMap) {
-      // Merge with default to ensure data extraction is handled if not explicitly overridden
+      const base = {
+        response: { data: targetSchemaFromConfig === 'lookups' ? 'data' : 'data.0.data' },
+        item: { id: 'id', label: 'label', icon: 'icon', color: 'color' as const },
+      };
       return {
-        ...defaultColumnMap,
+        ...base,
         ...configColumnMap,
-        response: {
-          ...defaultColumnMap.response,
-          ...configColumnMap.response,
-        },
-        item: {
-          ...defaultColumnMap.item,
-          ...configColumnMap.item,
-        }
+        response: { ...base.response, ...configColumnMap.response },
+        item: { ...base.item, ...configColumnMap.item },
       };
     }
-    // Use default columnMap when using reference-based filtering (effectiveSourceUrl from reference)
     return referenceBasedSourceUrl ? defaultColumnMap : undefined;
-  }, [configColumnMap, referenceBasedSourceUrl, defaultColumnMap]);
+  }, [configColumnMap, referenceBasedSourceUrl, defaultColumnMap, targetSchemaFromConfig]);
 
   // Fetch options from schemaId or sourceUrl if provided
   const {

@@ -10,7 +10,10 @@ import { DataStorageError } from '../errors/domain.errors';
 const DATA_FILE_PATH = path.join(process.cwd(), 'data', 'all-data.json');
 
 export interface ExternalNode {
+  /** Unique stable id (ULID) for relations. Use this as targetId in HAS_FIELD_VALUE. */
   id: string;
+  /** Business/source id from the external option (e.g. lookup row id). Avoids id collisions across sources. */
+  businessId?: string;
   label?: string;
   color?: string;
   icon?: string;
@@ -64,6 +67,11 @@ export function getExternalNodes(): ExternalNode[] {
   return data.external_nodes ?? [];
 }
 
+/**
+ * Upsert an external node from a picker/select option.
+ * Uses ULID for node.id to avoid collisions across sources; stores the option's id as businessId.
+ * Match existing node by sourceUrl + (id or businessId) so re-saves after enrich still find the same node.
+ */
 export function upsertExternalNodeFromOption(params: {
   sourceUrl: string;
   option: { id?: string | number; label?: string; icon?: string; color?: string; metadata?: any };
@@ -71,14 +79,16 @@ export function upsertExternalNodeFromOption(params: {
   const data = readAllData();
   const externalNodes: ExternalNode[] = data.external_nodes ?? [];
 
-  const optionId = params.option.id ? String(params.option.id) : ulid();
+  const optionId = params.option.id != null && params.option.id !== '' ? String(params.option.id) : undefined;
+  const businessId = optionId;
 
   const existingIndex = externalNodes.findIndex(
-    (node) => node.sourceUrl === params.sourceUrl && node.id === optionId,
+    (node) =>
+      node.sourceUrl === params.sourceUrl &&
+      (node.id === optionId || node.businessId === optionId),
   );
 
-  const baseNode: ExternalNode = {
-    id: optionId,
+  const basePayload = {
     label: params.option.label,
     icon: params.option.icon,
     color: params.option.color,
@@ -87,9 +97,10 @@ export function upsertExternalNodeFromOption(params: {
   };
 
   if (existingIndex >= 0) {
-    const updated = {
+    const updated: ExternalNode = {
       ...externalNodes[existingIndex],
-      ...baseNode,
+      ...basePayload,
+      businessId: businessId ?? externalNodes[existingIndex].businessId,
     };
     externalNodes[existingIndex] = updated;
     data.external_nodes = externalNodes;
@@ -97,7 +108,11 @@ export function upsertExternalNodeFromOption(params: {
     return updated;
   }
 
-  const created: ExternalNode = baseNode;
+  const created: ExternalNode = {
+    id: ulid(),
+    businessId: businessId,
+    ...basePayload,
+  };
   const nextNodes = [...externalNodes, created];
   data.external_nodes = nextNodes;
   writeAllData(data);

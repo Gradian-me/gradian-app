@@ -195,14 +195,23 @@ export async function syncHasFieldValueRelationsForEntity(params: {
     const fieldId = field.id || fieldName;
     const rawTargetSchemaId = (field as any).targetSchema as string | undefined;
     const sourceUrl = (field as any).sourceUrl as string | undefined;
+    const referenceEntityId = (field as any).referenceEntityId as string | undefined;
     const fieldOptions = (field as any).options as Array<{ id?: string; label?: string; value?: string; icon?: string; color?: string }> | undefined;
 
     // Resolve dynamic targetSchema (e.g., "{{formData.resourceType}}") using entity data
-    // The entity contains the formData values, so we can use it to resolve templates
-    // This ensures relations are saved with the actual schema ID, not the template string
-    const targetSchemaId = rawTargetSchemaId 
+    const targetSchemaId = rawTargetSchemaId
       ? replaceDynamicContext(rawTargetSchemaId, { formSchema: schema, formData: entity })
       : undefined;
+
+    // Lookup options: targetSchema=lookups + referenceEntityId → treat like external source (external_nodes)
+    // Use a stable sourceUrl so options are stored and resolved like sourceUrl-based pickers
+    let effectiveSourceUrl: string | undefined = sourceUrl;
+    if (!effectiveSourceUrl && targetSchemaId === 'lookups' && referenceEntityId) {
+      const resolvedLookupId = replaceDynamicContext(referenceEntityId, { formSchema: schema, formData: entity });
+      if (resolvedLookupId && typeof resolvedLookupId === 'string' && !resolvedLookupId.includes('{{')) {
+        effectiveSourceUrl = `lookup-options:${resolvedLookupId}`;
+      }
+    }
 
     const rawValue = entity[fieldName];
     // For single-select components (select, radio, toggle-group), convert to array
@@ -230,8 +239,8 @@ export async function syncHasFieldValueRelationsForEntity(params: {
     for (const option of options) {
       if (option === null || option === undefined) continue;
 
-      if (targetSchemaId) {
-        // Internal schema-based picker/select
+      // Internal schema-based picker/select (exclude lookups: lookup options are stored as external_nodes)
+      if (targetSchemaId && targetSchemaId !== 'lookups') {
         if (typeof option === 'string' || typeof option === 'number') {
           targets.push({
             targetSchema: targetSchemaId,
@@ -246,11 +255,11 @@ export async function syncHasFieldValueRelationsForEntity(params: {
             });
           }
         }
-      } else if (sourceUrl) {
-        // External URL-based picker/select -> map into external_nodes
+      } else if (effectiveSourceUrl) {
+        // External URL or lookup-options → map into external_nodes
         if (typeof option === 'object') {
           const externalNode = upsertExternalNodeFromOption({
-            sourceUrl,
+            sourceUrl: effectiveSourceUrl,
             option: {
               id: option.id,
               label: option.label,
@@ -265,9 +274,8 @@ export async function syncHasFieldValueRelationsForEntity(params: {
             targetId: externalNode.id,
           });
         } else {
-          // Primitive value from external source - store minimal external node
           const externalNode = upsertExternalNodeFromOption({
-            sourceUrl,
+            sourceUrl: effectiveSourceUrl,
             option: {
               id: option as any,
               label: String(option),
@@ -627,7 +635,8 @@ export async function enrichEntityPickerFieldsFromRelations(params: {
           if (externalNode) {
             return {
               id: externalNode.id,
-              label: externalNode.label || externalNode.id,
+              ...(externalNode.businessId != null ? { businessId: externalNode.businessId } : {}),
+              label: externalNode.label || externalNode.businessId || externalNode.id,
               icon: externalNode.icon,
               color: externalNode.color,
               targetSchema: rel.targetSchema, // Include targetSchema from relation for badge navigation

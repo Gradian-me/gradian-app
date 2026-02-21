@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { extractIds, normalizeOptionArray, NormalizedOption } from '../utils/option-normalizer';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { sortNormalizedOptions, SortType } from '@/gradian-ui/shared/utils/sort-utils';
-import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
+import { buildReferenceFilterUrl, buildLookupOptionsUrl } from '../../utils/reference-filter-builder';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { replaceDynamicContext } from '../../utils/dynamic-context-replacer';
@@ -135,17 +135,15 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
 
     // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
     const referenceBasedSourceUrl = React.useMemo(() => {
-      if (!referenceSchema || !referenceRelationTypeId || !referenceEntityId || sourceUrl) {
-        return null;
-      }
-      
-      // For static IDs, we can build the URL immediately without waiting for dynamic context
-      // For dynamic IDs, we need the context to be ready
+      if (!referenceEntityId || sourceUrl) return null;
       const shouldUseContext = !isStaticReferenceId;
       const contextSchema = shouldUseContext ? dynamicContext.formSchema : undefined;
       const contextValues = shouldUseContext ? dynamicContext.formData : undefined;
-      
-      // Build the sourceUrl using reference fields
+      if (targetSchemaFromConfig === 'lookups') {
+        const url = buildLookupOptionsUrl({ referenceEntityId, schema: contextSchema, values: contextValues });
+        return url && url.trim() !== '' ? url : null;
+      }
+      if (!referenceSchema || !referenceRelationTypeId) return null;
       const url = buildReferenceFilterUrl({
         referenceSchema,
         referenceRelationTypeId,
@@ -154,24 +152,17 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
         schema: contextSchema,
         values: contextValues,
       });
-      
-      // If URL is empty (e.g., dynamic context not ready for dynamic IDs), return null
       return url && url.trim() !== '' ? url : null;
     }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, sourceUrl, isStaticReferenceId, dynamicContext.formSchema, dynamicContext.formData]);
 
     // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl
     const effectiveSourceUrl = sourceUrl || referenceBasedSourceUrl || undefined;
 
-    // Default columnMap for API responses that nest data under data[0].data
+    // Lookups options: { data: options }; relations: { data: [{ data: [...] }] } → data.0.data
     const defaultColumnMap: ColumnMapConfig = React.useMemo(() => ({
-      response: { data: 'data.0.data' },
-      item: {
-        id: 'id',
-        label: 'label',
-        icon: 'icon',
-        color: 'color',
-      },
-    }), []);
+      response: { data: targetSchemaFromConfig === 'lookups' ? 'data' : 'data.0.data' },
+      item: { id: 'id', label: 'label', icon: 'icon', color: 'color' },
+    }), [targetSchemaFromConfig]);
 
     // Get columnMap from config if provided
     const configColumnMap = (config as any)?.columnMap as ColumnMapConfig | undefined;

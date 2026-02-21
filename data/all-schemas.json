@@ -541,6 +541,16 @@
         ]
       },
       {
+        "id": "external-node-business-id",
+        "name": "businessId",
+        "label": "Business ID",
+        "sectionId": "basic-information",
+        "component": "text",
+        "colSpan": 1,
+        "order": 2,
+        "caption": "Source option id (e.g. lookup row id); avoids id collisions across sources"
+      },
+      {
         "id": "external-node-label",
         "name": "label",
         "label": "Label",
@@ -35515,6 +35525,17 @@
             "ru": "Добавить пункты в список"
           }
         ]
+      },
+      {
+        "id": "part-name",
+        "name": "partName",
+        "label": "Part Name",
+        "sectionId": "note-content",
+        "component": "picker",
+        "targetSchema": "lookups",
+        "referenceEntityId": "01KJ06YM685FYANN2ZVV4CGSGH",
+        "colSpan": 1,
+        "order": 5
       }
     ],
     "sections": [
@@ -35651,9 +35672,19 @@
       {"id": "cacheEnabled", "name": "cacheEnabled", "label": "Cache Enabled", "sectionId": "basic", "component": "switch", "colSpan": 1, "order": 13},
       {"id": "cacheTTL", "name": "cacheTTL", "label": "Cache TTL", "sectionId": "basic", "component": "number", "colSpan": 1, "order": 14},
       {"id": "createdAt", "name": "createdAt", "label": "Created", "sectionId": "basic", "component": "datetime", "colSpan": 1, "order": 15},
-      {"id": "updatedAt", "name": "updatedAt", "label": "Updated", "sectionId": "basic", "component": "datetime", "colSpan": 1, "order": 16}
+      {"id": "updatedAt", "name": "updatedAt", "label": "Updated", "sectionId": "basic", "component": "datetime", "colSpan": 1, "order": 16},
+      {"id": "column_map_id", "name": "column_map_id", "label": "Column Map (ID)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 17, "caption": "Comma-separated column names for option id; values concatenated with \" | \""},
+      {"id": "column_map_title", "name": "column_map_title", "label": "Column Map (Title)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 18, "caption": "Comma-separated column names for option label; values concatenated with \" | \""},
+      {"id": "column_map_subtitle", "name": "column_map_subtitle", "label": "Column Map (Subtitle)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 19, "caption": "Comma-separated column names"},
+      {"id": "column_map_description", "name": "column_map_description", "label": "Column Map (Description)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 20, "caption": "Comma-separated column names"},
+      {"id": "column_map_color", "name": "column_map_color", "label": "Column Map (Color)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 21, "caption": "Column name for color"},
+      {"id": "column_map_icon", "name": "column_map_icon", "label": "Column Map (Icon)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 22, "caption": "Column name for icon"},
+      {"id": "column_map_url", "name": "column_map_url", "label": "Column Map (URL)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 23, "caption": "Column name for URL"},
+      {"id": "column_map_avatar", "name": "column_map_avatar", "label": "Column Map (Avatar)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 24, "caption": "Column name for avatar"},
+      {"id": "column_map_pagination_page", "name": "column_map_pagination_page", "label": "Column Map (Pagination Page)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 25, "caption": "Column name for page"},
+      {"id": "column_map_pagination_limit", "name": "column_map_pagination_limit", "label": "Column Map (Pagination Limit)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 26, "caption": "Column name for limit"}
     ],
-    "sections": [{"id": "basic", "title": "Lookup", "order": 1}],
+    "sections": [{"id": "basic", "title": "Lookup", "order": 1}, {"id": "column-mapping", "title": "Column Mapping", "order": 2}],
     "detailPageMetadata": {
       "quickActions": [
         {

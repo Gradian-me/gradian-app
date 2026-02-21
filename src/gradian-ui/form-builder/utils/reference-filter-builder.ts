@@ -120,3 +120,60 @@ export function buildReferenceFilterUrl(params: {
   return `${baseUrl}?${queryParams.toString()}`;
 }
 
+/**
+ * Resolves referenceEntityId (static or dynamic context) to a string.
+ * Shared by buildReferenceFilterUrl and buildLookupOptionsUrl.
+ */
+function resolveReferenceEntityId(
+  referenceEntityId: string,
+  schema?: any,
+  values?: any
+): string {
+  if (!referenceEntityId || typeof referenceEntityId !== 'string') {
+    return '';
+  }
+  if (!referenceEntityId.includes('{{') || !referenceEntityId.includes('}}')) {
+    return referenceEntityId.trim();
+  }
+  const match = referenceEntityId.match(/\{\{(\w+)\.([^}]+)\}\}/);
+  if (!match) return '';
+  const [, contextKey, path] = match;
+  let resolved: string = '';
+  if (contextKey === 'formSchema' && schema) {
+    resolved = extractValueFromContext('formSchema', path, { formSchema: schema });
+  } else if (contextKey === 'formData' && values) {
+    resolved = extractValueFromContext('formData', path, { formData: values });
+  } else {
+    if (contextKey === 'formSchema') {
+      resolved = decodeURIComponent(extractFromDynamicContext('formSchema', path));
+    } else if (contextKey === 'formData') {
+      resolved = decodeURIComponent(extractFromDynamicContext('formData', path));
+    }
+  }
+  return typeof resolved === 'string' && resolved.trim() !== '' ? resolved.trim() : '';
+}
+
+/**
+ * Builds sourceUrl for lookup options when targetSchema=lookups and referenceEntityId is the lookup id.
+ * Calls GET /api/lookups/options/[lookup-id] which returns normalized options [{ id, label, icon, color }].
+ *
+ * @param params.referenceEntityId - Lookup id (static or dynamic e.g. "{{formData.lookup.id}}")
+ * @param params.schema - Form schema (for dynamic context)
+ * @param params.values - Form values (for dynamic context)
+ */
+export function buildLookupOptionsUrl(params: {
+  referenceEntityId: string;
+  schema?: any;
+  values?: any;
+}): string {
+  const { referenceEntityId, schema, values } = params;
+  if (!referenceEntityId || typeof referenceEntityId !== 'string') {
+    return '';
+  }
+  const resolvedId = resolveReferenceEntityId(referenceEntityId, schema, values);
+  if (!resolvedId) {
+    return '';
+  }
+  return `/api/lookups/options/${encodeURIComponent(resolvedId)}`;
+}
+

@@ -68,4 +68,3 @@ export { getDiscussionCount, type EngagementCountItem } from './engagement-count
 export { getFilterStrategy, registerFilterStrategy, getComponentTypeFromField } from './filter-strategy';
 export { FilterPaneRenderer } from './filter-pane-renderer-utils';
 export type { FilterPaneRendererProps, NumberRangeValue } from './filter-pane-renderer-utils';
-

@@ -19,7 +19,7 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
-import { buildReferenceFilterUrl } from '../../utils/reference-filter-builder';
+import { buildReferenceFilterUrl, buildLookupOptionsUrl } from '../../utils/reference-filter-builder';
 import { useDynamicFormContextStore } from '@/stores/dynamic-form-context.store';
 import { replaceDynamicContext } from '../../utils/dynamic-context-replacer';
 import { getT, getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
@@ -113,17 +113,16 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   
   // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
   const referenceBasedSourceUrl = useMemo(() => {
-    if (!referenceSchema || !referenceRelationTypeId || !referenceEntityId) {
-      return null;
-    }
-    
-    // For static IDs, we can build the URL immediately without waiting for dynamic context
-    // For dynamic IDs, we need the context to be ready
+    if (!referenceEntityId) return null;
     const shouldUseContext = !isStaticReferenceId;
     const contextSchema = shouldUseContext ? dynamicContext.formSchema : undefined;
     const contextValues = shouldUseContext ? dynamicContext.formData : undefined;
-    
-    // Build the sourceUrl using reference fields
+
+    if (targetSchemaId === 'lookups') {
+      const url = buildLookupOptionsUrl({ referenceEntityId, schema: contextSchema, values: contextValues });
+      return url && url.trim() !== '' ? url : null;
+    }
+    if (!referenceSchema || !referenceRelationTypeId) return null;
     const url = buildReferenceFilterUrl({
       referenceSchema,
       referenceRelationTypeId,
@@ -132,8 +131,6 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       schema: contextSchema,
       values: contextValues,
     });
-    
-    // If URL is empty (e.g., dynamic context not ready for dynamic IDs), return null to allow fallback to targetSchema
     return url && url.trim() !== '' ? url : null;
   }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaId, isStaticReferenceId, dynamicContext.formSchema, dynamicContext.formData]);
   
@@ -152,17 +149,16 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   );
   
   // Use explicit columnMap if provided, otherwise provide default for reference-based filtering
-  // Reference-based filtering returns data in format: { data: [{ data: [...] }] }
-  // So we need to extract from data[0].data
+  // Lookups options: { data: options }; relations: { data: [{ data: [...] }] } → data.0.data
   const columnMap = useMemo(() => {
     const explicitColumnMap = (config as any).columnMap;
     if (explicitColumnMap) {
       return explicitColumnMap;
     }
-    // If using reference-based filtering, provide default columnMap to extract from nested structure
     if (referenceBasedSourceUrl && !explicitColumnMap) {
+      const dataPath = targetSchemaId === 'lookups' ? 'data' : 'data.0.data';
       return {
-        response: { data: 'data.0.data' }, // Extract items from data[0].data array
+        response: { data: dataPath },
         item: {
           id: 'id',
           label: 'label',
@@ -171,8 +167,8 @@ export const PickerInput: React.FC<PickerInputProps> = ({
         },
       };
     }
-    return explicitColumnMap;
-  }, [(config as any).columnMap, referenceBasedSourceUrl]);
+    return undefined;
+  }, [(config as any).columnMap, referenceBasedSourceUrl, targetSchemaId]);
   const pageSize = (config as any).pageSize;
   const sortType = (config as any).sortType;
   const sourceColumnRoles = (config as any).sourceColumnRoles;
