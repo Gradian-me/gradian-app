@@ -180,6 +180,20 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
   const [gyroDebugDisplay, setGyroDebugDisplay] = useState<typeof gyroDebugRef.current>({});
   const enableGyroRef = useRef<() => void>(() => {});
 
+  /** Tilt divisors: mobile uses 2.5/2 for stronger tilt, desktop 5/4. */
+  const tiltDivisorRef = useRef({ divX: 5, divY: 4 });
+  useEffect(() => {
+    const mql = typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)') : null;
+    if (!mql) return;
+    const update = (): void => {
+      const mobile = mql.matches;
+      tiltDivisorRef.current = mobile ? { divX: 2.5, divY: 2 } : { divX: 5, divY: 4 };
+    };
+    update();
+    mql.addEventListener('change', update);
+    return () => mql.removeEventListener('change', update);
+  }, []);
+
   const GYRO_SMOOTH = 0.18;
 
   const tiltEngine = useMemo<TiltEngine | null>(() => {
@@ -220,8 +234,8 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
         '--pointer-from-center': `${clamp(Math.hypot(percentY - 50, percentX - 50) / 50, 0, 1)}`,
         '--pointer-from-top': `${percentY / 100}`,
         '--pointer-from-left': `${percentX / 100}`,
-        '--rotate-x': `${round(-(centerX / 5))}deg`,
-        '--rotate-y': `${round(centerY / 4)}deg`
+        '--rotate-x': `${round(-(centerX / tiltDivisorRef.current.divX))}deg`,
+        '--rotate-y': `${round(centerY / tiltDivisorRef.current.divY)}deg`
       };
 
       for (const [k, v] of Object.entries(properties)) wrap.style.setProperty(k, v);

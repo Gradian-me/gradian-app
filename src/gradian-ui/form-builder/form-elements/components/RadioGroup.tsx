@@ -15,6 +15,15 @@ import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { replaceDynamicContext } from '../../utils/dynamic-context-replacer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
+
+function getOptionDisplayLabel(raw: unknown, lang: string | undefined, defaultLang: string): string {
+  if (raw == null) return '';
+  if (typeof raw === 'string') return resolveDisplayLabel(raw, lang, defaultLang);
+  return resolveLocalizedField(raw as Parameters<typeof resolveLocalizedField>[0], lang ?? defaultLang, defaultLang);
+}
 
 export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
   (
@@ -220,6 +229,8 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
       sortType
     );
 
+    const language = useLanguageStore((s) => s.getLanguage?.()) ?? undefined;
+    const defaultLang = getDefaultLanguage();
     const resolvedValue = extractFirstId(value);
 
     return (
@@ -230,7 +241,7 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
               dir="auto"
               className={getLabelClasses({ error: Boolean(error), required, disabled })}
             >
-              {config.label}
+              {resolveDisplayLabel(config.label, language ?? undefined, defaultLang)}
             </legend>
             {isLoadingOptions ? (
               <div className="text-sm text-gray-500 py-2">Loading options...</div>
@@ -271,14 +282,14 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
                     )}
                   />
                   <label
-                    htmlFor={`${config.name}-${index}`}
+                    htmlFor={`${config.name}-${option.id ?? index}`}
                     className={cn(
                       'ms-2 text-sm font-medium',
                       error ? 'text-red-700' : 'text-gray-700',
                       (disabled || option.disabled) && 'text-gray-400'
                     )}
                   >
-                    {option.label}
+                    {getOptionDisplayLabel(option.label ?? option.id, language ?? undefined, defaultLang)}
                   </label>
                 </div>
               ))}

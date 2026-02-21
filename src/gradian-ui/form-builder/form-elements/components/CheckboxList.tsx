@@ -1,5 +1,6 @@
 'use client';
 
+/* eslint-disable react-hooks/preserve-manual-memoization -- normalizedOptions is derived inline per render; compiler cannot preserve useMemo/useCallback that depend on it. */
 // CheckboxList Component - Multiple checkbox selection
 
 import React, { forwardRef, useImperativeHandle, useRef, useEffect } from 'react';
@@ -19,6 +20,13 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { useLanguageStore } from '@/stores/language.store';
 import { getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
+
+function getOptionDisplayLabel(raw: unknown, lang: string | undefined, defaultLang: string): string {
+  if (raw == null) return '';
+  if (typeof raw === 'string') return resolveDisplayLabel(raw, lang, defaultLang);
+  return resolveLocalizedField(raw as Parameters<typeof resolveLocalizedField>[0], lang ?? defaultLang, defaultLang);
+}
 
 export interface CheckboxListProps extends FormElementProps {
   options?: Array<{ id?: string; label: string; value?: string; disabled?: boolean; icon?: string; color?: string }>;
@@ -207,12 +215,14 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
     const currentValueIds = extractIds(value);
     
     const selectAllCheckboxRef = useRef<HTMLButtonElement>(null);
+    const language = useLanguageStore((s) => s.language);
+    const defaultLang = getDefaultLanguage();
 
     // Get options from config if not provided directly, or use URL options
     const checkboxOptions: CheckboxListProps['options'] = effectiveSourceUrl
       ? urlOptions.map(opt => ({
           id: opt.id,
-          label: opt.label ?? opt.id,
+          label: (getOptionDisplayLabel(opt.label ?? opt.id, language ?? undefined, defaultLang) || opt.id) ?? '',
           value: opt.value ?? opt.id,
           disabled: opt.disabled,
           icon: opt.icon,
@@ -228,9 +238,6 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
     );
 
     // Resolve current value to option objects (for backward compatibility with IDs)
-    // This converts array of IDs to array of option objects with labels, icons, colors
-    // Resolve current value to option objects (for backward compatibility with IDs)
-    // This converts array of IDs to array of option objects with labels, icons, colors
     const resolvedValueObjects = React.useMemo(() => {
       if (!value || !Array.isArray(value)) return [];
       // Treat value as immutable for memoization; callers should not mutate in-place.
@@ -255,7 +262,6 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
           return { id, label: id };
         })
         .filter(Boolean);
-      // eslint-disable-next-line react-hooks/preserve-manual-memoization
     }, [value, normalizedOptions]);
 
     // Get selectable options (not disabled)
@@ -366,8 +372,6 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
       }
     };
 
-    const language = useLanguageStore((s) => s.language);
-    const defaultLang = getDefaultLanguage();
     const fieldName = config.name || 'checkbox-list';
     const fieldLabel = resolveDisplayLabel(config.label, language ?? undefined, defaultLang);
 
@@ -437,7 +441,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
                     (disabled || option.disabled) && 'opacity-50 cursor-not-allowed'
                   )}
                 >
-                  {resolveDisplayLabel(option.label ?? option.id, language ?? undefined, defaultLang)}
+                  {getOptionDisplayLabel(option.label ?? option.id, language ?? undefined, defaultLang)}
                 </Label>
               </div>
             );

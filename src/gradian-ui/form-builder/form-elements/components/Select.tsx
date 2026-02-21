@@ -32,8 +32,16 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { scrollInputIntoView } from '@/gradian-ui/shared/utils/dom-utils';
 import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-variant-mapper';
 import { getT, getDefaultLanguage, isRTL, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { useLanguageStore } from '@/stores/language.store';
+
+/** Resolve option label (string or API localized shape) to display string. */
+function getOptionDisplayLabel(raw: unknown, lang: string, defaultLang: string): string {
+  if (raw == null) return '';
+  if (typeof raw === 'string') return resolveDisplayLabel(raw, lang, defaultLang);
+  return resolveLocalizedField(raw as Parameters<typeof resolveLocalizedField>[0], lang, defaultLang);
+}
 
 export interface SelectOption {
   id?: string;
@@ -414,10 +422,10 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     if (!resolvedOptions || resolvedOptions.length === 0) {
       return [] as NormalizedOption[];
     }
-    // Otherwise, normalize the provided options
+    // Otherwise, normalize the provided options (resolve localized labels to string)
     const normalized = normalizeOptionArray(resolvedOptions).map((opt) => ({
       ...opt,
-      label: opt.label ?? opt.id,
+      label: getOptionDisplayLabel(opt.label ?? opt.id, selectLang, selectDefaultLang) || (opt.id ?? ''),
     }));
     
     // Sort options based on sortType or sortAtoZ
@@ -428,14 +436,15 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     } else if (sortAtoZ) {
       // Sort alphabetically A to Z
       sorted = [...normalized].sort((a, b) => {
-        const labelA = (a.label || a.id || '').toLowerCase();
-        const labelB = (b.label || b.id || '').toLowerCase();
+        const labelA = getOptionDisplayLabel(a.label ?? a.id, selectLang, selectDefaultLang).toLowerCase();
+        const labelB = getOptionDisplayLabel(b.label ?? b.id, selectLang, selectDefaultLang).toLowerCase();
         return labelA.localeCompare(labelB);
       });
     }
     // If sortAtoZ is false and sortType is null, keep original order (no sorting)
     
     return sorted;
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization -- selectLang from store; compiler flags it as possibly mutated
   }, [resolvedOptions, schemaId, effectiveSourceUrl, fetchedOptions, isLoadingOptions, optionsError, sortType, sortAtoZ, selectLang]);
 
   const normalizedOptionsLookup = useMemo(() => {
@@ -461,7 +470,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     }
     const searchLower = searchValue.toLowerCase().trim();
     return normalizedOptions.filter((opt) => {
-      const labelStr = resolveDisplayLabel(opt.label ?? opt.id ?? '', selectLang, selectDefaultLang);
+      const labelStr = getOptionDisplayLabel(opt.label ?? opt.id ?? '', selectLang, selectDefaultLang);
       const id = (opt.id || '').toLowerCase();
       return labelStr.toLowerCase().includes(searchLower) || id.includes(searchLower);
     });
@@ -483,7 +492,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
     validOptions.forEach((option) => {
       const rawCategory = (option as any).category ?? option.category;
-      const category = resolveDisplayLabel(rawCategory, selectLang, selectDefaultLang);
+      const category = getOptionDisplayLabel(rawCategory, selectLang, selectDefaultLang);
       if (category && category.trim()) {
         const categoryKey = category.trim();
         if (!groups[categoryKey]) {
@@ -504,8 +513,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     const sortedGroups: Record<string, NormalizedOption[]> = {};
     sortedGroupEntries.forEach(([category, options]) => {
       sortedGroups[category] = [...options].sort((a, b) => {
-        const labelA = resolveDisplayLabel(a.label ?? a.id ?? '', selectLang, selectDefaultLang).toLowerCase();
-        const labelB = resolveDisplayLabel(b.label ?? b.id ?? '', selectLang, selectDefaultLang).toLowerCase();
+        const labelA = getOptionDisplayLabel(a.label ?? a.id ?? '', selectLang, selectDefaultLang).toLowerCase();
+        const labelB = getOptionDisplayLabel(b.label ?? b.id ?? '', selectLang, selectDefaultLang).toLowerCase();
         return labelA.localeCompare(labelB);
       });
     });
@@ -544,9 +553,9 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
            /^[a-z]+-[a-z0-9-]+/.test(color); // Matches Tailwind class patterns like bg-red-400
   };
 
-  // Resolve option label (handles translation arrays [{en: 'x'}, {fa: 'y'}])
+  // Resolve option label (handles translation arrays and API localized fields e.g. company name)
   const optionLabel = (option: NormalizedOption) =>
-    resolveDisplayLabel(option.label ?? option.id ?? '', selectLang, selectDefaultLang);
+    getOptionDisplayLabel(option.label ?? option.id ?? '', selectLang, selectDefaultLang);
 
   // Render badge or custom colored badge
   const renderBadgeContent = (option: NormalizedOption) => {
@@ -671,7 +680,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       (normalizedValueEntry
         ? {
             ...normalizedValueEntry,
-            label: normalizedValueEntry.label ?? normalizedValueEntry.id,
+            label: getOptionDisplayLabel(normalizedValueEntry.label ?? normalizedValueEntry.id, selectLang, selectDefaultLang) || normalizedValueEntry.id,
           }
         : undefined);
 

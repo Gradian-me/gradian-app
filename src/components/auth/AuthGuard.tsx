@@ -4,58 +4,62 @@ import { useEffect, useState, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { PUBLIC_PAGES } from '@/gradian-ui/shared/configs/auth-config';
 import { REQUIRE_LOGIN } from '@/gradian-ui/shared/configs/env-config';
-import { encryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util';
-import { useUserStore } from '@/stores/user.store';
-import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
+import { AuthEventType, dispatchAuthEvent } from '@/gradian-ui/shared/utils/auth-events';
 
 /**
  * AuthGuard Component
  *
  * - When REQUIRE_LOGIN is true: runs session check (GET /api/auth/token/validate with cookies).
- *   If invalid or no refresh_token cookie, clears user store + in-memory token and redirects to login.
+ *   If invalid (401/400), timeout, or error: dispatches FORCE_LOGOUT so centralized logout runs and redirects to login.
  * - When REQUIRE_LOGIN is false: skips auth check; app never redirects to login (profile selector
  *   still hides when user store is empty after clearing storage).
  *
  * UserProfileSelector visibility is driven only by useUserStore().user (persisted in localStorage).
  * To get "force logout" (redirect to login when cookies/storage are cleared), set REQUIRE_LOGIN=true.
  */
+const AUTH_CHECK_TIMEOUT_MS = 15_000;
+
 interface AuthGuardProps {
   children: React.ReactNode;
 }
 
 /**
- * Check authentication status via API
+ * Check authentication status via API with timeout.
  * Validate endpoint accepts access_token (header/cookie) or refresh_token (cookie).
+ * Returns true only when response is ok and data.valid === true.
  */
 async function checkAuthViaAPI(): Promise<boolean> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), AUTH_CHECK_TIMEOUT_MS);
+
   try {
     const response = await fetch('/api/auth/token/validate', {
       method: 'GET',
-      credentials: 'include', // Include cookies (refresh_token, etc.)
+      credentials: 'include',
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     if (response.ok) {
       const data = await response.json();
       return data.valid === true;
     }
-
+    // 401 Unauthorized or 400 Bad Request (e.g. missing token) → not authenticated
     return false;
   } catch (error) {
-    console.error('[AuthGuard] Error checking auth via API:', error);
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.warn('[AuthGuard] Auth check timed out');
+    } else {
+      console.error('[AuthGuard] Error checking auth via API:', error);
+    }
     return false;
   }
 }
 
-/** Clear client auth state and redirect to login. Use when session is missing/invalid so UI and storage stay in sync. */
-function redirectToLogin(pathname: string) {
-  useUserStore.getState().clearUser();
-  authTokenManager.clearAccessToken();
-  const currentPath = pathname || (typeof window !== 'undefined' ? window.location.pathname : '/');
-  const encryptedReturnUrl = encryptReturnUrl(currentPath);
-  const loginUrl = `/authentication/login?returnUrl=${encodeURIComponent(encryptedReturnUrl)}`;
-  if (typeof window !== 'undefined') {
-    window.location.href = loginUrl;
-  }
+/** Trigger centralized logout (clear cookies, stores, redirect to login). Used when session is invalid or check times out. */
+function triggerForceLogout(reason: string) {
+  dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, reason);
 }
 
 export function AuthGuard({ children }: AuthGuardProps) {
@@ -107,7 +111,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
         const isValid = await checkAuthViaAPI();
 
         if (!isValid) {
-          redirectToLogin(pathname || '/');
+          triggerForceLogout('Session invalid or expired');
           return;
         }
 
@@ -115,7 +119,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
         setIsAuthenticated(true);
       } catch (error) {
         console.error('[AuthGuard] Error during auth check:', error);
-        redirectToLogin(pathname || '/');
+        triggerForceLogout('Auth check failed');
       } finally {
         setIsChecking(false);
       }

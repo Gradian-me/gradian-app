@@ -1,7 +1,12 @@
 {
   "companies": [
     {
-      "name": [{ "en": "CinnaGen", "fa": "سیناژن"}],
+      "name": [
+        {
+          "en": "CinnaGen",
+          "fa": "سیناژن"
+        }
+      ],
       "logo": "https://go.cinnagen.com/_next/image?url=%2Ficon%2FCinnagen_Logo_Color.png&w=256&q=75",
       "address": "Iran, Tehran, Shahrake Gharb, Farahzadi Blvd, Sepehr Street, No. 34",
       "country": "Iran",
@@ -17,14 +22,24 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
-      "name": [{ "en": "AryoGen", "fa": "آریوژن"}],
+      "name": [
+        {
+          "en": "AryoGen",
+          "fa": "آریوژن"
+        }
+      ],
       "logo": "https://www.aryogen.com/wp-content/uploads/2023/09/Aryogen-web-logo.png",
       "address": "No. 140, 24th Km Tehran-Karaj Makhsous road",
       "country": "Iran",
@@ -40,14 +55,24 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
-      "name": [{ "en": "NanoAlvand", "fa": "نانوالوند"}],
+      "name": [
+        {
+          "en": "NanoAlvand",
+          "fa": "نانوالوند"
+        }
+      ],
       "logo": "https://jobvision.ir/blog/wp-content/uploads/2025/04/n00016680-b.jpg",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -59,12 +84,22 @@
       "relatedCompanies": [
         {
           "id": "01KB85MPFBMS4GQ6KGA0EGJNGA",
-          "label": [{ "en": "NanoAlvand", "fa": "نانوالوند"}]
+          "label": [
+            {
+              "en": "NanoAlvand",
+              "fa": "نانوالوند"
+            }
+          ]
         }
       ]
     },
     {
-      "name": [{ "en": "Arvand Pharmed", "fa": "اروند فارمد"}],
+      "name": [
+        {
+          "en": "Arvand Pharmed",
+          "fa": "اروند فارمد"
+        }
+      ],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9VFNMVC92XF1JRND69S4Z9",
@@ -75,7 +110,12 @@
       "relatedCompanies": [
         {
           "id": "01KB9VFNMVC92XF1JRND69S4Z9",
-          "label": [{ "en": "Arvand Pharmed", "fa": "اروند فارمد"}]
+          "label": [
+            {
+              "en": "Arvand Pharmed",
+              "fa": "اروند فارمد"
+            }
+          ]
         }
       ]
     }
@@ -585,7 +625,12 @@
         },
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         },
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
@@ -611,11 +656,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ]
     },
@@ -680,7 +735,12 @@
         },
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         },
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
@@ -706,11 +766,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         },
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "employeeCode": "841"
@@ -766,7 +836,12 @@
       "relatedTenants": [
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -781,7 +856,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -829,7 +909,12 @@
       "relatedTenants": [
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -852,7 +937,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -908,7 +998,12 @@
       "relatedTenants": [
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -923,7 +1018,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -981,7 +1081,12 @@
         },
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         },
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
@@ -1008,11 +1113,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -1070,7 +1185,12 @@
         },
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         },
         {
           "id": "01KBFBGV9151FQN481NB2CT4MX",
@@ -1097,11 +1217,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         },
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -1163,7 +1293,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z"
@@ -1194,11 +1329,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         },
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
@@ -1247,7 +1392,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
@@ -1257,7 +1407,12 @@
         },
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "username": "saffariounm@aryogen.com",
@@ -1320,7 +1475,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
@@ -1388,7 +1548,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
@@ -1456,7 +1621,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
@@ -1516,7 +1686,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
@@ -1586,7 +1761,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
@@ -1654,7 +1834,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
@@ -1723,13 +1908,23 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "username": "sadeghiyans",
@@ -1792,13 +1987,23 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "username": "amidzadehz",
@@ -1862,13 +2067,23 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "username": "samadbeygim",
@@ -1959,7 +2174,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
@@ -2001,7 +2221,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "relatedTenants": [
@@ -3330,8 +3555,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-02-16T08:26:00.195Z",
-      "lastSynced": "2026-02-16T08:26:00.195Z",
+      "updatedAt": "2026-02-21T08:33:59.695Z",
+      "lastSynced": "2026-02-21T08:33:59.695Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -3371,7 +3596,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-02-16T08:25:27.156Z",
+      "updatedAt": "2026-02-21T08:40:10.286Z",
       "isTenantBased": true,
       "category": [
         {
@@ -3381,8 +3606,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-02-16T08:25:27.156Z",
-      "lastSyncMessage": "Generated relations for 35 out of 35 schemas",
+      "lastSynced": "2026-02-21T08:40:10.286Z",
+      "lastSyncMessage": "Generated relations for 44 out of 44 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -3432,7 +3657,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2026-02-16T12:33:39.500Z",
+      "updatedAt": "2026-02-21T08:40:28.920Z",
       "category": [
         {
           "id": "production-integration",
@@ -3441,8 +3666,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-02-16T12:33:39.500Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 435, nodes updated: 219, edges created: 76, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2026-02-21T08:40:28.920Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 227, edges created: 102, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -5105,11 +5330,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "title": "Active / Inactive",
@@ -5126,11 +5361,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "title": "Progress Status",
@@ -5147,7 +5392,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "title": "Change Management Status",
@@ -5164,11 +5414,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         },
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "title": "Follow Up Status",
@@ -5185,11 +5445,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "title": "Inquiry Tender Status",
@@ -5206,11 +5476,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "title": "Quotation Item Status",
@@ -5621,11 +5901,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "incomplete": false,
@@ -5647,7 +5937,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "name": "aryogen",
@@ -5663,7 +5958,12 @@
       "relatedTenants": [
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -5673,7 +5973,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "name": "dev",
@@ -5699,11 +6004,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "name": "local",
@@ -5726,7 +6041,12 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         }
       ],
       "name": "gradianapp",
@@ -7059,7 +7379,12 @@
           },
           {
             "id": "01KBFBD109G6CYRT7RA04TMMXC",
-            "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+            "label": [
+              {
+                "en": "AryoGen",
+                "fa": "آریوژن"
+              }
+            ]
           },
           {
             "id": "01KBFBAZR3K04CS80DMHGPHMHF",
@@ -7085,11 +7410,21 @@
         "relatedCompanies": [
           {
             "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-            "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+            "label": [
+              {
+                "en": "AryoGen",
+                "fa": "آریوژن"
+              }
+            ]
           },
           {
             "id": "01K94V4PJSFKCXS6AVX07P86N5",
-            "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+            "label": [
+              {
+                "en": "CinnaGen",
+                "fa": "سیناژن"
+              }
+            ]
           }
         ],
         "employeeCode": "841"
@@ -7406,11 +7741,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "title": "6M Types",
@@ -7427,11 +7772,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "title": "Task Types",
@@ -7448,11 +7803,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "title": "Process Types",
@@ -7468,11 +7833,21 @@
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [{ "en": "CinnaGen", "fa": "سیناژن"}]
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
         },
         {
           "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ],
       "title": "User Type",
@@ -19791,7 +20166,12 @@
         },
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         }
       ]
     },
@@ -19807,7 +20187,12 @@
       "relatedTenants": [
         {
           "id": "01KBFBD109G6CYRT7RA04TMMXC",
-          "label": [{ "en": "AryoGen", "fa": "آریوژن"}]
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
         },
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",

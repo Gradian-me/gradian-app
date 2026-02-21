@@ -48,6 +48,7 @@ import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/Hie
 import { fetchOptionsFromSchemaOrUrl } from '../utils/fetch-options-utils';
 import { CompanySelector } from '@/components/layout/CompanySelector';
 import { getT, getDefaultLanguage, isRTL, resolveFromTranslationsArray, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { useLanguageStore } from '@/stores/language.store';
 import { getSchemaTranslatedSingularName, getSchemaTranslatedPluralName } from '@/gradian-ui/schema-manager/utils/schema-utils';
@@ -239,6 +240,13 @@ const getValueByRoleFromSourceColumns = (
   return undefined;
 };
 
+/** Resolve API/localized value (string, Record, or [{en},{fa}]) to a display string. */
+const toLabelString = (value: unknown): string => {
+  if (value == null) return '';
+  if (typeof value === 'string') return value.trim();
+  return resolveLocalizedField(value as Parameters<typeof resolveLocalizedField>[0], 'en', 'en');
+};
+
 const buildSelectionEntry = (
   item: any,
   schema?: FormSchema | null,
@@ -289,7 +297,7 @@ const buildSelectionEntry = (
 
       return {
         id: baseId,
-        label: title || baseId,
+        label: toLabelString(title) || baseId,
         icon,
         color,
         description,
@@ -301,14 +309,15 @@ const buildSelectionEntry = (
     const fallbackLabel = item.label || item.name || item.title || item.singular_name || baseId;
     return {
       id: baseId,
-      label: fallbackLabel || baseId,
+      label: toLabelString(fallbackLabel) || baseId,
       icon: item.icon,
       color: item.color,
       metadata: extractMetadata(item, schema),
     };
   }
 
-  const title = getValueByRole(schema, item, 'title') || item.name || item.title || baseId;
+  const rawTitle = getValueByRole(schema, item, 'title') || item.name || item.title || baseId;
+  const title = toLabelString(rawTitle) || baseId;
   let icon = getSingleValueByRole(schema, item, 'icon') || item.icon;
   
   // Add default icon for users schema if missing
@@ -1374,14 +1383,17 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const highlightQuery = searchQuery.trim();
 
     if (!effectiveSchema) {
-      // Fallback rendering with sourceColumnRoles support (resolve translation arrays for safe display)
+      // Fallback rendering with sourceColumnRoles support (resolve translation arrays and API localized fields)
       const langFallback = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
       const dLangFallback = getDefaultLanguage();
       const rawDisplayName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) ||
           item.label || item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
         : item.label || item.name || item.title || item.id || `Item ${index + 1}`;
-      const displayName = resolveDisplayLabel(rawDisplayName, langFallback, dLangFallback);
+      const displayName =
+        typeof rawDisplayName === 'string'
+          ? resolveDisplayLabel(rawDisplayName, langFallback, dLangFallback)
+          : resolveLocalizedField(rawDisplayName as Parameters<typeof resolveLocalizedField>[0], langFallback, dLangFallback) || String(item.id ?? `Item ${index + 1}`);
       const iconName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'icon', effectiveSourceColumnRoles) || item.icon
         : item.icon || item.name || item.title;
@@ -1804,14 +1816,17 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const isExpanded = expandedIds.has(node.id);
 
     if (!effectiveSchema) {
-      // Fallback rendering with sourceColumnRoles support (resolve translation arrays for safe display)
+      // Fallback rendering with sourceColumnRoles support (resolve translation arrays and API localized fields)
       const langFallback = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
       const dLangFallback = getDefaultLanguage();
       const rawDisplayName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'title', effectiveSourceColumnRoles) ||
           item.label || item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
         : item.label || item.name || item.title || item.id || `Item ${index + 1}`;
-      const displayName = resolveDisplayLabel(rawDisplayName, langFallback, dLangFallback);
+      const displayName =
+        typeof rawDisplayName === 'string'
+          ? resolveDisplayLabel(rawDisplayName, langFallback, dLangFallback)
+          : resolveLocalizedField(rawDisplayName as Parameters<typeof resolveLocalizedField>[0], langFallback, dLangFallback) || String(item.id ?? `Item ${index + 1}`);
       const iconName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'icon', effectiveSourceColumnRoles) || item.icon
         : item.icon || item.name || item.title;

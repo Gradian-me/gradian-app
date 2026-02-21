@@ -6,6 +6,7 @@ import { getUserInitials } from '../utils';
 import { config } from '@/lib/config';
 import { getDisplayNameFields, resolveLocalizedField } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
+import { AuthEventType, dispatchAuthEvent } from '@/gradian-ui/shared/utils/auth-events';
 
 export interface UseUserProfileReturn {
   profile: UserProfile | null;
@@ -74,16 +75,25 @@ export const useUserProfile = (userId: string): UseUserProfileReturn => {
     setError(null);
     
     try {
-      // Fetch user data from API (uses config to determine correct URL based on demo mode)
-      const apiUrl = `${config.dataApi.basePath}/users/${userId}`;
+      // GET /api/data/users/[user-id] — same origin so visible in Network tab
+      const path = `${config.dataApi.basePath}/users/${encodeURIComponent(userId)}`;
+      const apiUrl = typeof window !== 'undefined' ? new URL(path, window.location.origin).href : path;
       const response = await fetch(apiUrl, {
+        method: 'GET',
         cache: 'no-store',
+        credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          dispatchAuthEvent(AuthEventType.FORCE_LOGOUT, 'Session expired or unauthorized');
+          setError('Session expired');
+          setLoading(false);
+          return;
+        }
         if (response.status === 404) {
           throw new Error('User not found');
         }
@@ -115,6 +125,10 @@ export const useUserProfile = (userId: string): UseUserProfileReturn => {
   useEffect(() => {
     if (userId) {
       fetchProfile();
+    } else {
+      setLoading(false);
+      setError('User ID is required');
+      setProfile(null);
     }
   }, [userId]);
 

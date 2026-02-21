@@ -18,6 +18,13 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { useLanguageStore } from '@/stores/language.store';
 import { getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
+
+function getOptionDisplayLabel(raw: unknown, lang: string | undefined, defaultLang: string): string {
+  if (raw == null) return '';
+  if (typeof raw === 'string') return resolveDisplayLabel(raw, lang, defaultLang);
+  return resolveLocalizedField(raw as Parameters<typeof resolveLocalizedField>[0], lang ?? defaultLang, defaultLang);
+}
 
 const isBadgeVariant = (color?: string): color is keyof typeof BADGE_SELECTED_VARIANT_CLASSES => {
   if (!color) return false;
@@ -262,11 +269,11 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
       () => {
         const normalized = normalizeOptionArray(rawOptions).map((opt) => ({
           ...opt,
-          label: opt.label ?? opt.id,
+          label: getOptionDisplayLabel(opt.label ?? opt.id, language ?? undefined, defaultLang) || (opt.id ?? ''),
         }));
         return sortNormalizedOptions(normalized, sortType);
       },
-      [rawOptions, sortType]
+      [rawOptions, sortType, language, defaultLang]
     );
 
     const normalizedValue = useMemo(() => normalizeOptionArray(value), [value]);
@@ -394,7 +401,7 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
           onBlur={onBlur}
         >
           {option.icon && <IconRenderer iconName={option.icon} className="h-3.5 w-3.5 shrink-0" />}
-          <span>{resolveDisplayLabel(option.label ?? option.id, language ?? undefined, defaultLang)}</span>
+          <span>{getOptionDisplayLabel(option.label ?? option.id, language ?? undefined, defaultLang)}</span>
         </ToggleGroupItem>
       );
     };

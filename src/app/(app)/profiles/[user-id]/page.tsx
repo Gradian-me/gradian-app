@@ -10,14 +10,20 @@ import { motion } from 'framer-motion';
 import { useUserStore } from '@/stores/user.store';
 import { useLanguageStore } from '@/stores/language.store';
 
+function getUserIdFromParams(params: ReturnType<typeof useParams>): string {
+  const raw = params['user-id'] ?? (params as Record<string, unknown>)['userId'];
+  if (Array.isArray(raw)) return (raw[0] ?? '') as string;
+  return typeof raw === 'string' ? raw : '';
+}
+
 export default function ProfilePage() {
   const params = useParams();
   const router = useRouter();
   const user = useUserStore((state) => state.user);
-  const userIdFromParams = params['user-id'] as string;
+  const userIdFromParams = getUserIdFromParams(params);
   
-  // Use logged-in user's ID if no user-id in params, or use params if provided
-  const userId = userIdFromParams || user?.id;
+  // Prefer URL param so /profiles/:id always fetches that user
+  const userId = userIdFromParams || user?.id || '';
   
   // Redirect to login if no user ID available
   useEffect(() => {
@@ -26,7 +32,7 @@ export default function ProfilePage() {
     }
   }, [userId, user, router]);
   
-  const { profile, loading, error } = useUserProfile(userId || '');
+  const { profile, loading, error } = useUserProfile(userId);
   const language = useLanguageStore((state) => state.language) ?? getDefaultLanguage();
   const layoutTitle = loading || error || !profile ? 'User Profile' : profile.fullName;
   useSetLayoutProps({ title: layoutTitle, showEndLine: false });
