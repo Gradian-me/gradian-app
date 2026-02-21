@@ -23,6 +23,14 @@ export async function initializeSkipKeyStorage(): Promise<boolean> {
       return false;
     }
 
+    const encryptionKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY;
+    if (!encryptionKey || !encryptionKey.trim()) {
+      console.warn(
+        '[skip-key-storage] NEXT_PUBLIC_ENCRYPTION_KEY is not set or empty. Add it to .env and restart the dev server (npm run dev) so it is inlined into the client bundle.'
+      );
+      return false;
+    }
+
     // Check if we already have an encrypted key stored
     const existing = localStorage.getItem(SKIP_KEY_STORAGE_KEY);
     if (existing) {
@@ -30,10 +38,22 @@ export async function initializeSkipKeyStorage(): Promise<boolean> {
       return true;
     }
 
-    // Encrypt the skip key and store it
-    const encrypted = await encryptPayload(skipKey);
+    // Encrypt the skip key and store it (requires Web Crypto)
+    let encrypted;
+    try {
+      encrypted = await encryptPayload(skipKey);
+    } catch (encryptError) {
+      console.warn(
+        '[skip-key-storage] Encryption threw:',
+        encryptError instanceof Error ? encryptError.message : String(encryptError)
+      );
+      return false;
+    }
+
     if (!encrypted) {
-      console.error('[skip-key-storage] Failed to encrypt skip key');
+      console.warn(
+        '[skip-key-storage] Failed to encrypt skip key (crypto key import or Web Crypto failed). Check console for "[schema-cache] Failed to import crypto key". If you just added env vars, restart the dev server.'
+      );
       return false;
     }
 

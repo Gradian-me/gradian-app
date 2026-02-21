@@ -1134,7 +1134,7 @@ export function AiBuilderForm({
   return (
     <div className="space-y-6">
       {showForm && (
-        <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200/50 dark:border-violet-800/50 shadow-sm">
+        <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200 dark:border-violet-400 shadow-sm">
           <div className="relative p-4 md:p-6 space-y-4">
             {/* Header Section */}
             {displayType === 'default' && (
@@ -1275,7 +1275,7 @@ export function AiBuilderForm({
             
             {/* Footer Section with Model Badge and Buttons */}
             {showFooter && (
-              <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center gap-3 md:gap-2 pt-2 border-t border-violet-200/50 dark:border-violet-800/50 min-w-0">
+              <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center gap-3 md:gap-2 pt-2 border-t border-violet-200 dark:border-violet-400 min-w-0">
                 {/* Model Badge */}
                 {showModelBadge && selectedAgent?.model && (
                   <Badge 

@@ -263,7 +263,7 @@ export function AiPromptHistory({
                         ))}
                       </div>
                       {/* Total Tokens & Price Skeleton */}
-                      <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/40 dark:via-purple-950/40 dark:to-indigo-950/40 border border-violet-200/50 dark:border-violet-800/50">
+                      <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/40 dark:via-purple-950/40 dark:to-indigo-950/40 border border-violet-200 dark:border-violet-400">
                         <div className="absolute inset-0 opacity-5 dark:opacity-10">
                           <div className="absolute inset-0" style={{
                             backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
@@ -287,7 +287,7 @@ export function AiPromptHistory({
                               </div>
                             </div>
                           </div>
-                          <div className="mt-4 pt-4 border-t border-violet-200/50 dark:border-violet-800/50">
+                          <div className="mt-4 pt-4 border-t border-violet-200 dark:border-violet-400">
                             <div className="flex items-center gap-2">
                               <Skeleton className="h-3.5 w-3.5 rounded-full bg-violet-300 dark:bg-violet-800/60" />
                               <Skeleton className="h-3 w-48 rounded-md bg-violet-200 dark:bg-violet-900/60" />

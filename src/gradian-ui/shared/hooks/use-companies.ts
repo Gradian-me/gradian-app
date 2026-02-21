@@ -10,6 +10,7 @@ import {
   subscribeToCompaniesCache,
 } from '@/gradian-ui/indexdb-manager';
 import type { CompanyRecord } from '@/gradian-ui/indexdb-manager/types';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
 
 interface Company {
   id: string | number;
@@ -107,16 +108,7 @@ function normalizeCompanyRecord(company: CompanyRecord): Company {
     return { id: 'unknown', name: 'Untitled company' };
   }
 
-  const resolvedName = deriveCompanyName(company);
-  const trimmedName = typeof resolvedName === 'string' ? resolvedName.trim() : '';
-
-  if (company.name && company.name.trim() === trimmedName) {
-    return {
-      ...company,
-      name: trimmedName,
-    };
-  }
-
+  const trimmedName = deriveCompanyName(company);
   return {
     ...company,
     name: trimmedName || 'Untitled company',
@@ -141,8 +133,13 @@ function deriveCompanyName(company?: CompanyRecord | null): string {
   ];
 
   for (const value of candidateValues) {
+    if (value == null) continue;
     if (typeof value === 'string' && value.trim().length > 0) {
       return value.trim();
+    }
+    const resolved = resolveLocalizedField(value, 'en', 'en');
+    if (resolved && resolved.trim().length > 0) {
+      return resolved.trim();
     }
   }
 

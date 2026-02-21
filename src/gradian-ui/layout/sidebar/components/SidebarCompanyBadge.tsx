@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { SidebarCompanyBadgeProps } from '../types';
 import { cn } from '../../../shared/utils';
+import { resolveLocalizedField } from '../../../shared/utils/localization';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage } from '../../../shared/utils/translation-utils';
 
 export const SidebarCompanyBadge: React.FC<SidebarCompanyBadgeProps> = ({
   company,
@@ -12,9 +15,12 @@ export const SidebarCompanyBadge: React.FC<SidebarCompanyBadgeProps> = ({
   isMobile,
   className,
 }) => {
+  const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+
   if (!company) return null;
 
-  const displayName = company.name || 'Company';
+  const displayName = resolveLocalizedField(company.name, language, defaultLang) || 'Company';
   const abbreviation = company.abbreviation || 
     displayName
       .split(' ')

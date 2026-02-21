@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Mail, Share2 } from 'lucide-react';
 import { resolveLocalizedField, isRTL } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
+import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 
 const DEFAULT_INNER_GRADIENT = 'linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)';
 
@@ -121,6 +122,11 @@ function isOrientationPermissionRequired(): boolean {
   return typeof w.DeviceOrientationEvent?.requestPermission === 'function';
 }
 
+type WindowWithMotion = Window & {
+  DeviceOrientationEvent?: { requestPermission?: () => Promise<string> };
+  DeviceMotionEvent?: { requestPermission?: () => Promise<string> };
+};
+
 const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
   avatarUrl = DEFAULT_AVATAR_PLACEHOLDER,
   iconUrl = '/logo/Gradian_Pattern.png',
@@ -154,8 +160,27 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
 
   const enterTimerRef = useRef<number | null>(null);
   const leaveRafRef = useRef<number | null>(null);
+  const gyroSmoothRef = useRef<{ beta: number; gamma: number } | null>(null);
+  const gyroListenerAddedRef = useRef(false);
   const [gyroActive, setGyroActive] = useState(false);
   const [pointerOver, setPointerOver] = useState(false);
+
+  const gyroDebugRef = useRef<{
+    beta?: number;
+    gamma?: number;
+    smoothBeta?: number;
+    smoothGamma?: number;
+    x?: number;
+    y?: number;
+    currentX?: number;
+    currentY?: number;
+    targetX?: number;
+    targetY?: number;
+  }>({});
+  const [gyroDebugDisplay, setGyroDebugDisplay] = useState<typeof gyroDebugRef.current>({});
+  const enableGyroRef = useRef<() => void>(() => {});
+
+  const GYRO_SMOOTH = 0.18;
 
   const tiltEngine = useMemo<TiltEngine | null>(() => {
     if (!enableTilt) return null;
@@ -332,14 +357,32 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
       const { beta, gamma } = event;
       if (beta == null || gamma == null) return;
 
+      let smooth = gyroSmoothRef.current;
+      if (smooth == null) {
+        smooth = { beta, gamma };
+        gyroSmoothRef.current = smooth;
+      } else {
+        smooth.beta = smooth.beta + GYRO_SMOOTH * (beta - smooth.beta);
+        smooth.gamma = smooth.gamma + GYRO_SMOOTH * (gamma - smooth.gamma);
+      }
+
       const centerX = shell.clientWidth / 2;
       const centerY = shell.clientHeight / 2;
-      const x = clamp(centerX + gamma * mobileTiltSensitivity, 0, shell.clientWidth);
+      const x = clamp(centerX + smooth.gamma * mobileTiltSensitivity, 0, shell.clientWidth);
       const y = clamp(
-        centerY + (beta - ANIMATION_CONFIG.DEVICE_BETA_OFFSET) * mobileTiltSensitivity,
+        centerY + (smooth.beta - ANIMATION_CONFIG.DEVICE_BETA_OFFSET) * mobileTiltSensitivity,
         0,
         shell.clientHeight
       );
+
+      if (DEMO_MODE && gyroDebugRef.current) {
+        gyroDebugRef.current.beta = beta;
+        gyroDebugRef.current.gamma = gamma;
+        gyroDebugRef.current.smoothBeta = smooth.beta;
+        gyroDebugRef.current.smoothGamma = smooth.gamma;
+        gyroDebugRef.current.x = x;
+        gyroDebugRef.current.y = y;
+      }
 
       tiltEngine.setTarget(x, y);
     },
@@ -363,27 +406,51 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
 
     const mobileWithGyro = isMobileWithGyroAvailable();
     const needsPermission = isOrientationPermissionRequired();
-    const secureContext = typeof location !== 'undefined' && location.protocol === 'https:';
+    const secureContext = typeof location !== 'undefined' && (location.protocol === 'https:' || location.hostname === 'localhost');
 
-    const handleClick = (): void => {
-      if (!enableMobileTilt || !mobileWithGyro || !secureContext) return;
-      if (!needsPermission) return;
-      (window as Window & { DeviceOrientationEvent?: { requestPermission?: () => Promise<string> } })
-        .DeviceOrientationEvent?.requestPermission?.()
-        .then((state: string) => {
-          if (state === 'granted') {
-            window.addEventListener('deviceorientation', deviceOrientationHandler);
-            setGyroActive(true);
-          }
-        })
-        .catch(() => {});
-    };
-    shell.addEventListener('click', handleClick);
-
-    if (enableMobileTilt && mobileWithGyro && secureContext && !needsPermission) {
+    const addGyroListener = (): void => {
+      if (gyroListenerAddedRef.current) return;
+      gyroListenerAddedRef.current = true;
       window.addEventListener('deviceorientation', deviceOrientationHandler);
       setGyroActive(true);
+    };
+
+    const enableGyroOnGesture = (): void => {
+      if (!enableMobileTilt || !mobileWithGyro || !secureContext) return;
+      if (gyroListenerAddedRef.current) return;
+
+      if (needsPermission) {
+        const win = window as WindowWithMotion;
+        const orientationPromise = win.DeviceOrientationEvent?.requestPermission?.();
+        const motionPromise = win.DeviceMotionEvent?.requestPermission?.();
+        const promises: Promise<string>[] = [];
+        if (orientationPromise) promises.push(orientationPromise);
+        if (motionPromise) promises.push(motionPromise);
+        if (promises.length === 0) {
+          addGyroListener();
+          return;
+        }
+        Promise.all(promises)
+          .then((results) => {
+            if (results.every((s) => s === 'granted')) addGyroListener();
+          })
+          .catch(() => {
+            gyroListenerAddedRef.current = false;
+          });
+      } else {
+        addGyroListener();
+      }
+    };
+
+    // On Android (and other non-iOS): enable gyro immediately so tilt works without a tap
+    if (enableMobileTilt && mobileWithGyro && secureContext && !needsPermission) {
+      addGyroListener();
     }
+
+    shell.addEventListener('click', enableGyroOnGesture);
+    shell.addEventListener('touchstart', enableGyroOnGesture, { passive: true });
+
+    enableGyroRef.current = enableGyroOnGesture;
 
     const initialX = (shell.clientWidth || 0) - ANIMATION_CONFIG.INITIAL_X_OFFSET;
     const initialY = ANIMATION_CONFIG.INITIAL_Y_OFFSET;
@@ -395,9 +462,12 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
       shell.removeEventListener('pointerenter', pointerEnterHandler);
       shell.removeEventListener('pointermove', pointerMoveHandler);
       shell.removeEventListener('pointerleave', pointerLeaveHandler);
-      shell.removeEventListener('click', handleClick);
+      shell.removeEventListener('click', enableGyroOnGesture);
+      shell.removeEventListener('touchstart', enableGyroOnGesture);
       window.removeEventListener('deviceorientation', deviceOrientationHandler);
       setGyroActive(false);
+      gyroSmoothRef.current = null;
+      gyroListenerAddedRef.current = false;
       if (enterTimerRef.current) window.clearTimeout(enterTimerRef.current);
       if (leaveRafRef.current) cancelAnimationFrame(leaveRafRef.current);
       tiltEngine.cancel();
@@ -412,6 +482,30 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
     handlePointerLeave,
     handleDeviceOrientation
   ]);
+
+  useEffect(() => {
+    if (!DEMO_MODE || !tiltEngine) return;
+    const interval = setInterval(() => {
+      const curr = tiltEngine.getCurrent();
+      setGyroDebugDisplay({
+        ...gyroDebugRef.current,
+        currentX: curr.x,
+        currentY: curr.y,
+        targetX: curr.tx,
+        targetY: curr.ty
+      });
+    }, 300);
+    return () => clearInterval(interval);
+  }, [tiltEngine]);
+
+  const gyroAvailability =
+    typeof window !== 'undefined'
+      ? {
+          mobileWithGyro: isMobileWithGyroAvailable(),
+          needsPermission: isOrientationPermissionRequired(),
+          secureContext: location.protocol === 'https:' || location.hostname === 'localhost'
+        }
+      : { mobileWithGyro: false, needsPermission: false, secureContext: false };
 
   const cardRadius = '30px';
 
@@ -563,14 +657,15 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
   };
 
   return (
-    <div
-      ref={wrapRef}
-      className={`relative touch-none ${className}`.trim()}
-      style={{ perspective: '500px', transform: 'translate3d(0, 0, 0.1px)', ...cardStyle } as React.CSSProperties}
-    >
+    <div className="flex flex-col items-center gap-2 w-full">
+      <div
+        ref={wrapRef}
+        className={`relative touch-none select-none ${className}`.trim()}
+        style={{ perspective: '500px', transform: 'translate3d(0, 0, 0.1px)', ...cardStyle } as React.CSSProperties}
+      >
       {behindGlowEnabled && (
         <div
-          className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-200 ease-out"
+          className="absolute inset-0 z-0 pointer-events-none transition-opacity duration-200 ease-out select-none"
           style={{
             background: `radial-gradient(circle at var(--pointer-x) var(--pointer-y), var(--behind-glow-color) 0%, transparent var(--behind-glow-size))`,
             filter: 'blur(50px) saturate(1.1)',
@@ -578,9 +673,9 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
           }}
         />
       )}
-      <div ref={shellRef} className="relative z-1 group">
+      <div ref={shellRef} className="relative z-1 group select-none">
         <section
-          className="grid relative overflow-hidden"
+          className="grid relative overflow-hidden select-none"
           style={{
             height: '80svh',
             maxHeight: '540px',
@@ -595,17 +690,23 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                 ? 'translateZ(0) rotateX(var(--rotate-y)) rotateY(var(--rotate-x))'
                 : 'translateZ(0) rotateX(0deg) rotateY(0deg)',
             background: 'rgba(0, 0, 0, 0.9)',
-            backfaceVisibility: 'hidden'
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            transformStyle: 'preserve-3d',
+            willChange: gyroActive || pointerOver ? 'transform' : 'auto',
+            isolation: 'isolate'
           }}
         >
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 select-none"
             style={{
               backgroundImage: 'var(--inner-gradient)',
               backgroundColor: 'rgba(0, 0, 0, 0.9)',
               borderRadius: cardRadius,
               display: 'grid',
-              gridArea: '1 / -1'
+              gridArea: '1 / -1',
+              backfaceVisibility: 'hidden',
+              transformStyle: 'preserve-3d'
             }}
           >
             <div style={shineStyle} />
@@ -649,7 +750,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
               />
               {showUserInfo && (
                 <div
-                  className="absolute z-2 flex items-center justify-between backdrop-blur-[30px] border border-white/10 pointer-events-none"
+                  className="absolute z-2 flex items-center justify-between backdrop-blur-[30px] border border-white/10 pointer-events-none select-none"
                   style={
                     {
                       '--ui-inset': '20px',
@@ -723,7 +824,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
               )}
             </div>
             <div
-              className="max-h-full overflow-hidden text-center relative z-5 flex flex-col"
+              className="max-h-full overflow-hidden text-center relative z-5 flex flex-col select-none"
               style={{
                 transform:
                   'translate3d(calc(var(--pointer-from-left) * -6px + 3px), calc(var(--pointer-from-top) * -6px + 3px), 0.1px)',
@@ -817,7 +918,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
         </section>
         {/* Overlay for correct button hit-testing: not 3D-transformed so clicks align with visible buttons */}
         {showUserInfo && (
-          <div className="absolute inset-0 z-10 pointer-events-none">
+          <div className="absolute inset-0 z-10 pointer-events-none select-none">
             <div
               className="absolute inset-x-0 bottom-0 flex items-center justify-between pointer-events-none"
               style={
@@ -863,6 +964,51 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
           </div>
         )}
       </div>
+      </div>
+      {DEMO_MODE && (
+        <div
+          className="rounded-lg border border-violet-500/40 bg-violet-950/80 px-3 py-2 font-mono text-xs text-violet-200 shadow-lg"
+          aria-live="polite"
+        >
+          <div className="font-semibold text-violet-300 mb-1">Gyro</div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+            <span>β: {gyroDebugDisplay.beta != null ? gyroDebugDisplay.beta.toFixed(1) : '—'}</span>
+            <span>γ: {gyroDebugDisplay.gamma != null ? gyroDebugDisplay.gamma.toFixed(1) : '—'}</span>
+            <span>βs: {gyroDebugDisplay.smoothBeta != null ? gyroDebugDisplay.smoothBeta.toFixed(1) : '—'}</span>
+            <span>γs: {gyroDebugDisplay.smoothGamma != null ? gyroDebugDisplay.smoothGamma.toFixed(1) : '—'}</span>
+            <span>x: {gyroDebugDisplay.x != null ? Math.round(gyroDebugDisplay.x) : '—'}</span>
+            <span>y: {gyroDebugDisplay.y != null ? Math.round(gyroDebugDisplay.y) : '—'}</span>
+            <span>curr: {gyroDebugDisplay.currentX != null && gyroDebugDisplay.currentY != null ? `${Math.round(gyroDebugDisplay.currentX)},${Math.round(gyroDebugDisplay.currentY)}` : '—'}</span>
+            <span>tgt: {gyroDebugDisplay.targetX != null && gyroDebugDisplay.targetY != null ? `${Math.round(gyroDebugDisplay.targetX)},${Math.round(gyroDebugDisplay.targetY)}` : '—'}</span>
+          </div>
+          <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <span className="text-violet-400">
+              {gyroActive ? '🟢 gyro active' : '⚪ gyro off'}
+            </span>
+            {!gyroActive && (
+              <>
+                <span className="text-violet-500/80">
+                  HTTPS: {gyroAvailability.secureContext ? '✓' : '✗'} · Mobile: {gyroAvailability.mobileWithGyro ? '✓' : '✗'}
+                  {gyroAvailability.needsPermission ? ' · iOS' : ''}
+                </span>
+                {!gyroAvailability.secureContext ? (
+                  <span className="text-amber-300/90" title="Browsers only allow motion/orientation over HTTPS or localhost">
+                    Use HTTPS (e.g. ngrok or next --experimental-https) for gyro
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => enableGyroRef.current()}
+                    className="rounded bg-violet-600 px-2 py-1 text-violet-100 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-400"
+                  >
+                    Enable gyro
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

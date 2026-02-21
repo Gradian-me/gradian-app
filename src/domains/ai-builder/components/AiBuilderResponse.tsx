@@ -1119,7 +1119,7 @@ export function AiBuilderResponse({
 
       {/* Summarized Prompt - shown before search/image results when summarization is enabled */}
       {summarizedPrompt && summarizedPrompt.trim() && (
-        <div className="relative overflow-hidden rounded-xl border border-violet-200/50 dark:border-violet-800/50 bg-gradient-to-br from-violet-50/50 via-purple-50/50 to-indigo-50/50 dark:from-violet-950/20 dark:via-purple-950/20 dark:to-indigo-950/20 backdrop-blur-sm shadow-sm">
+        <div className="relative overflow-hidden rounded-xl border border-violet-200 dark:border-violet-400 bg-gradient-to-br from-violet-50/50 via-purple-50/50 to-indigo-50/50 dark:from-violet-950/20 dark:via-purple-950/20 dark:to-indigo-950/20 backdrop-blur-sm shadow-sm">
           <div className="absolute inset-0 bg-gradient-to-br from-violet-100/20 to-transparent dark:from-violet-900/10" />
           <div className="relative p-5 md:p-6">
             <div className="flex items-start gap-3 mb-3">

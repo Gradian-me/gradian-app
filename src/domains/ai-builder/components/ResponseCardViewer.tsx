@@ -197,7 +197,7 @@ export function ResponseCardViewer({
               'relative overflow-hidden rounded-xl',
               'bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50',
               'dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30',
-              'border border-violet-200/50 dark:border-violet-800/50',
+              'border border-violet-200 dark:border-violet-400',
               'shadow-sm hover:shadow-md',
               'transition-all duration-200',
               'text-start p-5',

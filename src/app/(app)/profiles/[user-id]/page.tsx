@@ -74,7 +74,7 @@ export default function ProfilePage() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="flex flex-col items-center gap-6"
+      className="flex flex-col items-center gap-6 min-h-0 pb-0 w-full"
     >
       <ProfileCardHologram
         avatarUrl={avatarUrl}

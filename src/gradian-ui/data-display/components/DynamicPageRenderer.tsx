@@ -63,6 +63,7 @@ import { normalizeCreateUpdateDates } from './CreateUpdateDetail';
 import { formatCreatedLabel, formatRelativeTime, formatFullDate, isLocaleRTL } from '@/gradian-ui/shared/utils/date-utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage, resolveDisplayLabel, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials } from '../utils';
@@ -1989,19 +1990,24 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     return values;
   }, [groupedEntities]);
   
-  // Get company info by ID
+  // Get company info by ID (company.name may be string or localized e.g. [{ en }, { fa }])
   const getCompanyInfo = useCallback((companyId: string) => {
     const company = companies.find((c: any) => c.id === companyId);
     if (!company) return null;
-    
+
+    const resolveTitle = (raw: unknown): string =>
+      typeof raw === 'string' ? raw : resolveLocalizedField(raw as Parameters<typeof resolveLocalizedField>[0], language, 'en');
+
     if (companySchema) {
       const imageUrl = getSingleValueByRole(companySchema, company, 'image') || company.logo;
-      const title = getSingleValueByRole(companySchema, company, 'title') || company.name;
+      const rawTitle = getSingleValueByRole(companySchema, company, 'title') || company.name;
+      const title = resolveTitle(rawTitle);
       return { imageUrl, title, company };
     }
-    
-    return { imageUrl: company.logo, title: company.name, company };
-  }, [companies, companySchema]);
+
+    const title = resolveTitle(company.name);
+    return { imageUrl: company.logo, title, company };
+  }, [companies, companySchema, language]);
 
   const getStatusColor = useCallback((status: string) => {
     switch (status) {

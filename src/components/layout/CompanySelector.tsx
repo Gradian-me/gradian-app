@@ -16,6 +16,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
 
 interface Company {
   id: string | number;
@@ -57,6 +58,9 @@ export function CompanySelector({
   const onCompanyChangeFullRef = useRef(onCompanyChangeFull);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const { resolvedTheme } = useTheme();
+  const defaultLang = getDefaultLanguage();
+  const language = useLanguageStore((s) => s.language) || defaultLang;
+
   const computedVariant =
     variant === 'auto'
       ? isMounted && resolvedTheme === 'dark'
@@ -64,7 +68,10 @@ export function CompanySelector({
         : 'light'
       : variant;
   const isDarkVariant = computedVariant === 'dark';
-  
+
+  const normalizeCompanyName = (raw: unknown): string =>
+    (resolveLocalizedField(raw as Parameters<typeof resolveLocalizedField>[0], language, defaultLang) || '').trim() || 'Company';
+
   // Keep ref in sync with callback
   useEffect(() => {
     onCompanyChangeFullRef.current = onCompanyChangeFull;
@@ -82,9 +89,9 @@ export function CompanySelector({
       try {
         // Use only tenant-store relatedCompanies. Never use user.relatedCompanies.
         const tenant = selectedTenant;
-        
+
         let relatedCompanies: RelatedCompanyLike[] = [];
-        
+
         if (tenant && tenant['relatedCompanies'] && (tenant['relatedCompanies'] as RelatedCompanyLike[]).length > 0) {
           relatedCompanies = tenant['relatedCompanies'] as RelatedCompanyLike[];
         } else if (typeof window !== 'undefined') {
@@ -101,7 +108,7 @@ export function CompanySelector({
         if (relatedCompanies && relatedCompanies.length > 0) {
           const mappedCompanies: Company[] = relatedCompanies.map((company: RelatedCompanyLike) => ({
             id: company.id,
-            name: company.label || company.name || 'Company',
+            name: normalizeCompanyName(company.label ?? company.name),
             logo: company.logo,
           }));
 
@@ -137,8 +144,15 @@ export function CompanySelector({
             name: 'All Companies',
           };
           
-          // Filter out any existing "All Companies" option to avoid duplicates
-          const filteredData = data.filter((c: Company) => c.id !== -1);
+          // Filter out any existing "All Companies" option and normalize names (may be localized)
+          const filteredData = data
+            .filter((c: { id?: number }) => c.id !== -1)
+            .map((c: Record<string, unknown>) => ({
+              ...c,
+              id: c.id,
+              name: normalizeCompanyName(c.name),
+              logo: c.logo
+            })) as Company[];
           setCompanies([allCompaniesOption, ...filteredData]);
         } else {
           // Even if API fails, still show "All Companies" option
@@ -162,7 +176,7 @@ export function CompanySelector({
     };
 
     void loadCompanies();
-  }, [isMounted, selectedTenant]);
+  }, [isMounted, selectedTenant, language, defaultLang]);
 
   // Set default company when companies are loaded
   useEffect(() => {
@@ -220,19 +234,20 @@ export function CompanySelector({
       document.cookie = `selectedCompanyId=${companyId}; path=/; max-age=${60 * 60 * 24 * 365}`; // 1 year
     }
     if (onCompanyChange) {
-      onCompanyChange(company.name);
+      onCompanyChange(getCompanyName(company));
     }
     if (onCompanyChangeFull) {
       onCompanyChangeFull(company);
     }
   };
 
-  const defaultLang = getDefaultLanguage();
-  const language = useLanguageStore((s) => s.language) || defaultLang;
   const labelAllCompanies = getT(TRANSLATION_KEYS.LABEL_ALL_COMPANIES, language, defaultLang);
 
-  const getCompanyName = (company?: Company | null) =>
-    company?.name && company.name.trim().length > 0 ? company.name.trim() : 'Untitled company';
+  const getCompanyName = (company?: Company | null): string => {
+    if (!company?.name) return 'Untitled company';
+    const s = String(company.name).trim();
+    return s.length > 0 ? s : 'Untitled company';
+  };
 
   const getCompanyDisplayName = (company?: Company | null) =>
     company?.id === -1 ? labelAllCompanies : getCompanyName(company);

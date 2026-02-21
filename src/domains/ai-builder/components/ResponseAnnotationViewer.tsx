@@ -67,7 +67,7 @@ export function ResponseAnnotationViewer({
         {schemasWithAnnotations.map((schemaAnnotation) => (
           <div
             key={schemaAnnotation.schemaId}
-            className="relative overflow-hidden rounded-xl bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200/50 dark:border-violet-800/50 shadow-sm p-5"
+            className="relative overflow-hidden rounded-xl bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200 dark:border-violet-400 shadow-sm p-5"
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">

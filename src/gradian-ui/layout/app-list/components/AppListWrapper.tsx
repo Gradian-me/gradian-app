@@ -136,7 +136,7 @@ const AppListItem: React.FC<AppListItemProps> = ({
             </div>
             <Button
               size="icon"
-              className="h-8 w-8 rounded-full border border-violet-200/70 bg-white/80 text-violet-600 shadow-sm transition-all hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md group-hover:-translate-y-0.5 dark:border-violet-500/50 dark:bg-gray-900/80 dark:text-violet-200 dark:hover:bg-violet-500/10"
+              className="h-8 w-8 rounded-full border border-violet-200/70 bg-white/80 text-violet-600 shadow-sm transition-all hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md group-hover:-translate-y-0.5 dark:border-violet-500/50 dark:bg-gray-800 dark:text-violet-200 dark:hover:bg-violet-500/10"
               onClick={(e) => {
                 // Middle-click (button === 1) or Ctrl/Cmd+click opens in new tab
                 if (e.button === 1 || e.ctrlKey || e.metaKey) {
@@ -224,7 +224,7 @@ const AppListItem: React.FC<AppListItemProps> = ({
       </div>
       <Button
         size="icon"
-        className="relative z-10 h-8 w-8 rounded-full border border-violet-200/70 bg-white/80 text-violet-600 shadow-sm transition-all hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md group-hover:-translate-y-0.5 dark:border-violet-500/50 dark:bg-gray-900/80 dark:text-violet-200 dark:hover:bg-violet-500/10"
+        className="relative z-10 h-8 w-8 rounded-full border border-violet-200/70 bg-white/80 text-violet-600 shadow-sm transition-all hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 hover:shadow-md group-hover:-translate-y-0.5 dark:border-violet-500/50 dark:bg-gray-800 dark:text-violet-200 dark:hover:bg-violet-500/10"
         onClick={(e) => {
           // Middle-click (button === 1) or Ctrl/Cmd+click opens in new tab
           if (e.button === 1 || e.ctrlKey || e.metaKey) {
@@ -480,7 +480,7 @@ export function AppListWrapper() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="flex min-w-0 flex-col gap-3 overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-3 shadow-sm backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/80 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-4"
+          className="flex min-w-0 flex-col gap-3 overflow-hidden rounded-2xl border border-gray-200 bg-white/80 p-3 shadow-sm backdrop-blur-sm dark:border-gray-800 dark:bg-gray-800 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-4"
         >
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <IconBox
