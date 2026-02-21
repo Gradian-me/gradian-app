@@ -669,7 +669,7 @@ function MainLayoutContent(initialProps: MainLayoutProps) {
 
         {/* Page Action Buttons - Top of page */}
         {showActionButtons && (
-          <div className="sticky top-0 z-20 bg-white/90 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-4 py-2">
+          <div className="sticky top-0 z-20 bg-gray-200/70 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 px-4 py-2">
             <PageActionButtons />
           </div>
         )}

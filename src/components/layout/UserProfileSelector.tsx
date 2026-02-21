@@ -18,6 +18,7 @@ import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { ProfileSelectorConfig } from '@/gradian-ui/layout/profile-selector/types';
 import { UserProfile } from '@/gradian-ui/shared/types';
 import { AuthEventType, dispatchAuthEvent } from '@/gradian-ui/shared/utils/auth-events';
+import { canAccessSystemAdminRoute } from '@/gradian-ui/shared/utils/access-control';
 
 interface UserProfileSelectorProps {
   config?: Partial<ProfileSelectorConfig>;
@@ -100,7 +101,7 @@ export function UserProfileSelector({
       .toUpperCase();
   }, [isMounted, displayName, user]);
 
-  const isAdmin = isMounted && user?.role === 'admin';
+  const isSystemAdministrator = isMounted && user ? canAccessSystemAdminRoute(user) : false;
 
   const triggerClasses = cn(
     'flex h-10 items-center rounded-xl border transition-colors outline-none ring-0 focus:outline-none focus:ring-0 focus:ring-offset-0 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0',
@@ -209,31 +210,33 @@ export function UserProfileSelector({
     permissions: [],
   };
 
+  const profileAction = {
+    id: 'profile',
+    label: getT(TRANSLATION_KEYS.PROFILE_MENU_PROFILE, language, defaultLang),
+    description: getT(TRANSLATION_KEYS.PROFILE_MENU_PROFILE_DESCRIPTION, language, defaultLang),
+    icon: UserIcon,
+    action: () => {
+      onProfileSelect?.(profilePayload);
+      handleNavigate(`/profiles/${user.id}`);
+    },
+  };
+  const settingsAction = {
+    id: 'settings',
+    label: getT(TRANSLATION_KEYS.PROFILE_MENU_ACCOUNT_SETTINGS, language, defaultLang),
+    description: getT(TRANSLATION_KEYS.PROFILE_MENU_ACCOUNT_SETTINGS_DESCRIPTION, language, defaultLang),
+    icon: Settings,
+    action: () => handleNavigate('/settings'),
+  };
+  const passwordAction = {
+    id: 'password',
+    label: getT(TRANSLATION_KEYS.PROFILE_MENU_CHANGE_PASSWORD, language, defaultLang),
+    description: getT(TRANSLATION_KEYS.PROFILE_MENU_CHANGE_PASSWORD_DESCRIPTION, language, defaultLang),
+    icon: KeyRound,
+    action: () => handleNavigate('/authentication/change-password'),
+  };
   const dropdownActions = [
-    {
-      id: 'profile',
-      label: getT(TRANSLATION_KEYS.PROFILE_MENU_PROFILE, language, defaultLang),
-      description: getT(TRANSLATION_KEYS.PROFILE_MENU_PROFILE_DESCRIPTION, language, defaultLang),
-      icon: UserIcon,
-      action: () => {
-        onProfileSelect?.(profilePayload);
-        handleNavigate(`/profiles/${user.id}`);
-      },
-    },
-    {
-      id: 'settings',
-      label: getT(TRANSLATION_KEYS.PROFILE_MENU_ACCOUNT_SETTINGS, language, defaultLang),
-      description: getT(TRANSLATION_KEYS.PROFILE_MENU_ACCOUNT_SETTINGS_DESCRIPTION, language, defaultLang),
-      icon: Settings,
-      action: () => handleNavigate('/settings'),
-    },
-    {
-      id: 'password',
-      label: getT(TRANSLATION_KEYS.PROFILE_MENU_CHANGE_PASSWORD, language, defaultLang),
-      description: getT(TRANSLATION_KEYS.PROFILE_MENU_CHANGE_PASSWORD_DESCRIPTION, language, defaultLang),
-      icon: KeyRound,
-      action: () => handleNavigate('/authentication/change-password'),
-    },
+    profileAction,
+    ...(isSystemAdministrator ? [settingsAction, passwordAction] : []),
   ];
 
   return (
@@ -319,7 +322,7 @@ export function UserProfileSelector({
                       <p className="text-gray-900 dark:text-gray-100 text-sm font-semibold truncate min-w-0" title={displayName}>
                         {displayName}
                       </p>
-                      {isAdmin && (
+                      {isSystemAdministrator && (
                         <FormBadge
                           variant="outline"
                           size="sm"

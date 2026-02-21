@@ -380,48 +380,11 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
 
   try {
-    // In live mode, first try to proxy to backend with all query params preserved.
-    // If backend is unavailable (404 or 5xx), fall back to local schemas.json using
-    // the same query params (id, schemaIds, tenantIds, summary, includeStatistics, etc.).
+    // In live mode (demo false), proxy to backend only; no local fallback.
     if (!isDemoModeEnabled()) {
       const targetPath = `/api/schemas${request.nextUrl.search}`;
       const proxyResponse = await proxySchemaRequest(request, targetPath);
-
-      // If backend returns success (2xx), return it immediately
-      if (proxyResponse.status >= 200 && proxyResponse.status < 300) {
-        return proxyResponse;
-      }
-
-      // If backend returns 404 or 5xx error, log and try local fallback
-      if (proxyResponse.status === 404 || (proxyResponse.status >= 500 && proxyResponse.status < 600)) {
-        try {
-          const cloned = proxyResponse.clone();
-          let proxyData: any = null;
-          try {
-            proxyData = await cloned.json();
-          } catch {
-            // Non‑JSON or empty body – just treat as generic error
-          }
-
-          loggingCustom(
-            LogType.INFRA_LOG,
-            'warn',
-            `[API] /api/schemas backend returned ${proxyResponse.status} (summary=${searchParams.get('summary')}, includeStatistics=${searchParams.get('includeStatistics')}, tenantIds=${searchParams.get('tenantIds') || 'none'}) – attempting local fallback from filesystem`
-          );
-          // Fall through to local filesystem logic below
-        } catch (fallbackError) {
-          loggingCustom(
-            LogType.INFRA_LOG,
-            'warn',
-            `[API] /api/schemas fallback preparation failed: ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`,
-          );
-          // If fallback setup fails, return original proxy response
-          return proxyResponse;
-        }
-      } else {
-        // Non‑404/5xx errors (e.g. 401/403/422) should propagate from backend
-        return proxyResponse;
-      }
+      return proxyResponse;
     }
     const schemaId = searchParams.get('id');
     const schemaIdsParam = searchParams.get('schemaIds');

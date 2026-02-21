@@ -66,15 +66,29 @@ export const resolveLocalizedField = (
   return (typeof firstNonEmpty === 'string' ? firstNonEmpty.trim() : null) ?? '';
 };
 
-/** Keys used by APIs for first/given name (in priority order). */
-const NAME_KEYS = ['name', 'firstName', 'first_name'] as const;
-/** Keys used by APIs for last/family name (in priority order). */
-const LASTNAME_KEYS = ['lastname', 'lastName', 'last_name'] as const;
+/** Keys for first/given name. Prefer localized (array/record) over plain string so language is respected. */
+const NAME_KEYS = ['firstName', 'first_name', 'name'] as const;
+/** Keys for last/family name. Prefer localized (array/record) over plain string. */
+const LASTNAME_KEYS = ['lastName', 'last_name', 'lastname'] as const;
+
+/** Prefer a value that is array or record (localized) over plain string when both exist. */
+function pickLocalizedOrString(
+  user: Record<string, unknown>,
+  keys: readonly string[]
+): LocalizedField | undefined {
+  const localized = keys.map((k) => user[k]).find(
+    (v) => v != null && typeof v === 'object' && (Array.isArray(v) || (v !== null && !Array.isArray(v)))
+  ) as LocalizedField | undefined;
+  if (localized) return localized;
+  const plain = keys.map((k) => user[k]).find((v) => v != null && typeof v === 'string') as string | undefined;
+  return plain ?? undefined;
+}
 
 /**
  * Get display name fields from a user-like object, supporting multiple API shapes
- * (name/lastname, firstName/lastName, first_name/last_name) so the UI shows
- * the user's name based on selected language instead of falling back to email.
+ * (name/lastname, firstName/lastName, first_name/last_name). Prefers localized
+ * fields (e.g. [{ "en": "X" }, { "fa": "Y" }]) over plain strings so the UI
+ * shows the name in the selected language.
  */
 export function getDisplayNameFields(
   user: Record<string, unknown> | null | undefined
@@ -82,12 +96,8 @@ export function getDisplayNameFields(
   if (!user || typeof user !== 'object') {
     return { name: undefined, lastname: undefined };
   }
-  const name = NAME_KEYS.map((k) => user[k]).find(
-    (v) => v != null && (typeof v === 'string' || (typeof v === 'object' && v !== null))
-  ) as LocalizedField | undefined;
-  const lastname = LASTNAME_KEYS.map((k) => user[k]).find(
-    (v) => v != null && (typeof v === 'string' || (typeof v === 'object' && v !== null))
-  ) as LocalizedField | undefined;
+  const name = pickLocalizedOrString(user, NAME_KEYS);
+  const lastname = pickLocalizedOrString(user, LASTNAME_KEYS);
   return { name: name ?? undefined, lastname: lastname ?? undefined };
 }
 

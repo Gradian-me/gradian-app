@@ -15,6 +15,8 @@ interface UserProfileDropdownProps {
   userInitials?: string;
   userId?: string;
   variant?: 'light' | 'dark';
+  /** When true, shows Account settings and Change password. Only system administrators should see these. */
+  isSystemAdministrator?: boolean;
 }
 
 const DROPDOWN_Z_INDEX = 2147483000;
@@ -24,7 +26,8 @@ export function UserProfileDropdown({
   userAvatar = "/avatars/mahyar.jpg", 
   userInitials = "MA",
   userId = "mahyar", // Default user ID
-  variant = "light"
+  variant = "light",
+  isSystemAdministrator = false,
 }: UserProfileDropdownProps) {
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
@@ -47,6 +50,10 @@ export function UserProfileDropdown({
 
   const handleSettingsClick = () => {
     router.push('/settings');
+  };
+
+  const handleChangePasswordClick = () => {
+    router.push('/authentication/change-password');
   };
 
   const handleLogout = async () => {
@@ -143,16 +150,30 @@ export function UserProfileDropdown({
             Profile
           </DropdownMenuPrimitive.Item>
           
-          <DropdownMenuPrimitive.Item
-            className={cn(
-              "relative flex cursor-pointer select-none items-center rounded-lg px-2 py-1.5 text-sm outline-none",
-              "hover:bg-violet-50 focus:bg-violet-50",
-              "dark:hover:bg-violet-500/10 dark:focus:bg-violet-500/10"
-            )}
-            onSelect={handleSettingsClick}
-          >
-            Settings
-          </DropdownMenuPrimitive.Item>
+          {isSystemAdministrator && (
+            <>
+              <DropdownMenuPrimitive.Item
+                className={cn(
+                  "relative flex cursor-pointer select-none items-center rounded-lg px-2 py-1.5 text-sm outline-none",
+                  "hover:bg-violet-50 focus:bg-violet-50",
+                  "dark:hover:bg-violet-500/10 dark:focus:bg-violet-500/10"
+                )}
+                onSelect={handleSettingsClick}
+              >
+                Account settings
+              </DropdownMenuPrimitive.Item>
+              <DropdownMenuPrimitive.Item
+                className={cn(
+                  "relative flex cursor-pointer select-none items-center rounded-lg px-2 py-1.5 text-sm outline-none",
+                  "hover:bg-violet-50 focus:bg-violet-50",
+                  "dark:hover:bg-violet-500/10 dark:focus:bg-violet-500/10"
+                )}
+                onSelect={handleChangePasswordClick}
+              >
+                Change password
+              </DropdownMenuPrimitive.Item>
+            </>
+          )}
           
           <DropdownMenuPrimitive.Separator className="-mx-1 my-1 h-px bg-gray-200 dark:bg-gray-700" />
           

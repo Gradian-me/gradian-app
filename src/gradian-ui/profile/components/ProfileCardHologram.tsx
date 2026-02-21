@@ -88,6 +88,7 @@ export interface ProfileCardHologramProps {
   contactText?: string;
   shareText?: string;
   showUserInfo?: boolean;
+  showGyroDebug?: boolean;
   sections?: ProfileSection[];
   entityType?: UserProfileEntityType[];
   onContactClick?: () => void;
@@ -148,6 +149,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
   contactText = 'Contact',
   shareText = 'Share',
   showUserInfo = true,
+  showGyroDebug = false,
   sections = [],
   entityType = [],
   onContactClick,
@@ -164,6 +166,14 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
   const gyroListenerAddedRef = useRef(false);
   const [gyroActive, setGyroActive] = useState(false);
   const [pointerOver, setPointerOver] = useState(false);
+  const [mainAvatarError, setMainAvatarError] = useState(false);
+  const [miniAvatarError, setMiniAvatarError] = useState(false);
+
+  const hasValidAvatarUrl = useCallback((url: string | undefined) => {
+    return Boolean(url && url.trim() && url !== DEFAULT_AVATAR_PLACEHOLDER);
+  }, []);
+  const showMainAvatar = hasValidAvatarUrl(avatarUrl) && !mainAvatarError;
+  const showMiniAvatar = (hasValidAvatarUrl(miniAvatarUrl) || hasValidAvatarUrl(avatarUrl)) && !miniAvatarError;
 
   const gyroDebugRef = useRef<{
     beta?: number;
@@ -187,7 +197,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
     if (!mql) return;
     const update = (): void => {
       const mobile = mql.matches;
-      tiltDivisorRef.current = mobile ? { divX: 2.5, divY: 2 } : { divX: 5, divY: 4 };
+      tiltDivisorRef.current = mobile ? { divX: 4, divY: 3 } : { divX: 5, divY: 4 };
     };
     update();
     mql.addEventListener('change', update);
@@ -737,31 +747,29 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                 backfaceVisibility: 'hidden'
               }}
             >
-              <img
-                className="
-                  absolute 
-                  bottom-30 
-                  shadow-2xl 
-                  will-change-transform 
-                  transition-transform 
-                  duration-[120ms] 
-                  end-6
-                  rounded-2xl
-                  ease-out
-                  w-32 lg:w-38
-                "
-                style={{
-                  backfaceVisibility: 'hidden'
-                }}
-                src={avatarUrl}
-                alt={`${displayName} avatar`}
-                loading="lazy"
-                
-                onError={e => {
-                  const t = e.target as HTMLImageElement;
-                  t.style.display = 'none';
-                }}
-              />
+              {showMainAvatar && (
+                <img
+                  className="
+                    absolute 
+                    bottom-30 
+                    shadow-2xl 
+                    will-change-transform 
+                    transition-transform 
+                    duration-[120ms] 
+                    end-6
+                    rounded-2xl
+                    ease-out
+                    w-32 lg:w-38
+                  "
+                  style={{
+                    backfaceVisibility: 'hidden'
+                  }}
+                  src={avatarUrl}
+                  alt={`${displayName} avatar`}
+                  loading="lazy"
+                  onError={() => setMainAvatarError(true)}
+                />
+              )}
               {showUserInfo && (
                 <div
                   className="absolute z-2 flex items-center justify-between backdrop-blur-[30px] border border-white/10 pointer-events-none select-none"
@@ -779,29 +787,27 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                   }
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <div
-                      className="rounded-full overflow-hidden border border-white/10 shrink-0"
-                      style={{ width: '48px', height: '48px' }}
-                    >
-                      <img
-                        className="w-full h-full object-cover rounded-full"
-                        src={miniAvatarUrl || avatarUrl}
-                        alt={`${displayName} mini avatar`}
-                        loading="lazy"
-                        style={{ display: 'block', gridArea: 'auto', borderRadius: '50%', pointerEvents: 'auto' }}
-                        onError={e => {
-                          const t = e.target as HTMLImageElement;
-                          t.style.opacity = '0.5';
-                          t.src = avatarUrl;
-                        }}
-                      />
-                    </div>
+                    {showMiniAvatar && (
+                      <div
+                        className="rounded-full overflow-hidden border border-white/10 shrink-0"
+                        style={{ width: '48px', height: '48px' }}
+                      >
+                        <img
+                          className="w-full h-full object-cover rounded-full"
+                          src={miniAvatarUrl || avatarUrl}
+                          alt={`${displayName} mini avatar`}
+                          loading="lazy"
+                          style={{ display: 'block', gridArea: 'auto', borderRadius: '50%', pointerEvents: 'auto' }}
+                          onError={() => setMiniAvatarError(true)}
+                        />
+                      </div>
+                    )}
                     <div className="flex flex-col gap-1">
                       <p className="text-md font-semibold text-white/90">{displayName}</p>
                       {entityType.length > 0 && (
                         <Badge
                           variant={entityTypeColorToVariant(entityType[0].color)}
-                          className="w-fit text-[0.65rem] border-white/20"
+                          className="w-fit text-[0.65rem] border-white/20 !bg-white/10 !text-white hover:!bg-white/15"
                         >
                           {resolveEntityTypeLabel(entityType[0].label, language)}
                         </Badge>
@@ -812,10 +818,10 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                     {(onContactClick ?? email) && (
                       <Button
                         type="button"
-                        variant="square"
+                        variant="ghost"
                         size="icon"
                         onClick={handleContactClick}
-                        className="h-10 w-10 rounded-xl border border-white/20 bg-white/10 text-white hover:bg-white/15 hover:border-white/30 hover:text-white [&_svg]:h-4 [&_svg]:w-4"
+                        className="h-10 w-10 rounded-xl !border !border-white/20 !bg-black/20 !text-white hover:!bg-black/30 hover:!border-white/30 [&_svg]:h-4 [&_svg]:w-4"
                         aria-label={contactText}
                       >
                         <Mail className="h-4 w-4" />
@@ -824,10 +830,10 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                     {onShareClick && (
                       <Button
                         type="button"
-                        variant="square"
+                        variant="ghost"
                         size="icon"
                         onClick={handleShareClick}
-                        className="h-10 w-10 rounded-xl border border-white/20 bg-white/10 text-white hover:bg-white/15 hover:border-white/30 hover:text-white [&_svg]:h-4 [&_svg]:w-4"
+                        className="h-10 w-10 rounded-xl !border !border-white/20 !bg-black/20 !text-white hover:!bg-black/30 hover:!border-white/30 [&_svg]:h-4 [&_svg]:w-4"
                         aria-label={shareText}
                       >
                         <Share2 className="h-4 w-4" />
@@ -950,10 +956,10 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                 {(onContactClick ?? email) && (
                   <Button
                     type="button"
-                    variant="square"
+                    variant="ghost"
                     size="icon"
                     onClick={handleContactClick}
-                    className="h-10 w-10 rounded-xl"
+                    className="h-10 w-10 rounded-xl !border !border-white/20 !bg-black/20 !text-white hover:!bg-black/30 hover:!border-white/30 [&_svg]:h-4 [&_svg]:w-4"
                     aria-label={contactText}
                     style={{ opacity: 0, pointerEvents: 'auto' }}
                   >
@@ -963,10 +969,10 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                 {onShareClick && (
                   <Button
                     type="button"
-                    variant="square"
+                    variant="ghost"
                     size="icon"
                     onClick={handleShareClick}
-                    className="h-10 w-10 rounded-xl"
+                    className="h-10 w-10 rounded-xl !border !border-white/20 !bg-black/20 !text-white hover:!bg-black/30 hover:!border-white/30 [&_svg]:h-4 [&_svg]:w-4"
                     aria-label={shareText}
                     style={{ opacity: 0, pointerEvents: 'auto' }}
                   >
@@ -979,7 +985,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
         )}
       </div>
       </div>
-      {DEMO_MODE && (
+      {DEMO_MODE && showGyroDebug && (
         <div
           className="rounded-lg border border-violet-500/40 bg-violet-950/80 px-3 py-2 font-mono text-xs text-violet-200 shadow-lg"
           aria-live="polite"

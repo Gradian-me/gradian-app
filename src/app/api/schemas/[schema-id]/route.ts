@@ -371,104 +371,10 @@ export async function GET(
   }
 
   if (!isDemoModeEnabled()) {
-    // Try to proxy to backend first
     const proxyResponse = await proxySchemaRequest(
       request,
       `/api/schemas/${schemaId}${request.nextUrl.search}`
     );
-    
-    // If backend returns success (2xx), return it immediately
-    if (proxyResponse.status >= 200 && proxyResponse.status < 300) {
-      return proxyResponse;
-    }
-    
-    // If backend returns 404 or 5xx error, try to fallback to local schema file
-    if (proxyResponse.status === 404 || (proxyResponse.status >= 500 && proxyResponse.status < 600)) {
-      try {
-        // Clone the response to read it without consuming the original
-        const clonedResponse = proxyResponse.clone();
-        let proxyData: any = null;
-        try {
-          proxyData = await clonedResponse.json();
-        } catch {
-          // If response is not JSON, treat as error
-        }
-        
-        // If backend explicitly says schema not found or returns 404, try local fallback
-        if (proxyResponse.status === 404 || (proxyData && proxyData.success === false)) {
-          loggingCustom(
-            LogType.INFRA_LOG,
-            'warn',
-            `[Schema API] Backend returned ${proxyResponse.status} for schema "${schemaId}", attempting local fallback`
-          );
-          
-          // Fallback to local schema file
-          try {
-            const schemas = loadSchemas();
-            const schema = schemas.find((s: any) => s.id === schemaId);
-            
-            if (schema) {
-              loggingCustom(
-                LogType.INFRA_LOG,
-                'info',
-                `[Schema API] Found schema "${schemaId}" in local fallback`
-              );
-              
-              // Get tenantIds from query params if available
-              const searchParams = request.nextUrl.searchParams;
-              const tenantIdsParam = searchParams.get('tenantIds');
-              const tenantIds = tenantIdsParam
-                ?.split(',')
-                .map((id) => id.trim())
-                .filter((id) => id.length > 0);
-              
-              // Get related applications for this schema
-              const relatedApplications = getRelatedApplications(schemaId, tenantIds);
-              
-              // Add applications and mock permissions to response
-              const responseData = applyMockSchemaPermissions({
-                ...schema,
-                applications: relatedApplications,
-              });
-              
-              const corsHeaders = getCorsHeaders(request);
-              return NextResponse.json({
-                success: true,
-                data: responseData
-              }, {
-                headers: {
-                  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-                  'Pragma': 'no-cache',
-                  'Expires': '0',
-                  ...corsHeaders,
-                },
-              });
-            } else {
-              loggingCustom(
-                LogType.INFRA_LOG,
-                'warn',
-                `[Schema API] Schema "${schemaId}" not found in local fallback either`
-              );
-            }
-          } catch (loadError) {
-            loggingCustom(
-              LogType.INFRA_LOG,
-              'error',
-              `[Schema API] Failed to load local schemas for fallback: ${loadError instanceof Error ? loadError.message : String(loadError)}`
-            );
-          }
-        }
-      } catch (fallbackError) {
-        // If fallback fails, log and return original proxy response
-        loggingCustom(
-          LogType.INFRA_LOG,
-          'warn',
-          `[Schema API] Fallback failed for schema "${schemaId}": ${fallbackError instanceof Error ? fallbackError.message : String(fallbackError)}`
-        );
-      }
-    }
-    
-    // Return proxy response (either success or error)
     return proxyResponse;
   }
 
