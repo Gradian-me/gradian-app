@@ -27197,6 +27197,17 @@
         ]
       },
       {
+        "id": "part-name-lookup",
+        "name": "partNameLookup",
+        "label": "Part Name Lookup",
+        "sectionId": "part-information",
+        "component": "picker",
+        "targetSchema": "lookups",
+        "referenceEntityId": "01KJ06YM685FYANN2ZVV4CGSGH",
+        "colSpan": 1,
+        "order": 5
+      },
+      {
         "id": "brand",
         "name": "brand",
         "label": "Brand",
@@ -35525,17 +35536,6 @@
             "ru": "Добавить пункты в список"
           }
         ]
-      },
-      {
-        "id": "part-name",
-        "name": "partName",
-        "label": "Part Name",
-        "sectionId": "note-content",
-        "component": "picker",
-        "targetSchema": "lookups",
-        "referenceEntityId": "01KJ06YM685FYANN2ZVV4CGSGH",
-        "colSpan": 1,
-        "order": 5
       }
     ],
     "sections": [

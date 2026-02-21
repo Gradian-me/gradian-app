@@ -687,7 +687,7 @@ function MainLayoutContent(initialProps: MainLayoutProps) {
           )}
           data-scroll-container="main-content"
         >
-          <div className="max-w-9xl mx-auto w-full h-full">
+          <div className="max-w-9xl mx-auto w-full">
             {children}
             {showEndLine && <EndLine />}
           </div>

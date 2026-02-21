@@ -3555,8 +3555,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-02-21T08:33:59.695Z",
-      "lastSynced": "2026-02-21T08:33:59.695Z",
+      "updatedAt": "2026-02-21T19:23:59.486Z",
+      "lastSynced": "2026-02-21T19:23:59.486Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -3568,7 +3568,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 43 schemas: 43 succeeded, 0 failed (0 created, 43 updated)"
+      "lastSyncMessage": "Processed 40 schemas: 40 succeeded, 0 failed (0 created, 40 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
