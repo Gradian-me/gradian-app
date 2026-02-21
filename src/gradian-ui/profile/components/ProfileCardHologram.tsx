@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useEffect, useRef, useCallback, useMemo, useState } from 'react';
 import type { ProfileSection, UserProfileEntityType, EntityTypeLabel } from '../types';
 import { formatProfileFieldValue } from '../utils';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,14 @@ if (typeof document !== 'undefined' && !document.getElementById(KEYFRAMES_ID)) {
     @keyframes pc-holo-bg {
       0% { background-position: 0 var(--background-y), 0 0, center; }
       100% { background-position: 0 var(--background-y), 90% 90%, center; }
+    }
+    @keyframes pc-holo-shine-pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 0.72; }
+    }
+    @keyframes pc-holo-glow-pulse {
+      0%, 100% { opacity: 0.35; }
+      50% { opacity: 0.5; }
     }
   `;
   document.head.appendChild(style);
@@ -97,9 +105,25 @@ interface TiltEngine {
 const DEFAULT_AVATAR_PLACEHOLDER =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle fill='%23444' cx='50' cy='50' r='50'/%3E%3C/svg%3E";
 
+/** True when device likely has a gyro and we're in a mobile-like context (touch or narrow). */
+function isMobileWithGyroAvailable(): boolean {
+  if (typeof window === 'undefined') return false;
+  if (typeof DeviceOrientationEvent === 'undefined') return false;
+  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const narrow = typeof window.innerWidth === 'number' && window.innerWidth < 1024;
+  return !!(hasTouch || narrow);
+}
+
+/** iOS 13+ requires user gesture to request device motion/orientation permission. */
+function isOrientationPermissionRequired(): boolean {
+  if (typeof window === 'undefined') return false;
+  const w = window as Window & { DeviceOrientationEvent?: { requestPermission?: () => Promise<string> } };
+  return typeof w.DeviceOrientationEvent?.requestPermission === 'function';
+}
+
 const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
   avatarUrl = DEFAULT_AVATAR_PLACEHOLDER,
-  iconUrl = '',
+  iconUrl = '/logo/Gradian_Pattern.png',
   grainUrl = '',
   innerGradient,
   behindGlowEnabled = true,
@@ -107,8 +131,8 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
   behindGlowSize,
   className = '',
   enableTilt = true,
-  enableMobileTilt = false,
-  mobileTiltSensitivity = 5,
+  enableMobileTilt = true,
+  mobileTiltSensitivity = 7,
   miniAvatarUrl,
   name = '',
   title = '',
@@ -130,6 +154,8 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
 
   const enterTimerRef = useRef<number | null>(null);
   const leaveRafRef = useRef<number | null>(null);
+  const [gyroActive, setGyroActive] = useState(false);
+  const [pointerOver, setPointerOver] = useState(false);
 
   const tiltEngine = useMemo<TiltEngine | null>(() => {
     if (!enableTilt) return null;
@@ -263,6 +289,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
       const shell = shellRef.current;
       if (!shell || !tiltEngine) return;
 
+      setPointerOver(true);
       shell.classList.add('active');
       shell.classList.add('entering');
       if (enterTimerRef.current) window.clearTimeout(enterTimerRef.current);
@@ -280,6 +307,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
     const shell = shellRef.current;
     if (!shell || !tiltEngine) return;
 
+    setPointerOver(false);
     tiltEngine.toCenter();
 
     const checkSettle = (): void => {
@@ -333,25 +361,29 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
     shell.addEventListener('pointermove', pointerMoveHandler);
     shell.addEventListener('pointerleave', pointerLeaveHandler);
 
+    const mobileWithGyro = isMobileWithGyroAvailable();
+    const needsPermission = isOrientationPermissionRequired();
+    const secureContext = typeof location !== 'undefined' && location.protocol === 'https:';
+
     const handleClick = (): void => {
-      if (!enableMobileTilt || typeof location === 'undefined' || location.protocol !== 'https:') return;
-      const anyMotion = window.DeviceMotionEvent as typeof DeviceMotionEvent & {
-        requestPermission?: () => Promise<string>;
-      };
-      if (anyMotion && typeof anyMotion.requestPermission === 'function') {
-        anyMotion
-          .requestPermission()
-          .then((state: string) => {
-            if (state === 'granted') {
-              window.addEventListener('deviceorientation', deviceOrientationHandler);
-            }
-          })
-          .catch(() => {});
-      } else {
-        window.addEventListener('deviceorientation', deviceOrientationHandler);
-      }
+      if (!enableMobileTilt || !mobileWithGyro || !secureContext) return;
+      if (!needsPermission) return;
+      (window as Window & { DeviceOrientationEvent?: { requestPermission?: () => Promise<string> } })
+        .DeviceOrientationEvent?.requestPermission?.()
+        .then((state: string) => {
+          if (state === 'granted') {
+            window.addEventListener('deviceorientation', deviceOrientationHandler);
+            setGyroActive(true);
+          }
+        })
+        .catch(() => {});
     };
     shell.addEventListener('click', handleClick);
+
+    if (enableMobileTilt && mobileWithGyro && secureContext && !needsPermission) {
+      window.addEventListener('deviceorientation', deviceOrientationHandler);
+      setGyroActive(true);
+    }
 
     const initialX = (shell.clientWidth || 0) - ANIMATION_CONFIG.INITIAL_X_OFFSET;
     const initialY = ANIMATION_CONFIG.INITIAL_Y_OFFSET;
@@ -365,6 +397,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
       shell.removeEventListener('pointerleave', pointerLeaveHandler);
       shell.removeEventListener('click', handleClick);
       window.removeEventListener('deviceorientation', deviceOrientationHandler);
+      setGyroActive(false);
       if (enterTimerRef.current) window.clearTimeout(enterTimerRef.current);
       if (leaveRafRef.current) cancelAnimationFrame(leaveRafRef.current);
       tiltEngine.cancel();
@@ -383,37 +416,40 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
   const cardRadius = '30px';
 
   const cardStyle = useMemo(
-    () => ({
-      '--icon': iconUrl ? `url(${iconUrl})` : 'none',
-      '--grain': grainUrl ? `url(${grainUrl})` : 'none',
-      '--inner-gradient': innerGradient ?? DEFAULT_INNER_GRADIENT,
-      '--behind-glow-color': behindGlowColor ?? 'rgba(125, 190, 255, 0.67)',
-      '--behind-glow-size': behindGlowSize ?? '50%',
-      '--pointer-x': '50%',
-      '--pointer-y': '50%',
-      '--pointer-from-center': '0',
-      '--pointer-from-top': '0.5',
-      '--pointer-from-left': '0.5',
-      '--card-opacity': '0',
-      '--rotate-x': '0deg',
-      '--rotate-y': '0deg',
-      '--background-x': '50%',
-      '--background-y': '50%',
-      '--card-radius': cardRadius,
-      '--sunpillar-1': 'hsl(2, 100%, 73%)',
-      '--sunpillar-2': 'hsl(53, 100%, 69%)',
-      '--sunpillar-3': 'hsl(93, 100%, 69%)',
-      '--sunpillar-4': 'hsl(176, 100%, 76%)',
-      '--sunpillar-5': 'hsl(228, 100%, 74%)',
-      '--sunpillar-6': 'hsl(283, 100%, 73%)',
-      '--sunpillar-clr-1': 'var(--sunpillar-1)',
-      '--sunpillar-clr-2': 'var(--sunpillar-2)',
-      '--sunpillar-clr-3': 'var(--sunpillar-3)',
-      '--sunpillar-clr-4': 'var(--sunpillar-4)',
-      '--sunpillar-clr-5': 'var(--sunpillar-5)',
-      '--sunpillar-clr-6': 'var(--sunpillar-6)'
-    }),
-    [iconUrl, grainUrl, innerGradient, behindGlowColor, behindGlowSize, cardRadius]
+    () => {
+      const active = pointerOver || gyroActive;
+      return {
+        '--icon': iconUrl ? `url(${iconUrl})` : 'none',
+        '--grain': grainUrl ? `url(${grainUrl})` : 'none',
+        '--inner-gradient': innerGradient ?? DEFAULT_INNER_GRADIENT,
+        '--behind-glow-color': behindGlowColor ?? 'rgba(125, 190, 255, 0.67)',
+        '--behind-glow-size': behindGlowSize ?? '50%',
+        '--pointer-x': '50%',
+        '--pointer-y': '50%',
+        '--pointer-from-center': '0',
+        '--pointer-from-top': '0.5',
+        '--pointer-from-left': '0.5',
+        '--card-opacity': active ? '1' : '0',
+        '--rotate-x': '0deg',
+        '--rotate-y': '0deg',
+        '--background-x': '50%',
+        '--background-y': '50%',
+        '--card-radius': cardRadius,
+        '--sunpillar-1': 'hsl(2, 100%, 73%)',
+        '--sunpillar-2': 'hsl(53, 100%, 69%)',
+        '--sunpillar-3': 'hsl(93, 100%, 69%)',
+        '--sunpillar-4': 'hsl(176, 100%, 76%)',
+        '--sunpillar-5': 'hsl(228, 100%, 74%)',
+        '--sunpillar-6': 'hsl(283, 100%, 73%)',
+        '--sunpillar-clr-1': 'var(--sunpillar-1)',
+        '--sunpillar-clr-2': 'var(--sunpillar-2)',
+        '--sunpillar-clr-3': 'var(--sunpillar-3)',
+        '--sunpillar-clr-4': 'var(--sunpillar-4)',
+        '--sunpillar-clr-5': 'var(--sunpillar-5)',
+        '--sunpillar-clr-6': 'var(--sunpillar-6)'
+      };
+    },
+    [iconUrl, grainUrl, innerGradient, behindGlowColor, behindGlowSize, cardRadius, pointerOver, gyroActive]
   );
 
   const handleContactClick = useCallback((): void => {
@@ -439,10 +475,10 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
     maskImage: iconUrl ? `url(${iconUrl})` : 'none',
     maskMode: 'luminance',
     maskRepeat: 'repeat',
-    maskSize: '150%',
+    maskSize: '120%',
     maskPosition: 'top calc(200% - (var(--background-y) * 5)) left calc(100% - var(--background-x))',
-    filter: 'brightness(0.66) contrast(1.33) saturate(0.33) opacity(0.85)',
-    animation: 'pc-holo-bg 10s linear infinite',
+    filter: 'brightness(0.72) contrast(1.38) saturate(0.5)',
+    animation: 'pc-holo-bg 10s linear infinite, pc-holo-shine-pulse 6s ease-in-out infinite',
     animationPlayState: 'running',
     mixBlendMode: 'color-dodge',
     transform: 'translate3d(0, 0, 1px)',
@@ -473,15 +509,42 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
       ),
       radial-gradient(
         farthest-corner circle at var(--pointer-x) var(--pointer-y),
-        hsla(0, 0%, 0%, 0.1) 12%,
-        hsla(0, 0%, 0%, 0.15) 20%,
-        hsla(0, 0%, 0%, 0.25) 120%
+        hsla(0, 0%, 0%, 0.08) 12%,
+        hsla(0, 0%, 0%, 0.14) 20%,
+        hsla(0, 0%, 0%, 0.22) 120%
       )
     `.replace(/\s+/g, ' '),
     gridArea: '1 / -1',
     borderRadius: cardRadius,
     pointerEvents: 'none'
   };
+
+  const iconHologramGlowStyle: React.CSSProperties = iconUrl
+    ? {
+        maskImage: `url(${iconUrl})`,
+        maskMode: 'luminance',
+        maskRepeat: 'repeat',
+        maskSize: '120%',
+        maskPosition: 'top calc(200% - (var(--background-y) * 5)) left calc(100% - var(--background-x))',
+        background: `radial-gradient(
+          ellipse 80% 80% at var(--pointer-x) var(--pointer-y),
+          hsla(190, 90%, 75%, 0.45) 0%,
+          hsla(280, 80%, 70%, 0.35) 35%,
+          hsla(340, 85%, 72%, 0.2) 60%,
+          transparent 85%
+        )`,
+        mixBlendMode: 'screen',
+        filter: 'blur(0.5px)',
+        opacity: 0.4,
+        animation: 'pc-holo-glow-pulse 5s ease-in-out infinite',
+        transform: 'translate3d(0, 0, 1.05px)',
+        overflow: 'hidden',
+        zIndex: 3.5,
+        gridArea: '1 / -1',
+        borderRadius: cardRadius,
+        pointerEvents: 'none'
+      }
+    : { display: 'none' };
 
   const glareStyle: React.CSSProperties = {
     transform: 'translate3d(0, 0, 1.1px)',
@@ -511,7 +574,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
           style={{
             background: `radial-gradient(circle at var(--pointer-x) var(--pointer-y), var(--behind-glow-color) 0%, transparent var(--behind-glow-size))`,
             filter: 'blur(50px) saturate(1.1)',
-            opacity: 'calc(0.8 * var(--card-opacity))'
+            opacity: 'calc(0.5 + 0.4 * var(--card-opacity))'
           }}
         />
       )}
@@ -526,23 +589,13 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
             backgroundBlendMode: 'color-dodge, normal, normal, normal',
             boxShadow:
               'rgba(0, 0, 0, 0.8) calc((var(--pointer-from-left) * 10px) - 3px) calc((var(--pointer-from-top) * 20px) - 6px) 20px -5px',
-            transition: 'transform 1s ease',
-            transform: 'translateZ(0) rotateX(0deg) rotateY(0deg)',
+            transition: gyroActive || pointerOver ? 'transform 180ms ease-out' : 'transform 1s ease',
+            transform:
+              gyroActive || pointerOver
+                ? 'translateZ(0) rotateX(var(--rotate-y)) rotateY(var(--rotate-x))'
+                : 'translateZ(0) rotateX(0deg) rotateY(0deg)',
             background: 'rgba(0, 0, 0, 0.9)',
             backfaceVisibility: 'hidden'
-          }}
-          onMouseEnter={e => {
-            e.currentTarget.style.transition = 'none';
-            e.currentTarget.style.transform = 'translateZ(0) rotateX(var(--rotate-y)) rotateY(var(--rotate-x))';
-          }}
-          onMouseLeave={e => {
-            const shell = shellRef.current;
-            if (shell?.classList.contains('entering')) {
-              e.currentTarget.style.transition = 'transform 180ms ease-out';
-            } else {
-              e.currentTarget.style.transition = 'transform 1s ease';
-            }
-            e.currentTarget.style.transform = 'translateZ(0) rotateX(0deg) rotateY(0deg)';
           }}
         >
           <div
@@ -556,6 +609,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
             }}
           >
             <div style={shineStyle} />
+            <div style={iconHologramGlowStyle} />
             <div style={glareStyle} />
             <div
               className="overflow-visible"
@@ -679,11 +733,20 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                 pointerEvents: 'none'
               }}
             >
-              <div className="w-full flex flex-col shrink-0" style={{ top: '3em', display: 'flex', gridArea: 'auto' }}>
+              <div
+                className="w-full flex flex-col shrink-0 gap-2"
+                style={{
+                  top: '3em',
+                  display: 'flex',
+                  gridArea: 'auto',
+                  containerType: 'inline-size',
+                  containerName: 'name-container'
+                }}
+              >
                 <h3
-                  className="font-semibold m-0 "
+                  className="font-semibold m-0 whitespace-nowrap min-w-0 overflow-hidden text-ellipsis"
                   style={{
-                    fontSize: 'min(5svh, 2.5em)',
+                    fontSize: 'clamp(0.8rem, min(8cqw, min(4svh, 2em)), min(4svh, 2em))',
                     backgroundImage: 'linear-gradient(to bottom, #fff, #6f6fbe)',
                     backgroundSize: '1em 1.5em',
                     WebkitTextFillColor: 'transparent',
@@ -702,7 +765,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
                   style={{
                     position: 'relative',
                     top: '-12px',
-                    fontSize: '1.5rem',
+                    fontSize: '1.4rem',
                     margin: '0 auto',
                     backgroundImage: 'linear-gradient(to bottom, #fff, #4a4ac0)',
                     backgroundSize: '1em 1.5em',
@@ -720,7 +783,7 @@ const ProfileCardHologramComponent: React.FC<ProfileCardHologramProps> = ({
               </div>
               {cardSections.length > 0 && (
                 <div
-                  className="flex-1 min-h-0 overflow-y-auto px-4 text-left mt-2"
+                  className="flex-1 min-h-0 overflow-y-auto px-4 text-start"
                   style={{
                     maxHeight: 'calc(100% - 10em)',
                     pointerEvents: 'auto'

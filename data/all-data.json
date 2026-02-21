@@ -1,7 +1,7 @@
 {
   "companies": [
     {
-      "name": "CinnaGen",
+      "name": [{ "en": "CinnaGen", "fa": "سیناژن"}],
       "logo": "https://www.cinnagen.com/img/Logo.svg",
       "address": "Iran, Tehran, Shahrake Gharb, Farahzadi Blvd, Sepehr Street, No. 34",
       "country": "Iran",
@@ -24,7 +24,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
-      "name": "AryoGen",
+      "name": [{ "en": "AryoGen", "fa": "آریوژن"}],
       "logo": "https://www.aryogen.com/wp-content/uploads/2023/09/Aryogen-web-logo.png",
       "address": "No. 140, 24th Km Tehran-Karaj Makhsous road",
       "country": "Iran",
@@ -47,7 +47,7 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
-      "name": "NanoAlvand",
+      "name": [{ "en": "NanoAlvand", "fa": "نانوالوند"}],
       "logo": "https://jobvision.ir/blog/wp-content/uploads/2025/04/n00016680-b.jpg",
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -64,7 +64,7 @@
       ]
     },
     {
-      "name": "Arvand Pharmed",
+      "name": [{ "en": "Arvand Pharmed", "fa": "اروند فارمد"}],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KB9VFNMVC92XF1JRND69S4Z9",

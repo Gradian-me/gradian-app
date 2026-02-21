@@ -78,7 +78,6 @@ export default function ProfilePage() {
     >
       <ProfileCardHologram
         avatarUrl={avatarUrl}
-        iconUrl={"/logo/Gradian_Pattern.png"}
         name={profile.fullName}
         title={profile.jobTitle ?? profile.role}
         status={profile.availability ?? 'Online'}
