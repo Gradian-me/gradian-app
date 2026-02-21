@@ -507,6 +507,24 @@ export interface FormSchema {
    */
   permissions?: string[];
   /**
+   * @deprecated Prefer externalUrlSettings[0].externalBaseUrl. Kept for backward compatibility.
+   */
+  externalBaseUrl?: string;
+  /**
+   * @deprecated Prefer externalUrlSettings[0].externalFetchPathTemplate. Kept for backward compatibility.
+   */
+  externalFetchPathTemplate?: string;
+  /**
+   * Array of external URL configs. First entry is used for list/detail/fetch.
+   * When using externalBaseUrl, passTenants/passCompanies control whether tenant/company context is sent.
+   */
+  externalUrlSettings?: Array<{
+    externalBaseUrl?: string;
+    externalFetchPathTemplate?: string;
+    passTenants?: boolean;
+    passCompanies?: boolean;
+  }>;
+  /**
    * Optional tenant scoping configuration. When applyToAllTenants is true,
    * the form applies to every tenant and relatedTenants should be ignored.
    * Otherwise, relatedTenants should contain tenant IDs selected via picker.

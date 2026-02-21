@@ -8,6 +8,7 @@ import { useCompanyStore } from '@/stores/company.store';
 import { PaginationMeta } from '../utils/pagination-utils';
 import { ApiResponse } from '../types/common';
 import { SortConfig } from '../utils/sort-utils';
+import { getListBaseEndpoint, getDetailEndpoint } from '../utils/external-base-url';
 
 interface EntityFilters {
   search?: string;
@@ -52,8 +53,8 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
   const [formValues, setFormValues] = useState<any>({});
   const [paginationMeta, setPaginationMeta] = useState<PaginationMeta | null>(null);
 
-  // Use the new dynamic API route
-  const apiEndpoint = `/api/data/${schema.id}`;
+  // List base endpoint (supports externalBaseUrl and external-proxy for absolute URLs)
+  const listBaseEndpoint = getListBaseEndpoint(schema);
 
   // Fetch all entities
   const fetchEntities = useCallback(async (
@@ -112,10 +113,11 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
         queryParams.append('limit', String(options.limit));
       }
       
-      const url = queryParams.toString() 
-        ? `${apiEndpoint}?${queryParams.toString()}`
-        : apiEndpoint;
-      
+      const sep = listBaseEndpoint.includes('?') ? '&' : '?';
+      const url = queryParams.toString()
+        ? `${listBaseEndpoint}${sep}${queryParams.toString()}`
+        : listBaseEndpoint;
+
       const response = await apiRequest<T[]>(url, {
         disableCache: options?.disableCache,
       });
@@ -143,12 +145,13 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
     } finally {
       setIsLoading(false);
     }
-  }, [apiEndpoint]);
+  }, [listBaseEndpoint]);
 
   // Fetch entity by ID
   const fetchEntityById = useCallback(async (id: string): Promise<T | null> => {
     try {
-      const response = await apiRequest<T>(`${apiEndpoint}/${id}`);
+      const url = getDetailEndpoint(schema, id);
+      const response = await apiRequest<T>(url);
       
       if (response.success && response.data) {
         return response.data;
@@ -159,7 +162,7 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
       console.error('Failed to fetch entity:', err);
       return null;
     }
-  }, [apiEndpoint]);
+  }, [schema]);
 
   // Create entity
   const createEntity = useCallback(async (data: Partial<T>) => {
@@ -172,8 +175,8 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
           enrichedData.companyId = String(companyId);
         }
       }
-      
-      const response = await apiRequest<T>(apiEndpoint, {
+
+      const response = await apiRequest<T>(listBaseEndpoint, {
         method: 'POST',
         body: enrichedData,
       });
@@ -190,12 +193,13 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
         error: err instanceof Error ? err.message : 'Failed to create entity' 
       };
     }
-  }, [apiEndpoint, getCompanyId]);
+  }, [listBaseEndpoint, getCompanyId]);
 
   // Update entity
   const updateEntity = useCallback(async (id: string, data: Partial<T>) => {
     try {
-      const response = await apiRequest<T>(`${apiEndpoint}/${id}`, {
+      const url = getDetailEndpoint(schema, id);
+      const response = await apiRequest<T>(url, {
         method: 'PUT',
         body: data,
       });
@@ -216,12 +220,13 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
         error: err instanceof Error ? err.message : 'Failed to update entity' 
       };
     }
-  }, [apiEndpoint]);
+  }, [schema]);
 
   // Delete entity
   const deleteEntity = useCallback(async (id: string) => {
     try {
-      const response = await apiRequest(`${apiEndpoint}/${id}`, {
+      const url = getDetailEndpoint(schema, id);
+      const response = await apiRequest(url, {
         method: 'DELETE',
         callerName: 'useDynamicEntity.deleteEntity',
       });
@@ -238,7 +243,7 @@ export function useDynamicEntity<T = any>(schema: FormSchema) {
         error: err instanceof Error ? err.message : 'Failed to delete entity' 
       };
     }
-  }, [apiEndpoint]);
+  }, [schema]);
 
   // Modal handlers
   const openCreateModal = useCallback(() => {

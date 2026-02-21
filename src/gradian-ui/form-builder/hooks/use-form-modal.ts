@@ -18,6 +18,7 @@ import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { filterFormDataForSubmission } from '../utils/form-data-filter';
 import { syncParentRelation } from '@/gradian-ui/shared/utils/parent-relation.util';
 import { replaceDynamicContext } from '../utils/dynamic-context-replacer';
+import { getDetailEndpoint, getExternalUrlConfig, getListBaseEndpoint } from '@/gradian-ui/shared/utils/external-base-url';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
@@ -466,7 +467,7 @@ export function useFormModal(
 
         // Only fetch from API if we don't have initial entity data
         if (!entitySource) {
-          const apiEndpoint = `/api/data/${schemaId}/${editEntityId}`;
+          const apiEndpoint = getDetailEndpoint(formBuilderSchema, editEntityId);
           const entityResult = await apiRequest(apiEndpoint, {
             method: 'GET',
             callerName: 'useFormModal.loadEntity',
@@ -637,10 +638,14 @@ export function useFormModal(
             formSchema: targetSchema,
             formData: templateContext,
           })
-        : mode === 'edit' && entityId
-          ? `/api/data/${targetSchema.id}/${entityId}`
-          : `/api/data/${targetSchema.id}`;
-      
+        : (getExternalUrlConfig(targetSchema)?.externalBaseUrl ?? targetSchema.externalBaseUrl?.trim())
+          ? mode === 'edit' && entityId
+            ? getDetailEndpoint(targetSchema, entityId)
+            : getListBaseEndpoint(targetSchema)
+          : mode === 'edit' && entityId
+            ? `/api/data/${targetSchema.id}/${entityId}`
+            : `/api/data/${targetSchema.id}`;
+
       const method = customSubmitRoute
         ? customSubmitMethod || 'POST'
         : mode === 'edit'

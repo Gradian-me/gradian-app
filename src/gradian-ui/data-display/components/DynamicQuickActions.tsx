@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { FormModal } from '@/gradian-ui/form-builder';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { getDetailEndpoint } from '@/gradian-ui/shared/utils/external-base-url';
 import { replaceDynamicContext, replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { AiAgentDialog } from '@/domains/ai-builder/components/AiAgentDialog';
 import { getEncryptedSkipKey } from '@/gradian-ui/shared/utils/skip-key-storage';
@@ -30,6 +31,7 @@ import {
 import { useLanguageStore } from '@/stores/language.store';
 import { resolveDisplayLabel, getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { toast } from 'sonner';
 
 export interface DynamicQuickActionsProps {
   actions: QuickAction[];
@@ -254,7 +256,8 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
         let referenceData = data;
         if (schema?.id && data?.id) {
           try {
-            const latest = await apiRequest(`/api/data/${schema.id}/${data.id}`, {
+            const entityUrl = getDetailEndpoint(schema, data.id);
+            const latest = await apiRequest(entityUrl, {
               method: 'GET',
               callerName: 'DynamicQuickActions.refreshReference',
             });
@@ -329,13 +332,25 @@ export const DynamicQuickActions: React.FC<DynamicQuickActionsProps> = ({
           })}`);
         }
         
-        await apiRequest(endpoint, {
+        const result = await apiRequest(endpoint, {
           method,
           body,
           callerName: 'DynamicQuickActions.callApiAction',
         });
+        if (!result.success) {
+          const res = result as any;
+          const message =
+            (typeof res.message === 'string' && res.message) ? res.message
+              : (typeof res.data?.message === 'string' && res.data?.message) ? res.data.message
+              : (typeof res.error === 'string' && res.error) ? res.error
+              : (typeof res.data?.error === 'string' && res.data?.error) ? res.data.error
+              : 'Request failed';
+          setTimeout(() => toast.error(message), 0);
+        }
       } catch (error) {
-        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to call API for action ${action.id}: ${error instanceof Error ? error.message : String(error)}`);
+        const message = error instanceof Error ? error.message : String(error);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Failed to call API for action ${action.id}: ${message}`);
+        setTimeout(() => toast.error(message), 0);
       } finally {
         setLoadingActionId(null);
       }

@@ -64,6 +64,22 @@ export async function GET(
   const targetPath = `/api/data/${schemaId}${request.nextUrl.search}`;
 
   if (!isDemoModeEnabled()) {
+    // Lookups: proxy to URL_LOOKUP_CRUD (not URL_DATA_CRUD); do not forward tenant/company query params
+    if (schemaId === 'lookups') {
+      const baseUrl = process.env.URL_LOOKUP_CRUD?.replace(/\/+$/, '');
+      if (!baseUrl) {
+        return NextResponse.json(
+          { success: false, error: 'Lookup service URL is not configured. Set URL_LOOKUP_CRUD.' },
+          { status: 500 }
+        );
+      }
+      const search = new URLSearchParams(request.nextUrl.searchParams);
+      search.delete('tenantIds');
+      search.delete('companyIds');
+      const pathWithQuery = search.toString() ? `?${search.toString()}` : '';
+      return proxyDataRequest(request, pathWithQuery, {}, baseUrl, '/api/data/lookups');
+    }
+
     // Special handling for tenants and integrations: try backend first, fallback to local if backend fails
     if (schemaId === 'tenants' || schemaId === 'integrations') {
       // Try to proxy to backend first

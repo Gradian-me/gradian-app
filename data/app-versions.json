@@ -7210,5 +7210,23 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000019",
+    "timestamp": "2026-02-21T00:00:00.000Z",
+    "version": "1.60.001",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "FEATURE MAJOR: LOOKUP HANDLING | Enhanced API handling for lookups by implementing dedicated proxying to URL_LOOKUP_CRUD, ensuring tenant and company query parameters are excluded. Updated data schemas to include lookup definitions and improved error handling in dynamic entity management. This update enhances overall application performance and user experience when interacting with lookup data.",
+        "priority": "High",
+        "affectedDomains": [
+          "api",
+          "lookups",
+          "data-schemas",
+          "dynamic-entity"
+        ]
+      }
+    ]
   }
 ]

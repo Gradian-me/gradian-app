@@ -404,14 +404,16 @@ export const proxyDataRequest = async (
   request: NextRequest,
   targetPathWithQuery: string,
   options: ProxyOptions = {},
-  /** Override base URL (e.g. for engagements). When set, response is not normalized. */
-  baseUrlOverride?: string
+  /** Override base URL (e.g. for engagements, lookups). When set, response is not normalized unless pathForNormalization is provided. */
+  baseUrlOverride?: string,
+  /** When set with baseUrlOverride, use this path for response normalization (e.g. '/api/data/lookups' for list, '/api/data/lookups/1' for detail). */
+  pathForNormalization?: string
 ) => {
   const baseUrl = (baseUrlOverride ?? process.env.URL_DATA_CRUD)?.replace(/\/+$/, '');
   const isEngagementProxy = Boolean(baseUrlOverride) || targetPathWithQuery.startsWith('/api/engagement');
 
   if (!baseUrl) {
-    loggingCustom(LogType.INFRA_LOG, 'error', 'URL_DATA_CRUD environment variable is not defined.');
+    loggingCustom(LogType.INFRA_LOG, 'error', baseUrlOverride !== undefined ? 'Override base URL is empty.' : 'URL_DATA_CRUD environment variable is not defined.');
     loggingCustom(
       LogType.CALL_BACKEND,
       'error',
@@ -427,7 +429,7 @@ export const proxyDataRequest = async (
   }
 
   const targetUrl = `${baseUrl}${targetPathWithQuery}`;
-  const skipNormalize = options.skipNormalize === true || isEngagementProxy;
+  const skipNormalize = options.skipNormalize === true || (isEngagementProxy && !pathForNormalization);
 
   // Extract tenant domain BEFORE creating new Headers object to ensure we check original request
   // IMPORTANT: Tenant domain must come from the browser/app domain, NOT from backend service URLs
@@ -823,7 +825,7 @@ export const proxyDataRequest = async (
         : normalizeUpstreamDataResponse(data, {
             method,
             status: response.status,
-            targetPathWithQuery,
+            targetPathWithQuery: pathForNormalization ?? targetPathWithQuery,
           });
       return NextResponse.json(payload, { status: response.status });
     }

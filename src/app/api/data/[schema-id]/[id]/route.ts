@@ -59,6 +59,23 @@ export async function GET(
     const data = await response.json();
     return NextResponse.json(data, { status: response.status });
   }
+
+  // Lookups: proxy to URL_LOOKUP_CRUD (not URL_DATA_CRUD); do not forward tenant/company query params
+  if (schemaId === 'lookups') {
+    const baseUrl = process.env.URL_LOOKUP_CRUD?.replace(/\/+$/, '');
+    if (!baseUrl) {
+      return NextResponse.json(
+        { success: false, error: 'Lookup service URL is not configured. Set URL_LOOKUP_CRUD.' },
+        { status: 500 }
+      );
+    }
+    const search = new URLSearchParams(request.nextUrl.searchParams);
+    search.delete('tenantIds');
+    search.delete('companyIds');
+    const pathWithQuery = `/${encodeURIComponent(id)}${search.toString() ? `?${search.toString()}` : ''}`;
+    return proxyDataRequest(request, pathWithQuery, {}, baseUrl, '/api/data/lookups/0');
+  }
+
   const targetPath = `/api/data/${schemaId}/${id}${request.nextUrl.search}`;
 
   if (!isDemoModeEnabled()) {

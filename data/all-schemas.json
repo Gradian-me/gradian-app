@@ -35618,5 +35618,54 @@
         "ru": "Личные заметки и чек-листы – рабочее пространство в стиле стикеров"
       }
     ]
+  },
+  {
+    "id": "lookups",
+    "description": "Lookup definitions (stored procedures and metadata)",
+    "singular_name": "Lookup",
+    "plural_name": "Lookups",
+    "singular_name_translations": [{"en": "Lookup"}, {"fa": "جستجو"}],
+    "plural_name_translations": [{"en": "Lookups"}, {"fa": "جستجوها"}],
+    "isNotCompanyBased": true,
+    "externalUrlSettings": [
+      {
+        "externalBaseUrl": "/api/lookups",
+        "externalFetchPathTemplate": "fetch/{{formData.id}}",
+        "passTenants": false,
+        "passCompanies": false
+      }
+    ],
+    "fields": [
+      {"id": "id", "name": "id", "label": "ID", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 1},
+      {"id": "name", "name": "name", "label": "Name", "sectionId": "basic", "component": "text", "role": "title", "colSpan": 1, "order": 2},
+      {"id": "description", "name": "description", "label": "Description", "sectionId": "basic", "component": "textarea", "role": "description", "colSpan": 1, "order": 3},
+      {"id": "databaseId", "name": "databaseId", "label": "Database ID", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 4},
+      {"id": "storedProcedureName", "name": "storedProcedureName", "label": "Stored Procedure", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 5},
+      {"id": "resultKeyColumn", "name": "resultKeyColumn", "label": "Result Key Column", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 6},
+      {"id": "resultValueColumn", "name": "resultValueColumn", "label": "Result Value Column", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 7},
+      {"id": "resultValueColumnEN", "name": "resultValueColumnEN", "label": "Result Value Column (EN)", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 8},
+      {"id": "resultColorColumn", "name": "resultColorColumn", "label": "Result Color Column", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 9},
+      {"id": "resultIconColumn", "name": "resultIconColumn", "label": "Result Icon Column", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 10},
+      {"id": "returnOriginalColumns", "name": "returnOriginalColumns", "label": "Return Original Columns", "sectionId": "basic", "component": "checkbox", "colSpan": 1, "order": 11},
+      {"id": "isActive", "name": "isActive", "label": "Active", "sectionId": "basic", "component": "switch", "colSpan": 1, "order": 12},
+      {"id": "cacheEnabled", "name": "cacheEnabled", "label": "Cache Enabled", "sectionId": "basic", "component": "switch", "colSpan": 1, "order": 13},
+      {"id": "cacheTTL", "name": "cacheTTL", "label": "Cache TTL", "sectionId": "basic", "component": "number", "colSpan": 1, "order": 14},
+      {"id": "createdAt", "name": "createdAt", "label": "Created", "sectionId": "basic", "component": "datetime", "colSpan": 1, "order": 15},
+      {"id": "updatedAt", "name": "updatedAt", "label": "Updated", "sectionId": "basic", "component": "datetime", "colSpan": 1, "order": 16}
+    ],
+    "sections": [{"id": "basic", "title": "Lookup", "order": 1}],
+    "detailPageMetadata": {
+      "quickActions": [
+        {
+          "id": "fetch",
+          "label": "Fetch",
+          "action": "callApi",
+          "submitRoute": "/api/lookups/fetch/{{formData.id}}",
+          "submitMethod": "POST",
+          "icon": "Play",
+          "payloadTemplate": {}
+        }
+      ]
+    }
   }
 ]

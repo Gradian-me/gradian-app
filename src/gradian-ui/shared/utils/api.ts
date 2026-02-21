@@ -687,6 +687,18 @@ async function enrichDataEndpoint(
     return { endpoint, params: existingParams };
   }
 
+  // Lookups: do not add tenantIds/companyIds (external API does not use them)
+  const isLookupsEndpoint =
+    endpoint === '/api/lookups' ||
+    endpoint.startsWith('/api/lookups?') ||
+    endpoint.startsWith('/api/lookups/') ||
+    endpoint === '/api/data/lookups' ||
+    endpoint.startsWith('/api/data/lookups?') ||
+    endpoint.startsWith('/api/data/lookups/');
+  if (isLookupsEndpoint) {
+    return { endpoint, params: existingParams };
+  }
+
   const isDev = isDevEnvironment();
 
   /**

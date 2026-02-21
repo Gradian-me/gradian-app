@@ -21655,7 +21655,7 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KGF6M26309P00Y0GJVBCN2QK",
       "createdAt": "2026-02-02T12:53:11.499Z",
-      "updatedAt": "2026-02-02T20:32:24.715Z",
+      "updatedAt": "2026-02-21T15:29:43.392Z",
       "isBookmarked": false,
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "checklist": [
@@ -21680,14 +21680,12 @@
           "isCompleted": false
         }
       ],
-      "entityType": [
-        {
-          "id": "01KCDZTASK003FAMILY00000000003",
-          "label": "Family",
-          "icon": "Users",
-          "color": "pink"
-        }
-      ]
+      "entityType": {
+        "id": "01KCDZTASK002PERSONAL000000002",
+        "label": "Personal",
+        "color": "purple",
+        "icon": "User"
+      }
     }
   ],
   "change-managements": [],
@@ -21854,5 +21852,6 @@
       "createdAt": "2026-02-15T23:58:31.870Z",
       "updatedAt": "2026-02-15T23:58:32.290Z"
     }
-  ]
+  ],
+  "lookups": []
 }
