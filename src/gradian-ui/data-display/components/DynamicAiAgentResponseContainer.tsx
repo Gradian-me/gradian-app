@@ -214,10 +214,21 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     if (!contentHostRef.current) return;
     if (showMaximizeModal && modalContentRef.current) {
       modalContentRef.current.appendChild(contentHostRef.current);
-    } else if (cardContentRef.current) {
+    } else if (!showMaximizeModal && cardContentRef.current) {
       cardContentRef.current.appendChild(contentHostRef.current);
     }
   }, [showMaximizeModal]);
+
+  // Ref callback: when modal container mounts while maximize is open, move content into it (fixes empty dialog when Radix mounts portal async)
+  const setModalContentRef = React.useCallback(
+    (el: HTMLDivElement | null) => {
+      (modalContentRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+      if (el && showMaximizeModal && contentHostRef.current && el !== contentHostRef.current.parentElement) {
+        el.appendChild(contentHostRef.current);
+      }
+    },
+    [showMaximizeModal]
+  );
 
   const handleCloseMaximize = React.useCallback(() => {
     if (contentHostRef.current && cardContentRef.current) {
@@ -350,9 +361,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
         className="max-w-[95vw] max-h-[95vh] lg:max-h-[90vh] lg:max-w-[90vw]"
       >
         <div
-          ref={(el) => {
-            modalContentRef.current = el;
-          }}
+          ref={setModalContentRef}
           className="min-h-0 flex-1 flex flex-col overflow-y-auto"
           style={{ maxHeight: '75vh' }}
         />
