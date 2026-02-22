@@ -13,7 +13,8 @@ import { Textarea } from '@/gradian-ui/form-builder/form-elements/components/Tex
 import { Button } from '@/components/ui/button';
 import { MessageCirclePlus } from 'lucide-react';
 import { cn } from '@/gradian-ui/shared/utils';
-import { createDiscussion } from '../utils/discussion-api';
+import { createDiscussion, DiscussionApiError } from '../utils/discussion-api';
+import { Badge } from '@/components/ui/badge';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
@@ -47,9 +48,10 @@ export const DiscussionInputDialog: React.FC<DiscussionInputDialogProps> = ({
   const t = (key: string) => getT(key, language, defaultLang);
 
   const [message, setMessage] = useState('');
-  const [priority, setPriority] = useState<EngagementPriority | ''>('medium');
+  const [priority, setPriority] = useState<EngagementPriority | ''>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorStatusCode, setErrorStatusCode] = useState<number | null>(null);
 
   const isReply = Boolean(config.referenceEngagementId);
 
@@ -57,6 +59,7 @@ export const DiscussionInputDialog: React.FC<DiscussionInputDialogProps> = ({
     if (!isOpen) {
       setMessage('');
       setError(null);
+      setErrorStatusCode(null);
     }
   }, [isOpen]);
 
@@ -66,20 +69,23 @@ export const DiscussionInputDialog: React.FC<DiscussionInputDialogProps> = ({
 
     setIsSubmitting(true);
     setError(null);
+    setErrorStatusCode(null);
     try {
       await createDiscussion({
         schemaId: config.schemaId,
         instanceId: config.instanceId,
         message: trimmed,
-        priority: priority || 'medium',
+        priority: priority || undefined,
         referenceEngagementId: config.referenceEngagementId,
       });
       setMessage('');
-      setPriority('medium');
+      setPriority('');
       onSuccess?.();
       onOpenChange(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send');
+      const message = err instanceof Error ? err.message : 'Failed to send';
+      setError(message);
+      setErrorStatusCode(err instanceof DiscussionApiError ? err.statusCode ?? null : null);
     } finally {
       setIsSubmitting(false);
     }
@@ -90,6 +96,7 @@ export const DiscussionInputDialog: React.FC<DiscussionInputDialogProps> = ({
       if (!open && !isSubmitting) {
         setMessage('');
         setError(null);
+        setErrorStatusCode(null);
       }
       onOpenChange(open);
     },
@@ -190,9 +197,19 @@ export const DiscussionInputDialog: React.FC<DiscussionInputDialogProps> = ({
             </ToggleGroup>
           </div>
           {error && (
-            <p className="text-xs text-red-600 dark:text-red-400" role="alert">
-              {error}
-            </p>
+            <div
+              className="rounded-2xl border border-red-500/50 bg-red-500/10 dark:bg-red-500/5 p-4"
+              role="alert"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium text-red-600 dark:text-red-400 flex-1">{error}</p>
+                {errorStatusCode != null && (
+                  <Badge variant="destructive" className="shrink-0">
+                    {errorStatusCode}
+                  </Badge>
+                )}
+              </div>
+            </div>
           )}
         </div>
         <DialogFooter>

@@ -57,6 +57,18 @@ export interface CreateDiscussionParams {
   referenceEngagementId?: string;
 }
 
+/** Error thrown when discussion API returns success: false; carries statusCode and message from the API. */
+export class DiscussionApiError extends Error {
+  constructor(
+    message: string,
+    public readonly statusCode?: number
+  ) {
+    super(message);
+    this.name = 'DiscussionApiError';
+    Object.setPrototypeOf(this, DiscussionApiError.prototype);
+  }
+}
+
 export async function createDiscussion({
   schemaId,
   instanceId,
@@ -68,8 +80,10 @@ export async function createDiscussion({
 
   const body: Record<string, unknown> = {
     message: String(message || '').trim(),
-    priority: priority ?? 'medium',
   };
+  if (priority) {
+    body.priority = priority;
+  }
   // Do not send createdBy: API uses user store / JWT (live mode).
   if (referenceEngagementId) {
     body.referenceEngagementId = referenceEngagementId;
@@ -82,7 +96,11 @@ export async function createDiscussion({
   });
 
   if (!res.success || !res.data) {
-    throw new Error('Failed to create discussion');
+    const apiMessage =
+      (typeof res.message === 'string' ? res.message : null) ||
+      res.error ||
+      'Failed to create discussion';
+    throw new DiscussionApiError(apiMessage, res.statusCode);
   }
   return res.data;
 }
