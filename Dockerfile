@@ -28,11 +28,15 @@
     
     WORKDIR /app
     
-    # Build-time environment variables
+    # Build-time environment variables (optional – can also be set at container runtime)
     ARG NEXT_PUBLIC_ENCRYPTION_KEY
     ARG NEXT_PUBLIC_SKIP_KEY
+    ARG URL_LOOKUP_CRUD
+    ARG URL_DATA_CRUD
     ENV NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY
     ENV NEXT_PUBLIC_SKIP_KEY=$NEXT_PUBLIC_SKIP_KEY
+    ENV URL_LOOKUP_CRUD=$URL_LOOKUP_CRUD
+    ENV URL_DATA_CRUD=$URL_DATA_CRUD
     ENV NEXT_TELEMETRY_DISABLED=1
     
     # Copy package files and npm config
@@ -96,6 +100,12 @@
     FROM reg.cinnagen.com:8083/distroless/nodejs24-debian13 AS runner
     
     WORKDIR /app
+    
+    # Optional: bake URL_LOOKUP_CRUD / URL_DATA_CRUD into image via --build-arg; else set at container runtime
+    ARG URL_LOOKUP_CRUD
+    ARG URL_DATA_CRUD
+    ENV URL_LOOKUP_CRUD=$URL_LOOKUP_CRUD
+    ENV URL_DATA_CRUD=$URL_DATA_CRUD
     
     ENV NODE_ENV=production
     ENV PORT=8502

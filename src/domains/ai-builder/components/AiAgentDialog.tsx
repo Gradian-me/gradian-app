@@ -14,7 +14,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
 import { Eye } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import type { AiAgent } from '../types';
 import { AiBuilderWrapper } from './AiBuilderWrapper';
 
@@ -25,6 +25,21 @@ export interface AiAgentDialogProps {
   schema: FormSchema;
   data: any; // Current item data
   agent: AiAgent | null;
+  /** Modal options: default maximized, close on outside click, etc. */
+  defaultMaximized?: boolean;
+  onMaximizeChange?: (value: boolean) => void;
+  closeOnOutsideClick?: boolean;
+  /** Optional actions in header (right side) or between header and content */
+  headerActions?: React.ReactNode;
+  actions?: React.ReactNode;
+  /** Optional badges in header */
+  headerBadges?: Array<{ id: string; label: string; color?: string; icon?: string }>;
+  /** Optional copy button in header */
+  enableCopy?: boolean;
+  copyContent?: string | number;
+  /** Modal size */
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  className?: string;
 }
 
 export function AiAgentDialog({
@@ -34,6 +49,16 @@ export function AiAgentDialog({
   schema,
   data,
   agent,
+  defaultMaximized = false,
+  onMaximizeChange,
+  closeOnOutsideClick = false,
+  headerActions,
+  actions,
+  headerBadges = [],
+  enableCopy = false,
+  copyContent,
+  size = 'xl',
+  className,
 }: AiAgentDialogProps) {
   const [preloadRoutes, setPreloadRoutes] = useState<Array<{
     route: string;
@@ -202,9 +227,18 @@ export function AiAgentDialog({
       onClose={onClose}
       title={`AI Agent: ${agent.label}`}
       description={agent.description}
-      size="xl"
+      size={size}
       showCloseButton={true}
       enableMaximize={true}
+      defaultMaximized={defaultMaximized}
+      onMaximizeChange={onMaximizeChange}
+      closeOnOutsideClick={closeOnOutsideClick}
+      headerActions={headerActions}
+      actions={actions}
+      headerBadges={headerBadges}
+      enableCopy={enableCopy}
+      copyContent={copyContent}
+      className={className}
       footerLeftActions={
         DEMO_MODE ? (
           <Button

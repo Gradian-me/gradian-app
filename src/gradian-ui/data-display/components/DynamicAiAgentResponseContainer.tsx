@@ -82,6 +82,14 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   const defaultLang = getDefaultLanguage();
   const actionLabel = resolveDisplayLabel(action.label, language, defaultLang);
 
+  // Prefer streaming for chat + string agents when we have the loaded agent (so response streams in)
+  const agentsForBuilder = useMemo(() => {
+    if (!agent) return undefined;
+    const isChatString =
+      (agent.agentType === 'chat' || !agent.agentType) && agent.requiredOutputFormat === 'string';
+    return [{ ...agent, stream: isChatString ? true : agent.stream }];
+  }, [agent]);
+
   const {
     aiResponse,
     isLoading,
@@ -89,7 +97,7 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     generateResponse,
     loadPreloadRoutes,
     clearResponse,
-  } = useAiBuilder();
+  } = useAiBuilder(agentsForBuilder);
 
   // Utility function to parse JSON and extract array data for tables
   const parseTableData = useCallback((response: string): { data: any[]; isValid: boolean } => {

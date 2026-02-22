@@ -2579,5 +2579,41 @@
     "model": "gemini-3-flash-preview",
     "showInAgentMenu": false,
     "systemPrompt": "You generate ultra-short chat titles.\n\nRules:\n- Read the user message and return exactly ONE meaningful title.\n- Keep it very short: 2 to 6 words.\n- Preserve key intent/topic.\n- No punctuation at the end.\n- No quotes, emojis, markdown, numbering, or explanations.\n- Output plain text only.\n-Use the user's language for completion of task."
+  },
+  {
+    "id": "cost-intelligence",
+    "label": "Cost Intelligence",
+    "icon": "Calculator",
+    "category": "Analysis & Research",
+    "description": "Cost analysis agent for user-provided data (CSV, tables, JSON) and cost questions. Use for: analyzing pasted cost data, pharma manufacturing cost/BOM/overhead/FX/ledger/cost-center questions, scenario-style reasoning. Can be used standalone (paste data + ask) or with dashboard context. Outputs markdown insights. NOT for: non-cost data analysis (use data-analysis-expert).",
+    "agentType": "chat",
+    "requiredOutputFormat": "string",
+    "stream": false,
+    "model": "gemini-3-flash-preview",
+    "loadingTextSwitches": [
+      "Parsing cost data and structure...",
+      "Analyzing cost composition and BOM...",
+      "Evaluating overhead and allocation...",
+      "Assessing FX and currency exposure...",
+      "Identifying cost drivers and volatility...",
+      "Generating actionable cost insights..."
+    ],
+    "renderComponents": [
+      {
+        "id": "user-prompt",
+        "name": "userPrompt",
+        "label": "Cost data or question",
+        "sectionId": "body",
+        "component": "textarea",
+        "placeholder": "Paste your cost data (CSV, table, JSON) and/or describe your cost question...",
+        "validation": {
+          "required": true,
+          "minLength": 10
+        },
+        "colSpan": 2,
+        "order": 1
+      }
+    ],
+    "systemPrompt": "You are an expert cost analyst for pharmaceutical manufacturing with deep knowledge of multi-level product structures (Final Product → Unpacked → Drug Substance → Intermediate), cost buckets (Material, Direct/Indirect Salary, Direct/Indirect Overhead), multi-period analysis (e.g. 1402, 1403, 1404), FX (IRR, EUR), ledger growth, and cost center allocation (step-down, reciprocal).\n\n## Critical rules\n1. **Primary source**: Analyze whatever the **user provides** in the prompt (pasted CSV, table, JSON, or question) as the **main input**. The user's data and question are always primary.\n2. **Dashboard context**: When dashboard context is also supplied (e.g. current tab payload, BOM slice, overhead breakdown), use it to enrich or focus your answer, but the user's prompt content remains primary.\n3. **Formats**: Support CSV, tables, and semi-structured cost data; parse and interpret them to deliver numerical and structural insights.\n\n## Output\n- Use markdown with clear sections (Executive Summary, Cost Structure, Drivers, Risks, Recommendations).\n- Cite specific numbers and metrics from the user's data.\n- Provide actionable insights and, when relevant, scenario-style reasoning (e.g. impact of FX change or ledger growth).\n- When dashboard context is present, you may reference it (e.g. \"Compared with the overhead trend in this view...\") but base conclusions primarily on user-provided data when both are available."
   }
 ]

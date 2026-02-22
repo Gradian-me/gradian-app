@@ -598,15 +598,36 @@ export function useRepeatingTableData(
   const schemaForColumns = isRelationBased && targetSchemaData ? targetSchemaData : schema;
 
   const fieldsToDisplay = useMemo(() => {
-    if (config.columns && config.columns.length > 0) {
-      return config.columns
-        .map((fieldId) => resolveFieldById(schemaForColumns, fieldId))
-        .filter(Boolean);
+    // Relation-based tables: only use target schema for columns; avoid showing source schema columns
+    if (isRelationBased && !targetSchemaData) {
+      return [];
     }
 
-    if (isRelationBased && targetSchemaData) {
-      // Filter out hidden fields for relation-based tables
-      const allFields = targetSchemaData.fields || [];
+    const effectiveSchema = isRelationBased ? targetSchemaData! : schemaForColumns;
+
+    if (config.columns && config.columns.length > 0) {
+      const resolved = config.columns
+        .map((fieldId) => resolveFieldById(effectiveSchema, fieldId))
+        .filter(Boolean);
+      // If target schema exists but resolved columns are empty (e.g. config has source-schema field IDs),
+      // fall back to all target schema fields so the table still shows data columns
+      if (isRelationBased && resolved.length === 0) {
+        const allFields = targetSchemaData!.fields || [];
+        return allFields.filter((field: any) => !field.hidden);
+      }
+      if (isRelationBased && resolved.length > 0) {
+        // Prefer only columns that exist on the target schema; otherwise fall back to all target fields
+        const targetFieldIds = new Set((targetSchemaData!.fields || []).map((f: any) => f.id));
+        const valid = resolved.filter((f: any) => targetFieldIds.has(f.id));
+        if (valid.length > 0) return valid;
+        const allFields = targetSchemaData!.fields || [];
+        return allFields.filter((field: any) => !field.hidden);
+      }
+      return resolved;
+    }
+
+    if (isRelationBased) {
+      const allFields = targetSchemaData!.fields || [];
       return allFields.filter((field: any) => !field.hidden);
     }
 

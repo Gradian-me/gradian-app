@@ -5238,6 +5238,54 @@
     {
       "menuTitle": [
         {
+          "en": "Cost Intelligence"
+        },
+        {
+          "fa": "هوشمندسازی هزینه"
+        },
+        {
+          "ar": "ذكاء التكاليف"
+        },
+        {
+          "es": "Inteligencia de costes"
+        },
+        {
+          "fr": "Intelligence des coûts"
+        },
+        {
+          "de": "Kostenintelligenz"
+        },
+        {
+          "it": "Intelligence dei costi"
+        },
+        {
+          "ru": "Управление затратами"
+        }
+      ],
+      "menuIcon": "Calculator",
+      "sortIndex": 11,
+      "hideInAD": false,
+      "description": "Cost structure, overhead, FX exposure, and cost center allocation",
+      "menuUrl": "/cost-intelligence",
+      "openInNewTab": false,
+      "id": "01KCCOSTINTEL0000000000001",
+      "createdAt": "2025-12-15T12:00:00.000Z",
+      "updatedAt": "2025-12-15T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "companies": [],
+      "relatedTenants": [
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG"
+    },
+    {
+      "menuTitle": [
+        {
           "en": "Sales Analytics"
         },
         {
@@ -5263,7 +5311,7 @@
         }
       ],
       "menuIcon": "TrendingUp",
-      "sortIndex": 11,
+      "sortIndex": 12,
       "hideInAD": false,
       "description": "Board-level sales performance analysis and insights",
       "menuUrl": "/sales-analytics",

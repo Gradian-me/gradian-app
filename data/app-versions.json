@@ -7228,5 +7228,23 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000020",
+    "timestamp": "2026-02-22T00:00:00.000Z",
+    "version": "1.60.003",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Enhanced Dockerfile with optional build-time environment variables for URL_LOOKUP_CRUD and URL_DATA_CRUD. Added new Cost Intelligence agent to ai-agents.json for improved cost analysis capabilities. Updated all-data.json to include Cost Intelligence in the menu structure, enhancing data accessibility. Refactored AiAgentDialog component to support new modal options and improved agent handling. This update enhances overall application functionality and user experience.",
+        "priority": "High",
+        "affectedDomains": [
+          "infrastructure",
+          "ai-builder",
+          "data-display",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

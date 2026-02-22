@@ -5,7 +5,10 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Clock, AlertCircle, Calendar } from 'lucide-react';
-import { formatDate } from '../../../shared/utils';
+import { formatDate, formatShortDate } from '@/gradian-ui/shared/utils/date-utils';
+import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { useLanguageStore } from '@/stores/language.store';
 
 const Odometer = dynamic(() => import('react-odometerjs'), {
   ssr: false,
@@ -33,6 +36,9 @@ export const Countdown: React.FC<CountdownProps> = ({
   fieldLabel,
   countUp = false,
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -143,18 +149,20 @@ export const Countdown: React.FC<CountdownProps> = ({
   const normalizedExpireDate = normalizeToEndOfDay(expireDate);
   const normalizedStartDate = startDate ? normalizeToEndOfDay(startDate) : null;
 
+  const expiredOnLabel = getT(TRANSLATION_KEYS.COUNTDOWN_EXPIRED_ON, language, defaultLang) || 'Expired on';
+  const expiresLabel = getT(TRANSLATION_KEYS.COUNTDOWN_EXPIRES, language, defaultLang) || 'Expires';
+  const startedLabel = getT(TRANSLATION_KEYS.COUNTDOWN_STARTED, language, defaultLang) || 'Started';
+
+  const formatCountdownDate = (date: Date) =>
+    includeTime ? formatShortDate(date, language) : formatDate(date, language);
+
   if (isExpired && !countUp) {
     return (
       <div className={`flex flex-col gap-1 ${className}`}>
         <div className="flex items-center gap-2 text-red-600">
           {showIcon && <AlertCircle className={`${size === 'sm' ? 'h-3 w-3' : size === 'md' ? 'h-4 w-4' : 'h-5 w-5'}`} />}
           <span className={`font-medium ${sizeClasses[size]}`}>
-            Expired on: {formatDate(normalizedExpireDate, { 
-              month: 'short', 
-              day: 'numeric', 
-              year: 'numeric',
-              ...(includeTime && { hour: '2-digit', minute: '2-digit' })
-            })}
+            {expiredOnLabel}: {formatCountdownDate(normalizedExpireDate)}
           </span>
         </div>
       </div>
@@ -232,12 +240,7 @@ export const Countdown: React.FC<CountdownProps> = ({
         <div className="flex items-end gap-1.5 text-gray-500">
           <Calendar className="h-3 w-3" />
           <span className={`${sizeClasses[size]}`}>
-            Expires: {formatDate(normalizedExpireDate, { 
-              month: 'short', 
-              day: 'numeric', 
-              year: 'numeric',
-              ...(includeTime && { hour: '2-digit', minute: '2-digit' })
-            })}
+            {expiresLabel}: {formatCountdownDate(normalizedExpireDate)}
           </span>
         </div>
       )}
@@ -245,12 +248,7 @@ export const Countdown: React.FC<CountdownProps> = ({
         <div className="flex items-end gap-1.5 text-gray-500">
           <Calendar className="h-3 w-3" />
           <span className={`${sizeClasses[size]}`}>
-            Started: {formatDate(normalizedStartDate, { 
-              month: 'short', 
-              day: 'numeric', 
-              year: 'numeric',
-              ...(includeTime && { hour: '2-digit', minute: '2-digit' })
-            })}
+            {startedLabel}: {formatCountdownDate(normalizedStartDate)}
           </span>
         </div>
       )}
