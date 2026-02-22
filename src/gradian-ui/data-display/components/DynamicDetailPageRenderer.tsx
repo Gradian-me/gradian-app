@@ -37,6 +37,9 @@ import Link from 'next/link';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { getSchemasWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
+import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { useQueryClient } from '@tanstack/react-query';
 import { RepeatingTableRendererConfig } from '@/gradian-ui/schema-manager/types/form-schema';
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
 import { toast } from 'sonner';
@@ -412,6 +415,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   customQuickActionHandler,
 }) => {
   const BackIcon = useBackIcon();
+  const queryClient = useQueryClient();
   const language = useLanguageStore((s) => s.language);
   const defaultLang = getDefaultLanguage();
   const labelBack = getT(TRANSLATION_KEYS.BUTTON_BACK, language ?? undefined, defaultLang);
@@ -634,6 +638,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
     return Array.from(ids);
   }, [relatedSchemas, allTableRenderers, schema?.id]);
 
+  // Load target schemas via IndexedDB-first path (same as forms): check IndexedDB, then fetch from API and cache
   useEffect(() => {
     if (!requiredTargetSchemaIds.length) {
       return;
@@ -647,29 +652,26 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
       return;
     }
 
-    const fetchSchemas = async () => {
+    const loadTargetSchemas = async () => {
       try {
-        const response = await apiRequest<FormSchema[]>(
-          `/api/schemas?schemaIds=${missingSchemaIds.join(',')}`
-        );
-        if (response.success && Array.isArray(response.data)) {
-          setTargetSchemaCache((prev) => {
-            const next = { ...prev };
-            response.data?.forEach((schema) => {
-              if (schema?.id) {
-                next[schema.id] = schema;
-              }
+        const loaded = await getSchemasWithClientCache(missingSchemaIds);
+        loaded.forEach((schema) => {
+          if (schema?.id) {
+            setTargetSchemaCache((prev) => {
+              if (prev[schema.id]) return prev;
+              return { ...prev, [schema.id]: schema };
             });
-            return next;
-          });
-        }
+            cacheSchemaClientSide(schema, { queryClient, persist: false });
+            queryClient.setQueryData(['schemas', schema.id], schema);
+          }
+        });
       } catch (error) {
-        loggingCustom(LogType.CLIENT_LOG, 'error', `Error preloading related schemas: ${error instanceof Error ? error.message : String(error)}`);
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error preloading target schemas (IndexedDB/API): ${error instanceof Error ? error.message : String(error)}`);
       }
     };
 
-    fetchSchemas();
-  }, [requiredTargetSchemaIds, targetSchemaCache]);
+    loadTargetSchemas();
+  }, [requiredTargetSchemaIds, targetSchemaCache, queryClient]);
 
   // Default layout values (can be overridden in detailPageMetadata if needed)
   const mainColumns = 2 as 1 | 2 | 3;

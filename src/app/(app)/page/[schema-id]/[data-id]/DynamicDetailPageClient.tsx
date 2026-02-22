@@ -12,7 +12,7 @@ import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsConte
 import { QueryClientContext } from '@tanstack/react-query';
 import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
-import { getSchemaWithClientCache, clearClientSchemaCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
+import { getSchemaWithClientCache, getSchemasWithClientCache, clearClientSchemaCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 
 interface DynamicDetailPageClientProps {
   schema: FormSchema;
@@ -118,30 +118,43 @@ export function DynamicDetailPageClient({
 
           // Preload schemas for quick actions that open form modals
           const quickActions = updated.detailPageMetadata?.quickActions || [];
-          const targetSchemas = quickActions
+          const quickActionSchemaIds = quickActions
             .filter((action) =>
               (action.action === 'openFormDialog' || action.action === 'openActionForm') &&
               action.targetSchema
             )
-            .map((action) => action.targetSchema!)
-            .filter((schemaId, index, self) => self.indexOf(schemaId) === index); // Remove duplicates
+            .map((action) => action.targetSchema!);
+
+          // Preload schemas for table/repeating relation sections (e.g. Tender Items, Tender Invitations, Inquiries)
+          // so they are in IndexedDB and React Query before DynamicRepeatingTableViewer mounts
+          const tableRendererIds =
+            (updated.detailPageMetadata?.tableRenderers || [])
+              .map((tr: { targetSchema?: string }) => tr.targetSchema)
+              .filter((id): id is string => Boolean(id));
+          const repeatingSectionIds = (updated.sections || [])
+            .filter((s) => s.isRepeatingSection && s.repeatingConfig?.targetSchema)
+            .map((s) => s.repeatingConfig!.targetSchema)
+            .filter((id): id is string => Boolean(id));
+
+          const targetSchemas = Array.from(
+            new Set([...quickActionSchemaIds, ...tableRendererIds, ...repeatingSectionIds])
+          ).filter((id) => id && id !== schemaId);
 
           if (queryClient && targetSchemas.length > 0) {
-            // Preload all target schemas in parallel
-            Promise.all(
-              targetSchemas.map(async (targetSchemaId) => {
-                try {
-                  const target = await getSchemaWithClientCache(targetSchemaId);
-                  if (target) {
+            // Preload all target schemas in one call (IndexedDB first, then GET /api/schemas?includedSchemaIds=...)
+            getSchemasWithClientCache(targetSchemas)
+              .then((schemas) => {
+                schemas.forEach((target) => {
+                  if (target?.id) {
                     const reconstructed = reconstructRegExp(target) as FormSchema;
-                    await cacheSchemaClientSide(reconstructed, { queryClient, persist: false });
-                    queryClient.setQueryData(['schemas', targetSchemaId], reconstructed);
+                    cacheSchemaClientSide(reconstructed, { queryClient, persist: false });
+                    queryClient.setQueryData(['schemas', target.id], reconstructed);
                   }
-                } catch (err) {
-                  console.warn(`[DetailPage] Failed to preload schema ${targetSchemaId} for quick action:`, err);
-                }
+                });
               })
-            );
+              .catch((err) => {
+                console.warn('[DetailPage] Failed to preload target schemas (batch):', err);
+              });
           }
         }
       } catch (err) {

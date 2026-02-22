@@ -34,24 +34,22 @@ export function Table({ node, children }: TableProps) {
   if (!parsed) {
     // Fallback to default table rendering if parsing fails
     return (
-      <div className="my-6">
-        <div className="w-full m-2">
-          <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-x-auto overflow-y-hidden">
-            <table className="min-w-full border-collapse">
-              {children ?? null}
-            </table>
-          </div>
+      <div className="my-6 w-full min-w-0 overflow-x-auto">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-x-auto overflow-y-hidden">
+          <table className="min-w-full border-collapse">
+            {children ?? null}
+          </table>
         </div>
       </div>
     );
   }
-  
+
   const { headers, data } = parsed;
   const columns = createTableColumns(headers);
   const tableConfig = createTableConfig(columns, data);
-  
+
   return (
-    <div className="my-6">
+    <div className="my-6 w-full min-w-0 overflow-x-auto">
       <TableWrapper
         tableConfig={tableConfig}
         columns={columns}

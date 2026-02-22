@@ -207,7 +207,7 @@ export function CardMetadataTab({ schema, onUpdate }: CardMetadataTabProps) {
   const labelFieldsPlural = getT(TRANSLATION_KEYS.SCHEMA_LABEL_FIELDS_COUNT, language, defaultLang);
   return (
     <div className="space-y-4">
-      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 overflow-visible">
+      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800/30 overflow-visible">
         <CardHeader>
           <div className="flex items-center gap-2">
             <CardTitle>{titleCardMetadata}</CardTitle>

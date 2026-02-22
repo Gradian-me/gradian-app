@@ -1,44 +1,27 @@
 // Dynamic AI Agent Response Container Component
-// Renders AI agent responses inline as card sections with gradient header
+// Embeds the same logic and content as AiAgentDialog inline (prompt building + AiBuilderWrapper).
+// Same config as quick actions runAiAgent — no separate dialog, everything in the card.
 
 'use client';
 
-import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { motion } from 'framer-motion';
 import { CardContent, CardHeader, CardTitle, CardWrapper } from '../card/components/CardWrapper';
 import { QuickAction, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { cn } from '../../shared/utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { replaceDynamicContextInObject } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { RefreshCw, Sparkles, Maximize2 } from 'lucide-react';
+import { Sparkles, Maximize2 } from 'lucide-react';
 import type { AiAgent } from '@/domains/ai-builder/types';
-import { useAiBuilder } from '@/domains/ai-builder/hooks/useAiBuilder';
-import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';
-import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
-import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWrapper';
-import { ImageViewer } from '@/gradian-ui/form-builder/form-elements/components/ImageViewer';
-import { VideoViewer } from '@/gradian-ui/form-builder/form-elements/components/VideoViewer';
-import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
-import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
-import { VoicePoweredOrb } from '@/components/ui/voice-powered-orb';
-import { TextSwitcher } from '@/components/ui/text-switcher';
-import { cleanMarkdownResponse } from '@/domains/ai-builder/utils/ai-security-utils';
-import { Badge } from '@/components/ui/badge';
-import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
-import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
-import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
-import { getT, getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
-import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
+import { getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
-import { extractJson } from '@/gradian-ui/shared/utils/json-extractor';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { AiBuilderWrapper } from '@/domains/ai-builder/components/AiBuilderWrapper';
+import { Modal } from '@/gradian-ui/data-display/components/Modal';
 
 export interface DynamicAiAgentResponseContainerProps {
   action: QuickAction;
@@ -73,286 +56,35 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
   const [userPrompt, setUserPrompt] = useState<string>('');
   const [processedBody, setProcessedBody] = useState<Record<string, any> | undefined>(undefined);
   const [processedExtraBody, setProcessedExtraBody] = useState<Record<string, any> | undefined>(undefined);
-  const [hasExecuted, setHasExecuted] = useState(false);
-  const [showRefreshConfirmation, setShowRefreshConfirmation] = useState(false);
-  const [showMaximizeDialog, setShowMaximizeDialog] = useState(false);
-  const autoExecuteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const isCurrentlyLoadingRef = useRef(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [showMaximizeModal, setShowMaximizeModal] = useState(false);
+  /** Single persistent DOM node: portal always renders here; we only move this node between card and modal to preserve state (e.g. streaming). */
+  const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+  const contentHostRef = useRef<HTMLDivElement | null>(null);
+  const cardContentRef = useRef<HTMLDivElement>(null);
+  const modalContentRef = useRef<HTMLDivElement>(null);
+
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const defaultLang = getDefaultLanguage();
   const actionLabel = resolveDisplayLabel(action.label, language, defaultLang);
 
-  // Prefer streaming for chat + string agents when we have the loaded agent (so response streams in)
-  const agentsForBuilder = useMemo(() => {
-    if (!agent) return undefined;
-    const isChatString =
-      (agent.agentType === 'chat' || !agent.agentType) && agent.requiredOutputFormat === 'string';
-    return [{ ...agent, stream: isChatString ? true : agent.stream }];
-  }, [agent]);
-
-  const {
-    aiResponse,
-    isLoading,
-    error,
-    generateResponse,
-    loadPreloadRoutes,
-    clearResponse,
-  } = useAiBuilder(agentsForBuilder);
-
-  // Utility function to parse JSON and extract array data for tables
-  const parseTableData = useCallback((response: string): { data: any[]; isValid: boolean } => {
-    try {
-      const parsed = JSON.parse(response);
-
-      // If it's already an array, return it
-      if (Array.isArray(parsed)) {
-        return { data: parsed, isValid: true };
-      }
-
-      // If it's an object with a single array property, extract that
-      if (typeof parsed === 'object' && parsed !== null) {
-        const keys = Object.keys(parsed);
-        if (keys.length === 1 && Array.isArray(parsed[keys[0]])) {
-          return { data: parsed[keys[0]], isValid: true };
-        }
-        // If it's an object, wrap it in an array
-        return { data: [parsed], isValid: true };
-      }
-
-      return { data: [], isValid: false };
-    } catch {
-      return { data: [], isValid: false };
-    }
-  }, []);
-
-  // Utility function to generate table columns from JSON data
-  const generateColumnsFromData = useCallback((data: any[]): TableColumn[] => {
-    if (!data || data.length === 0) return [];
-
-    // Get all unique keys from all objects in the array
-    const allKeys = new Set<string>();
-    data.forEach((item) => {
-      if (item && typeof item === 'object') {
-        Object.keys(item).forEach((key) => allKeys.add(key));
-      }
-    });
-
-    // Generate columns from keys
-    return Array.from(allKeys).map((key) => {
-      // Format key to label (e.g., "firstName" -> "First Name")
-      const label = key
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, (str) => str.toUpperCase())
-        .trim();
-
-      // Determine alignment based on value type
-      const firstValue = data.find((item) => item?.[key] != null)?.[key];
-      const isNumeric = typeof firstValue === 'number';
-      const align = isNumeric ? 'right' : 'left';
-
-      return {
-        id: key,
-        label,
-        accessor: key,
-        sortable: true,
-        align,
-        render: (value: any) => {
-          if (value === null || value === undefined) {
-            return '—';
-          }
-          if (typeof value === 'object') {
-            return JSON.stringify(value);
-          }
-          return String(value);
-        },
-      } as TableColumn;
-    });
-  }, []);
-
-  // Parse image data if format is image
-  const imageData = useMemo(() => {
-    if (!aiResponse || !agent) return null;
-
-    const agentFormatValue = agent.requiredOutputFormat as string | undefined;
-    const isImageFormat = agentFormatValue === 'image';
-
-    // Only try to parse as JSON if agent format is image or content looks like JSON
-    const trimmedContent = aiResponse.trim();
-    const looksLikeJson = trimmedContent.startsWith('{') || trimmedContent.startsWith('[');
-
-    if (!isImageFormat && !looksLikeJson) {
-      return null;
-    }
-
-    try {
-      const parsed = JSON.parse(aiResponse);
-
-      // Check if response has image structure
-      const hasImageStructure = parsed && typeof parsed === 'object' && parsed.image &&
-        (parsed.image.url || parsed.image.b64_json);
-
-      if (!isImageFormat && !hasImageStructure) {
-        return null;
-      }
-
-      if (parsed && typeof parsed === 'object' && parsed.image) {
-        const img = parsed.image;
-        if (img && (img.url || img.b64_json)) {
-          return img;
-        }
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  }, [aiResponse, agent]);
-
-  // Parse video data if format is video
-  const videoData = useMemo(() => {
-    if (!aiResponse || !agent) return null;
-
-    const agentFormatValue = agent.requiredOutputFormat as string | undefined;
-    const isVideoFormat = agentFormatValue === 'video';
-
-    // Only try to parse as JSON if agent format is video or content looks like JSON
-    const trimmedContent = aiResponse.trim();
-    const looksLikeJson = trimmedContent.startsWith('{') || trimmedContent.startsWith('[');
-
-    if (!isVideoFormat && !looksLikeJson) {
-      return null;
-    }
-
-    try {
-      const parsed = JSON.parse(aiResponse);
-
-      // Check if response has video structure
-      const hasVideoStructure = parsed && typeof parsed === 'object' && parsed.video &&
-        (parsed.video.video_id || parsed.video.url || parsed.video.file_path);
-
-      if (!isVideoFormat && !hasVideoStructure) {
-        return null;
-      }
-
-      if (parsed && typeof parsed === 'object' && parsed.video) {
-        const vid = parsed.video;
-        // Return video data if we have video_id, url, or file_path
-        if (vid && (vid.video_id || vid.url || vid.file_path)) {
-          return vid;
-        }
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  }, [aiResponse, agent]);
-
-  // Determine render format
-  const shouldRenderImage = useMemo(() => {
-    const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
-    return agentFormatValue === 'image' || !!imageData;
-  }, [agent?.requiredOutputFormat, imageData]);
-
-  const shouldRenderVideo = useMemo(() => {
-    const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
-    return agentFormatValue === 'video' || !!videoData;
-  }, [agent?.requiredOutputFormat, videoData]);
-
-  // Parse graph data if format is graph
-  const graphData = useMemo(() => {
-    if (!aiResponse || !agent) return null;
-
-    const agentFormatValue = agent.requiredOutputFormat as string | undefined;
-    const isGraphFormat = agentFormatValue === 'graph';
-
-    if (!isGraphFormat) return null;
-
-    try {
-      // Extract JSON from markdown code blocks if present
-      const extractedJson = extractJson(aiResponse);
-      if (!extractedJson) return null;
-
-      const parsed = JSON.parse(extractedJson);
-      // Check if response has graph structure
-      if (parsed && typeof parsed === 'object') {
-        const graph = parsed.graph || parsed;
-        if (graph && typeof graph === 'object' &&
-          Array.isArray(graph.nodes) && Array.isArray(graph.edges)) {
-          return graph;
-        }
-      }
-    } catch {
-      return null;
-    }
-    return null;
-  }, [aiResponse, agent]);
-
-  const shouldRenderGraph = useMemo(() => {
-    const agentFormatValue = agent?.requiredOutputFormat as string | undefined;
-    return agentFormatValue === 'graph' || !!graphData;
-  }, [agent?.requiredOutputFormat, graphData]);
-
-  const shouldRenderTable = agent?.requiredOutputFormat === 'table';
-  const { data: tableData, isValid: isValidTable } = useMemo(() => {
-    if (!aiResponse || !shouldRenderTable) {
-      return { data: [], isValid: false };
-    }
-    return parseTableData(aiResponse);
-  }, [aiResponse, shouldRenderTable, parseTableData]);
-
-  const tableColumns = useMemo(() => {
-    if (!shouldRenderTable || !isValidTable || tableData.length === 0) {
-      return [];
-    }
-    return generateColumnsFromData(tableData);
-  }, [shouldRenderTable, isValidTable, tableData, generateColumnsFromData]);
-
-  const tableConfig: TableConfig = useMemo(() => {
-    return {
-      id: 'ai-response-table',
-      columns: tableColumns,
-      data: tableData,
-      pagination: {
-        enabled: tableData.length > 10,
-        pageSize: DEFAULT_LIMIT,
-        showPageSizeSelector: true,
-        pageSizeOptions: [10, 25, 50, 100, 500],
-      },
-      sorting: {
-        enabled: true,
-      },
-      filtering: {
-        enabled: true,
-        globalSearch: true,
-      },
-      emptyState: {
-        message: 'No data available',
-      },
-      striped: true,
-      hoverable: true,
-      bordered: false,
-    };
-  }, [tableColumns, tableData]);
-
-  const showModelBadge = LOG_CONFIG[LogType.AI_MODEL_LOG] === true;
-
-  // Load agent on mount
+  // Load agent on mount (same as quick actions / AiAgentDialog)
   useEffect(() => {
     if (!action.agentId) {
       setIsLoadingAgent(false);
       return;
     }
-
     setIsLoadingAgent(true);
     fetch(`/api/ai-agents/${action.agentId}`)
-      .then(res => res.json())
-      .then(result => {
+      .then((res) => res.json())
+      .then((result) => {
         if (result.success && result.data) {
           setAgent(result.data);
         } else {
           console.error('Failed to load agent:', result.error);
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error('Error loading agent:', err);
       })
       .finally(() => {
@@ -360,15 +92,13 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
       });
   }, [action.agentId]);
 
-  // Process preset body and extra_body with dynamic context replacement
+  // Same as AiAgentDialog: process body and extra_body with dynamic context
   useEffect(() => {
     if (!data || !schema) {
       setProcessedBody(undefined);
       setProcessedExtraBody(undefined);
       return;
     }
-
-    // Process body if provided
     if (action.body) {
       const processed = replaceDynamicContextInObject(action.body, {
         formSchema: schema,
@@ -378,8 +108,6 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     } else {
       setProcessedBody(undefined);
     }
-
-    // Process extra_body if provided
     if (action.extra_body) {
       const processed = replaceDynamicContextInObject(action.extra_body, {
         formSchema: schema,
@@ -391,120 +119,76 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     }
   }, [data, schema, action.body, action.extra_body]);
 
-  // Build preload routes from action-defined routes only.
-  // Skip the current-record API route: userPrompt already embeds the same data from selectedFields/selectedSections.
-  // Adding it would duplicate record data in both user message and system prompt, wasting tokens.
+  // Same as AiAgentDialog: build preload routes with dynamic context
   useEffect(() => {
     if (!data || !schema) return;
-
     const routes: typeof preloadRoutes = [];
-
-    // Add preload routes from action configuration (with dynamic context replacement)
     if (action.preloadRoutes && action.preloadRoutes.length > 0) {
-      const processedRoutes = action.preloadRoutes.map(route => {
+      const processedRoutes = action.preloadRoutes.map((route) => {
         const processed = replaceDynamicContextInObject(route, {
           formSchema: schema,
           formData: data,
         });
+        if (JSON.stringify(processed).includes('{{')) {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', `Some dynamic context variables may not have been replaced in preload route: ${JSON.stringify(processed)}`);
+        }
         return processed;
       });
       routes.push(...processedRoutes);
     }
-
     setPreloadRoutes(routes);
   }, [data, schema, action.preloadRoutes]);
 
-  // Build user prompt from selected fields/sections
-  // For image-generator: use condensed narrative to save tokens (matches AI builder flow)
+  // Same as AiAgentDialog: build user prompt from selected fields/sections
   useEffect(() => {
     if (!data || !schema) {
       setUserPrompt('');
       return;
     }
-
-    const isImageGenerator = action.agentId === 'image-generator';
-
-    const extractCondensedNarrative = (obj: Record<string, any>): string => {
-      const parts: string[] = [];
-      const skipKeys = new Set(['id', 'icon', 'color', 'targetSchema', 'sectionId']);
-      for (const [key, value] of Object.entries(obj)) {
-        if (value === null || value === undefined || skipKeys.has(key)) continue;
-        if (typeof value === 'string' && value.trim()) {
-          parts.push(value.trim());
-        } else if (Array.isArray(value) && value.length > 0) {
-          const items = value.map((v: any) =>
-            typeof v === 'string' ? v : (v?.label ?? v?.id ?? v?.value ?? String(v))
-          ).filter(Boolean);
-          if (items.length > 0) parts.push(items.join(', '));
-        } else if (typeof value === 'object' && !Array.isArray(value)) {
-          const label = value.label ?? value.value;
-          if (typeof label === 'string' && label.trim()) parts.push(label);
-        }
-      }
-      return parts.join('. ');
-    };
-
-    if (isImageGenerator) {
-      let sourceData: Record<string, any> = {};
-      if (action.selectedFields && action.selectedFields.length > 0) {
-        action.selectedFields.forEach((fieldId) => {
-          const field = schema.fields?.find(f => f.id === fieldId);
-          const name = field?.name ?? fieldId;
-          if (data[name] !== undefined) sourceData[name] = data[name];
-        });
-      } else if (action.selectedSections && action.selectedSections.length > 0) {
-        action.selectedSections.forEach((sectionId) => {
-          const sectionFields = schema.fields?.filter(f => f.sectionId === sectionId) || [];
-          sectionFields.forEach((f) => {
-            if (f.name && data[f.name] !== undefined) sourceData[f.name] = data[f.name];
-          });
-        });
-      } else {
-        sourceData = { ...data };
-      }
-      const narrative = extractCondensedNarrative(sourceData);
-      const instruction = action.additionalSystemPrompt?.trim() || 'Create an illustration based on the provided context.';
-      setUserPrompt(narrative ? `${narrative}\n\n${instruction}` : instruction);
-      return;
-    }
-
     const promptParts: string[] = [];
     promptParts.push(`Working on ${schema.singular_name || schema.name} data:`);
 
     if (action.selectedFields && action.selectedFields.length > 0) {
       const selectedData: Record<string, any> = {};
       action.selectedFields.forEach((fieldId) => {
-        const field = schema.fields?.find(f => f.id === fieldId);
-        if (field && field.name) {
-          if (data[field.name] !== undefined) selectedData[field.name] = data[field.name];
+        const field = schema.fields?.find((f) => f.id === fieldId);
+        if (field?.name && data[field.name] !== undefined) {
+          selectedData[field.name] = data[field.name];
         } else if (data[fieldId] !== undefined) {
           selectedData[fieldId] = data[fieldId];
         }
       });
       if (Object.keys(selectedData).length > 0) {
-        promptParts.push(`\nSelected fields data:\n\`\`\`json\n${JSON.stringify(selectedData, null, 2)}\n\`\`\``);
+        const formattedJson = formatJsonForMarkdown(selectedData);
+        promptParts.push(`\nSelected fields data:\n\`\`\`json\n${formattedJson}\n\`\`\``);
       }
     }
 
     if (action.selectedSections && action.selectedSections.length > 0) {
       action.selectedSections.forEach((sectionId) => {
-        const section = schema.sections?.find(s => s.id === sectionId);
+        const section = schema.sections?.find((s) => s.id === sectionId);
         if (section) {
-          const sectionFields = schema.fields?.filter(f => f.sectionId === sectionId) || [];
+          const sectionFields = schema.fields?.filter((f) => f.sectionId === sectionId) || [];
           const sectionData: Record<string, any> = {};
           sectionFields.forEach((field) => {
-            if (field.name && data[field.name] !== undefined) sectionData[field.name] = data[field.name];
+            if (field.name && data[field.name] !== undefined) {
+              sectionData[field.name] = data[field.name];
+            }
           });
           if (Object.keys(sectionData).length > 0) {
-            promptParts.push(`\n${section.title || sectionId} section data:\n\`\`\`json\n${JSON.stringify(sectionData, null, 2)}\n\`\`\``);
+            const formattedJson = formatJsonForMarkdown(sectionData);
+            promptParts.push(`\n${section.title || sectionId} section data:\n\`\`\`json\n${formattedJson}\n\`\`\``);
           }
         }
       });
     }
 
-    if ((!action.selectedFields || action.selectedFields.length === 0) &&
-      (!action.selectedSections || action.selectedSections.length === 0)) {
-      promptParts.push(`\nFull item data:\n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\``);
+    if (
+      (!action.selectedFields || action.selectedFields.length === 0) &&
+      (!action.selectedSections || action.selectedSections.length === 0)
+    ) {
+      const formattedJson = formatJsonForMarkdown(data);
+      promptParts.push(`\nFull item data:\n\`\`\`json\n${formattedJson}\n\`\`\``);
     }
 
     if (action.additionalSystemPrompt) {
@@ -512,478 +196,60 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     }
 
     setUserPrompt(promptParts.join('\n'));
-  }, [data, schema, action.agentId, action.selectedFields, action.selectedSections, action.additionalSystemPrompt]);
+  }, [data, schema, action.selectedFields, action.selectedSections, action.additionalSystemPrompt]);
 
-  // Load preload routes when agent is ready
+  // Create a single persistent portal host and append to card so the same React tree stays mounted when toggling maximize
+  const initPortalHost = React.useCallback((cardSlot: HTMLDivElement | null) => {
+    if (!cardSlot || contentHostRef.current) return;
+    const host = document.createElement('div');
+    host.className = 'min-h-0 flex flex-col overflow-y-auto';
+    host.style.maxHeight = '100%';
+    contentHostRef.current = host;
+    cardSlot.appendChild(host);
+    setPortalTarget(host);
+  }, []);
+
+  // When maximizing, move the portal host into the modal; state is preserved because we never unmount
   useEffect(() => {
-    if (agent) {
-      if (preloadRoutes.length > 0) {
-        // Merge custom preload routes with agent's preload routes
-        const mergedAgent = {
-          ...agent,
-          preloadRoutes: [
-            ...(agent.preloadRoutes || []),
-            ...preloadRoutes,
-          ],
-        };
-        loadPreloadRoutes(mergedAgent);
-      } else {
-        // Load agent's default preload routes if no custom routes
-        loadPreloadRoutes(agent);
-      }
+    if (!contentHostRef.current) return;
+    if (showMaximizeModal && modalContentRef.current) {
+      modalContentRef.current.appendChild(contentHostRef.current);
+    } else if (cardContentRef.current) {
+      cardContentRef.current.appendChild(contentHostRef.current);
     }
-  }, [agent, preloadRoutes, loadPreloadRoutes]);
+  }, [showMaximizeModal]);
 
-  // Execute agent function
-  const executeAgent = useCallback(() => {
-    if (!agent || !action.agentId || !userPrompt.trim()) return;
-
-    isCurrentlyLoadingRef.current = true;
-    const formValues: Record<string, any> = {};
-    if (language && language !== 'en') {
-      formValues['output-language'] = language;
+  const handleCloseMaximize = React.useCallback(() => {
+    if (contentHostRef.current && cardContentRef.current) {
+      cardContentRef.current.appendChild(contentHostRef.current);
     }
-    if (processedBody && Object.keys(processedBody).length > 0) {
-      Object.assign(formValues, processedBody);
-    }
-    if (processedExtraBody && Object.keys(processedExtraBody).length > 0) {
-      Object.assign(formValues, processedExtraBody);
-    }
-    generateResponse({
-      userPrompt,
-      agentId: action.agentId,
-      body: processedBody,
-      extra_body: processedExtraBody,
-      formValues: Object.keys(formValues).length > 0 ? formValues : undefined,
-    });
-    setHasExecuted(true);
-  }, [agent, action.agentId, userPrompt, processedBody, processedExtraBody, language, generateResponse]);
+    setShowMaximizeModal(false);
+  }, []);
 
-  // Track loading state
-  useEffect(() => {
-    if (isLoading) {
-      isCurrentlyLoadingRef.current = true;
-    } else if (aiResponse || error) {
-      isCurrentlyLoadingRef.current = false;
-    }
-  }, [isLoading, aiResponse, error]);
-
-  // Auto-execute when runType is 'automatic' after delay
-  useEffect(() => {
-    if (!agent || isLoadingAgent) return;
-
-    const runType = action.runType || 'manual';
-
-    // If there's already a response, mark as executed and don't re-execute
-    if (aiResponse && aiResponse.trim().length > 0) {
-      setHasExecuted(true);
-      isCurrentlyLoadingRef.current = false;
-      return;
-    }
-
-    // Don't execute if already executed, if manual mode, if currently loading, or if there's no prompt
-    if (hasExecuted || runType !== 'automatic' || isCurrentlyLoadingRef.current || !userPrompt.trim()) {
-      return;
-    }
-
-    // Clear any existing timeout
-    if (autoExecuteTimeoutRef.current) {
-      clearTimeout(autoExecuteTimeoutRef.current);
-    }
-
-    // Set timeout for ~500ms delay
-    autoExecuteTimeoutRef.current = setTimeout(() => {
-      // Double-check we're not loading before executing
-      if (!isCurrentlyLoadingRef.current) {
-        executeAgent();
-      }
-    }, 500);
-
-    return () => {
-      if (autoExecuteTimeoutRef.current) {
-        clearTimeout(autoExecuteTimeoutRef.current);
-      }
-    };
-  }, [agent, isLoadingAgent, hasExecuted, action.runType, aiResponse, executeAgent, userPrompt]);
-
-  // Handle refresh with confirmation
-  const handleRefreshClick = useCallback(() => {
-    // If currently loading, don't allow refresh
-    if (isLoading) {
-      return;
-    }
-    setShowRefreshConfirmation(true);
-  }, [isLoading]);
-
-  const handleRefreshConfirm = useCallback(() => {
-    setShowRefreshConfirmation(false);
-    setHasExecuted(false);
-    isCurrentlyLoadingRef.current = false;
-    clearResponse();
-    executeAgent();
-  }, [clearResponse, executeAgent]);
-
-  // Define variables needed for renderContent (before early returns to maintain hook order)
-  // These are safe to compute even if agent is null
-  const runType = action.runType || 'manual';
-  const hasResponse = aiResponse && aiResponse.trim().length > 0;
-  const showManualButton = runType === 'manual' && !hasResponse && !isLoading && !error;
-  const showSkeleton = isLoading || (runType === 'automatic' && !hasExecuted && !hasResponse);
-
-  // Reusable content renderer function - MUST be defined before any early returns
-  // This hook must always be called, even if agent is null
-  const renderContent = useCallback(() => {
-    // Early return inside the callback is fine - the hook itself is always called
-    if (!agent) return null;
-
-    // Check for error first - show error message instead of manual button or response
-    if (error) {
-      return (
-        <div className="flex flex-col items-center justify-center min-h-[200px] gap-4 p-6">
-          <Button
-            onClick={executeAgent}
-            size="default"
-            variant="gradient"
-          >
-            <RefreshCw className="h-4 w-4 me-2" />
-            Try Again
-          </Button>
-          <div className="text-xs text-red-600 dark:text-red-400 font-medium">
-            Error occurred while generating response
-          </div>
-          <div className="text-xs text-red-500 dark:text-red-500/80 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 max-w-2xl w-full">
-            <div className="font-semibold mb-2">Error details:</div>
-            <div className="whitespace-pre-wrap break-words">{error}</div>
-          </div>
-        </div>
-      );
-    }
-
-    if (showSkeleton) {
-      return (
-        <AnimatePresence>
-          <motion.div
-            key="loading-orb"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            className="w-full h-96 relative rounded-xl overflow-hidden"
-          >
-            <VoicePoweredOrb
-              enableVoiceControl={false}
-              className="rounded-xl overflow-hidden"
-            />
-            {agent?.loadingTextSwitches && agent.loadingTextSwitches.length > 0 && (
-              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4" dir="ltr">
-                <div className="max-w-[85%] text-center">
-                  <TextSwitcher
-                    texts={agent.loadingTextSwitches}
-                    className="text-violet-900 dark:text-white font-medium text-xs px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
-                    switchInterval={3000}
-                    transitionDuration={0.5}
-                  />
-                </div>
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
-      );
-    }
-
-    if (showManualButton) {
-      return (
-        <div className="flex items-center justify-center min-h-[200px]">
-          <Button
-            onClick={executeAgent}
-            size="default"
-            variant="gradient"
-          >
-            <Sparkles className="h-4 w-4 me-2" />
-            Do the Magic
-          </Button>
-        </div>
-      );
-    }
-
-    if (hasResponse) {
-      return (
-        <div className="w-full">
-          {shouldRenderImage ? (
-            imageData ? (
-              <div className="flex justify-center items-center w-full">
-                <div className="w-full max-w-4xl">
-                  <ImageViewer
-                    sourceUrl={imageData.url || undefined}
-                    content={imageData.b64_json || undefined}
-                    alt="AI Generated Image"
-                    objectFit="contain"
-                    className="w-full h-auto rounded-lg"
-                  />
-                </div>
-              </div>
-            ) : (
-              <CodeViewer
-                code={aiResponse}
-                programmingLanguage="json"
-                title={getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang)}
-                initialLineNumbers={10}
-              />
-            )
-          ) : shouldRenderVideo ? (
-            videoData ? (
-              <div className="flex justify-center items-center w-full">
-                <div className="w-full max-w-4xl">
-                  <VideoViewer
-                    videoId={videoData.video_id || undefined}
-                    sourceUrl={videoData.url || undefined}
-                    content={videoData.file_path || undefined}
-                    value={videoData}
-                    alt="AI Generated Video"
-                    className="w-full h-auto rounded-lg"
-                    controls={true}
-                    autoplay={false}
-                  />
-                </div>
-              </div>
-            ) : (
-              <CodeViewer
-                code={aiResponse}
-                programmingLanguage="json"
-                title={getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang)}
-                initialLineNumbers={10}
-              />
-            )
-          ) : shouldRenderGraph ? (
-            graphData ? (
-              <div className="space-y-4">
-                <div className="w-full h-[600px] min-h-[400px] rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-                  <GraphViewer
-                    data={{
-                      nodes: graphData.nodes || [],
-                      edges: graphData.edges || [],
-                      nodeTypes: graphData.nodeTypes,
-                      relationTypes: graphData.relationTypes,
-                      schemas: graphData.schemas,
-                    }}
-                    height="100%"
-                  />
-                </div>
-                <details className="text-sm">
-                  <summary className="cursor-pointer text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-                    View Raw Graph Data
-                  </summary>
-                  <div className="mt-2">
-                    <CodeViewer
-                      code={JSON.stringify(graphData, null, 2)}
-                      programmingLanguage="json"
-                      title="Raw Graph Data"
-                      initialLineNumbers={10}
-                    />
-                  </div>
-                </details>
-              </div>
-            ) : (
-              <CodeViewer
-                code={aiResponse}
-                programmingLanguage="json"
-                title={getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang)}
-                initialLineNumbers={10}
-              />
-            )
-          ) : shouldRenderTable && isValidTable && tableData.length > 0 ? (
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
-              <TableWrapper
-                tableConfig={tableConfig}
-                columns={tableColumns}
-                data={tableData}
-                showCards={false}
-                disableAnimation={false}
-              />
-            </div>
-          ) : agent?.requiredOutputFormat === 'string' ? (
-            <MarkdownViewer
-              content={cleanMarkdownResponse(aiResponse || '')}
-              showToggle={false}
-              isEditable={false}
-            />
-          ) : (
-            <CodeViewer
-              code={aiResponse}
-              programmingLanguage={agent?.requiredOutputFormat === 'json' ? 'json' : 'text'}
-              title={getT(TRANSLATION_KEYS.AI_GENERATED_CONTENT, language, defaultLang)}
-              initialLineNumbers={10}
-            />
-          )}
-        </div>
-      );
-    }
-
-    return null;
-  }, [
-    showSkeleton,
-    showManualButton,
-    hasResponse,
-    shouldRenderImage,
-    imageData,
-    shouldRenderVideo,
-    videoData,
-    shouldRenderGraph,
-    graphData,
-    shouldRenderTable,
-    isValidTable,
-    tableData,
-    tableConfig,
-    tableColumns,
-    agent,
-    aiResponse,
-    error,
-    executeAgent,
-  ]);
-
-  // For manual run type, avoid showing the orb while the agent metadata loads; show a disabled action instead
-  if (isLoadingAgent && (action.runType || 'manual') === 'manual') {
-    return (
-      <motion.div
-        initial={disableAnimation ? false : { opacity: 0, y: 20 }}
-        animate={disableAnimation ? false : { opacity: 1, y: 0 }}
-        transition={disableAnimation ? {} : {
-          duration: 0.3,
-          delay: index * 0.1
-        }}
-        className={cn(
-          className,
-          action.maxHeight && action.maxHeight > 0 ? "" : "h-full min-h-0 flex flex-col"
-        )}
-      >
-        <CardWrapper
-          config={{
-            id: action.id,
-            name: actionLabel,
-            styling: {
-              variant: 'default',
-              size: 'md'
-            }
-          }}
-          className={cn(
-            "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm",
-            action.maxHeight && action.maxHeight > 0 ? "h-auto" : "h-full min-h-0 flex flex-col"
-          )}
-        >
-          <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4 shrink-0">
-            <div className="relative flex flex-col gap-1">
-              <CardTitle className="text-sm font-semibold text-white">{actionLabel}</CardTitle>
-              <div className="flex items-center gap-2 text-xs text-white/80">
-                <Sparkles className="h-3 w-3" />
-                <span>Powered by Gradian AI</span>
-                {showModelBadge && agent?.model && (
-                  <Badge
-                    variant="outline"
-                    className="ml-1 text-[0.65rem] font-medium border-white/50 text-white bg-white/10"
-                  >
-                    {agent.model}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent
-            className="p-6"
-            style={
-              action.maxHeight && action.maxHeight > 0
-                ? undefined
-                : { flex: 1, minHeight: 0, overflowY: 'auto' }
-            }
-          >
-            <div className="flex items-center justify-center min-h-[200px]">
-              <Button
-                disabled
-                size="default"
-                variant="secondary"
-                className="gap-2"
-              >
-                <RefreshCw className="h-4 w-4 animate-spin" />
-                Loading agent...
-              </Button>
-            </div>
-          </CardContent>
-        </CardWrapper>
-      </motion.div>
-    );
-  }
-
-  // Show loading state while agent is loading (auto-run)
   if (isLoadingAgent) {
     return (
       <motion.div
         initial={disableAnimation ? false : { opacity: 0, y: 20 }}
         animate={disableAnimation ? false : { opacity: 1, y: 0 }}
-        transition={disableAnimation ? {} : {
-          duration: 0.3,
-          delay: index * 0.1
-        }}
-        className={cn(
-          className,
-          action.maxHeight && action.maxHeight > 0 ? "" : "h-full min-h-0 flex flex-col"
-        )}
+        transition={disableAnimation ? {} : { duration: 0.3, delay: index * 0.1 }}
+        className={cn(className, 'h-fit min-h-0 max-h-[65vh] flex flex-col')}
       >
         <CardWrapper
-          config={{
-            id: action.id,
-            name: actionLabel,
-            styling: {
-              variant: 'default',
-              size: 'md'
-            }
-          }}
-          className={cn(
-            "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm",
-            action.maxHeight && action.maxHeight > 0 ? "h-auto" : "h-full min-h-0 flex flex-col"
-          )}
+          config={{ id: action.id, name: actionLabel, styling: { variant: 'default', size: 'md' } }}
+          className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-700 shadow-sm h-full min-h-0 max-h-[65vh] flex flex-col"
         >
           <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4 shrink-0">
-            {/* Dotted background pattern */}
-            <div className="absolute inset-0 opacity-10 dark:opacity-15 rounded-t-xl">
-              <div
-                className="absolute inset-0 rounded-t-xl"
-                style={{
-                  backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
-                  backgroundSize: '24px 24px',
-                }}
-              />
-            </div>
-            <div className="relative flex flex-col gap-1">
-              <CardTitle className="text-sm font-semibold text-white">{actionLabel}</CardTitle>
-              <div className="flex items-center gap-1.5 text-xs text-white/80">
-                <Sparkles className="h-3 w-3" />
-                <span>Powered by Gradian AI</span>
-              </div>
+            <CardTitle className="text-sm font-semibold text-white">{actionLabel}</CardTitle>
+            <div className="flex items-center gap-2 text-xs text-white/80">
+              <Sparkles className="h-3 w-3" />
+              <span>Powered by Gradian AI</span>
             </div>
           </CardHeader>
-          <CardContent
-            className="p-6"
-            style={
-              action.maxHeight && action.maxHeight > 0
-                ? undefined
-                : { flex: 1, minHeight: 0, overflowY: 'auto' }
-            }
-          >
-            <div className="w-full h-96 relative rounded-xl overflow-hidden">
-              <VoicePoweredOrb
-                enableVoiceControl={false}
-                className="rounded-xl overflow-hidden"
-              />
-              <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none px-4" dir="ltr">
-                <div className="max-w-[85%] text-center">
-                  <TextSwitcher
-                    texts={['Loading agent...', 'Preparing AI...']} 
-                    className="text-violet-900 dark:text-white font-medium text-xs px-4 py-2 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-lg"
-                    switchInterval={3000}
-                    transitionDuration={0.5}
-                  />
-                </div>
-              </div>
-            </div>
+          <CardContent className="p-6 flex-1 min-h-0 flex items-center justify-center">
+            <Button disabled size="default" variant="secondary" className="gap-2">
+              <Sparkles className="h-4 w-4 animate-pulse" />
+              Loading agent...
+            </Button>
           </CardContent>
         </CardWrapper>
       </motion.div>
@@ -994,145 +260,107 @@ export const DynamicAiAgentResponseContainer: React.FC<DynamicAiAgentResponseCon
     return null;
   }
 
+  const builderContent = (
+    <AiBuilderWrapper
+      initialAgentId={action.agentId || agent.id}
+      initialUserPrompt={userPrompt}
+      mode="dialog"
+      additionalSystemPrompt={action.additionalSystemPrompt}
+      customPreloadRoutes={preloadRoutes}
+      showResetButton={false}
+      displayType={action.displayType || 'hideForm'}
+      runType={action.runType || 'manual'}
+      agent={agent}
+      initialBody={processedBody}
+      initialExtraBody={processedExtraBody}
+      previewOpen={isPreviewOpen}
+      onPreviewOpenChange={setIsPreviewOpen}
+      initialSelectedLanguage={
+        action.language ?? (agent.agentType === 'image-generation' ? 'en' : 'fa')
+      }
+    />
+  );
+
+  const cardContentMaxHeight =
+    action.maxHeight && action.maxHeight > 0 ? action.maxHeight : 480;
+
   return (
-    <motion.div
-      initial={disableAnimation ? false : { opacity: 0, y: 20 }}
-      animate={disableAnimation ? false : { opacity: 1, y: 0 }}
-      transition={disableAnimation ? {} : {
-        duration: 0.3,
-        delay: index * 0.1
-      }}
-      className={cn(
-        className,
-        action.maxHeight && action.maxHeight > 0 ? "" : "h-full max-h-full min-h-0 flex flex-col overflow-hidden"
-      )}
-    >
-      <CardWrapper
-        config={{
-          id: action.id,
-          name: actionLabel,
-          styling: {
-            variant: 'default',
-            size: 'md'
-          }
-        }}
-        className={cn(
-          "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm",
-          action.maxHeight && action.maxHeight > 0 ? "h-auto" : "h-full min-h-0 flex flex-col"
-        )}
+    <>
+      <motion.div
+        initial={disableAnimation ? false : { opacity: 0, y: 20 }}
+        animate={disableAnimation ? false : { opacity: 1, y: 0 }}
+        transition={disableAnimation ? {} : { duration: 0.3, delay: index * 0.1 }}
+        className={cn(className, 'h-fit min-h-0 flex flex-col')}
       >
-        <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4 shrink-0">
-          {/* Dotted background pattern */}
-          <div className="absolute inset-0 opacity-10 dark:opacity-15 rounded-t-xl">
-            <div
-              className="absolute inset-0 rounded-t-xl"
-              style={{
-                backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`,
-                backgroundSize: '24px 24px',
-              }}
-            />
-          </div>
-          <div className="relative flex items-start justify-between gap-2">
-            <div className="flex flex-col gap-1 flex-1">
-              <div className="flex items-center gap-2">
-                {action.icon && (
-                  <IconRenderer iconName={action.icon} className="h-4 w-4 text-white" />
-                )}
-                <CardTitle className="text-sm font-semibold text-white">{actionLabel}</CardTitle>
+        <CardWrapper
+          config={{ id: action.id, name: actionLabel, styling: { variant: 'default', size: 'md' } }}
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm h-fit min-h-0 flex flex-col"
+        >
+          <CardHeader className="relative bg-linear-to-r from-violet-600 to-purple-600 rounded-t-xl py-3 px-4 shrink-0">
+            <div className="relative flex items-start justify-between gap-2">
+              <div className="flex flex-col gap-1 flex-1">
+                <div className="flex items-center gap-2">
+                  {action.icon && (
+                    <IconRenderer iconName={action.icon} className="h-4 w-4 text-white" />
+                  )}
+                  <CardTitle className="text-sm font-semibold text-white">{actionLabel}</CardTitle>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-white/80">
+                  <Sparkles className="h-3 w-3" />
+                  <span>Powered by Gradian AI</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-white/80">
-                <Sparkles className="h-3 w-3" />
-                <span>Powered by Gradian AI</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setShowMaximizeDialog(true)}
-                className="h-7 w-7 p-0 text-white hover:bg-white/20 hover:text-white"
+                onClick={() => setShowMaximizeModal(true)}
+                className="h-7 w-7 p-0 text-white hover:bg-white/20 hover:text-white shrink-0"
                 title="Maximize"
               >
                 <Maximize2 className="h-3.5 w-3.5" />
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleRefreshClick}
-                disabled={isLoading}
-                className="h-7 w-7 p-0 text-white hover:bg-white/20 hover:text-white"
-                title="Refresh"
-              >
-                <RefreshCw className={cn("h-3.5 w-3.5", isLoading && "animate-spin")} />
-              </Button>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent
-          className="p-6"
-          style={
-            action.maxHeight && action.maxHeight > 0
-              ? { height: `${action.maxHeight}px`, overflowY: 'auto' }
-              : { flex: 1, minHeight: 0, overflowY: 'auto' }
-          }
-        >
-          {renderContent()}
-        </CardContent>
-      </CardWrapper>
+          </CardHeader>
+          <CardContent className="p-4 flex-1 min-h-0 flex flex-col overflow-hidden">
+            <div
+              ref={(el) => {
+                cardContentRef.current = el;
+                if (el) initPortalHost(el);
+              }}
+              className="min-h-0 flex flex-col overflow-y-auto"
+              style={{ maxHeight: cardContentMaxHeight }}
+            />
+          </CardContent>
+        </CardWrapper>
+      </motion.div>
 
-      <ConfirmationMessage
-        isOpen={showRefreshConfirmation}
-        onOpenChange={setShowRefreshConfirmation}
-        title={[{ en: 'Previous result will be lost' }, { fa: 'نتیجه قبلی از بین می‌رود' }, { ar: 'ستفقد النتيجة السابقة' }, { es: 'Se perderá el resultado anterior' }, { fr: 'Le résultat précédent sera perdu' }, { de: 'Das vorherige Ergebnis geht verloren' }, { it: 'Il risultato precedente andrà perso' }, { ru: 'Предыдущий результат будет потерян' }]}
-        message={[{ en: 'Running again will clear the current response and generate a new one. Do you want to continue?' }, { fa: 'اجرای دوباره پاسخ فعلی را پاک کرده و پاسخ جدید تولید می‌کند. ادامه می‌دهید؟' }, { ar: 'التشغيل مرة أخرى سيمسح الاستجابة الحالية وينشئ واحدة جديدة. هل تريد المتابعة؟' }, { es: 'Ejecutar de nuevo borrará la respuesta actual y generará una nueva. ¿Desea continuar?' }, { fr: 'Relancer effacera la réponse actuelle et en générera une nouvelle. Voulez-vous continuer ?' }, { de: 'Bei erneuter Ausführung wird die aktuelle Antwort gelöscht und eine neue erstellt. Möchten Sie fortfahren?' }, { it: 'Eseguire di nuovo cancellerà la risposta attuale e ne genererà una nuova. Vuoi continuare?' }, { ru: 'Повторный запуск удалит текущий ответ и создаст новый. Продолжить?' }]}
-        buttons={[
-          {
-            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
-            variant: 'outline',
-            action: () => setShowRefreshConfirmation(false),
-          },
-          {
-            label: getT(TRANSLATION_KEYS.BUTTON_REFRESH, language, defaultLang),
-            variant: 'default',
-            action: handleRefreshConfirm,
-            icon: 'RefreshCw',
-          },
-        ]}
-        size="md"
-      />
+      <Modal
+        isOpen={showMaximizeModal}
+        onClose={handleCloseMaximize}
+        title={
+          <span className="flex items-center gap-2">
+            {action.icon && (
+              <IconRenderer iconName={action.icon} className="h-5 w-5" />
+            )}
+            <span className="text-lg font-semibold">{actionLabel}</span>
+          </span>
+        }
+        size="xl"
+        enableMaximize
+        className="max-w-[95vw] max-h-[95vh] lg:max-h-[90vh] lg:max-w-[90vw]"
+      >
+        <div
+          ref={(el) => {
+            modalContentRef.current = el;
+          }}
+          className="min-h-0 flex-1 flex flex-col overflow-y-auto"
+          style={{ maxHeight: '75vh' }}
+        />
+      </Modal>
 
-      <Dialog open={showMaximizeDialog} onOpenChange={setShowMaximizeDialog}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full flex flex-col p-0">
-          <DialogHeader className="px-6 pt-6 pb-4 shrink-0 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {action.icon && (
-                  <IconRenderer iconName={action.icon} className="h-5 w-5" />
-                )}
-                <DialogTitle className="text-lg font-semibold">{actionLabel}</DialogTitle>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400">
-                <Sparkles className="h-3 w-3" />
-                <span>Powered by Gradian AI</span>
-                {showModelBadge && agent?.model && (
-                  <Badge
-                    variant="outline"
-                    className="ml-1 text-[0.65rem] font-medium"
-                  >
-                    {agent.model}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto p-6">
-            {renderContent()}
-          </div>
-        </DialogContent>
-      </Dialog>
-    </motion.div>
+      {portalTarget && createPortal(builderContent, portalTarget)}
+    </>
   );
 };
 
 DynamicAiAgentResponseContainer.displayName = 'DynamicAiAgentResponseContainer';
-

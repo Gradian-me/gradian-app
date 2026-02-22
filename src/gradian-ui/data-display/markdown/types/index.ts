@@ -55,6 +55,11 @@ export interface MarkdownViewerProps {
    * Use during streaming to avoid parse errors from incomplete diagram syntax.
    */
   deferMermaid?: boolean;
+  /**
+   * When true, content is updating incrementally (e.g. streaming). Use a stable article key
+   * so the markdown tree is not remounted on every chunk, allowing Mermaid/async blocks to finish rendering.
+   */
+  isStreaming?: boolean;
 }
 
 export interface TableParseResult {

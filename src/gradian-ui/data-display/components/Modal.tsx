@@ -54,14 +54,21 @@ export const Modal: React.FC<ModalProps> = ({
     hideDialogHeader 
       ? 'border-0 bg-white dark:bg-gray-900 shadow-none overflow-hidden rounded-none h-full w-full' // Full screen, no border, no rounded corners, no max constraints when header is hidden
       : cn(
-          'border-none bg-white dark:bg-gray-900 shadow-xl overflow-hidden rounded-none lg:rounded-2xl h-full w-full lg:max-h-[90vh] lg:max-w-[90vw]', // No rounded corners on mobile, rounded on desktop
-          // When maximized, expand on large screens to full viewport width/height
-          enableMaximize && isMaximized && 'lg:max-w-screen lg:max-h-screen'
+          'border-none bg-white dark:bg-gray-900 shadow-xl overflow-hidden rounded-none lg:rounded-2xl h-full w-full',
+          // When not maximized, use default max size (caller className can override)
+          !(enableMaximize && isMaximized) && 'lg:max-h-[90vh] lg:max-w-[90vw]',
         ),
     'mx-0', // No margin on mobile, margin on desktop
     'flex flex-col', // Add flex column layout
-    className
+    // When maximized, don't apply caller className for size so our maximized style wins
+    !(enableMaximize && isMaximized) && className
   );
+
+  // When maximized, use inline style so dialog actually resizes (overrides any className)
+  const maximizedStyle =
+    enableMaximize && isMaximized
+      ? { width: '100vw', height: '100vh', maxWidth: '100vw', maxHeight: '100vh' }
+      : undefined;
 
   // Always render DialogTitle for accessibility (Radix UI requirement)
   // Hide it visually when hideDialogHeader is true
@@ -70,7 +77,8 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className={modalClasses} 
+        className={modalClasses}
+        style={maximizedStyle}
         hideCloseButton={hideCloseButton}
         onInteractOutside={(e) => {
           if (!closeOnOutsideClick) {

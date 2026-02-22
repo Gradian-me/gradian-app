@@ -59,8 +59,13 @@ export default function CostTreemap({ data, theme }: Props) {
     ],
   };
   return (
-    <div className="w-full min-h-[280px]" style={{ height: 320 }}>
-      <ReactECharts option={option} style={{ height: '100%', width: '100%' }} opts={{ renderer: 'svg' }} />
+    <div className="w-full max-w-full min-h-[200px] overflow-hidden rounded-md" style={{ height: 320 }}>
+      <ReactECharts
+        option={option}
+        style={{ height: '100%', width: '100%', minHeight: 0 }}
+        opts={{ renderer: 'svg' }}
+        notMerge
+      />
     </div>
   );
 }

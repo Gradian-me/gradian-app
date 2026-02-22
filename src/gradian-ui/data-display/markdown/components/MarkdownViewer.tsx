@@ -84,6 +84,7 @@ export function MarkdownViewer({
   printConfig,
   onPrint,
   deferMermaid = false,
+  isStreaming = false,
 }: MarkdownViewerProps) {
   const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'raw'>('preview');
   const [headings, setHeadings] = useState<Array<{ id: string; text: string; level: number }>>([]);
@@ -400,7 +401,7 @@ export function MarkdownViewer({
           ref={markdownContentRef} 
           dir="auto" 
           className="prose prose-lg dark:prose-invert max-w-none"
-          key={displayContent} // Force re-render when content changes
+          key={isStreaming ? 'streaming' : displayContent}
         >
           <ReactMarkdown
             remarkPlugins={[

@@ -92,9 +92,6 @@ export const EXCLUDED_LOGIN_ROUTES: string[] = [
   // API health routes
   '/api/health',
   '/api/health/*',
-
-  // Lookups proxy – public so list page works without login; token still forwarded to upstream when present
-  '/api/lookups',
 ];
 
 // Routes forbidden in production environment

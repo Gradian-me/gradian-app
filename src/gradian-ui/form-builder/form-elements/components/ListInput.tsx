@@ -877,7 +877,7 @@ export const ListInput: React.FC<ListInputProps> = ({
         ) : (
           <div
             className={cn(
-              'text-xs text-gray-500 dark:text-gray-400 text-center py-6 px-4 border border-dashed rounded-xl bg-gray-50/50 dark:bg-gray-800/30',
+              'text-xs text-gray-500 dark:text-gray-400 text-center py-6 px-4 border border-dashed rounded-xl bg-gray-50 dark:bg-gray-800/30',
               error ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700'
             )}
           >

@@ -368,7 +368,7 @@ export const TodoEditDialog: React.FC<TodoEditDialogProps> = ({
                   const safeAvailableComponents = Array.isArray(availableComponents) ? availableComponents : [];
                   
                   return (
-                    <div key={param.id} className="flex items-start gap-2 p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-800/50">
+                    <div key={param.id} className="flex items-start gap-2 p-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50">
                       <div className="flex-1 space-y-2">
                         {/* Field Select */}
                         <div>

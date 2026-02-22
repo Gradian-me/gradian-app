@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { motion } from 'framer-motion';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
@@ -40,11 +40,15 @@ import {
   getLocalVsForeignByPeriod,
   getFxShockImpactByProduct,
   getLedgerImpactTornado,
+  getBomNodeMetadata,
   DEFAULT_FX_EUR_IRR,
 } from './data/scenario-engine';
 import ReactECharts from 'echarts-for-react';
 import { CHART_COLOR_PALETTE } from '@/gradian-ui/shared/constants/chart-theme';
 import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Info } from 'lucide-react';
+import type { BomNodeMetadata } from './types';
 
 type Tabs =
   | 'cost-structure'
@@ -57,8 +61,13 @@ type Tabs =
 export default function CostIntelligencePage() {
   const { resolvedTheme } = useTheme();
   const chartTheme = useMemo(() => createChartTheme(resolvedTheme === 'dark'), [resolvedTheme]);
+  const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState<Tabs>('cost-structure');
   const [periodId, setPeriodId] = useState('1403');
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [scenarioId, setScenarioId] = useState<ScenarioId>('base');
   const [productId, setProductId] = useState<string | undefined>(undefined);
   const [fxRateOverride, setFxRateOverride] = useState(DEFAULT_FX_EUR_IRR);
@@ -188,15 +197,27 @@ export default function CostIntelligencePage() {
     return pid ? getLedgerImpactTornado(periodId, pid) : [];
   }, [periodId, productId]);
 
+  const [selectedBomNode, setSelectedBomNode] = useState<BomNodeMetadata | null>(null);
+
   const bomGraph = useMemo(() => {
-    const nodes: GraphNodeData[] = products.map((p) => ({
-      id: p.id,
-      schemaId: 'product',
-      title: p.name,
-      incomplete: false,
-      parentId: p.parentId,
-      payload: { level: p.level },
-    }));
+    const fxOver =
+      scenarioId === 'fx-shock' || scenarioId === 'combined' ? fxRateOverride : undefined;
+    const nodes: GraphNodeData[] = products.map((p) => {
+      const bomMetadata = getBomNodeMetadata(periodId, scenarioId, p.id, {
+        fxRateEurToIrr: fxOver,
+      });
+      return {
+        id: p.id,
+        schemaId: 'product',
+        title: p.name,
+        incomplete: false,
+        parentId: p.parentId,
+        payload: {
+          level: p.level,
+          bomMetadata,
+        },
+      };
+    });
     const edges: GraphEdgeData[] = products
       .filter((p) => p.parentId)
       .map((p) => ({
@@ -220,7 +241,7 @@ export default function CostIntelligencePage() {
       ],
       relationTypes: [{ id: 'contains', label: 'Contains', color: 'slate', icon: 'ArrowRight' }],
     };
-  }, []);
+  }, [periodId, scenarioId, fxRateOverride]);
 
   const networkGraph = useMemo(() => {
     const nodes: GraphNodeData[] = [
@@ -330,8 +351,29 @@ export default function CostIntelligencePage() {
 
       <CostKpiCards kpis={kpis} />
 
-      <FormTabs value={activeTab} onValueChange={(v) => setActiveTab(v as Tabs)}>
-        <FormTabsList className="min-w-full bg-gray-100 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 flex-wrap">
+      {mounted ? (
+        <FormTabs value={activeTab} onValueChange={(v) => setActiveTab(v as Tabs)}>
+          <FormTabsList className="min-w-full bg-gray-100 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 flex-wrap">
+            {[
+              ['cost-structure', 'Cost Structure & BOM'],
+              ['overhead', 'Overhead'],
+              ['salary', 'Salary & Cost Center'],
+              ['fx', 'FX Exposure'],
+              ['ledger-growth', 'Ledger Growth'],
+              ['cost-center-network', 'Cost Center Network'],
+            ].map(([id, label]) => (
+              <FormTabsTrigger key={id} value={id} className="px-4 py-1.5 text-sm">
+                {label}
+              </FormTabsTrigger>
+            ))}
+          </FormTabsList>
+        </FormTabs>
+      ) : (
+        <div
+          role="tablist"
+          aria-orientation="horizontal"
+          className="min-h-10 inline-flex min-w-full items-center justify-start gap-2 rounded-lg bg-gray-100 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-800 flex-wrap ps-1 pe-1 pt-1 pb-1"
+        >
           {[
             ['cost-structure', 'Cost Structure & BOM'],
             ['overhead', 'Overhead'],
@@ -340,12 +382,19 @@ export default function CostIntelligencePage() {
             ['ledger-growth', 'Ledger Growth'],
             ['cost-center-network', 'Cost Center Network'],
           ].map(([id, label]) => (
-            <FormTabsTrigger key={id} value={id} className="px-4 py-1.5 text-sm">
+            <span
+              key={id}
+              className={
+                id === 'cost-structure'
+                  ? 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-1.5 text-sm font-medium bg-white text-violet-700 shadow-sm dark:bg-gray-700 dark:text-violet-300'
+                  : 'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300'
+              }
+            >
               {label}
-            </FormTabsTrigger>
+            </span>
           ))}
-        </FormTabsList>
-      </FormTabs>
+        </div>
+      )}
 
       {activeTab === 'cost-structure' && (
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -364,6 +413,10 @@ export default function CostIntelligencePage() {
                       relationTypes: bomGraph.relationTypes,
                     }}
                     height="100%"
+                    onNodeClick={(node) => {
+                      const meta = (node.payload as { bomMetadata?: BomNodeMetadata })?.bomMetadata;
+                      if (meta) setSelectedBomNode(meta);
+                    }}
                   />
                 </div>
               </CardContent>
@@ -384,11 +437,11 @@ export default function CostIntelligencePage() {
                 <CostMultiLine data={unitCostTrend} theme={chartTheme} />
               </CardContent>
             </Card>
-            <Card>
+            <Card className="min-w-0 overflow-hidden">
               <CardHeader>
                 <CardTitle>Hierarchical cost breakdown</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-hidden">
                 <CostTreemap data={costComposition} theme={chartTheme} />
               </CardContent>
             </Card>
@@ -860,6 +913,72 @@ export default function CostIntelligencePage() {
           </div>
         </div>
       )}
+
+      {/* BOM node metadata dialog — shown when clicking a product node in the BOM graph */}
+      <Dialog open={!!selectedBomNode} onOpenChange={(open) => !open && setSelectedBomNode(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Info className="h-5 w-5 text-violet-600 dark:text-violet-400 shrink-0" />
+              {selectedBomNode?.productName}
+            </DialogTitle>
+          </DialogHeader>
+          {selectedBomNode && (
+            <div className="space-y-4 text-sm">
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-3">
+                <div className="font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Period: {selectedBomNode.periodLabel} · Level: {selectedBomNode.level}
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-3">
+                <div>
+                  <span className="font-medium text-gray-600 dark:text-gray-400">Overhead</span>
+                  <ul className="mt-1 list-disc list-inside text-gray-900 dark:text-gray-100">
+                    <li>Direct: {formatCost(selectedBomNode.directOverhead)}</li>
+                    <li>Indirect: {formatCost(selectedBomNode.indirectOverhead)}</li>
+                  </ul>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600 dark:text-gray-400">Salary</span>
+                  <ul className="mt-1 list-disc list-inside text-gray-900 dark:text-gray-100">
+                    <li>Direct: {formatCost(selectedBomNode.directSalary)}</li>
+                    <li>Indirect: {formatCost(selectedBomNode.indirectSalary)}</li>
+                  </ul>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600 dark:text-gray-400">Material cost</span>
+                  <p className="mt-1 text-gray-900 dark:text-gray-100">
+                    {formatCost(selectedBomNode.materialCost)}
+                  </p>
+                </div>
+                <div>
+                  <span className="font-medium text-gray-600 dark:text-gray-400">
+                    Top 5 materials consumed (by price)
+                  </span>
+                  <ul className="mt-1 list-disc list-inside text-gray-900 dark:text-gray-100 space-y-0.5">
+                    {selectedBomNode.top5MaterialsByPrice.length === 0 ? (
+                      <li className="text-gray-500 dark:text-gray-400">No material consumption data</li>
+                    ) : (
+                      selectedBomNode.top5MaterialsByPrice.map((m, i) => (
+                        <li key={i}>
+                          {m.label}: {formatCost(m.amount)}
+                        </li>
+                      ))
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
+}
+
+function formatCost(amount: number): string {
+  if (amount >= 1e9) return `${(amount / 1e9).toFixed(2)}B IRR`;
+  if (amount >= 1e6) return `${(amount / 1e6).toFixed(2)}M IRR`;
+  if (amount >= 1e3) return `${(amount / 1e3).toFixed(2)}K IRR`;
+  return `${amount} IRR`;
 }

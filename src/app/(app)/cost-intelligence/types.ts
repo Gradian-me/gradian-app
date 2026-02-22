@@ -207,3 +207,25 @@ export interface ScenarioParams {
   fxRateEurToIrr: number;
   ledgerGrowthPct: Record<string, number>;
 }
+
+/** Single material consumption entry for BOM node (e.g. top 5 by price). */
+export interface BomMaterialItem {
+  label: string;
+  amount: number;
+  currency: string;
+}
+
+/** Metadata for a BOM graph node (semi-product): cost breakdown and top materials. */
+export interface BomNodeMetadata {
+  productId: string;
+  productName: string;
+  level: ProductLevel;
+  periodId: string;
+  periodLabel: string;
+  directOverhead: number;
+  indirectOverhead: number;
+  directSalary: number;
+  indirectSalary: number;
+  materialCost: number;
+  top5MaterialsByPrice: BomMaterialItem[];
+}

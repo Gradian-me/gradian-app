@@ -696,7 +696,7 @@ export default function GraphViewerPage() {
                 }}
                 className="h-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm"
               >
-                <CardHeader className="bg-gray-50/50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
+                <CardHeader className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-xl">
                   <CardTitle className="text-base font-semibold text-gray-900 dark:text-gray-200">
                     Payload Data
                   </CardTitle>

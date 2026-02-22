@@ -363,7 +363,7 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
         const scheduleFlush = () => {
           if (!scheduled) {
             scheduled = true;
-            setTimeout(flush, 50);
+            setTimeout(flush, 16); // ~60fps so streamed content appears smoothly
           }
         };
         const reader = res.body!.getReader();
@@ -996,7 +996,7 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
                 setDuration(null);
                 abortControllerRef.current = null;
               } else {
-                if (isStreamingAgent(agent ?? null) && isStreamResponse(response)) {
+                if (isStreamResponse(response)) {
                   await consumeStreamResponse(response);
                   setError(null);
                   return;
@@ -1263,7 +1263,9 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
         throw new Error(detailedError);
       }
 
-      if (isStreamingAgent(agent ?? null) && isStreamResponse(response)) {
+      // Consume as stream whenever the server sends a streaming response (response-first detection).
+      // This ensures streaming works even when agent config is missing or stale (e.g. from a different hook instance).
+      if (isStreamResponse(response)) {
         await consumeStreamResponse(response);
         return;
       }

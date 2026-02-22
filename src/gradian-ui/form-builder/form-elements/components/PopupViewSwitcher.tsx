@@ -29,7 +29,7 @@ export const PopupViewSwitcher: React.FC<PopupViewSwitcherProps> = ({
   const ariaList = getT(TRANSLATION_KEYS.ARIA_LIST_VIEW, language, defaultLang);
 
   return (
-    <div className={cn('flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-0.5 bg-gray-50/50 dark:bg-gray-800/50', className)} role="group" aria-label="View mode">
+    <div className={cn('flex items-center rounded-lg border border-gray-200 dark:border-gray-700 p-0.5 bg-gray-50 dark:bg-gray-800/50', className)} role="group" aria-label="View mode">
       <Button
         type="button"
         variant="ghost"

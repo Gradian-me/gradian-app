@@ -14,6 +14,8 @@ import type {
   CostCenterNetwork,
   SalaryComponentBarItem,
   TotalSalaryByCostCenterItem,
+  BomNodeMetadata,
+  BomMaterialItem,
 } from '../types';
 import type { Product, Period, Ledger, CostCenter } from '../types';
 import { products, periods, ledgers, costCenters } from './dimensions';
@@ -238,6 +240,52 @@ export function getVolumeUnitCostOverhead(
     });
   }
   return result;
+}
+
+const TOP_MATERIALS_COUNT = 5;
+
+/**
+ * Metadata for a single BOM node (semi-product): overhead (direct/indirect),
+ * salary (direct/indirect), material cost, and top 5 material consumption entries by price.
+ * Used to show node details when clicking a product in the BOM graph.
+ */
+export function getBomNodeMetadata(
+  periodId: string,
+  scenarioId: ScenarioId,
+  productId: string,
+  overrides?: { fxRateEurToIrr?: number; ledgerGrowthPct?: Record<string, number> }
+): BomNodeMetadata {
+  const params = getScenarioParams(scenarioId, overrides);
+  const cost = getAbsorbedCostForPeriod(periodId, params, productId);
+  const product = products.find((p) => p.id === productId);
+  const conv = (amount: number, currency: string) =>
+    currency === 'EUR' ? amount * params.fxRateEurToIrr : amount;
+  const toBase = (r: { amount: number; currency: string; amountBase?: number }) =>
+    r.currency === 'EUR' ? conv(r.amount, r.currency) : (r.amountBase ?? r.amount);
+
+  const consumptionRows = materialConsumption
+    .filter((r) => r.productId === productId)
+    .map((r) => ({
+      label: `Period ${r.periodId}`,
+      amount: toBase(r),
+      currency: 'IRR',
+    }))
+    .sort((a, b) => b.amount - a.amount)
+    .slice(0, TOP_MATERIALS_COUNT);
+
+  return {
+    productId,
+    productName: product?.name ?? productId,
+    level: product?.level ?? 'Intermediate',
+    periodId,
+    periodLabel: getPeriodLabel(periodId),
+    directOverhead: Math.round(cost.directOverhead),
+    indirectOverhead: Math.round(cost.indirectOverhead),
+    directSalary: Math.round(cost.directSalary),
+    indirectSalary: Math.round(cost.indirectSalary),
+    materialCost: Math.round(cost.material),
+    top5MaterialsByPrice: consumptionRows,
+  };
 }
 
 export function getOverheadCategoryByPeriod(

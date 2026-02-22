@@ -1174,7 +1174,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         dir={isRtl ? 'rtl' : undefined}
         className={cn(
         // Match System Section background & border by default
-        'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
+        'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800/30',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
         // Keep card variant shadows/borders but do not override background color
         styling?.variant === 'card' && 'shadow-sm dark:border-gray-700',
@@ -1282,7 +1282,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   <Badge
                     variant="outline"
                     size="sm"
-                    className="text-xs font-normal bg-gray-50/50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400"
+                    className="text-xs font-normal bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400"
                   >
                     {formattedRelationType}
                   </Badge>
@@ -1890,7 +1890,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         dir={isRtl ? 'rtl' : undefined}
         className={cn(
         // Match System Section background & border by default
-        'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
+        'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800/30',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
         // Keep card variant shadows/borders but do not override background color
         styling?.variant === 'card' && 'shadow-sm dark:border-gray-700',
@@ -2185,7 +2185,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         dir={isRtl ? 'rtl' : undefined}
         className={cn(
         // Match System Section background & border by default
-        'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
+        'border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800/30',
         styling?.variant === 'minimal' && 'border-0 shadow-none bg-transparent dark:bg-transparent',
         // Keep card variant shadows/borders but do not override background color
         styling?.variant === 'card' && 'shadow-sm dark:border-gray-700',

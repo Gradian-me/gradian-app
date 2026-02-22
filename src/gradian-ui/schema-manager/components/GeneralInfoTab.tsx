@@ -72,7 +72,7 @@ export function GeneralInfoTab({ schema, onUpdate, readonly = false }: GeneralIn
       })
     : schema.relatedTenants;
   return (
-    <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 overflow-visible">
+    <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800/30 overflow-visible">
       <CardHeader>
         <CardTitle>{titleInfo}</CardTitle>
       </CardHeader>

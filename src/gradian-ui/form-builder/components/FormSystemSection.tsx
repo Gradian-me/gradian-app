@@ -73,7 +73,7 @@ export const FormSystemSection: React.FC<FormSystemSectionProps> = ({
 
   return (
     <Card className={cn(
-      'border rounded-2xl bg-gray-50/50 dark:bg-gray-800/30',
+      'border rounded-2xl bg-gray-50 dark:bg-gray-800/30',
       'overflow-visible',
       'md:col-span-2',
       hasAnyError ? 'border-red-500 dark:border-red-500' : 'border-gray-200 dark:border-gray-700'

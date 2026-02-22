@@ -16,6 +16,50 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { replaceDynamicContext } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 import { useCompanyStore } from '@/stores/company.store';
 
+/** Keys we never show as columns when inferring from data */
+const INFERRED_FIELD_SKIP_KEYS = new Set([
+  '__relationId',
+  '__relationType',
+]);
+
+/**
+ * Infer a minimal field descriptor from a key and value for table columns.
+ * Used when the target schema has no (or empty) fields so the table can still show data.
+ */
+function inferFieldFromKeyValue(key: string, value: unknown, order: number): { id: string; name: string; label: string; component: string; order: number } {
+  const label = key
+    .replace(/([A-Z])/g, ' $1')
+    .replace(/^./, (s) => s.toUpperCase())
+    .replace(/_/g, ' ')
+    .trim();
+  let component = 'text';
+  if (typeof value === 'number') {
+    component = 'number';
+  } else if (typeof value === 'boolean') {
+    component = 'toggle';
+  } else if (value != null && Array.isArray(value) && value.length > 0) {
+    const first = value[0];
+    if (typeof first === 'object' && first !== null && ('label' in first || 'title' in first || 'name' in first)) {
+      component = 'picker';
+    }
+  } else if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}/.test(value)) {
+    component = 'date';
+  }
+  return { id: key, name: key, label, component, order };
+}
+
+/**
+ * Build a list of synthetic field descriptors from the first row of data.
+ * Used as fallback when the target schema returns no fields (e.g. production backend omits fields).
+ */
+function inferFieldsFromFirstRow(firstRow: Record<string, unknown>): any[] {
+  if (!firstRow || typeof firstRow !== 'object') return [];
+  const keys = Object.keys(firstRow).filter((k) => !INFERRED_FIELD_SKIP_KEYS.has(k));
+  return keys
+    .map((key, index) => inferFieldFromKeyValue(key, firstRow[key], index))
+    .sort((a, b) => a.order - b.order || a.label.localeCompare(b.label));
+}
+
 async function fetchSchemaClient(schemaId: string): Promise<FormSchema | null> {
   const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
   if (response.success && response.data) {
@@ -628,11 +672,20 @@ export function useRepeatingTableData(
 
     if (isRelationBased) {
       const allFields = targetSchemaData!.fields || [];
-      return allFields.filter((field: any) => !field.hidden);
+      const visible = allFields.filter((field: any) => !field.hidden);
+      // Fallback: when backend returns schema with no fields (e.g. production), infer columns from first row
+      if (visible.length === 0 && sectionData.length > 0 && sectionData[0]) {
+        const inferred = inferFieldsFromFirstRow(sectionData[0] as Record<string, unknown>);
+        if (inferred.length > 0) {
+          loggingCustom(LogType.CLIENT_LOG, 'info', `[useRepeatingTableData] No fields on schema "${targetSchemaData!.id}"; inferred ${inferred.length} columns from data`);
+          return inferred;
+        }
+      }
+      return visible;
     }
 
     return fieldsToUse;
-  }, [config.columns, fieldsToUse, isRelationBased, schemaForColumns, targetSchemaData]);
+  }, [config.columns, fieldsToUse, isRelationBased, schemaForColumns, sectionData, targetSchemaData]);
 
   const relationTypeTexts = useMemo(() => {
     if (!isRelationBased) {

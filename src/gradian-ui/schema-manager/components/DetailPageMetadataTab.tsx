@@ -291,7 +291,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
   return (
     <div className="space-y-4">
       {/* Sections */}
-      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 overflow-visible">
+      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800/30 overflow-visible">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -573,7 +573,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
       </Card>
 
       {/* Quick Actions */}
-      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 overflow-visible">
+      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800/30 overflow-visible">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -1082,7 +1082,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
       </Card>
 
       {/* Table Renderers */}
-      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 overflow-visible">
+      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800/30 overflow-visible">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -1353,7 +1353,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
       </Card>
 
       {/* Component Renderers */}
-      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 overflow-visible">
+      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800/30 overflow-visible">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -1543,7 +1543,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
       </Card>
 
       {/* Layout */}
-      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 overflow-visible">
+      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800/30 overflow-visible">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Button
@@ -1604,7 +1604,7 @@ export function DetailPageMetadataTab({ schema, onUpdate }: DetailPageMetadataTa
       </Card>
 
       {/* Header */}
-      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50/50 dark:bg-gray-800/30 overflow-visible">
+      <Card className="border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800/30 overflow-visible">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Button

@@ -78,7 +78,7 @@ export function CostKpiCards({ kpis }: Props) {
         const display = typeof value === 'number' ? item.format(value) : String(value ?? '—');
         const colors = KPI_COLORS[index % KPI_COLORS.length];
         return (
-          <Card key={item.key} className={`border-l-4 ${colors.border}`}>
+          <Card key={item.key} className={`flex h-full flex-col justify-between border-l-4 ${colors.border}`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">
                 {item.label}

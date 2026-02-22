@@ -56,10 +56,71 @@ export async function getSchemaWithClientCache(schemaId: string): Promise<FormSc
 
   const schema = response.data;
 
-  // 3) Store in IndexedDB for future requests (best-effort)
-  void schemaIndexedDbStore.set(schema.id, schema);
+  // 3) Store in IndexedDB for future requests (read-first: if not in IndexedDB we just fetched; persist so next time we hit cache)
+  try {
+    await schemaIndexedDbStore.set(schema.id, schema);
+  } catch (persistError) {
+    // Log but do not fail: caller still gets the schema; next load will hit API again
+    if (typeof console !== 'undefined' && console.warn) {
+      console.warn(`[client-schema-cache] Failed to persist schema "${schema.id}" to IndexedDB:`, persistError);
+    }
+  }
 
   return schema;
+}
+
+/**
+ * Get multiple schemas in one API call (IndexedDB first for each, then one request for missing).
+ * Use this when preloading schemas for relation tables (e.g. Tender Items, Tender Invitations)
+ * so all required schemas are loaded with a single network request.
+ *
+ * - For each requested ID: if in IndexedDB, use it; otherwise add to "missing" list.
+ * - If any missing: GET /api/schemas?includedSchemaIds=id1,id2,id3
+ * - Persist each returned schema to IndexedDB; return all (cached + fetched).
+ */
+export async function getSchemasWithClientCache(schemaIds: string[]): Promise<FormSchema[]> {
+  const ids = Array.from(new Set(schemaIds)).filter(Boolean);
+  if (ids.length === 0) {
+    return [];
+  }
+
+  const results: FormSchema[] = [];
+  const byId = new Map<string, FormSchema>();
+  const missingIds: string[] = [];
+
+  for (const id of ids) {
+    const cached = await schemaIndexedDbStore.get(id);
+    if (cached) {
+      byId.set(id, cached);
+      results.push(cached);
+    } else {
+      missingIds.push(id);
+    }
+  }
+
+  if (missingIds.length > 0) {
+    const encoded = missingIds.map((id) => encodeURIComponent(id)).join(',');
+    const response = await apiRequest<FormSchema[]>(`/api/schemas?includedSchemaIds=${encoded}`);
+    if (response.success && Array.isArray(response.data)) {
+      for (const schema of response.data) {
+        if (schema?.id) {
+          byId.set(schema.id, schema);
+          if (!results.some((s) => s.id === schema.id)) {
+            results.push(schema);
+          }
+          try {
+            await schemaIndexedDbStore.set(schema.id, schema);
+          } catch (persistError) {
+            if (typeof console !== 'undefined' && console.warn) {
+              console.warn(`[client-schema-cache] Failed to persist schema "${schema.id}" to IndexedDB:`, persistError);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return ids.map((id) => byId.get(id)!).filter(Boolean);
 }
 
 /**

@@ -68,7 +68,7 @@ export function MarkdownToolbox({
   };
 
   return (
-    <div className="flex items-center justify-between mb-4 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
+    <div className="flex flex-wrap items-center justify-between gap-2 mb-4 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700">
       <div className="flex items-center gap-2">
         {aiAgentId && hasContent && onAiAgentClick && (
           <Button
@@ -147,7 +147,6 @@ export function MarkdownToolbox({
             className="gap-2 rounded-l-md rounded-r-none border-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 data-[state=on]:bg-violet-200 dark:data-[state=on]:bg-violet-900 data-[state=on]:text-violet-800 dark:data-[state=on]:text-violet-200"
           >
             <Eye className="h-4 w-4" />
-            <span>Preview</span>
           </ToggleGroupItem>
           {showEditor && (
             <ToggleGroupItem 
@@ -156,7 +155,6 @@ export function MarkdownToolbox({
               className="gap-2 rounded-none border-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 data-[state=on]:bg-violet-200 dark:data-[state=on]:bg-violet-900 data-[state=on]:text-violet-800 dark:data-[state=on]:text-violet-200"
             >
               <Pencil className="h-4 w-4" />
-              <span>Editor</span>
             </ToggleGroupItem>
           )}
           <ToggleGroupItem 
@@ -165,7 +163,6 @@ export function MarkdownToolbox({
             className={`gap-2 ${showEditor ? 'rounded-r-md rounded-l-none' : 'rounded-r-md rounded-l-none'} border-0 bg-white dark:bg-gray-800 data-[state=on]:bg-violet-200 dark:data-[state=on]:bg-violet-900 data-[state=on]:text-violet-800 dark:data-[state=on]:text-violet-200`}
           >
             <FileCode className="h-4 w-4" />
-            <span>Raw</span>
           </ToggleGroupItem>
         </ToggleGroup>
       </div>

@@ -388,6 +388,7 @@ export async function GET(request: NextRequest) {
     }
     const schemaId = searchParams.get('id');
     const schemaIdsParam = searchParams.get('schemaIds');
+    const includedSchemaIdsParam = searchParams.get('includedSchemaIds');
     const tenantIdsParam = searchParams.get('tenantIds');
     const summaryParam = searchParams.get('summary');
     const isSummaryRequested = summaryParam === 'true' || summaryParam === '1';
@@ -476,9 +477,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // If multiple schema IDs requested, return only those schemas
-    if (schemaIdsParam) {
-      const schemaIds = schemaIdsParam
+    // If multiple schema IDs requested (schemaIds or includedSchemaIds), return only those schemas in one call
+    const multiIdParam = [schemaIdsParam, includedSchemaIdsParam].filter(Boolean).join(',');
+    if (multiIdParam) {
+      const schemaIds = multiIdParam
         .split(',')
         .map(id => id.trim())
         .filter(id => id.length > 0);

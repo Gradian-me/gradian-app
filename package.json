@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.60.003",
+  "version": "1.60.004",
   "private": true,
   "scripts": {
     "dev": "npm run clean:relations && cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack",

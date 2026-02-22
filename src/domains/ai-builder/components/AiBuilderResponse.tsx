@@ -1893,7 +1893,8 @@ export function AiBuilderResponse({
                 isEditable={!(isMainLoading ?? isLoading)}
                 onChange={handleContentChange}
                 enablePrint={true}
-                deferMermaid={isMainLoading ?? isLoading}
+                deferMermaid={false}
+                isStreaming={isMainLoading ?? isLoading}
                 printConfig={{
                   includeHeader: true,
                   documentTitle: agent?.label || aiGeneratedContentLabel,
@@ -1937,7 +1938,8 @@ export function AiBuilderResponse({
                 isEditable={!(isMainLoading ?? isLoading)}
                 onChange={handleContentChange}
                 enablePrint={true}
-                deferMermaid={isMainLoading ?? isLoading}
+                deferMermaid={false}
+                isStreaming={isMainLoading ?? isLoading}
                 printConfig={{
                   includeHeader: true,
                   documentTitle: agent?.label || aiGeneratedContentLabel,
