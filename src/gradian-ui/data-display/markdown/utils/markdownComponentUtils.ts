@@ -105,3 +105,28 @@ export function isEmptyChildren(children: React.ReactNode): boolean {
   return false;
 }
 
+/**
+ * Strip subgraph blocks from Mermaid diagram source.
+ * Keeps nodes and edges inside subgraphs so the diagram renders as a flat flowchart/graph,
+ * avoiding "Unable to render this Mermaid layout" errors caused by subgraph layout.
+ */
+export function stripMermaidSubgraphs(diagram: string): string {
+  if (!diagram || typeof diagram !== 'string') return diagram;
+  const lines = diagram.split(/\r?\n/);
+  const out: string[] = [];
+  let depth = 0;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (/^\s*subgraph\s/i.test(line)) {
+      depth++;
+      continue;
+    }
+    if (depth > 0 && /^\s*end\s*$/i.test(trimmed)) {
+      depth--;
+      continue;
+    }
+    out.push(line);
+  }
+  return out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+}
+

@@ -1893,7 +1893,7 @@ export function AiBuilderResponse({
                 isEditable={!(isMainLoading ?? isLoading)}
                 onChange={handleContentChange}
                 enablePrint={true}
-                deferMermaid={false}
+                deferMermaid={isMainLoading ?? isLoading}
                 isStreaming={isMainLoading ?? isLoading}
                 printConfig={{
                   includeHeader: true,
@@ -1938,7 +1938,7 @@ export function AiBuilderResponse({
                 isEditable={!(isMainLoading ?? isLoading)}
                 onChange={handleContentChange}
                 enablePrint={true}
-                deferMermaid={false}
+                deferMermaid={isMainLoading ?? isLoading}
                 isStreaming={isMainLoading ?? isLoading}
                 printConfig={{
                   includeHeader: true,

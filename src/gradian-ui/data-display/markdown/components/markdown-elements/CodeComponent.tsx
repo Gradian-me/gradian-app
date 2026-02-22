@@ -6,7 +6,7 @@ import 'katex/dist/katex.min.css';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { MermaidSimple } from '@/app/(app)/ui/components/mermaid-viewer/MermaidSimple';
 import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
-import { extractLanguage, extractLanguageFromNode, getCodeContent } from '../../utils/markdownComponentUtils';
+import { extractLanguage, extractLanguageFromNode, getCodeContent, stripMermaidSubgraphs } from '../../utils/markdownComponentUtils';
 import { sanitizeHtml } from '@/gradian-ui/shared/utils/html-sanitizer';
 import type { GraphNodeData, GraphEdgeData, GraphRecord } from '@/domains/graph-designer/types';
 
@@ -134,15 +134,17 @@ export function CodeComponent({
   
   // Render Mermaid diagrams (case-insensitive check). Defer to raw code when streaming to avoid parse errors from incomplete syntax.
   if (!inline && normalizedLanguage === 'mermaid') {
-    const diagram = codeContent.replace(/\n$/, '').trim();
-    if (diagram) {
+    const rawDiagram = codeContent.replace(/\n$/, '').trim();
+    if (rawDiagram) {
       if (deferMermaid) {
         return (
           <div className="my-4">
-            <CodeViewer code={diagram} programmingLanguage="mermaid" title="mermaid" />
+            <CodeViewer code={rawDiagram} programmingLanguage="mermaid" title="mermaid" />
           </div>
         );
       }
+      // Strip subgraph blocks to avoid Mermaid layout errors; render flat diagram
+      const diagram = stripMermaidSubgraphs(rawDiagram);
       return (
         <div className="my-6">
           <MermaidSimple 
