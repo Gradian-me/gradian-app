@@ -66,12 +66,13 @@ export function PromptPreviewSheet({
     setIsMounted(true);
   }, []);
 
-  // Build system prompt using centralized utility if agent is provided
-  // Only run after mount to ensure server/client consistency
+  // Build system prompt using centralized utility only when the sheet is open and agent is provided.
+  // This avoids fetching preload routes (schemas, components, organization-rag) on page load before the user clicks "Do the magic" or opens the preview.
   useEffect(() => {
-    if (!isMounted) return;
-    
+    if (!isMounted || !isOpen) return;
+
     if (agent) {
+      setBuiltSystemPrompt(legacySystemPrompt || '');
       setIsLoadingPreload(true);
       buildSystemPrompt({
         agent,
@@ -94,7 +95,7 @@ export function PromptPreviewSheet({
       setBuiltSystemPrompt(legacySystemPrompt || '');
       setIsLoadingPreload(legacyIsLoadingPreload || false);
     }
-  }, [isMounted, agent, formValues, bodyParams, baseUrl, legacySystemPrompt, legacyIsLoadingPreload]);
+  }, [isMounted, isOpen, agent, formValues, bodyParams, baseUrl, legacySystemPrompt, legacyIsLoadingPreload]);
 
   const effectiveSystemPrompt = builtSystemPrompt;
   

@@ -89,12 +89,12 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
   // Similar to AccordionFormSection.tsx
   const getColSpan = (field: any): number => {
     const gridColumns = 2; // Fixed 2-column grid for AiBuilderForm
-    
+
     // First check for explicit colSpan at field level
     if (field.colSpan != null) {
       return field.colSpan;
     }
-    
+
     // Fallback to layout.colSpan for backward compatibility
     if (field.layout?.colSpan != null) {
       return field.layout.colSpan;
@@ -102,7 +102,7 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
 
     // Then check for width percentages and convert to colSpan
     const width = field.layout?.width;
-    
+
     if (width === '100%') {
       return gridColumns; // Full width spans all columns
     } else if (width === '50%') {
@@ -116,18 +116,18 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
     } else if (width === '75%') {
       return Math.ceil((gridColumns / 4) * 3); // Three fourths width
     }
-    
+
     // Default: textarea components span full width, others span 1 column
     if (field.component === 'textarea') {
       return gridColumns;
     }
-    
+
     // Default to 1 column if no width specified
     return 1;
   };
 
   const colSpan = getColSpan(field);
-  
+
   // Generate appropriate column span class for responsive grid
   // Mobile: always full width (1 column)
   // Tablet/Desktop: respect colSpan (1 or 2 columns)
@@ -145,18 +145,18 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
   const isPromptField = field.name === 'userPrompt' || field.id === 'user-prompt';
   const customClassName = isPromptField
     ? cn(
-        'min-h-[120px] md:min-h-[140px] px-4 md:px-5 py-3 md:py-4 rounded-xl border',
-        'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm',
-        'border-violet-200/50 dark:border-violet-700/50',
-        'text-gray-900 dark:text-gray-100',
-        'placeholder:text-gray-400 dark:placeholder:text-gray-500',
-        'focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:border-violet-400',
-        'shadow-sm',
-        'transition-all duration-200',
-        'direction-auto',
-        'leading-relaxed',
-        'text-sm' // Responsive text size
-      )
+      'min-h-[120px] md:min-h-[140px] px-4 md:px-5 py-3 md:py-4 rounded-xl border',
+      'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm',
+      'border-violet-200/50 dark:border-violet-700/50',
+      'text-gray-900 dark:text-gray-100',
+      'placeholder:text-gray-400 dark:placeholder:text-gray-500',
+      'focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:border-violet-400',
+      'shadow-sm',
+      'transition-all duration-200',
+      'direction-auto',
+      'leading-relaxed',
+      'text-sm' // Responsive text size
+    )
     : undefined;
 
   // Merge required state: business rule OR validation.required
@@ -166,23 +166,23 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
   const isDisabled = fieldEffects.isDisabled || isLoading || disabled;
 
   // Check if we should show CopyContent in the label row
-  const shouldShowCopyInLabel = field.component === 'textarea' && 
-    selectedAgent?.requiredOutputFormat === 'string' && 
-    fieldValue && 
+  const shouldShowCopyInLabel = field.component === 'textarea' &&
+    selectedAgent?.requiredOutputFormat === 'string' &&
+    fieldValue &&
     String(fieldValue).trim();
 
   return (
-    <div 
+    <div
       className={cn('relative space-y-2', colSpanClass)}
     >
       {(field.label || shouldShowCopyInLabel) && (
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between">
           <div className="flex-1">
             {field.label && (
               <label
                 htmlFor={field.id || field.name}
-                className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide block"
-              >
+                className="text-xs font-semibold text-violet-700 dark:text-violet-300"
+              > 
                 {field.label}
                 {isRequired && <span className="text-red-500 ms-1">*</span>}
               </label>
@@ -213,7 +213,7 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
         required={isRequired}
         className={customClassName}
         {...(field.aiAgentId ? { aiAgentId: field.aiAgentId } : {})}
-        {...(field.component === 'textarea' ? { 
+        {...(field.component === 'textarea' ? {
           enableVoiceInput: true,
           loadingTextSwitches: selectedAgent?.loadingTextSwitches,
           canCopy: false // Disable canCopy in Textarea since we're showing it in the label row
@@ -339,7 +339,7 @@ export function AiBuilderForm({
   // State for form errors
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  
+
   // Use props for summarized prompt if provided, otherwise use local state (for backward compatibility)
   const [localSummarizedPrompt, setLocalSummarizedPrompt] = useState<string | null>(null);
   const [localIsSummarizing, setLocalIsSummarizing] = useState(false);
@@ -349,32 +349,32 @@ export function AiBuilderForm({
   // Build concatenated prompt from all field labels and values
   const buildConcatenatedPrompt = useCallback((values: Record<string, any>) => {
     if (!selectedAgent?.renderComponents || !formFields.length) return '';
-    
+
     const parts: string[] = [];
-    
+
     // Sort fields by order to maintain consistent order
     const sortedFields = [...formFields].sort((a, b) => {
       const orderA = a.order ?? 999;
       const orderB = b.order ?? 999;
       return orderA - orderB;
     });
-    
+
     sortedFields.forEach((field) => {
       // Get value from formValues, fallback to defaultValue from field config
       let fieldValue = values[field.name];
-      
+
       // Helper to check if value is empty
       const isEmpty = (val: any): boolean => {
-        return val === undefined || val === null || 
-               (typeof val === 'string' && val === '') ||
-               (Array.isArray(val) && val.length === 0);
+        return val === undefined || val === null ||
+          (typeof val === 'string' && val === '') ||
+          (Array.isArray(val) && val.length === 0);
       };
-      
+
       // If value is missing/empty and field has a defaultValue, use it
       if (isEmpty(fieldValue) && field.defaultValue !== undefined) {
         fieldValue = field.defaultValue;
       }
-      
+
       // Skip empty values (only after checking defaultValue)
       if (isEmpty(fieldValue)) {
         return;
@@ -382,15 +382,15 @@ export function AiBuilderForm({
 
       // Note: sectionId is used to determine where data goes in API calls (body/extra_body vs prompt),
       // but ALL fields should be included in the concatenated prompt for preview purposes
-      
+
       // Format the value based on field type
       let formattedValue = '';
-      
+
       // Helper function to extract label from option object, looking up from field.options if needed
       const extractLabelFromOption = (item: any, fieldOptions?: any[]): string => {
         // If item already has a label, use it
         if (item?.label) return item.label;
-        
+
         // If item has an id, try to find the label from field.options
         if (item?.id && fieldOptions && Array.isArray(fieldOptions)) {
           const option = fieldOptions.find(
@@ -398,11 +398,11 @@ export function AiBuilderForm({
           );
           if (option?.label) return option.label;
         }
-        
+
         // Fallback to id, name, value, or string representation
         return item?.id || item?.name || item?.value || String(item || '');
       };
-      
+
       // Check if this is an array component that should use TOON format
       const isArrayComponent = [
         'checkbox-list',
@@ -412,21 +412,21 @@ export function AiBuilderForm({
         'list-input',
         'picker' // Add picker to array components
       ].includes(field.component);
-      
+
       // Check if select is multiple
-      const isMultipleSelect = 
+      const isMultipleSelect =
         field.component === 'select' &&
-        (field.multiple || 
-         field.metadata?.allowMultiselect ||
-         field.selectionType === 'multiple' ||
-         field.selectionMode === 'multiple' ||
-         field.mode === 'multiple');
-      
+        (field.multiple ||
+          field.metadata?.allowMultiselect ||
+          field.selectionType === 'multiple' ||
+          field.selectionMode === 'multiple' ||
+          field.mode === 'multiple');
+
       // Check if picker allows multiselect
-      const isMultiplePicker = 
+      const isMultiplePicker =
         field.component === 'picker' &&
         (field.allowMultiselect || field.multiple);
-      
+
       if (isArrayComponent || isMultipleSelect || isMultiplePicker) {
         // For picker with objects that only have id, enrich with labels from options
         if (field.component === 'picker' && Array.isArray(fieldValue) && field.options) {
@@ -465,7 +465,7 @@ export function AiBuilderForm({
           // String/number value - look up from options
           const option = field.options?.find((opt: any) => String(opt.id) === String(fieldValue) || String(opt.value) === String(fieldValue)) as any;
           formattedValue = option?.label || String(fieldValue);
-          
+
           // Append option description if available
           if (option?.description) {
             formattedValue += `\n\n${option.description}`;
@@ -474,7 +474,7 @@ export function AiBuilderForm({
       } else if (typeof fieldValue === 'object' && fieldValue !== null) {
         // Handle single object (for toggle-group, radio, etc.)
         formattedValue = extractLabelFromOption(fieldValue, field.options);
-        
+
         // Append option description if available
         if ((fieldValue as any).description) {
           formattedValue += `\n\n${(fieldValue as any).description}`;
@@ -490,13 +490,13 @@ export function AiBuilderForm({
       } else {
         formattedValue = String(fieldValue);
       }
-      
+
       // For userPrompt field, strip any existing "User Prompt:" prefix to avoid duplication
       if ((field.name === 'userPrompt' || field.id === 'user-prompt') && formattedValue) {
         // Remove "User Prompt:" prefix if it exists (case insensitive, with optional whitespace)
         formattedValue = formattedValue.replace(/^User\s+Prompt:\s*/i, '').trim();
       }
-      
+
       // Use field name for LLM prompt (standard field config)
       // Format name: convert camelCase to Title Case (e.g., "userPrompt" -> "User Prompt")
       const formatFieldName = (name: string): string => {
@@ -505,7 +505,7 @@ export function AiBuilderForm({
           .replace(/^./, (str) => str.toUpperCase()) // Capitalize first letter
           .trim();
       };
-      
+
       const displayLabel = formatFieldName(field.name);
       if (displayLabel) {
         parts.push(`${displayLabel}: ${formattedValue}`);
@@ -513,13 +513,13 @@ export function AiBuilderForm({
         parts.push(formattedValue);
       }
     });
-    
+
     let finalPrompt = parts.join('\n\n');
-    
+
     // Check if the prompt already contains a language instruction
     // This prevents duplicating language instructions when user pastes text that already includes them
     const hasLanguageInstruction = /IMPORTANT OUTPUT LANGUAGE REQUIREMENT/i.test(finalPrompt);
-    
+
     // Add language instructions if language is specified (check common language field names)
     // Also check selectedLanguage prop as fallback
     // Only add if not already present in the prompt
@@ -536,13 +536,13 @@ export function AiBuilderForm({
         'pt': 'Portuguese',
         'ru': 'Russian'
       };
-      
+
       const languageCode = outputLanguage.trim().toLowerCase();
       const languageName = languageMap[languageCode] || languageCode.toUpperCase();
-      
+
       finalPrompt += `\n\nIMPORTANT OUTPUT LANGUAGE REQUIREMENT:\nAll output must be in ${languageName} (${languageCode.toUpperCase()}). This includes:\n- All titles, subtitles, and headings\n- All body text and descriptions\n- All user-facing content\n\nHowever, keep the following in English:\n- Professional and technical abbreviations (e.g., API, JSON, HTTP, CSS, HTML, SQL, UUID, ID, URL)\n- Industry-standard terms and acronyms (e.g., SEO, CRM, UX, UI, SDK, IDE, CLI)\n- Programming language keywords and syntax\n- Technical specification names and standards\n- Brand names and product names that are internationally recognized\n- Scientific and medical terminology abbreviations\n\nEnsure natural, fluent ${languageName} while preserving essential English technical terms.`;
     }
-    
+
     return finalPrompt;
   }, [formFields, selectedAgent?.renderComponents, selectedLanguage]);
 
@@ -552,28 +552,28 @@ export function AiBuilderForm({
   useEffect(() => {
     buildConcatenatedPromptForResetRef.current = buildConcatenatedPrompt;
   }, [buildConcatenatedPrompt]);
-  
+
   // Track previous agent ID to only reset when agent actually changes
   const prevAgentIdRef = useRef<string>(selectedAgentId);
-  
+
   useEffect(() => {
     // Only reset if agent ID actually changed
     if (prevAgentIdRef.current === selectedAgentId) {
       return;
     }
     prevAgentIdRef.current = selectedAgentId;
-    
+
     if (!selectedAgent?.renderComponents) return;
-    
+
     const fields = selectedAgent.renderComponents.filter(
       (component) => component.component && !component.route
     );
-    
+
     if (!fields.length) return;
-    
+
     const initialValues: Record<string, any> = {};
-    
-    // Initialize all fields with their defaultValues or empty values
+
+    // Build initial values: preserve values from previous agent when field id or name matches
     fields.forEach((field) => {
       if (field.name === 'userPrompt' || field.id === 'user-prompt') {
         // Extract only the actual user prompt text, not the concatenated version with metadata
@@ -583,42 +583,47 @@ export function AiBuilderForm({
         if (promptValue) {
           // Remove "User Prompt:" prefix if it exists (case insensitive, with optional whitespace)
           promptValue = promptValue.replace(/^User\s+Prompt:\s*/i, '').trim();
-          
+
           // Remove language requirement section if present (everything from "IMPORTANT OUTPUT LANGUAGE REQUIREMENT" to end)
           promptValue = promptValue.replace(/\n\nIMPORTANT OUTPUT LANGUAGE REQUIREMENT:[\s\S]*$/i, '').trim();
-          
+
           // Remove other metadata fields that might be in the prompt
           // These patterns match field labels like "Max_results: 5", "Search Type: ...", etc.
           promptValue = promptValue.replace(/\n\n(Max_results|Max Results|Search Type|Image Type|Summarize Before Search Image|Summarize Before Search|Output Language|Language):\s*[^\n]*(?:\n|$)/gi, '').trim();
-          
+
           // Remove any remaining field labels that might have been added
           // This catches any "Field Name: value" patterns that weren't caught above
           promptValue = promptValue.replace(/\n\n[A-Z][^:]+:\s*[^\n]*(?:\n|$)/g, '').trim();
         }
         initialValues[field.name] = promptValue;
       } else {
-        // Use defaultValue or empty value for other fields
-        initialValues[field.name] = field.defaultValue ?? '';
+        // Preserve value from previous agent when field has same id or name (keeps data across agent switch)
+        const preserved =
+          formValues[field.name] ?? (field.id && formValues[field.id]);
+        initialValues[field.name] =
+          preserved !== undefined ? preserved : (field.defaultValue ?? '');
       }
     });
-    
-    // Always include selectedLanguage in formValues if it's set
+
+    // Always include selectedLanguage in formValues if it's set (preserve from previous if present)
     if (selectedLanguage && selectedLanguage !== 'text') {
-      initialValues['output-language'] = selectedLanguage;
+      initialValues['output-language'] =
+        formValues['output-language'] ?? selectedLanguage;
     }
-    
-    // Initialize search configuration defaults
-    initialValues.searchType = initialValues.searchType ?? 'no-search';
-    initialValues.max_results = initialValues.max_results ?? 5;
-    // Initialize summarization toggle (default: true)
-    initialValues.summarizeBeforeSearchImage = initialValues.summarizeBeforeSearchImage ?? true;
-    
+
+    // Initialize search configuration defaults (preserve from previous agent when present)
+    initialValues.searchType = formValues.searchType ?? initialValues.searchType ?? 'no-search';
+    initialValues.max_results = formValues.max_results ?? initialValues.max_results ?? 5;
+    // Initialize summarization toggle (default: true, preserve from previous when present)
+    initialValues.summarizeBeforeSearchImage =
+      formValues.summarizeBeforeSearchImage ?? initialValues.summarizeBeforeSearchImage ?? true;
+
     setFormValues(initialValues);
-    
+
     // Reset errors and touched when agent changes
     setFormErrors({});
     setTouched({});
-    
+
     // Validate required fields after initialization
     const initialErrors: Record<string, string> = {};
     fields.forEach((field) => {
@@ -633,14 +638,14 @@ export function AiBuilderForm({
     if (Object.keys(initialErrors).length > 0) {
       setFormErrors(initialErrors);
     }
-    
+
     // Defer parent callbacks to avoid updating parent state during render
     queueMicrotask(() => {
       // Notify parent of formValues change
       if (onFormValuesChange) {
         onFormValuesChange(initialValues);
       }
-      
+
       // Don't update userPrompt here - it should only contain the actual user prompt text
       // The full concatenated prompt (with metadata) will be built when generating
       // For now, just set the user prompt to the extracted text value
@@ -651,21 +656,21 @@ export function AiBuilderForm({
         onPromptChange('');
       }
     });
-  }, [selectedAgentId, selectedAgent, userPrompt, onFormValuesChange, onPromptChange, selectedLanguage]); // Only reset when agent ID changes, not when buildConcatenatedPrompt changes
+  }, [selectedAgentId, selectedAgent, userPrompt, formValues, onFormValuesChange, onPromptChange, selectedLanguage]); // formValues: read previous agent's values to preserve across switch; guard ensures we only merge when agent changed
 
   // Track previous selectedLanguage to avoid unnecessary updates
   const prevSelectedLanguageRef = useRef<string | undefined>(selectedLanguage);
   const buildConcatenatedPromptRef = useRef(buildConcatenatedPrompt);
   const onPromptChangeRef = useRef(onPromptChange);
   const onFormValuesChangeRef = useRef(onFormValuesChange);
-  
+
   // Keep refs updated
   useEffect(() => {
     buildConcatenatedPromptRef.current = buildConcatenatedPrompt;
     onPromptChangeRef.current = onPromptChange;
     onFormValuesChangeRef.current = onFormValuesChange;
   }, [buildConcatenatedPrompt, onPromptChange, onFormValuesChange]);
-  
+
   // Sync selectedLanguage with formValues and rebuild prompt when language changes
   // This effect ONLY updates the language field and rebuilds the prompt - it does NOT touch other form values
   useEffect(() => {
@@ -674,19 +679,19 @@ export function AiBuilderForm({
       return;
     }
     prevSelectedLanguageRef.current = selectedLanguage;
-    
+
     // Use functional update to preserve ALL existing form values
     setFormValues((prevFormValues) => {
       // Create a copy to avoid mutating the previous state
       const newFormValues = { ...prevFormValues };
-      
+
       if (selectedLanguage && selectedLanguage !== 'text') {
         // Only update if language is different from current formValues
         if (newFormValues['output-language'] === selectedLanguage) {
           // Language hasn't changed, no need to update
           return prevFormValues; // Return previous to avoid unnecessary update
         }
-        
+
         // Update only the language field, preserve everything else
         newFormValues['output-language'] = selectedLanguage;
       } else {
@@ -698,19 +703,19 @@ export function AiBuilderForm({
           return prevFormValues; // Return previous to avoid unnecessary update
         }
       }
-      
+
       // Notify parent of formValues change (only language field changed)
       if (onFormValuesChangeRef.current) {
         onFormValuesChangeRef.current(newFormValues);
       }
-      
+
       // Don't update userPrompt here - it should only contain the actual user prompt text
       // The full concatenated prompt (with language instruction) will be built when generating
       // Extract just the user prompt text from formValues
       const promptFieldValue = newFormValues['userPrompt'] || newFormValues['user-prompt'] || '';
       const promptText = typeof promptFieldValue === 'string' ? promptFieldValue : String(promptFieldValue || '');
       onPromptChangeRef.current(promptText);
-      
+
       return newFormValues;
     });
   }, [selectedLanguage]); // Only depend on selectedLanguage
@@ -728,7 +733,7 @@ export function AiBuilderForm({
       prevAgentIdForInitialBuildRef.current = selectedAgentId;
       hasBuiltInitialPromptRef.current = false; // Reset for new agent
     }
-    
+
     // When agent/formFields are ready and formValues exist, extract just the user prompt text
     // Don't build the full concatenated prompt here - that will be done when generating
     if (!hasBuiltInitialPromptRef.current && selectedAgent && formFields.length > 0 && Object.keys(formValues).length > 0) {
@@ -765,12 +770,12 @@ export function AiBuilderForm({
     const isSearchEnabled = searchType && searchType !== 'no-search';
     const imageType = formValues.imageType || 'none';
     const isImageEnabled = imageType && imageType !== 'none';
-    
+
     // Only summarize if enabled and search/image is configured
     if (shouldSummarize && (isSearchEnabled || isImageEnabled) && userPrompt.trim()) {
       setLocalIsSummarizing(true);
       const abortController = new AbortController();
-      
+
       summarizePrompt(userPrompt.trim(), abortController.signal, 60000, undefined, selectedLanguage)
         .then((summary) => {
           if (!abortController.signal.aborted) {
@@ -785,7 +790,7 @@ export function AiBuilderForm({
             setLocalIsSummarizing(false);
           }
         });
-      
+
       return () => {
         abortController.abort();
       };
@@ -811,12 +816,12 @@ export function AiBuilderForm({
       }
     } else {
       // For other display types, only sync if userPrompt is different from what we would generate
-    const currentConcatenatedPrompt = buildConcatenatedPrompt(formValues);
-    if (userPrompt !== currentConcatenatedPrompt && userPrompt.trim() !== '') {
-      // If userPrompt was set externally and doesn't match our concatenated version,
-      // we might need to parse it back, but for now we'll just ignore external updates
-      // since the prompt should be built from formValues
-    }
+      const currentConcatenatedPrompt = buildConcatenatedPrompt(formValues);
+      if (userPrompt !== currentConcatenatedPrompt && userPrompt.trim() !== '') {
+        // If userPrompt was set externally and doesn't match our concatenated version,
+        // we might need to parse it back, but for now we'll just ignore external updates
+        // since the prompt should be built from formValues
+      }
     }
   }, [userPrompt, formValues, buildConcatenatedPrompt, displayType]);
 
@@ -825,25 +830,25 @@ export function AiBuilderForm({
     // Extract the actual value from NormalizedOption array for select fields
     let actualValue = value;
     const currentField = formFields.find((f) => f.name === fieldName);
-    
+
     if (currentField?.component === 'select' && Array.isArray(value) && value.length > 0) {
       // For select, extract the ID from the NormalizedOption array
       const normalizedOption = value[0];
       actualValue = normalizedOption?.id || normalizedOption?.value || value;
     }
-    
+
     const newFormValues = {
       ...formValues,
       [fieldName]: actualValue,
     };
-    
+
     // Ensure selectedLanguage is always in formValues
     if (selectedLanguage && selectedLanguage !== 'text') {
       newFormValues['output-language'] = selectedLanguage;
     }
-    
+
     setFormValues(newFormValues);
-    
+
     // Notify parent of formValues change
     if (onFormValuesChange) {
       onFormValuesChange(newFormValues);
@@ -919,7 +924,7 @@ export function AiBuilderForm({
   // Validate all required fields
   const validateAllFields = useCallback(() => {
     const errors: Record<string, string> = {};
-    
+
     formFields.forEach((field) => {
       if (field.validation?.required) {
         const value = formValues[field.name];
@@ -929,7 +934,7 @@ export function AiBuilderForm({
         }
       }
     });
-    
+
     setFormErrors((prev) => ({ ...prev, ...errors }));
     return Object.keys(errors).length === 0;
   }, [formFields, formValues, language, defaultLang]);
@@ -940,7 +945,7 @@ export function AiBuilderForm({
     if (Object.keys(formErrors).length > 0) {
       return false;
     }
-    
+
     // Then check if all required fields have values
     return formFields.every((field) => {
       if (field.validation?.required) {
@@ -977,14 +982,14 @@ export function AiBuilderForm({
         // Try both id and name as the element ID
         const textareaId = promptField.id || promptField.name;
         const textarea = document.getElementById(textareaId) as HTMLTextAreaElement;
-        
+
         if (textarea) {
           // Reset height to auto to get accurate scrollHeight
           textarea.style.height = 'auto';
           const scrollHeight = textarea.scrollHeight;
           const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 24;
           const maxHeight = lineHeight * 8; // 8 lines max
-          
+
           if (scrollHeight <= maxHeight) {
             textarea.style.height = `${scrollHeight}px`;
             textarea.style.overflowY = 'hidden';
@@ -1008,11 +1013,11 @@ export function AiBuilderForm({
     if (promptField) {
       const textareaId = promptField.id || promptField.name;
       const textarea = document.getElementById(textareaId) as HTMLTextAreaElement;
-      
+
       if (textarea) {
         const handleInput = () => resizeTextarea();
         textarea.addEventListener('input', handleInput);
-        
+
         return () => {
           clearTimeout(timeoutId);
           textarea.removeEventListener('input', handleInput);
@@ -1166,7 +1171,7 @@ export function AiBuilderForm({
                         touched={touched[agentSelectField.name]}
                         onBlur={() => handleFieldBlur(agentSelectField.name)}
                         onFocus={() => handleFieldFocus(agentSelectField.name)}
-                        className="w-full"
+                        className="w-full h-9 min-h-9"
                       />
                     </div>
                   ) : (
@@ -1195,7 +1200,7 @@ export function AiBuilderForm({
                           }
                         }}
                         disabled={isLoading || disabled}
-                        className="w-full text-sm md:text-base"
+                        className="w-full text-sm h-9 min-h-9"
                       />
                     </div>
                   ))}
@@ -1272,13 +1277,13 @@ export function AiBuilderForm({
                 })}
               </div>
             )}
-            
+
             {/* Footer Section with Model Badge and Buttons */}
             {showFooter && (
               <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center gap-3 md:gap-2 pt-2 border-t border-violet-200 dark:border-violet-400 min-w-0">
                 {/* Model Badge */}
                 {showModelBadge && selectedAgent?.model && (
-                  <Badge 
+                  <Badge
                     className={cn(
                       'shrink-0 self-start',
                       'bg-violet-100 text-cyan-700 border-cyan-200',
@@ -1289,7 +1294,7 @@ export function AiBuilderForm({
                     {selectedAgent.model}
                   </Badge>
                 )}
-                
+
                 {/* Buttons */}
                 <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 w-full md:w-auto md:flex-wrap min-w-0">
                   {onSheetOpenChange && (
@@ -1345,26 +1350,26 @@ export function AiBuilderForm({
                               } else if (typeof value === 'string') {
                                 actualValue = value;
                               }
-                              
-                                const newFormValues = {
-                                  ...formValues,
+
+                              const newFormValues = {
+                                ...formValues,
                                 [effectiveImageTypeField.name]: actualValue,
-                                };
-                                setFormValues(newFormValues);
-                                // Notify parent of formValues change
-                                if (onFormValuesChange) {
-                                  onFormValuesChange(newFormValues);
-                                }
-                              }}
-                              disabled={isLoading || disabled}
+                              };
+                              setFormValues(newFormValues);
+                              // Notify parent of formValues change
+                              if (onFormValuesChange) {
+                                onFormValuesChange(newFormValues);
+                              }
+                            }}
+                            disabled={isLoading || disabled}
                             error={formErrors[effectiveImageTypeField.name]}
                             touched={touched[effectiveImageTypeField.name]}
                             onBlur={() => handleFieldBlur(effectiveImageTypeField.name)}
                             onFocus={() => handleFieldFocus(effectiveImageTypeField.name)}
                             className="w-full"
-                            />
-                          </div>
-                        )}
+                          />
+                        </div>
+                      )}
                       {/* Search Configuration */}
                       {!hideSearchConfig && (
                         <>
@@ -1378,26 +1383,26 @@ export function AiBuilderForm({
                                   component: 'select',
                                   type: 'select',
                                   options: [
-                                    { 
-                                      id: 'no-search', 
+                                    {
+                                      id: 'no-search',
                                       label: 'No Search',
                                       icon: 'X',
                                       color: 'default'
                                     },
-                                    { 
-                                      id: 'basic', 
+                                    {
+                                      id: 'basic',
                                       label: 'Basic Search',
                                       icon: 'Search',
                                       color: 'default'
                                     },
-                                    { 
-                                      id: 'advanced', 
+                                    {
+                                      id: 'advanced',
                                       label: 'Advanced Search',
                                       icon: 'Search',
                                       color: 'default'
                                     },
-                                    { 
-                                      id: 'deep', 
+                                    {
+                                      id: 'deep',
                                       label: 'Deep Search',
                                       icon: 'Search',
                                       color: 'default'
@@ -1455,7 +1460,7 @@ export function AiBuilderForm({
                         </>
                       )}
                       {(() => {
-                        const params = selectedAgent && formValues 
+                        const params = selectedAgent && formValues
                           ? extractParametersBySectionId(selectedAgent, formValues)
                           : { body: {}, extra: {}, prompt: {} };
                         const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
@@ -1526,7 +1531,7 @@ export function AiBuilderForm({
                           onGenerate();
                           return;
                         }
-                        
+
                         // For other display types, validate all fields before generating
                         const isValid = validateAllFields();
                         if (!isValid) {

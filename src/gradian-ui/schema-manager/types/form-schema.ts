@@ -8,7 +8,7 @@ export interface FormField {
   name: string;
   label: string;
   sectionId: string; // Reference to the section this field belongs to
-  component: 'text' | 'email' | 'tel' | 'number' | 'password' | 'url' | 'textarea' | 'json' | 'select' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'datetime-local' | 'datetime' | 'file' | 'picker' | 'icon' | 'image-text' | 'image-viewer' | 'name' | 'avatar' | 'color-picker' | 'rating' | 'badge' | 'countdown' | 'code-viewer' | 'list-input' | 'tag-input' | 'toggle' | 'toggle-group' | 'switch' | 'formula' | 'checklist';
+  component: 'text' | 'search-input' | 'email' | 'tel' | 'number' | 'password' | 'url' | 'textarea' | 'json' | 'select' | 'multi-select' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'datetime-local' | 'datetime' | 'file' | 'picker' | 'popup-picker' | 'icon' | 'image-text' | 'image-viewer' | 'name' | 'avatar' | 'color-picker' | 'rating' | 'badge' | 'countdown' | 'code-viewer' | 'list-input' | 'sortable-selector' | 'tag-input' | 'toggle' | 'toggle-group' | 'switch' | 'formula' | 'checklist';
   /** Input placeholder: string or translation array [{ en: "..." }, { fa: "..." }]. */
   placeholder?: string | Array<Record<string, string>>;
   /** Localized placeholder. Same format as translations. */

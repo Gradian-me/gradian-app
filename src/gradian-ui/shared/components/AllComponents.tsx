@@ -8,6 +8,11 @@ import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
 import { cn } from '@/gradian-ui/shared/utils';
 import { ALL_COMPONENTS, ComponentMeta } from '@/gradian-ui/shared/components/component-registry';
 import { IconBox, resolveIconBoxColor } from '@/gradian-ui/form-builder/form-elements';
+
+export interface AllComponentsProps {
+  /** Pass from server to avoid hydration mismatch (registry loads only on server). */
+  initialComponents?: ComponentMeta[];
+}
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { SearchInput } from '@/gradian-ui/form-builder/form-elements/components/SearchInput';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
@@ -15,10 +20,12 @@ import { Badge } from '@/gradian-ui/form-builder/form-elements/components/Badge'
 import { Select } from '@/gradian-ui/form-builder/form-elements/components/Select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
-export const AllComponents: React.FC = () => {
+export const AllComponents: React.FC<AllComponentsProps> = ({ initialComponents }) => {
   const [isTodosPickerOpen, setTodosPickerOpen] = useState(false);
   const [isStaticPickerOpen, setStaticPickerOpen] = useState(false);
   const [lastSelection, setLastSelection] = useState<any[]>([]);
+
+  const components = initialComponents ?? ALL_COMPONENTS;
 
   const columnMap: ColumnMapConfig = useMemo(() => ({
     item: {
@@ -99,15 +106,15 @@ export const AllComponents: React.FC = () => {
   const [catalogQuery, setCatalogQuery] = useState('');
   const categories = useMemo(() => {
     const set = new Set<string>();
-    ALL_COMPONENTS.forEach(c => set.add(c.category));
+    components.forEach(c => set.add(c.category));
     return ['all', ...Array.from(set)];
-  }, []);
+  }, [components]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const filteredComponents = useMemo(() => {
     const q = catalogQuery.trim().toLowerCase();
     const base = selectedCategory === 'all'
-      ? ALL_COMPONENTS
-      : ALL_COMPONENTS.filter(c => c.category === selectedCategory);
+      ? components
+      : components.filter(c => c.category === selectedCategory);
     if (!q) return base;
     return base.filter((c) => {
       return (
@@ -119,7 +126,7 @@ export const AllComponents: React.FC = () => {
         (c.directory && c.directory.toLowerCase().includes(q))
       );
     });
-  }, [catalogQuery, selectedCategory, ALL_COMPONENTS]);
+  }, [catalogQuery, selectedCategory, components]);
 
   const groupedByCategory = useMemo(() => {
     const map = new Map<string, ComponentMeta[]>();
@@ -131,7 +138,7 @@ export const AllComponents: React.FC = () => {
   }, [filteredComponents]);
 
   const categoryOptions = useMemo(() => {
-    return categories.map(cat => ({ id: cat, label: cat.toUpperCase() }));
+    return categories.map(cat => ({ id: cat, label: cat.replace('-', ' ').toUpperCase() }));
   }, [categories]);
 
   return (
@@ -149,8 +156,8 @@ export const AllComponents: React.FC = () => {
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Overview of exported components in <code>@gradian-ui</code>.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          <div className="md:col-span-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+          <div className="flex-1 min-w-0 w-full sm:w-auto">
             <SearchInput
               config={{ name: 'components-search', placeholder: 'Search components, categories, and descriptions...' } as any}
               value={catalogQuery}
@@ -158,9 +165,9 @@ export const AllComponents: React.FC = () => {
               onClear={() => setCatalogQuery('')}
             />
           </div>
-          <div className="md:col-span-1">
+          <div className="flex-shrink-0 w-full sm:w-48">
             <Select
-              config={{ name: 'component-category', label: 'Category', allowMultiselect: false } as any}
+              config={{ name: 'component-category', label: '', allowMultiselect: false } as any}
               options={categoryOptions}
               value={selectedCategory}
               onValueChange={(val) => setSelectedCategory(String(val))}

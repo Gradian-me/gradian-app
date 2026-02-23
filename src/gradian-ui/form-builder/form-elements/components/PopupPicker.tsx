@@ -995,6 +995,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     void loadItems(pageMeta.page + 1, true);
   }, [supportsPagination, isLoading, isFetchingMore, pageMeta.hasMore, pageMeta.page, loadItems]);
 
+  // Delay (ms) between last keystroke and triggering backend search – reduces requests while typing
+  const SEARCH_DEBOUNCE_MS = 450;
+
   useEffect(() => {
     if (!isOpen || !supportsPagination) {
       return;
@@ -1017,7 +1020,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         totalItems: 0,
       }));
       void loadItems(1, false);
-    }, 120);
+    }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(handler);
   }, [isOpen, supportsPagination, searchQuery, includeKey, excludeKey, loadItems, companyKey]);
 

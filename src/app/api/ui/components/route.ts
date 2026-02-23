@@ -21,10 +21,11 @@ async function loadComponents(): Promise<any[]> {
 }
 
 /**
- * GET - Get all form-elements components or filter by category
- * Example: 
- * - GET /api/ui/components - returns all form-elements
+ * GET - Get all form-elements components or filter by category / useInRAG
+ * Example:
+ * - GET /api/ui/components - returns all components
  * - GET /api/ui/components?category=form-elements - returns only form-elements
+ * - GET /api/ui/components?useInRAG=true - returns only components with useInRAG === true (for RAG/preload)
  */
 export async function GET(request: NextRequest) {
   // Check authentication if REQUIRE_LOGIN is true
@@ -32,14 +33,15 @@ export async function GET(request: NextRequest) {
   if (authResult instanceof NextResponse) {
     return authResult; // Return 401 if not authenticated
   }
-  
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const category = searchParams.get('category');
+    const useInRAGParam = searchParams.get('useInRAG');
 
     // Load components (always fresh, no caching)
     const components = await loadComponents();
-    
+
     if (!components || components.length === 0) {
       return NextResponse.json(
         { success: false, error: 'Components file not found or empty' },
@@ -50,7 +52,12 @@ export async function GET(request: NextRequest) {
     // Filter by category if provided
     let filteredComponents = components;
     if (category) {
-      filteredComponents = components.filter((comp: any) => comp.category === category);
+      filteredComponents = filteredComponents.filter((comp: any) => comp.category === category);
+    }
+
+    // Filter by useInRAG when requested (e.g. for app-builder preload / RAG)
+    if (useInRAGParam === 'true' || useInRAGParam === '1') {
+      filteredComponents = filteredComponents.filter((comp: any) => comp.useInRAG === true);
     }
 
     return NextResponse.json({

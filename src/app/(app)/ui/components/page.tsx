@@ -1,17 +1,7 @@
-'use client';
-
 import React from 'react';
-import { AllComponents } from '@/gradian-ui/shared/components/AllComponents';
-import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
+import { ALL_COMPONENTS } from '@/gradian-ui/shared/components/component-registry';
+import { ComponentsShowcaseClient } from './ComponentsShowcaseClient';
 
 export default function ComponentsShowcasePage() {
-  useSetLayoutProps({
-    title: 'Components',
-    subtitle: 'UI components wiki and live samples',
-    icon: 'Layers',
-  });
-
-  return <AllComponents />;
+  return <ComponentsShowcaseClient components={ALL_COMPONENTS} />;
 }
-
-

@@ -11,7 +11,6 @@ interface ComponentMeta {
   description?: string;
   usecase?: string;
   category?: string;
-  componentValue: string; // The component value used in schemas (e.g., "text", "email", "picker")
 }
 
 export interface ComponentOption {
@@ -53,11 +52,10 @@ export async function fetchFormComponents(): Promise<ComponentOption[]> {
   }
 
   // Map component registry data to Select options format
-  // Use componentValue directly from JSON (single source of truth)
+  // Use id as the component value (single source of truth)
   const components = result.data
-    .filter((comp: ComponentMeta) => comp.componentValue) // Only include components with componentValue
     .map((comp: ComponentMeta) => ({
-      value: comp.componentValue as FormField['component'],
+      value: comp.id as FormField['component'],
       label: comp.label,
       description: comp.description || comp.usecase,
     }));

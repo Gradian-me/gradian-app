@@ -4,6 +4,7 @@
  */
 
 import { TRANSLATIONS } from '@/gradian-ui/shared/constants/translations';
+import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
 
 type LangRecord = Record<string, string>;
 
@@ -241,18 +242,10 @@ export function resolveDisplayLabel(
   const l = lang ?? getDefaultLanguage();
   const d = defaultLang ?? getDefaultLanguage();
   if (isTranslationArray(value)) return resolveFromTranslationsArray(value, l, d);
-  // Single-key object like { en: "Label" } – treat as one-entry translation
-  if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
-    const entries = Object.entries(value).filter(
-      ([, v]) => v != null && typeof v === 'string' && String(v).trim() !== ''
-    );
-    if (entries.length > 0) {
-      const byLang: LangRecord = Object.fromEntries(entries.map(([k, v]) => [k, String(v).trim()]));
-      if (byLang[l]) return byLang[l];
-      if (byLang[d]) return byLang[d];
-      const first = Object.values(byLang).find(Boolean);
-      if (first) return first;
-    }
+  // API localized format: array of objects (e.g. [{ en: "X", fa: "Y" }]) or record – resolve via localization
+  if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
+    const resolved = resolveLocalizedField(value as Parameters<typeof resolveLocalizedField>[0], l, d);
+    if (resolved) return resolved;
   }
   return String(value);
 }

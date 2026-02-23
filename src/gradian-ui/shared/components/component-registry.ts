@@ -173,26 +173,20 @@ export function getComponentConfigSchema(componentId: string): ComponentConfigSc
 
 /**
  * Map field component type to component registry ID
+ * Registry ids are now the canonical types; only legacy/aliases are mapped.
  */
 export function mapComponentTypeToId(componentType: string): string {
-  // Map common component types to registry IDs
-  const typeMap: Record<string, string> = {
-    'number': 'number-input',
-    'text': 'text-input',
-    'textarea': 'textarea',
-    'email': 'email-input',
-    'url': 'url',
-    'tel': 'phone-input',
-    'date': 'date-input',
-    'datetime': 'datetime',
-    'datetime-local': 'datetime',
-    'select': 'select',
-    'slider': 'slider',
-    'code-viewer': 'code-viewer',
-    'tag-input': 'tag-input',
-    'switch': 'switch',
-    'checkbox': 'checkbox',
+  const aliasMap: Record<string, string> = {
+    'phone': 'tel',
+    'datetime': 'datetime-local',
+    'multiselect': 'multi-select',
+    'file-input': 'file',
+    'multi-select-legacy': 'multi-select',
+    'datetime-input': 'datetime-local',
+    'datetime-picker-calendar': 'datetime-local',
+    'tag-input': 'tag',
+    'list-input': 'list',
+    'language': 'language-selector',
   };
-  
-  return typeMap[componentType] || componentType;
+  return aliasMap[componentType] ?? componentType;
 }

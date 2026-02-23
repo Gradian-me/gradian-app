@@ -176,7 +176,7 @@ export async function summarizePrompt(
     }
 
     try {
-      // Call professional-writing agent API
+      // Call professional-writing agent API (stream: false so we get JSON with full response for display)
       const response = await fetch('/api/ai-builder/professional-writing', {
         method: 'POST',
         headers: {
@@ -184,6 +184,7 @@ export async function summarizePrompt(
         },
         body: JSON.stringify({
           userPrompt,
+          stream: false,
           body: {
             writingStyle: 'summarizer',
           },

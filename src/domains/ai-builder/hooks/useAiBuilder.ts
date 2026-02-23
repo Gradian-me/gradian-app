@@ -546,6 +546,8 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
       const originalPrompt = finalPrompt;
       let enhancedPrompt = originalPrompt;
       let searchResultsData: SearchResult[] | null = null;
+      /** When Search agent runs search in the block below, hold response so we skip the second /api/ai-builder/search call. */
+      let firstSearchResponse: AiBuilderResponseData | null = null;
       
       // Extract output language from formValues or prompt for summarization
       const languageFieldNames = ['language', 'outputLanguage', 'output-language', 'output_language', 'outputLanguageCode', 'lang'];
@@ -585,7 +587,13 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
       // STEP 2: Summarization: Only summarize if enabled AND search/image is actually configured
       // When user explicitly enables "summarize before search/image", run summarization for any agent that has search or image
       // (including image-generator with image type set — show "Summarized Prompt" so they see the optimized prompt used for image generation)
-      const hasSearchOrImage = isSearchEnabled || isImageEnabled || isImageGeneratorWithImage;
+      // For Search and image-generator agents, always treat as search/image so summarization runs (dropdown may be "No Search" or imageType not yet set)
+      const hasSearchOrImage =
+        isSearchEnabled ||
+        isImageEnabled ||
+        isImageGeneratorWithImage ||
+        agentId === 'search' ||
+        agentId === 'image-generator';
       const shouldSummarize = request.summarizeBeforeSearchImage !== false && hasSearchOrImage;
       let summarizedPromptValue: string | null = null;
       
@@ -631,15 +639,14 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
             return promptToSummarize;
           });
           
-          // Treat "unchanged" as "no summary": when the service returns the same text (e.g. on failure/timeout),
-          // do not show it as "Summarized Prompt" so the UI and search/image use the original prompt consistently.
+          // When the service returns the same text (unchanged), still show it in the UI so the user sees "Prompt used for search"
           const isUnchanged = summarizedText.trim() === promptToSummarize.trim();
           if (isUnchanged) {
             if (isDevelopment) {
-              loggingCustom(LogType.AI_BODY_LOG, 'info', 'Summarization returned unchanged prompt (e.g. fallback), not showing as summarized');
+              loggingCustom(LogType.AI_BODY_LOG, 'info', 'Summarization returned unchanged prompt (e.g. fallback), showing original as prompt used for search');
             }
-            summarizedPromptValue = null;
-            setSummarizedPrompt(null);
+            summarizedPromptValue = null; // search/image still use originalPrompt
+            setSummarizedPrompt(originalPrompt); // show in UI so Summarized Prompt card is visible with the query that was used
             setIsSummarizing(false);
           } else {
             // If outputLanguage was passed to summarizePrompt, it will already include the language instruction
@@ -658,12 +665,12 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
             setIsSummarizing(false);
           }
         } catch (summarizeError) {
-          // If summarization fails, fallback to original prompt
+          // If summarization fails, fallback to original prompt and still show it in UI
           if (isDevelopment) {
             loggingCustom(LogType.CLIENT_LOG, 'warn', `Summarization failed, using original prompt: ${summarizeError instanceof Error ? summarizeError.message : 'Unknown error'}`);
           }
-          summarizedPromptValue = originalPrompt; // Use original unified prompt as fallback
-          setSummarizedPrompt(null);
+          summarizedPromptValue = originalPrompt; // Use original unified prompt as fallback for search/image
+          setSummarizedPrompt(originalPrompt); // show in UI so Summarized Prompt card is visible with the query that was used
           setIsSummarizing(false);
         }
       } else {
@@ -768,7 +775,8 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
               
               if (searchResponseData.success && searchResponseData.data) {
                 const builderResponse: AiBuilderResponseData = searchResponseData.data;
-                
+                firstSearchResponse = builderResponse;
+
                 // Extract search results from response
                 if (builderResponse.searchResults && Array.isArray(builderResponse.searchResults)) {
                   searchResultsData = builderResponse.searchResults;
@@ -1185,6 +1193,15 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
             setImageError(`Parallel Request Error: ${errorMessage}`);
           }
         }
+      } else if (agentId === 'search' && isSearchEnabled && firstSearchResponse) {
+        // Search agent: we already ran search above; do not call /api/ai-builder/search again (avoids second request and overwriting results)
+        setAiResponse(firstSearchResponse.response ?? '');
+        setTokenUsage(firstSearchResponse.tokenUsage ?? null);
+        setDuration(firstSearchResponse.timing?.duration ?? null);
+        if (firstSearchResponse.searchResults && Array.isArray(firstSearchResponse.searchResults)) {
+          setSearchResults(firstSearchResponse.searchResults);
+        }
+        setIsMainLoading(false);
       } else {
         // Original single request flow when imageType is not set or is "none"
         setIsMainLoading(true);

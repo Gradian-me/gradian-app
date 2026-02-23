@@ -769,13 +769,16 @@ export function AiBuilderWrapper({
             
             <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
               <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                Add Annotations
+                {getT(TRANSLATION_KEYS.AI_BUILDER_ADD_ANNOTATIONS, language, defaultLang)}
               </h4>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                {getT(TRANSLATION_KEYS.AI_BUILDER_ADD_ANNOTATIONS_DESCRIPTION, language, defaultLang)}
+              </p>
               <ListInput
                 value={currentSchemaAnnotation?.annotations || []}
                 onChange={handleModalAnnotationChange}
-                placeholder="Enter annotation..."
-                addButtonText="Add Annotation"
+                placeholder={getT(TRANSLATION_KEYS.AI_BUILDER_ANNOTATION_PLACEHOLDER, language, defaultLang)}
+                addButtonText={getT(TRANSLATION_KEYS.AI_BUILDER_ADD_ANNOTATION_BUTTON, language, defaultLang)}
                 disabled={isLoading}
               />
             </div>

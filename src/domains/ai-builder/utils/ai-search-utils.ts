@@ -44,6 +44,23 @@ export interface SearchApiResponse {
 
 const MAX_SNIPPET_LENGTH = 1200;
 
+/** Search API (e.g. Avalai) allows query length 1–8192 characters. */
+const MAX_SEARCH_QUERY_LENGTH = 8192;
+
+/**
+ * Truncate query to API limit, preferring break at newline or space.
+ */
+function truncateSearchQuery(query: string, maxLength: number = MAX_SEARCH_QUERY_LENGTH): string {
+  if (!query || query.length <= maxLength) return query;
+  const trimmed = query.slice(0, maxLength);
+  const lastNewline = trimmed.lastIndexOf('\n');
+  const lastSpace = trimmed.lastIndexOf(' ');
+  const breakAt =
+    lastNewline > maxLength * 0.5 ? lastNewline : lastSpace > maxLength * 0.5 ? lastSpace : maxLength;
+  const out = breakAt > 0 ? trimmed.slice(0, breakAt) : trimmed;
+  return (out || trimmed).trimEnd();
+}
+
 /**
  * Normalize noisy crawler snippets so cards stay readable.
  * - Removes markdown links and decorative bullets.
@@ -210,8 +227,18 @@ export async function processSearchRequest(
 
     // Extract search parameters
     const query = requestData.userPrompt || requestData.prompt || '';
-    const searchToolName = requestData.body?.search_tool_name || 'parallel_ai-search';
-    const maxResults = requestData.body?.max_results || 5;
+    // Support AI builder dropdown: searchType (basic|advanced|deep) maps to search_tool_name
+    const searchTypeToTool: Record<string, string> = {
+      basic: 'parallel_ai-search',
+      advanced: 'perplexity-search',
+      deep: 'parallel_ai-search-pro',
+    };
+    const searchType = requestData.body?.searchType;
+    const searchToolName =
+      (searchType && searchTypeToTool[searchType]) ||
+      requestData.body?.search_tool_name ||
+      'parallel_ai-search';
+    const maxResults = requestData.body?.max_results ?? 5;
 
     // Security: Sanitize and validate query
     if (!query || typeof query !== 'string') {
@@ -227,6 +254,16 @@ export async function processSearchRequest(
         success: false,
         error: 'Query cannot be empty after sanitization',
       };
+    }
+
+    // Enforce provider limit (e.g. Avalai: 1–8192 chars) to avoid 500 from search API
+    const queryForApi = truncateSearchQuery(sanitizedQuery);
+    if (queryForApi.length !== sanitizedQuery.length && isDevelopment) {
+      loggingCustom(
+        LogType.AI_BODY_LOG,
+        'info',
+        `Search query truncated from ${sanitizedQuery.length} to ${queryForApi.length} chars (max ${MAX_SEARCH_QUERY_LENGTH})`
+      );
     }
 
     // Security: Validate search_tool_name
@@ -265,7 +302,7 @@ export async function processSearchRequest(
 
     // Build request body (without search_tool_name, as it's in the URL)
     const requestBody = {
-      query: sanitizedQuery,
+      query: queryForApi,
       max_results: maxResultsNum,
     };
 

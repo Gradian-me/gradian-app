@@ -811,7 +811,7 @@ const endOfCurrentYear = new Date(new Date().getFullYear(), 11, 31);
       <section className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 space-y-4">
         <h2 className="text-lg font-semibold">All holiday options combined</h2>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          <code>firstWeekDay="sat"</code> + <code>showHolidays</code> + <code>holidayDays={['thu','fri']}</code> + <code>customHolidays</code> (e.g. New Year, Christmas). Weekday and fixed dates both show with lighter text.
+          <code>firstWeekDay="sat"</code> + <code>showHolidays</code> + <code>holidayDays={['thu', 'fri']}</code> + <code>customHolidays</code> (e.g. New Year, Christmas). Weekday and fixed dates both show with lighter text.
         </p>
         <div className="flex flex-wrap items-end gap-4">
           <DatePickerCalendar

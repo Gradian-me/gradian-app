@@ -143,7 +143,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const [isSelectOpen, setIsSelectOpen] = React.useState(false);
   // Controlled open state to prevent closing when keyboard opens (must be declared unconditionally)
   const [controlledOpen, setControlledOpen] = React.useState<boolean | undefined>(undefined);
-  const selectContentRef = React.useRef<HTMLElement | null>(null);
+  const selectContentRef = React.useRef<HTMLDivElement | null>(null);
   
   // Detect touch device
   const isTouchDevice = React.useMemo(() => {
@@ -930,7 +930,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                         e.stopPropagation();
                       }}
                       placeholder={placeholderSearchOptions}
-                      className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-700 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:border-violet-400 dark:focus:border-violet-500"
+                      className="w-full pl-8 pr-3 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-700 focus:outline-none focus:ring-1 focus:ring-violet-300 dark:focus:ring-violet-500 focus:border-violet-400 dark:focus:border-violet-500"
                     />
                     {searchValue && (
                       <button
@@ -1008,7 +1008,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                     }}
                   >
                     <SelectGroup>
-                      <SelectLabel icon={<IconRenderer iconName="Folder" className="h-5 w-5" />}>{category}</SelectLabel>
+                      <SelectLabel icon={<IconRenderer iconName="Folder" className="h-3.5 w-3.5" />}>{category}</SelectLabel>
                       {options.map((option, index) => (
                         <motion.div
                           key={option.id ?? `${category}-${index}`}

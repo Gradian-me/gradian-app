@@ -205,7 +205,10 @@ export function MarkdownNavigation({
   const scrollNavTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastActiveHashRef = useRef<string | null>(null);
   const headingTopOffsetRef = useRef(headingTopOffset);
-  headingTopOffsetRef.current = headingTopOffset;
+
+  useEffect(() => {
+    headingTopOffsetRef.current = headingTopOffset;
+  }, [headingTopOffset]);
 
   const handleNavItemClick = useCallback(
     (evt: React.MouseEvent, element: HTMLElement, hashValue: string) => {

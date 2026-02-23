@@ -129,7 +129,7 @@ export const DiscussionInputDialog: React.FC<DiscussionInputDialogProps> = ({
         </DialogHeader>
         <div className="space-y-4 py-2">
           <div>
-            <label className="text-sm font-semibold text-violet-700 dark:text-violet-300 uppercase tracking-wide block mb-2">
+            <label className="text-sm font-semibold text-violet-700 dark:text-violet-300">
               {t(TRANSLATION_KEYS.DISCUSSION_LABEL_MESSAGE)}
             </label>
             <Textarea

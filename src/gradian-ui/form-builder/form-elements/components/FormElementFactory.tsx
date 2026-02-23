@@ -16,6 +16,7 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { getLabelClasses } from '../utils/field-styles';
 import { TextInput } from './TextInput';
+import { SearchInput } from './SearchInput';
 import { Textarea } from './Textarea';
 import { JsonInput } from './JsonInput';
 import { MarkdownInput } from './MarkdownInput';
@@ -51,6 +52,8 @@ import { OTPInput } from './OTPInput';
 import { NameInput } from './NameInput';
 import { ListInput } from './ListInput';
 import { TagInput } from './TagInput';
+import { SortableSelector } from './SortableSelector';
+import type { SortableSelectorItem } from './SortableSelector';
 import { LanguageSelector } from './LanguageSelector';
 import { FormulaField } from './FormulaField';
 import { ImageViewer } from './ImageViewer';
@@ -62,6 +65,7 @@ import {
   listInputItemsToChecklist,
   listInputItemsToChecklistForSubmit,
 } from '@/gradian-ui/form-builder/form-elements/utils/checklist-value-utils';
+import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 
 // Support both config-based and field-based interfaces
 export interface FormElementFactoryProps extends Omit<FormElementProps, 'config' | 'touched'> {
@@ -165,7 +169,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         )}
         {resolvedPlaceholder && (
           <p
-            className="text-[11px] font-normal leading-snug text-gray-400 dark:text-gray-500 mt-0.5 opacity-90"
+            className="text-xs font-normal leading-snug text-gray-400 dark:text-gray-500 mt-0.5 opacity-90"
             dir="auto"
           >
             {resolvedPlaceholder}
@@ -210,6 +214,15 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           defaultLanguage={defaultLang}
         />
       );
+
+      case 'search-input':
+        return (
+          <SearchInput
+            config={configForChild}
+            {...commonProps}
+            canCopy={canCopy}
+          />
+        );
     
       case 'email':
         return <EmailInput config={configForChild} {...commonProps} canCopy={canCopy} />;
@@ -739,6 +752,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         />
       );
     
+    case 'color':
     case 'color-picker':
       return (
         <ColorPicker
@@ -842,6 +856,37 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           config={configForChild}
         />
       );
+
+    case 'sortable-selector': {
+      const options = normalizeOptionArray((config as any)?.options ?? []);
+      const optionItems: SortableSelectorItem[] = options.map((opt) => ({
+        id: String(opt.id ?? opt.label ?? ''),
+        label: resolveDisplayLabel(opt.label ?? opt.id, language, defaultLang) || String(opt.id ?? ''),
+        ...(opt.icon && { icon: <IconRenderer iconName={opt.icon} className="h-3 w-3" /> }),
+        ...(opt.color && { color: opt.color }),
+      })).filter((item) => item.id !== '');
+      const rawValue = restProps.value;
+      const selectedIds = Array.isArray(rawValue)
+        ? rawValue.map((v) => (typeof v === 'object' && v !== null && 'id' in v ? String((v as any).id) : String(v)))
+        : [];
+      const selectedItems: SortableSelectorItem[] = selectedIds
+        .map((id) => optionItems.find((o) => o.id === id) ?? { id, label: id })
+        .filter((item) => item.id !== '');
+      const availableItems = optionItems.filter((o) => !selectedIds.includes(o.id));
+      return (
+        <SortableSelector
+          config={configForChild}
+          availableItems={availableItems}
+          selectedItems={selectedItems}
+          onChange={(items) => restProps.onChange?.(items)}
+          fieldLabel={configForChild?.label ?? ''}
+          className={restProps.className}
+          sourceUrl={(config as any)?.sourceUrl}
+          queryParams={(config as any)?.queryParams}
+          transform={(config as any)?.transform}
+        />
+      );
+    }
     
     case 'tag-input':
     case 'tag':

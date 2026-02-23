@@ -41,11 +41,11 @@ function extractHost(url: string): string {
  */
 function formatDate(dateString?: string): string {
   if (!dateString) return '';
-  
+
   try {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return dateString;
-    
+
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -116,7 +116,7 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
 
             // Use a stable key based on URL or title+index to prevent re-renders
             const stableKey = result.url || `${result.title}-${index}`;
-            
+
             return (
               <motion.div
                 key={stableKey}
@@ -126,10 +126,9 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
                   duration: 0.2,
                   delay: index * 0.05,
                 }}
-                whileHover={{ y: -1 }}
                 className={cn(
-                  'group relative rounded-md border border-gray-200 dark:border-gray-700',
-                  'bg-white dark:bg-gray-800',
+                  'group relative rounded-xl border border-gray-200 dark:border-gray-700',
+                  'bg-gray-100 dark:bg-gray-700',
                   'p-3 shadow-sm hover:shadow',
                   'transition-all duration-200',
                   'overflow-hidden'
@@ -194,7 +193,7 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
                         <button
                           type="button"
                           onClick={(e) => handleShowMore(result, e)}
-                          className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium"
+                          className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium text-end w-fit bg-gray-50 dark:bg-gray-800/50 p-2 rounded-lg"
                         >
                           Show more
                         </button>
@@ -204,7 +203,7 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
                 </div>
 
                 {/* Hover effect gradient */}
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-50/0 via-violet-50/0 to-violet-50/0 dark:from-violet-950/0 dark:via-violet-950/0 dark:to-violet-950/0 group-hover:from-violet-50/50 group-hover:via-violet-50/30 group-hover:to-violet-50/50 dark:group-hover:from-violet-950/20 dark:group-hover:via-violet-950/10 dark:group-hover:to-violet-950/20 transition-all duration-300 pointer-events-none rounded-md" />
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-50/0 via-violet-50/0 to-violet-50/0 dark:from-violet-950/0 dark:via-violet-950/0 dark:to-violet-950/0 group-hover:from-violet-50/50 group-hover:via-violet-50/30 group-hover:to-violet-50/50 dark:group-hover:from-violet-950/20 dark:group-hover:via-violet-950/10 dark:group-hover:to-violet-950/20 transition-all duration-300 pointer-events-none rounded-xl" />
               </motion.div>
             );
           })}
@@ -242,10 +241,10 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
             "scrollbar-thin scrollbar-thumb-violet-300 dark:scrollbar-thumb-violet-700 scrollbar-track-transparent",
             "[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-violet-300 [&::-webkit-scrollbar-thumb]:dark:bg-violet-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
           )}
-          style={{
-            scrollbarWidth: 'thin',
-            scrollbarColor: 'rgba(139, 92, 246, 0.3) transparent'
-          }}
+            style={{
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(139, 92, 246, 0.3) transparent'
+            }}
           >
             {results.map((result, index) => {
               const host = extractHost(result.url);
@@ -254,7 +253,7 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
               const truncatedSnippet = truncateText(result.snippet, 150);
               const shouldShowMore = result.snippet.length > 150;
               const stableKey = result.url || `${result.title}-${index}`;
-              
+
               return (
                 <motion.div
                   key={stableKey}
@@ -266,7 +265,7 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
                   }}
                   whileHover={{ y: -1 }}
                   className={cn(
-                    'group relative rounded-md border border-gray-200 dark:border-gray-700',
+                    'group relative rounded-xl border border-gray-200 dark:border-gray-700',
                     'bg-white dark:bg-gray-800',
                     'p-3 shadow-sm hover:shadow',
                     'transition-all duration-200',
@@ -333,7 +332,7 @@ export function AISearchResults({ results, className }: AISearchResultsProps) {
                               });
                               setDialogOpen(true);
                             }}
-                            className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium"
+                            className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium text-end w-fit bg-gray-50 dark:bg-gray-800/50 p-2 rounded-lg"
                           >
                             Show more
                           </button>

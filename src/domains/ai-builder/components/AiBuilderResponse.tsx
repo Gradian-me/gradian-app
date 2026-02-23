@@ -9,7 +9,7 @@ import React, { useMemo, useRef, useEffect, useState, useCallback } from 'react'
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
-import { Loader2, Sparkles, Timer, Download, ExternalLink, FileText } from 'lucide-react';
+import { Loader2, Sparkles, Timer, Download, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { MetricCard } from '@/gradian-ui/analytics';
 import { ResponseCardViewer } from './ResponseCardViewer';
@@ -21,6 +21,7 @@ import { ImageViewer } from '@/gradian-ui/form-builder/form-elements/components/
 import { VideoViewer } from '@/gradian-ui/form-builder/form-elements/components/VideoViewer';
 import { GraphViewer } from '@/domains/graph-designer/components/GraphViewer';
 import { AISearchResults } from './AISearchResults';
+import { SummarizedPromptCard } from './SummarizedPromptCard';
 import { cn } from '@/gradian-ui/shared/utils';
 import { useAiResponseStore } from '@/stores/ai-response.store';
 import type { TableColumn, TableConfig } from '@/gradian-ui/data-display/table/types';
@@ -903,12 +904,32 @@ export function AiBuilderResponse({
 
   // Don't render if we have no content to display
   if (!displayContent || !displayContent.trim()) {
-    // Still render parallel image, image errors, and metrics if available
-    if (parallelImageData || imageError || (tokenUsage || videoUsage || duration !== null)) {
+    // Still render when we have parallel image, errors, metrics, or search/summarizer output (e.g. search agent with no text response)
+    const hasSearchOrSummarizerOnly = (summarizedPrompt && summarizedPrompt.trim()) || (searchResults && searchResults.length > 0) || searchError;
+    if (parallelImageData || imageError || (tokenUsage || videoUsage || duration !== null) || searchUsage || hasSearchOrSummarizerOnly) {
       return (
         <div className="space-y-4">
+          {/* Summarized Prompt - show for search agent when we have no text response but summarization ran */}
+          {summarizedPrompt && summarizedPrompt.trim() && (
+            <SummarizedPromptCard content={summarizedPrompt.trim()} />
+          )}
+
+          {/* Search Results - for search agent when response is empty but we have results */}
+          {isSearchResultsFormat && searchResults && searchResults.length > 0 && (
+            <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
+              <AISearchResults results={searchResults} />
+            </div>
+          )}
+          {isSearchResultsFormat && searchError && (
+            <div className="rounded-xl border border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/30 p-4">
+              <p className="text-sm text-orange-800 dark:text-orange-200">
+                Search Error: {searchError}
+              </p>
+            </div>
+          )}
+
           {/* Token Usage & Pricing - MetricCard */}
-          {(tokenUsage || videoUsage || duration !== null) && (
+          {(tokenUsage || videoUsage || duration !== null || searchUsage) && (
             <MetricCard
               gradient="indigo"
               metrics={[
@@ -977,6 +998,18 @@ export function AiBuilderResponse({
                   format: 'number' as const,
                   precision: duration < 1000 ? 0 : 2,
                 }] : []),
+                ...(searchUsage ? [
+                  {
+                    id: 'search-cost',
+                    label: 'Search Cost',
+                    value: searchUsage.cost,
+                    prefix: '$',
+                    icon: 'Search',
+                    iconColor: 'violet' as const,
+                    format: 'currency' as const,
+                    precision: 4,
+                  },
+                ] : []),
               ]}
               footer={{
                 icon: 'Sparkles',
@@ -1199,38 +1232,7 @@ export function AiBuilderResponse({
 
       {/* Summarized Prompt - shown before search/image results when summarization is enabled */}
       {summarizedPrompt && summarizedPrompt.trim() && (
-        <div className="relative overflow-hidden rounded-xl border border-violet-200 dark:border-violet-400 bg-gradient-to-br from-violet-50/50 via-purple-50/50 to-indigo-50/50 dark:from-violet-950/20 dark:via-purple-950/20 dark:to-indigo-950/20 backdrop-blur-sm shadow-sm">
-          <div className="absolute inset-0 bg-gradient-to-br from-violet-100/20 to-transparent dark:from-violet-900/10" />
-          <div className="relative p-5 md:p-6">
-            <div className="flex items-start gap-3 mb-3">
-              <div className="flex-shrink-0 mt-0.5">
-                <div className="rounded-lg bg-violet-100 dark:bg-violet-900/30 p-2">
-                  <FileText className="h-4 w-4 text-violet-600 dark:text-violet-400" />
-                </div>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-violet-900 dark:text-violet-200 uppercase tracking-wide mb-1">
-                      Summarized Prompt
-                    </h3>
-                    <p className="text-xs text-violet-700/70 dark:text-violet-300/70">
-                      Optimized version used for search and image generation
-                    </p>
-                  </div>
-                  <CopyContent content={summarizedPrompt.trim()} />
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 pl-11">
-              <div className="prose prose-sm dark:prose-invert max-w-none">
-                <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-wrap break-words" dir="auto">
-                  {summarizedPrompt.trim()}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <SummarizedPromptCard content={summarizedPrompt.trim()} />
       )}
 
       {/* Search Results Container - shown before everything else (only for "respond after search" flow, not for direct search agent) */}
