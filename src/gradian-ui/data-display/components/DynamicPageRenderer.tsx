@@ -347,7 +347,11 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
     return null;
   }, [searchParams]);
 
-  const [viewMode, setViewMode] = useState<DisplayViewMode>(initialViewModeFromQuery ?? 'table');
+  const defaultViewModeWhenNoQuery: DisplayViewMode =
+    schema?.allowHierarchicalParent === true ? 'hierarchy' : 'table';
+  const [viewMode, setViewMode] = useState<DisplayViewMode>(
+    initialViewModeFromQuery ?? defaultViewModeWhenNoQuery
+  );
 
   // Prevent hierarchy view if not enabled
   const handleViewModeChange = useCallback((mode: DisplayViewMode) => {
@@ -2048,7 +2052,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   useSetLayoutProps({
     title: pluralName,
     icon: schema.icon,
-    showEndLine: false,
+    showEndLine: true,
     editSchemaPath: schema.id ? `/builder/schemas/${schema.id}` : undefined,
     isAdmin,
     navigationSchemas: reconstructedNavigationSchemas,

@@ -4307,12 +4307,16 @@ If you detect ANY non-English text in the user prompt, you MUST translate it to 
     });
 
     // Some providers may return success HTTP with an empty data array for over-constrained prompts.
-    // Retry once with a compact fallback prompt before surfacing an error.
+    // Retry once with a fallback prompt that still includes the image type (e.g. lego-style) so style is preserved.
     let finalApiResult = apiResult;
     if (!apiResult.success && (apiResult.error || '').toLowerCase().includes('empty data array')) {
-      const compactPrompt = `Generate a high-quality image from this request. Keep any visible text in English only.\n\nUser Prompt: ${baseUserPrompt}`;
+      const compactUserPart = `Generate a high-quality image from this request. Keep any visible text in English only.\n\nUser Prompt: ${baseUserPrompt}`;
+      const compactPrompt =
+        imageTypePrompt && imageTypePrompt.trim()
+          ? `${imageTypePrompt.trim()}\n\nUser Prompt: ${baseUserPrompt}`
+          : compactUserPart;
       if (isDevelopment) {
-        loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-image-utils] Empty image data received. Retrying with compact prompt (len=${compactPrompt.length}).`);
+        loggingCustom(LogType.CLIENT_LOG, 'warn', `[ai-image-utils] Empty image data received. Retrying with compact prompt (len=${compactPrompt.length}), imageType preserved=${!!(imageTypePrompt && imageTypePrompt.trim())}.`);
       }
       finalApiResult = await callImageApi({
         agent,

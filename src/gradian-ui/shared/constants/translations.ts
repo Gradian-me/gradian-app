@@ -28,6 +28,7 @@ export const TRANSLATION_KEYS = {
   ACTION_MINIMIZE_VIEW: 'ACTION_MINIMIZE_VIEW',
   TITLE_SHARE_THIS_PAGE: 'TITLE_SHARE_THIS_PAGE',
   TEXT_CHECK_OUT_THIS_PAGE: 'TEXT_CHECK_OUT_THIS_PAGE',
+  MARKDOWN_NAV_ON_THIS_PAGE: 'MARKDOWN_NAV_ON_THIS_PAGE',
   BUTTON_SUBMIT: 'BUTTON_SUBMIT',
   BUTTON_CLOSE: 'BUTTON_CLOSE',
   BUTTON_BACK: 'BUTTON_BACK',
@@ -1400,6 +1401,19 @@ export const TRANSLATIONS: TranslationEntry[] = [
       { de: 'Seite ansehen' },
       { it: 'Dai un\'occhiata a questa pagina' },
       { ru: 'Посмотрите эту страницу' },
+    ],
+  },
+  {
+    key: TRANSLATION_KEYS.MARKDOWN_NAV_ON_THIS_PAGE,
+    translations: [
+      { en: 'On this page' },
+      { fa: 'در این صفحه' },
+      { ar: 'في هذه الصفحة' },
+      { es: 'En esta página' },
+      { fr: 'Sur cette page' },
+      { de: 'Auf dieser Seite' },
+      { it: 'In questa pagina' },
+      { ru: 'На этой странице' },
     ],
   },
   {

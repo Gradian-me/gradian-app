@@ -13,7 +13,6 @@ import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 import { EndLine } from '@/gradian-ui/layout/end-line/components/EndLine';
 import { createMarkdownComponents } from './MarkdownComponents';
 import { MarkdownToolbox } from './MarkdownToolbox';
-import { MarkdownNavigation } from './MarkdownNavigation';
 import { MarkdownEditor } from './MarkdownEditor';
 import { extractHeadings } from '../utils/headingExtractor';
 import { useMarkdownScrollSpy } from '../hooks/useMarkdownScrollSpy';

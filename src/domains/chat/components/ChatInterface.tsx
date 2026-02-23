@@ -122,10 +122,15 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       };
     }
     
-    // Always scroll to bottom when messages change (new message sent or received)
+    // Only auto-scroll to bottom when messages change if user is already near bottom (better UX: if they scrolled up, don’t override)
     if (messages && messages.length > 0) {
       const timeoutId = setTimeout(() => {
-        scrollMessagesToBottom('smooth');
+        const container = messagesContainerRef.current;
+        if (!container) return;
+        const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+        if (distanceFromBottom <= 120) {
+          scrollMessagesToBottom('smooth');
+        }
       }, 80);
       return () => clearTimeout(timeoutId);
     }

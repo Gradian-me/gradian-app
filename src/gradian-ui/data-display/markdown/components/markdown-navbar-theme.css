@@ -1,0 +1,121 @@
+/* Override markdown-navbar default styles to match app design (On this page, sticky nav, violet active, dark mode) */
+/* Font: inherit from app default (e.g. Estedad via font-sans) */
+
+.gradian-markdown-nav .markdown-navigation {
+  font-family: inherit;
+  font-size: 0.875rem;
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-y: visible;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.gradian-markdown-nav .markdown-navigation .title-anchor {
+  display: block;
+  color: rgb(75 85 99); /* gray-600 */
+  transition: color 0.15s, background-color 0.15s;
+  margin: 0;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 0.375rem 0.5rem;
+  padding-inline-start: 0.5rem;
+  cursor: pointer;
+  position: relative;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.dark .gradian-markdown-nav .markdown-navigation .title-anchor {
+  color: rgb(156 163 175); /* gray-400 */
+}
+
+.gradian-markdown-nav .markdown-navigation .title-anchor:hover {
+  color: rgb(17 24 39);
+  background-color: transparent;
+  text-decoration: inherit;
+}
+
+.dark .gradian-markdown-nav .markdown-navigation .title-anchor:hover {
+  color: rgb(229 231 235);
+}
+
+/* Single violet indicator: only ::before bar (no border on active to avoid double line) */
+.gradian-markdown-nav .markdown-navigation .title-anchor.active {
+  color: rgb(124 58 237); /* violet-600 */
+  font-weight: 500;
+  background-color: transparent;
+}
+
+.gradian-markdown-nav .markdown-navigation .title-anchor.active::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: -12px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: rgb(124 58 237);
+  border-radius: 1px;
+}
+
+.dark .gradian-markdown-nav .markdown-navigation .title-anchor.active {
+  color: rgb(167 139 250); /* violet-400 */
+}
+
+.dark .gradian-markdown-nav .markdown-navigation .title-anchor.active::before {
+  background-color: rgb(167 139 250);
+}
+
+.gradian-markdown-nav .markdown-navigation .title-anchor small {
+  margin: 0 0.25em 0 0;
+  opacity: 0.8;
+}
+
+/* Level indentation and size - compact tree */
+.gradian-markdown-nav .markdown-navigation .title-level1 {
+  color: rgb(75 85 99);
+  font-size: 0.875rem;
+  padding-left: 0.5rem;
+  font-weight: 500;
+}
+
+.dark .gradian-markdown-nav .markdown-navigation .title-level1 {
+  color: rgb(156 163 175);
+}
+
+.gradian-markdown-nav .markdown-navigation .title-level2 {
+  color: rgb(75 85 99);
+  font-size: 0.8125rem;
+  padding-left: 1rem;
+  font-weight: 400;
+}
+
+.dark .gradian-markdown-nav .markdown-navigation .title-level2 {
+  color: rgb(156 163 175);
+}
+
+.gradian-markdown-nav .markdown-navigation .title-level3 {
+  color: rgb(107 114 128);
+  font-size: 0.8125rem;
+  padding-left: 1.5rem;
+}
+
+.dark .gradian-markdown-nav .markdown-navigation .title-level3 {
+  color: rgb(156 163 175);
+}
+
+.gradian-markdown-nav .markdown-navigation .title-level4,
+.gradian-markdown-nav .markdown-navigation .title-level5,
+.gradian-markdown-nav .markdown-navigation .title-level6 {
+  color: rgb(107 114 128);
+  font-size: 0.75rem;
+  padding-left: 2rem;
+}
+
+.dark .gradian-markdown-nav .markdown-navigation .title-level4,
+.dark .gradian-markdown-nav .markdown-navigation .title-level5,
+.dark .gradian-markdown-nav .markdown-navigation .title-level6 {
+  color: rgb(156 163 175);
+}

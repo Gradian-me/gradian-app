@@ -683,11 +683,11 @@ function MainLayoutContent(initialProps: MainLayoutProps) {
           transition={{ duration: 0.3, ease: "easeOut" }}
           className={cn(
             "flex-1 overflow-y-auto bg-slate-100 dark:bg-gray-900",
-            hidePadding ? "p-0" : "p-2 md:p-4 lg:p-6"
+            hidePadding ? "p-0 flex flex-col min-h-0" : "p-2 md:p-4 lg:p-6"
           )}
           data-scroll-container="main-content"
         >
-          <div className="max-w-9xl mx-auto w-full">
+          <div className={cn("max-w-9xl mx-auto w-full", hidePadding && "flex-1 flex flex-col min-h-0")}>
             {children}
             {showEndLine && <EndLine />}
           </div>

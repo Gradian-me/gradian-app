@@ -54,6 +54,29 @@ function normalizeStreamingMarkdown(content: string, isStreaming: boolean): stri
   return normalized;
 }
 
+/** Returns the nearest scrollable ancestor of el, or document.documentElement for window scroll. */
+function getScrollableParent(el: HTMLElement): HTMLElement {
+  let node: HTMLElement | null = el.parentElement;
+  while (node) {
+    const style = getComputedStyle(node);
+    const overflowY = style.overflowY;
+    const isScrollable = overflowY === 'auto' || overflowY === 'scroll' || overflowY === 'overlay';
+    if (isScrollable && node.scrollHeight > node.clientHeight) return node;
+    node = node.parentElement;
+  }
+  return document.documentElement;
+}
+
+/** Prefer main layout scroll container when present so stream scroll works in app layout. */
+function getStreamScrollContainer(el: HTMLElement): HTMLElement {
+  let node: HTMLElement | null = el.parentElement;
+  while (node) {
+    if (node.getAttribute?.('data-scroll-container') === 'main-content') return node;
+    node = node.parentElement;
+  }
+  return getScrollableParent(el);
+}
+
 interface AiBuilderResponseProps {
   response: string;
   agent: AiAgent | null;
@@ -270,6 +293,7 @@ export function AiBuilderResponse({
   const prevIsLoadingRef = useRef<boolean>(isLoading);
   const lastResponseRef = useRef<string>('');
   const streamScrollAnchorRef = useRef<HTMLDivElement>(null);
+  const userWasAtBottomRef = useRef(true);
   const showModelBadge = LOG_CONFIG[LogType.AI_MODEL_LOG] === true;
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const defaultLang = getDefaultLanguage();
@@ -454,17 +478,73 @@ export function AiBuilderResponse({
     prevIsLoadingRef.current = isLoading;
   }, [isLoading, response]);
 
-  // Scroll to bottom when streaming so the latest content is visible
+  // Scroll to bottom when streaming only if user is actually at the bottom (if they scrolled up, don’t override — better UX)
+  const STREAM_AT_BOTTOM_PX = 32;
+  const STREAM_SCROLLED_UP_PX = 80;
+  useEffect(() => {
+    const isStreaming = isMainLoading ?? isLoading;
+    const el = streamScrollAnchorRef.current;
+    if (!isStreaming || !el) return;
+
+    const getDistanceFromBottom = (): number => {
+      const scrollContainer = getStreamScrollContainer(el);
+      const scrollTop =
+        scrollContainer === document.documentElement
+          ? window.scrollY ?? document.documentElement.scrollTop
+          : scrollContainer.scrollTop;
+      const scrollHeight =
+        scrollContainer === document.documentElement
+          ? document.documentElement.scrollHeight
+          : scrollContainer.scrollHeight;
+      const clientHeight =
+        scrollContainer === document.documentElement
+          ? window.innerHeight
+          : scrollContainer.clientHeight;
+      return scrollHeight - scrollTop - clientHeight;
+    };
+
+    const onScroll = () => {
+      const d = getDistanceFromBottom();
+      if (d <= STREAM_AT_BOTTOM_PX) userWasAtBottomRef.current = true;
+      else if (d > STREAM_SCROLLED_UP_PX) userWasAtBottomRef.current = false;
+    };
+
+    const scrollContainer = getStreamScrollContainer(el);
+    if (scrollContainer === document.documentElement) {
+      window.addEventListener('scroll', onScroll, { passive: true });
+      return () => window.removeEventListener('scroll', onScroll);
+    }
+    scrollContainer.addEventListener('scroll', onScroll, { passive: true });
+    return () => scrollContainer.removeEventListener('scroll', onScroll);
+  }, [isMainLoading, isLoading, displayContent?.length]);
+
   useEffect(() => {
     if (!(isMainLoading ?? isLoading) || !displayContent?.trim() || !streamScrollAnchorRef.current) {
       return;
     }
+    if (!userWasAtBottomRef.current) return;
+
     const el = streamScrollAnchorRef.current;
     const id = requestAnimationFrame(() => {
-      el.scrollIntoView({ behavior: 'auto', block: 'end' });
+      const scrollContainer = getStreamScrollContainer(el);
+      if (scrollContainer === document.documentElement) {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight - window.innerHeight,
+          behavior: 'auto',
+        });
+      } else {
+        scrollContainer.scrollTop = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+      }
     });
     return () => cancelAnimationFrame(id);
   }, [displayContent, isMainLoading, isLoading]);
+
+  // When streaming ends, reset so next stream will auto-scroll from the start
+  useEffect(() => {
+    if (!(isMainLoading ?? isLoading)) {
+      userWasAtBottomRef.current = true;
+    }
+  }, [isMainLoading, isLoading]);
 
   // Helper function to format image type label
   const getImageTypeLabel = (type?: string): string => {

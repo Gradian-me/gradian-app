@@ -21,7 +21,7 @@ import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { truncateText } from '@/gradian-ui/shared/utils/text-utils';
 import { formatSearchResultsToToon, type SearchResult } from '../utils/ai-search-utils';
-import { summarizePrompt } from '../utils/ai-summarization-utils';
+import { summarizePrompt, extractUserContentFromBuiltPrompt } from '../utils/ai-summarization-utils';
 import { buildStandardizedPrompt } from '../utils/prompt-builder';
 import { ORGANIZATION_RAG_PROMPT } from '../utils/ai-chat-utils';
 
@@ -82,7 +82,7 @@ interface UseAiBuilderReturn {
   generateResponse: (request: GeneratePromptRequest) => Promise<void>;
   stopGeneration: () => void;
   approveResponse: (response: string, agent: AiAgent) => Promise<void>;
-  loadPreloadRoutes: (agent: AiAgent) => Promise<void>;
+  loadPreloadRoutes: (agent: AiAgent) => Promise<string>;
   clearResponse: () => void;
   clearError: () => void;
   clearSuccessMessage: () => void;
@@ -131,10 +131,10 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
   const user = useUserStore((state) => state.user);
   const { createPrompt } = useAiPrompts(undefined, { autoFetch: false });
 
-  const loadPreloadRoutes = useCallback(async (agent: AiAgent) => {
+  const loadPreloadRoutes = useCallback(async (agent: AiAgent): Promise<string> => {
     if (!agent.preloadRoutes || !Array.isArray(agent.preloadRoutes) || agent.preloadRoutes.length === 0) {
       setPreloadedContext('');
-      return;
+      return '';
     }
 
     setIsLoadingPreload(true);
@@ -276,15 +276,20 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
         : '';
       
       setPreloadedContext(context);
+      return context;
     } catch (error) {
       loggingCustom(LogType.CLIENT_LOG, 'error', `Error loading preload routes: ${error instanceof Error ? error.message : String(error)}`);
       setPreloadedContext('');
+      return '';
     } finally {
       setIsLoadingPreload(false);
     }
   }, []);
 
   const generateResponse = useCallback(async (request: GeneratePromptRequest) => {
+    // Use context from request when provided (e.g. after loading RAG on "Do the magic"), otherwise from state
+    const effectivePreloadedContext = request.preloadedContext ?? preloadedContext;
+
     // Check if we have either a userPrompt OR formValues that can build a prompt
     // The prompt will be built from formValues on the server side if userPrompt is empty
     const hasUserPrompt = request.userPrompt && request.userPrompt.trim();
@@ -335,8 +340,10 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
       const isSearchEnabled = searchType && searchType !== 'no-search';
       
       // Check if image generation is enabled
+      // For non-image-generator agents: image is an optional add-on. For image-generator: image is the main output when imageType is set.
       const imageType = request.imageType || request.body?.imageType;
       const isImageEnabled = imageType && imageType !== 'none' && agentId !== 'image-generator';
+      const isImageGeneratorWithImage = agentId === 'image-generator' && imageType && imageType !== 'none';
       
       // STEP 1: Build unified final prompt from formValues or userPrompt
       // This is the single source of truth for the prompt
@@ -576,10 +583,10 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
         : originalPrompt;
       
       // STEP 2: Summarization: Only summarize if enabled AND search/image is actually configured
-      // Skip summarization for non-text output agents (image-generator, graph-generator, video-generator)
-      // as these agents don't produce text and summarizing their prompts can distort the image generation instructions
-      const isNonTextOutputAgent = agentId === 'image-generator' || agentId === 'graph-generator' || agentId === 'video-generator';
-      const shouldSummarize = request.summarizeBeforeSearchImage !== false && !isNonTextOutputAgent && (isSearchEnabled || isImageEnabled);
+      // When user explicitly enables "summarize before search/image", run summarization for any agent that has search or image
+      // (including image-generator with image type set — show "Summarized Prompt" so they see the optimized prompt used for image generation)
+      const hasSearchOrImage = isSearchEnabled || isImageEnabled || isImageGeneratorWithImage;
+      const shouldSummarize = request.summarizeBeforeSearchImage !== false && hasSearchOrImage;
       let summarizedPromptValue: string | null = null;
       
       if (shouldSummarize) {
@@ -592,14 +599,15 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
         try {
           // Extract organization RAG from preloaded context if available
           // Pass it to summarizePrompt to avoid duplicate API calls
-          const organizationRag = extractOrganizationRagFromPreloadedContext(preloadedContext);
+          const organizationRag = extractOrganizationRagFromPreloadedContext(effectivePreloadedContext);
           
           // Use shorter timeout (20 seconds) to fail fast if summarization is slow
           // Use Promise.race with a timeout to ensure we don't wait too long
-          // Summarize the prompt WITHOUT language instruction (to avoid confusion in summarization)
-          // Pass outputLanguage directly to summarizePrompt so it can add the language instruction internally
+          // Summarize only the actual user content (strip "Writing Style: Summarizer" / instruction prefix)
+          // so the summarizer receives the text to summarize, not the form-built wrapper.
+          const promptToSummarize = extractUserContentFromBuiltPrompt(promptWithoutLanguage) || promptWithoutLanguage;
           const summarizationPromise = summarizePrompt(
-            promptWithoutLanguage, // Use prompt without language instruction for cleaner summarization
+            promptToSummarize,
             abortController.signal,
             20000, // Reduced to 20 seconds for faster fallback
             organizationRag, // Pass preloaded organization RAG to avoid duplicate fetch
@@ -616,29 +624,39 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
             summarizationPromise,
             timeoutPromise
           ]).catch((error) => {
-            // If summarization fails or times out, fallback to original prompt (without language instruction)
+            // If summarization fails or times out, return the same content we sent so isUnchanged is true
             if (isDevelopment) {
               loggingCustom(LogType.CLIENT_LOG, 'warn', `Summarization failed or timed out: ${error instanceof Error ? error.message : 'Unknown error'}`);
             }
-            return promptWithoutLanguage; // Return prompt without language instruction as fallback
+            return promptToSummarize;
           });
           
-          // If outputLanguage was passed to summarizePrompt, it will already include the language instruction
-          // Only append language instruction if we didn't pass outputLanguage and it existed in original
-          // (for backward compatibility with old approach)
-          if (languageInstruction && !outputLanguageForSummarization) {
-            summarizedPromptValue = `${summarizedText.trim()}\n\n${languageInstruction}`;
+          // Treat "unchanged" as "no summary": when the service returns the same text (e.g. on failure/timeout),
+          // do not show it as "Summarized Prompt" so the UI and search/image use the original prompt consistently.
+          const isUnchanged = summarizedText.trim() === promptToSummarize.trim();
+          if (isUnchanged) {
+            if (isDevelopment) {
+              loggingCustom(LogType.AI_BODY_LOG, 'info', 'Summarization returned unchanged prompt (e.g. fallback), not showing as summarized');
+            }
+            summarizedPromptValue = null;
+            setSummarizedPrompt(null);
+            setIsSummarizing(false);
           } else {
-            // summarizePrompt already handled language instruction if outputLanguage was provided
-            summarizedPromptValue = summarizedText;
+            // If outputLanguage was passed to summarizePrompt, it will already include the language instruction
+            // Only append language instruction if we didn't pass outputLanguage and it existed in original
+            // (for backward compatibility with old approach)
+            if (languageInstruction && !outputLanguageForSummarization) {
+              summarizedPromptValue = `${summarizedText.trim()}\n\n${languageInstruction}`;
+            } else {
+              // summarizePrompt already handled language instruction if outputLanguage was provided
+              summarizedPromptValue = summarizedText;
+            }
+            if (isDevelopment && summarizedPromptValue && summarizedPromptValue !== originalPrompt) {
+              loggingCustom(LogType.AI_BODY_LOG, 'info', `Prompt summarized successfully. Original: ${originalPrompt.length} chars, Summarized: ${summarizedPromptValue.length} chars`);
+            }
+            setSummarizedPrompt(summarizedPromptValue);
+            setIsSummarizing(false);
           }
-          
-          if (isDevelopment && summarizedPromptValue && summarizedPromptValue !== originalPrompt) {
-            loggingCustom(LogType.AI_BODY_LOG, 'info', `Prompt summarized successfully. Original: ${originalPrompt.length} chars, Summarized: ${summarizedPromptValue.length} chars`);
-          }
-          // Store summarized prompt in state for display
-          setSummarizedPrompt(summarizedPromptValue);
-          setIsSummarizing(false);
         } catch (summarizeError) {
           // If summarization fails, fallback to original prompt
           if (isDevelopment) {
@@ -654,6 +672,11 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
         setIsSummarizing(false);
       }
 
+      // For image-generator with summarization, use summarized prompt as the prompt sent to the API
+      if (agentId === 'image-generator' && summarizedPromptValue) {
+        enhancedPrompt = summarizedPromptValue;
+      }
+
       // Debug logging
       if (isDevelopment) {
         loggingCustom(LogType.AI_BODY_LOG, 'info', `Search check - searchType: ${searchType}, enabled: ${isSearchEnabled}, body keys: ${Object.keys(request.body || {}).join(', ')}`);
@@ -662,7 +685,7 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
       // Helper: append organization RAG with conditional usage rules (only when relevant)
       // The ORGANIZATION_RAG_PROMPT will instruct the AI to only use it when directly relevant
       const buildPromptWithOrgRag = (basePrompt: string): string => {
-        const orgRag = extractOrganizationRagFromPreloadedContext(preloadedContext);
+        const orgRag = extractOrganizationRagFromPreloadedContext(effectivePreloadedContext);
         if (!orgRag || !orgRag.trim()) return basePrompt;
         return `${basePrompt}\n\n---\n\n${ORGANIZATION_RAG_PROMPT.trim()}\n\n${orgRag}`;
       };
@@ -813,8 +836,10 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
         // For non-image-generator agents with imageType, make both requests in parallel
         // For image-generator agent, skip this and use the normal flow below
         try {
-          // Use summarized prompt for image if available, otherwise use unified original prompt
-          const promptForImage = buildPromptWithOrgRag(summarizedPromptValue || originalPrompt);
+          // Use summarized prompt for image if available; otherwise use only the user content from
+          // the built prompt (strip "Writing Style: Summarizer" / instruction wrapper so image gets content only).
+          const basePromptForImage = summarizedPromptValue ?? (extractUserContentFromBuiltPrompt(originalPrompt) || originalPrompt);
+          const promptForImage = buildPromptWithOrgRag(basePromptForImage);
           
           // Set loading states before starting requests
           setIsMainLoading(true);
@@ -840,7 +865,7 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
                 body: request.body,
                 extra_body: request.extra_body,
                 formValues: request.formValues,
-                preloadedContext: preloadedContext || undefined,
+                preloadedContext: effectivePreloadedContext || undefined,
               }),
               signal: abortController.signal,
           });
@@ -868,7 +893,7 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
                     ...(request.extra_body || {}), // Include other extra params if any
                   },
                   formValues: request.formValues,
-                  preloadedContext: preloadedContext || undefined,
+                  preloadedContext: effectivePreloadedContext || undefined,
                 }),
                 signal: abortController.signal,
               }),
@@ -1178,7 +1203,7 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
               body: request.body,
               extra_body: request.extra_body,
               formValues: request.formValues,
-              preloadedContext: preloadedContext || undefined,
+              preloadedContext: effectivePreloadedContext || undefined,
             }),
             signal: abortController.signal,
           });

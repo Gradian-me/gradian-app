@@ -306,44 +306,18 @@ export function AiBuilderWrapper({
     setCurrentImageType(undefined);
   }, [selectedAgentId, clearResponse]);
 
-  // Dedupe: avoid loading the same preload routes twice (e.g. React Strict Mode or new array refs)
-  const lastPreloadKeyRef = useRef<string | null>(null);
-  const prevAgentIdRef = useRef<string | undefined>(undefined);
-
-  // Load preload routes when agent or sheet opens, or when custom routes are provided
-  useEffect(() => {
-    if (!selectedAgent) return;
-
-    // Reset dedupe key when agent changes so we do load for the new agent
-    if (prevAgentIdRef.current !== selectedAgent.id) {
-      prevAgentIdRef.current = selectedAgent.id;
-      lastPreloadKeyRef.current = null;
-    }
-
-    // When customPreloadRoutes prop is passed (e.g. form-filler), use only those and never agent.preloadRoutes, so we never fetch unresolved URLs like /api/schemas/{{formSchema.id}}
+  // Resolve agent with preload routes: use customPreloadRoutes when provided (e.g. form-filler), else agent's preloadRoutes
+  const getAgentForPreload = useCallback(() => {
+    if (!selectedAgent) return null;
     const routes =
       customPreloadRoutes !== undefined
         ? (customPreloadRoutes || [])
         : selectedAgent.preloadRoutes || [];
-
-    if (routes.length === 0) {
-      if (customPreloadRoutes === undefined && (effectiveSheetOpen || mode === 'dialog')) {
-        loadPreloadRoutes(selectedAgent);
-      }
-      return;
-    }
-
-    const routeKey = routes.map((r: { route?: string }) => r.route || '').sort().join('\0');
-    const preloadKey = `${selectedAgent.id}\0${routeKey}`;
-    if (lastPreloadKeyRef.current === preloadKey) return;
-    lastPreloadKeyRef.current = preloadKey;
-
-    const agentToLoad =
-      routes === (selectedAgent.preloadRoutes || [])
-        ? selectedAgent
-        : { ...selectedAgent, preloadRoutes: routes };
-    loadPreloadRoutes(agentToLoad);
-  }, [effectiveSheetOpen, selectedAgent, loadPreloadRoutes, customPreloadRoutes, mode]);
+    if (routes.length === 0) return selectedAgent;
+    return routes === (selectedAgent.preloadRoutes || [])
+      ? selectedAgent
+      : { ...selectedAgent, preloadRoutes: routes };
+  }, [selectedAgent, customPreloadRoutes]);
 
   // Convert annotations map to array for ResponseAnnotationViewer
   const annotationsArray = Array.from(annotations.values());
@@ -392,8 +366,12 @@ export function AiBuilderWrapper({
     }
   }, []);
 
-  const doGenerate = useCallback(() => {
+  const doGenerate = useCallback(async () => {
     if (!selectedAgentId) return;
+
+    // Load RAG/preload routes first (in parallel internally), then generate
+    const agentToLoad = getAgentForPreload();
+    const preloadedContext = agentToLoad ? await loadPreloadRoutes(agentToLoad) : '';
 
     // Start with preset body/extra_body values (highest priority)
     let body: Record<string, any> = initialBody ? { ...initialBody } : {};
@@ -438,10 +416,11 @@ export function AiBuilderWrapper({
       formValues,
       imageType: imageType && imageType !== 'none' ? imageType : undefined,
       summarizeBeforeSearchImage,
+      preloadedContext: preloadedContext || undefined,
     });
 
     setTimeout(() => scrollToLoadingIndicator(), 100);
-  }, [selectedAgentId, userPrompt, generateResponse, selectedAgent, formValues, initialBody, initialExtraBody, scrollToLoadingIndicator, selectedLanguage]);
+  }, [selectedAgentId, userPrompt, generateResponse, selectedAgent, formValues, initialBody, initialExtraBody, scrollToLoadingIndicator, selectedLanguage, getAgentForPreload, loadPreloadRoutes]);
 
   const handleGenerate = useCallback(() => {
     if (!selectedAgentId) return;

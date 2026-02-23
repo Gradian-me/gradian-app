@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { DynamicPageRenderer } from '@/gradian-ui/data-display/components/DynamicPageRenderer';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useSchemaById } from '@/gradian-ui/schema-manager/hooks/use-schema-by-id';
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryClientContext } from '@tanstack/react-query';
 
 interface DynamicEntityPageClientProps {
   initialSchema: FormSchema;
@@ -96,7 +96,7 @@ function reconstructRegExp(obj: any): any {
 
 export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSchemas }: DynamicEntityPageClientProps) {
   const router = useRouter();
-  const queryClient = useQueryClient();
+  const queryClient = React.useContext(QueryClientContext);
   
   // Reconstruct RegExp objects from serialized schema from server
   const reconstructedInitialSchema = useMemo(
@@ -111,16 +111,12 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
 
   // Update React Query cache when initialSchema changes (e.g., after router.refresh())
   useEffect(() => {
-    if (reconstructedInitialSchema) {
-      queryClient.setQueryData(['schemas', schemaId], reconstructedInitialSchema);
-    }
+    if (!queryClient || !reconstructedInitialSchema) return;
+    queryClient.setQueryData(['schemas', schemaId], reconstructedInitialSchema);
   }, [queryClient, schemaId, reconstructedInitialSchema]);
 
   useEffect(() => {
-    if (!reconstructedNavigationSchemas.length) {
-      return;
-    }
-
+    if (!queryClient || !reconstructedNavigationSchemas.length) return;
     reconstructedNavigationSchemas.forEach((schema) => {
       if (schema?.id) {
         queryClient.setQueryData(['schemas', schema.id], schema);
@@ -150,9 +146,7 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
   
   // Always fetch fresh schema data when page loads or schemaId changes
   useEffect(() => {
-    if (!schemaId) {
-      return;
-    }
+    if (!queryClient || !schemaId) return;
     
     // Skip if we already fetched for this schemaId and it's ready
     if (hasFetched === schemaId && isSchemaReady) {
@@ -186,6 +180,7 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
 
   // Listen for React Query cache clear events - invalidate cache and refresh router
   useEffect(() => {
+    if (!queryClient) return;
     const handleCacheClear = async () => {
       // Reset fetch tracking to allow fresh fetch after cache clear
       setHasFetched(null);

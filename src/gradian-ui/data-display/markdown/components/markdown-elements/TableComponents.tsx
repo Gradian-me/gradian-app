@@ -143,6 +143,30 @@ function formatNumberWithSeparators(text: string): string {
   });
 }
 
+const URL_PATTERN = /^https?:\/\//i;
+
+/**
+ * Recursively get plain text from React children (for URL detection)
+ */
+function getTextFromChildren(children: React.ReactNode): string {
+  if (children == null) return '';
+  if (typeof children === 'string') return children;
+  if (Array.isArray(children)) return children.map(getTextFromChildren).join('');
+  if (React.isValidElement(children)) {
+    const props = (children.props as { children?: React.ReactNode }) ?? {};
+    return getTextFromChildren(props.children);
+  }
+  return String(children);
+}
+
+/**
+ * Returns true if the cell content is or starts with a URL (http/https)
+ */
+function isCellValueUrl(children: React.ReactNode): boolean {
+  const text = getTextFromChildren(children).trim();
+  return URL_PATTERN.test(text);
+}
+
 /**
  * Recursively format numbers in React children
  */
@@ -167,12 +191,16 @@ function formatNumbersInChildren(children: React.ReactNode): React.ReactNode {
 
 export function TableCell({ children, className }: TableCellProps) {
   const formattedChildren = children ? formatNumbersInChildren(children) : null;
-  
+  const isUrl = isCellValueUrl(children);
+
   return (
-    <td className={cn(
-      "p-3 text-xs text-gray-900 dark:text-gray-200 border-r border-gray-200 dark:border-gray-700 last:border-r-0",
-      className
-    )}>
+    <td
+      className={cn(
+        "p-3 text-xs text-gray-900 dark:text-gray-200 border-r border-gray-200 dark:border-gray-700 last:border-r-0",
+        className
+      )}
+      {...(isUrl ? { dir: 'ltr' as const } : {})}
+    >
       {formattedChildren ?? null}
     </td>
   );

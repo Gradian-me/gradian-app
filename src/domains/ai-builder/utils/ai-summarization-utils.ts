@@ -10,6 +10,27 @@ import { ORGANIZATION_RAG_PROMPT } from './ai-chat-utils';
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 /**
+ * Strip form-built prefixes (e.g. "Writing Style: Summarizer\n\nUser Prompt: " or the long
+ * "Please deeply analyze the following text..." instruction) so only the actual user content
+ * remains. Use when sending prompt to image/search when no summary is available.
+ */
+export function extractUserContentFromBuiltPrompt(prompt: string): string {
+  if (!prompt || typeof prompt !== 'string') return prompt;
+  let out = prompt.trim();
+  // Strip "Writing Style: Summarizer" (or similar) from buildStandardizedPrompt
+  const writingStylePrefix = /^(?:Writing Style|writingStyle|Style):\s*[^\n]+(\n+)/i;
+  out = out.replace(writingStylePrefix, '$1').trim();
+  // Strip the long summarizer instruction if present (so we don't send it to image)
+  const summarizerInstruction =
+    /^Please deeply analyze the following text to understand its meaning, context, relationships, and key details\.\s*Synthesize and completely rephrase[\s\S]*?original:\s*\n\n/i;
+  out = out.replace(summarizerInstruction, '').trim();
+  // Strip leading "User Prompt:" or "Prompt:" label if present
+  const userPromptLabel = /^(?:User Prompt|Prompt|userPrompt):\s*/i;
+  out = out.replace(userPromptLabel, '').trim();
+  return out || prompt.trim();
+}
+
+/**
  * Fetch organization RAG data non-blocking
  * Returns the data if available within timeout, otherwise returns empty string
  * @param timeout - Maximum time to wait in milliseconds (default: 2000ms)

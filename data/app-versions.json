@@ -7246,5 +7246,24 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000021",
+    "timestamp": "2026-02-23T00:00:00.000Z",
+    "version": "1.60.006",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Enhanced application functionality by adding the 'markdown-navbar' package for improved markdown navigation. Refactored DynamicEntityPageClient to utilize QueryClientContext for better state management. Updated MarkdownPageClient to streamline navigation handling and improve user experience. Enhanced AiBuilderResponse with new scroll handling logic for better user interaction during streaming. This update improves overall application performance and user experience in dynamic content rendering.",
+        "priority": "High",
+        "affectedDomains": [
+          "markdown",
+          "dynamic-entity",
+          "ai-builder",
+          "data-display",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

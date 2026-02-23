@@ -143,6 +143,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const [isSelectOpen, setIsSelectOpen] = React.useState(false);
   // Controlled open state to prevent closing when keyboard opens (must be declared unconditionally)
   const [controlledOpen, setControlledOpen] = React.useState<boolean | undefined>(undefined);
+  const selectContentRef = React.useRef<HTMLElement | null>(null);
   
   // Detect touch device
   const isTouchDevice = React.useMemo(() => {
@@ -788,6 +789,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
             </SelectValue>
           </SelectTrigger>
           <SelectContent
+            ref={selectContentRef}
             searchSlot={
               enableSearch ? (
                 <div 
@@ -835,9 +837,50 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
                       onKeyDown={(e) => {
                         // Prevent select from closing when typing
                         e.stopPropagation();
-                        // Prevent arrow keys from navigating select items when typing
-                        if (['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) {
-                          e.stopPropagation();
+                        // ArrowDown: focus first option so user can navigate with keyboard and select with Space
+                        if (e.key === 'ArrowDown' && validOptions.length > 0) {
+                          e.preventDefault();
+                          const viewport = selectContentRef.current?.querySelector('[data-radix-select-viewport]');
+                          const firstOption = viewport?.querySelector<HTMLElement>('[role="option"]');
+                          if (firstOption) {
+                            firstOption.focus();
+                            firstOption.scrollIntoView({ block: 'nearest' });
+                          }
+                          return;
+                        }
+                        // ArrowUp: focus last option
+                        if (e.key === 'ArrowUp' && validOptions.length > 0) {
+                          e.preventDefault();
+                          const viewport = selectContentRef.current?.querySelector('[data-radix-select-viewport]');
+                          const options = viewport?.querySelectorAll<HTMLElement>('[role="option"]');
+                          const lastOption = options?.length ? options[options.length - 1] : null;
+                          if (lastOption) {
+                            lastOption.focus();
+                            lastOption.scrollIntoView({ block: 'nearest' });
+                          }
+                          return;
+                        }
+                        // Home/End: focus first or last option
+                        if (e.key === 'Home' && validOptions.length > 0) {
+                          e.preventDefault();
+                          const viewport = selectContentRef.current?.querySelector('[data-radix-select-viewport]');
+                          const firstOption = viewport?.querySelector<HTMLElement>('[role="option"]');
+                          if (firstOption) {
+                            firstOption.focus();
+                            firstOption.scrollIntoView({ block: 'nearest' });
+                          }
+                          return;
+                        }
+                        if (e.key === 'End' && validOptions.length > 0) {
+                          e.preventDefault();
+                          const viewport = selectContentRef.current?.querySelector('[data-radix-select-viewport]');
+                          const options = viewport?.querySelectorAll<HTMLElement>('[role="option"]');
+                          const lastOption = options?.length ? options[options.length - 1] : null;
+                          if (lastOption) {
+                            lastOption.focus();
+                            lastOption.scrollIntoView({ block: 'nearest' });
+                          }
+                          return;
                         }
                         // Prevent Escape from closing if there's text (allow clearing instead)
                         if (e.key === 'Escape' && searchValue) {

@@ -155,6 +155,9 @@ export function TableBody<T = any>({
     }
   };
 
+  const isUrlValue = (v: unknown): boolean =>
+    typeof v === 'string' && /^https?:\/\//i.test((v as string).trim());
+
   return (
     <tbody>
       {data.map((row, rowIndex) => {
@@ -199,10 +202,13 @@ export function TableBody<T = any>({
               const shouldTruncate = isTextarea && textValue && textValue.length > 200;
               const truncatedText = shouldTruncate ? truncateText(textValue!, 200) : null;
 
+              const cellIsUrl = isUrlValue(value);
+
               return (
                 <td
                   key={column.id}
                   className={cn(tdClasses(column, rowIndex, isSelected, row), cellClassName)}
+                  {...(cellIsUrl ? { dir: 'ltr' as const } : {})}
                   style={{
                     // Only set width if explicitly provided, otherwise let content determine width
                     width: column.width ? (typeof column.width === 'number' ? `${column.width}px` : column.width) : undefined,
