@@ -939,7 +939,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full nx-form-element">
       {labelCaptionBlock}
       {renderElement()}
     </div>

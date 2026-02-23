@@ -519,8 +519,8 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   );
 
   const contentClasses = cn(
-    'flex gap-4',
-    viewMode === 'grid' ? 'flex-col' : 'flex-row items-center'
+    'flex',
+    viewMode === 'grid' ? 'flex-col gap-4' : 'flex-row items-center gap-2'
   );
 
   if (cardVariant === 'kanban') {
@@ -717,7 +717,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
         <CardContent className={cn(
           "h-full flex flex-col",
           viewMode === 'list' 
-            ? 'p-2 sm:p-3' 
+            ? 'p-1.5 sm:p-2' 
             : isInDialog 
               ? 'p-2 sm:p-3 md:p-4' 
               : 'p-3 sm:p-4'
@@ -943,7 +943,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       {fieldLabel}
                     </p>
                     {isChecklist ? (
-                      <ul className="list-none space-y-1 text-xs text-gray-600 dark:text-gray-300 pl-0">
+                      <ul className="list-none space-y-1 text-xs text-gray-600 dark:text-gray-300 pl-0 min-w-48 w-full">
                         {items.map((item: any, idx: number) => {
                           const text = getListItemLabel(item);
                           const isDone = typeof item === 'object' && item != null
@@ -966,7 +966,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                         })}
                       </ul>
                     ) : (
-                      <ul className="list-disc list-inside space-y-0.5 text-xs text-gray-600 dark:text-gray-300">
+                      <ul className="list-disc list-inside space-y-0.5 text-xs text-gray-600 dark:text-gray-300 min-w-48 w-full">
                         {items.map((item: any, idx: number) => {
                           const label = getListItemLabel(item);
                           if (label == null || String(label).trim() === '') return null;
@@ -1161,11 +1161,11 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
               </div>
             </>
           ) : (
-            // List view layout: row 1 = avatar + title (with copy) + actions in front; row 2 = meta; rest below
-            <div className="flex w-full flex-col gap-3">
+            // List view layout: row 1 = avatar + title (with copy) + actions in front; row 2 = meta; rest below (compact)
+            <div className="flex w-full flex-col gap-1.5">
               {/* Row 1: avatar + title+copy (attached) + action buttons in front; wraps on small screens */}
-              <div className="flex flex-wrap items-center justify-between gap-2 w-full">
-                <div className="flex items-center gap-2 min-w-0 flex-1">
+              <div className="flex flex-wrap items-center justify-between gap-1.5 w-full">
+                <div className="flex items-center gap-1.5 min-w-0 flex-1">
                   {showAvatarInCard && (
                     <motion.div
                       initial={disableAnimation ? false : { opacity: 0, scale: 0.8 }}
@@ -1177,16 +1177,16 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       <RoleBasedAvatar
                         schema={schema}
                         data={data}
-                        size="xl"
+                        size="lg"
                         showBorder={true}
                         showShadow={true}
                       />
                     </motion.div>
                   )}
-                  <div className="flex items-center gap-1.5 flex-wrap min-w-0 flex-1">
+                  <div className="flex items-center gap-1 flex-wrap min-w-0 flex-1">
                     {/* Code on top of title (list view) */}
                     {hasCodeField && cardConfig.codeField && (
-                      <div className="w-full shrink-0 mb-1">
+                      <div className="w-full shrink-0 mb-0.5">
                         <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
                       </div>
                     )}
@@ -1199,13 +1199,13 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       className="shrink-0"
                     />
                     {/* Title + copy attached (same line) */}
-                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                    <div className="flex items-center gap-1 min-w-0 flex-1">
                       <motion.h3
                         initial={disableAnimation ? false : { opacity: 0, x: 5 }}
                         animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                         transition={disableAnimation ? {} : { duration: 0.3 }}
                         className={cn(
-                          "text-sm font-semibold text-gray-900 dark:text-gray-200 wrap-break-word min-w-0 line-clamp-3",
+                          "text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-200 wrap-break-word min-w-0 line-clamp-2",
                           !disableAnimation && "group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors duration-100"
                         )}
                         whileHover={disableAnimation ? undefined : {
@@ -1296,7 +1296,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       initial={disableAnimation ? false : { opacity: 0, x: 5 }}
                       animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                       transition={disableAnimation ? {} : { duration: 0.3 }}
-                      className="mt-1.5 pt-1.5 border-t border-gray-100 dark:border-gray-800"
+                      className="mt-1 pt-1 border-t border-gray-100 dark:border-gray-800"
                     >
                       <EntityMetadata
                         createdAt={data.createdAt}
@@ -1314,7 +1314,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                       initial={disableAnimation ? false : { opacity: 0, x: 5 }}
                       animate={disableAnimation ? false : { opacity: 1, x: 0 }}
                       transition={disableAnimation ? {} : { duration: 0.3 }}
-                      className="mt-1"
+                      className="mt-0.5"
                     >
                       <p className="text-xs text-pink-700 dark:text-pink-400 truncate">
                         <span className="font-medium">Force Reason:</span> {forceReason}
@@ -1322,7 +1322,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     </motion.div>
                   )}
                   <div
-                    className="mt-1"
+                    className="mt-0.5"
                     onClick={(e) => e.stopPropagation()}
                     onMouseDown={(e) => e.stopPropagation()}
                     onKeyDown={(e) => e.stopPropagation()}
@@ -1358,9 +1358,9 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                 </div>
 
               {/* Row 2: assignee / due date / status badges (no action buttons; those are in row 1) */}
-              {(hasCodeField || hasRatingField || hasStatusField || hasEntityTypeField || hasDuedateField || hasPersonField) && (
-                <div className="flex flex-wrap items-center justify-between gap-2 ms-0 sm:ms-11 shrink-0">
-                  <div className="flex items-center gap-2 flex-wrap">
+              {(hasRatingField || hasStatusField || hasEntityTypeField || hasDuedateField || hasPersonField) && (
+                <div className="flex flex-wrap items-center justify-between gap-1.5 ms-0 sm:ms-9 shrink-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     {hasPersonField && cardConfig.personField && (
                       <motion.div
                         initial={disableAnimation ? false : { opacity: 0, y: -10 }}
@@ -1402,23 +1402,11 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     {/* Meta badges stack */}
-                    {(hasCodeField || hasRatingField || hasStatusField || hasEntityTypeField) && (
-                      <div className="flex items-end gap-1.5 flex-col">
-                        {hasCodeField && cardConfig.codeField && (
-                          <motion.div
-                            initial={disableAnimation ? false : { opacity: 0, scale: 0.9 }}
-                            animate={disableAnimation ? false : { opacity: 1, scale: 1 }}
-                            transition={disableAnimation ? {} : { duration: 0.3 }}
-                            whileHover={disableAnimation ? undefined : {
-                              scale: 1.01,
-                              transition: { type: "spring", stiffness: 300, damping: 30 }
-                            }}
-                          >
-                            <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
-                          </motion.div>
-                        )}
+                    {(hasRatingField || hasStatusField || hasEntityTypeField) && (
+                      <div className="flex items-end gap-1 flex-col">
+                        {/* Code is shown only in row 1 (next to title) in list view to avoid duplicate */}
                         {hasRatingField && (
                           <motion.div
                             initial={disableAnimation ? false : { opacity: 0, y: -10 }}

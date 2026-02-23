@@ -63,7 +63,7 @@ function TranslationViewCell({
     field ? resolveSchemaFieldLabel(field, language, defaultLang) : fieldLabel;
   const title = resolvedTitle || fieldLabel || '';
   return (
-    <span className="inline-flex items-center gap-1.5 min-w-0 leading-relaxed min-h-6">
+    <span className="inline-flex items-start gap-1 min-w-0 leading-relaxed min-h-6">
       <span className="min-w-0 truncate leading-relaxed py-0.5" dir="auto" title={displayText}>
         {displayText}
       </span>
@@ -163,7 +163,7 @@ const wrapWithForceIcon = (
   // Enhance title fields with copy-to-clipboard action when we have a non-empty title
   const contentWithCopy =
     isTitle && title ? (
-      <span className="inline-flex items-center gap-1.5">
+      <span className="inline-flex items-start gap-1">
         <span className="min-w-0">{wrappedContent}</span>
         <CopyContent content={title} />
       </span>
@@ -175,7 +175,7 @@ const wrapWithForceIcon = (
   if (!isForce || !isTitle) return contentWithCopy;
 
   return (
-    <span className="inline-flex items-center gap-1.5">
+    <span className="inline-flex items-start gap-1">
       <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} title={title} />
       {contentWithCopy}
     </span>
@@ -309,7 +309,7 @@ export const formatFieldValue = (
       const emptyContent = <span className={cn("text-gray-400 w-full block", isTitle && "font-semibold")} dir="auto">—</span>;
       const inactiveContent = isInactive ? <span className="line-through">{emptyContent}</span> : emptyContent;
       return (
-        <span className="inline-flex items-center gap-1.5">
+        <span className="inline-flex items-start gap-1">
           <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} />
           {inactiveContent}
         </span>
@@ -650,7 +650,7 @@ export const formatFieldValue = (
     }
     const listItems = Array.isArray(value) ? value : [value];
     return wrapWithForceIcon(
-      <ul className="list-none space-y-1 text-sm text-gray-700 dark:text-gray-300 pl-0 w-full" dir="auto">
+      <ul className="list-none space-y-1 text-sm text-gray-700 dark:text-gray-300 pl-0 w-full min-w-56" dir="auto">
         {listItems.map((item: any, index: number) => {
           const text = getListItemLabel(item);
           const isDone =
@@ -693,7 +693,7 @@ export const formatFieldValue = (
       return <span className="text-gray-400">—</span>;
     }
     return wrapWithForceIcon(
-      <ul className="list-disc list-inside space-y-0.5 text-sm text-gray-700 dark:text-gray-300" dir="auto">
+      <ul className="list-disc list-inside space-y-0.5 text-sm text-gray-700 dark:text-gray-300 w-full min-w-56" dir="auto">
         {itemLabels.map((label: string, index: number) => (
           <li key={index} className="break-words overflow-wrap-anywhere" dir="auto">{label}</li>
         ))}
@@ -890,7 +890,7 @@ export const formatFieldValue = (
       const emptyContent = <span className={cn("text-gray-400 w-full block", isTitle && "font-semibold")} dir="auto">—</span>;
       const inactiveContent = isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
       return isForce && isTitle ? (
-        <span className="inline-flex items-center gap-1.5">
+        <span className="inline-flex items-start gap-1">
           <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} />
           {inactiveContent}
         </span>
@@ -910,7 +910,7 @@ export const formatFieldValue = (
     const emptyContent = <span className={cn("text-gray-400 w-full block", isTitle && "font-semibold")} dir="auto">—</span>;
     const inactiveContent = isInactive && isTitle ? <span className="line-through">{emptyContent}</span> : emptyContent;
     return isForce && isTitle ? (
-      <span className="inline-flex items-center gap-1.5">
+      <span className="inline-flex items-start gap-1">
         <ForceIcon isForce={isForce} size="md" forceReason={row?.forceReason} />
         {inactiveContent}
       </span>

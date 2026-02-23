@@ -42,7 +42,7 @@ export function RepeatingSectionButton({
           entityId,
         })
       }
-      className="h-8 px-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-sky-50 hover:border-sky-300 hover:text-sky-700 transition-all duration-200"
+      className="h-8 px-3 bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-800 transition-all duration-200"
     >
       <Table2 className="h-4 w-4" />
       {itemCount !== null && (

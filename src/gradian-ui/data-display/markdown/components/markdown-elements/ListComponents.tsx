@@ -34,14 +34,14 @@ export function UnorderedList({ children, ...props }: UnorderedListProps) {
 
   if (taskList) {
     return (
-      <ul className="list-none ms-0 mb-4 space-y-2 text-gray-700 dark:text-gray-300" {...props}>
+      <ul className="list-none ms-0 mb-4 space-y-2 text-gray-700 dark:text-gray-300 min-w-56 w-full" {...props}>
         {filteredChildren.length > 0 ? filteredChildren : null}
       </ul>
     );
   }
 
   return (
-    <ul className="list-disc ms-6 mb-4 space-y-1 text-gray-700 dark:text-gray-300" {...props}>
+    <ul className="list-disc ms-6 mb-4 space-y-1 text-gray-700 dark:text-gray-300 min-w-56 w-full" {...props}>
       {filteredChildren.length > 0 ? filteredChildren : null}
     </ul>
   );
@@ -58,7 +58,7 @@ export function OrderedList({ children, ...props }: OrderedListProps) {
   });
 
   return (
-    <ol className="list-decimal ms-6 mb-4 space-y-1 text-gray-700 dark:text-gray-300" {...props}>
+    <ol className="list-decimal ms-6 mb-4 space-y-1 text-gray-700 dark:text-gray-300 min-w-56 w-full" {...props}>
       {filteredChildren.length > 0 ? filteredChildren : null}
     </ol>
   );

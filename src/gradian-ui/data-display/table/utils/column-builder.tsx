@@ -33,6 +33,7 @@ export const buildTableColumns = (
       accessor: (row: any) => getFieldValue(field, row),
       sortable: true,
       align,
+      minWidth: widthSettings.minWidth,
       maxWidth: widthSettings.maxWidth,
       width: widthSettings.width,
       allowWrap: shouldAllowWrap(field, widthSettings),

@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DynamicPageRenderer } from '@/gradian-ui/data-display/components/DynamicPageRenderer';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useSchemaById } from '@/gradian-ui/schema-manager/hooks/use-schema-by-id';
-import { QueryClientContext } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, QueryClientContext } from '@tanstack/react-query';
 
 interface DynamicEntityPageClientProps {
   initialSchema: FormSchema;
@@ -94,7 +94,11 @@ function reconstructRegExp(obj: any): any {
   return obj;
 }
 
-export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSchemas }: DynamicEntityPageClientProps) {
+/**
+ * Inner component that always runs under a QueryClientProvider (from parent or fallback).
+ * This avoids "No QueryClient set" during SSR when the root provider is not in the tree yet.
+ */
+function DynamicEntityPageClientInner({ initialSchema, schemaId, navigationSchemas }: DynamicEntityPageClientProps) {
   const router = useRouter();
   const queryClient = React.useContext(QueryClientContext);
   
@@ -247,6 +251,21 @@ export function DynamicEntityPageClient({ initialSchema, schemaId, navigationSch
       entityName={schema.singular_name || 'Entity'}
       navigationSchemas={reconstructedNavigationSchemas}
     />
+  );
+}
+
+export function DynamicEntityPageClient(props: DynamicEntityPageClientProps) {
+  const parentClient = React.useContext(QueryClientContext);
+  const [fallbackClient] = useState(() => new QueryClient());
+
+  if (parentClient) {
+    return <DynamicEntityPageClientInner {...props} />;
+  }
+
+  return (
+    <QueryClientProvider client={fallbackClient}>
+      <DynamicEntityPageClientInner {...props} />
+    </QueryClientProvider>
   );
 }
 

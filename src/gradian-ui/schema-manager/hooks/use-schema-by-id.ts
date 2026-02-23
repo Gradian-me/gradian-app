@@ -1,6 +1,7 @@
 'use client';
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import React from 'react';
+import { useQuery, QueryClientContext } from '@tanstack/react-query';
 import { FormSchema } from '../types/form-schema';
 import { getCacheConfigByPath } from '@/gradian-ui/shared/configs/cache-config';
 import { cacheSchemaClientSide } from '../utils/schema-client-cache';
@@ -9,7 +10,7 @@ import { getSchemaWithClientCache } from '../utils/client-schema-cache';
 /**
  * Hook to fetch a single schema by ID with client-side caching using React Query
  * This deduplicates requests and shares cache across all components
- * Uses the QueryClient from QueryClientProvider context automatically
+ * Uses the QueryClient from QueryClientProvider context when available (graceful when absent, e.g. SSR)
  */
 export function useSchemaById(
   schemaId: string | null | undefined, 
@@ -17,8 +18,8 @@ export function useSchemaById(
 ) {
   // Get cache configuration for /api/schemas/:id route
   const cacheConfig = getCacheConfigByPath(`/api/schemas/${schemaId || ''}`);
-  const queryClient = useQueryClient();
-  
+  const queryClient = React.useContext(QueryClientContext);
+
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['schemas', schemaId],
     queryFn: async () => {
@@ -30,7 +31,9 @@ export function useSchemaById(
       if (!schema) {
         throw new Error('Failed to fetch schema');
       }
-      await cacheSchemaClientSide(schema, { queryClient, persist: false });
+      if (queryClient) {
+        await cacheSchemaClientSide(schema, { queryClient, persist: false });
+      }
       return schema;
     },
     enabled: options?.enabled !== false && !!schemaId,

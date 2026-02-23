@@ -539,8 +539,8 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
     <div
       ref={ctnDom}
       className={cn(
-        "w-full h-full relative",
-        "drop-shadow-[0_0_20px_rgba(139,92,246,0.3)]",
+        "w-full h-full relative flex justify-center items-center",
+        "drop-shadow-[0_0_20px_rgba(139,92,246,0.3)] rounded-xl overflow-hidden",
         className
       )}
     >

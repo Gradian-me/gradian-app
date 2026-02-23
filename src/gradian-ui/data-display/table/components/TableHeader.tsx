@@ -86,6 +86,8 @@ export function TableHeader<T = any>({
             className={thClasses(column)}
             dir="auto"
             style={{
+              // Apply minWidth so columns (e.g. textarea) don't shrink too tight
+              minWidth: column.minWidth ? `${column.minWidth}px` : undefined,
               // Only set width if explicitly provided, otherwise let content determine width
               width: column.width ? (typeof column.width === 'number' ? `${column.width}px` : column.width) : undefined,
               // Only set maxWidth to prevent columns from being too wide

@@ -9,7 +9,7 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants';
 import { getT, getDefaultLanguage, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { TableCardView } from '../../components/TableCardView';
 import { TableColumn, TableConfig } from '../types';
 import { formatFieldValue } from '../utils/field-formatters';
@@ -56,6 +56,47 @@ export function TableWrapper<T = any>({
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const defaultLang = getDefaultLanguage();
   const isRtl = isRTL(language);
+
+  /** Wider min/max for textarea so long content (e.g. deviation/expected/actual) is readable */
+  const TEXTAREA_MIN_WIDTH = 520;
+  const TEXTAREA_MAX_WIDTH = 1800;
+  /** Slightly wider text/long-content columns so table doesn’t feel tight */
+  const TEXT_LONG_MIN_WIDTH = 240;
+  const TEXT_LONG_MAX_WIDTH = 900;
+  /** Wider list columns (bullets / checklist) so list content is not cramped */
+  const LIST_MIN_WIDTH = 260;
+  const LIST_MAX_WIDTH = 800;
+
+  const applyWiderColumnWidths = useCallback((cols: TableColumn<T>[]): TableColumn<T>[] => {
+    return cols.map((col) => {
+      const comp = col.field?.component;
+      if (comp === 'textarea') {
+        return {
+          ...col,
+          minWidth: col.minWidth ?? TEXTAREA_MIN_WIDTH,
+          maxWidth: col.maxWidth ?? TEXTAREA_MAX_WIDTH,
+          allowWrap: col.allowWrap !== false,
+        };
+      }
+      if (comp === 'text' && (col.allowWrap !== false || col.maxWidth != null)) {
+        return {
+          ...col,
+          minWidth: col.minWidth ?? TEXT_LONG_MIN_WIDTH,
+          maxWidth: col.maxWidth ?? TEXT_LONG_MAX_WIDTH,
+          allowWrap: col.allowWrap !== false,
+        };
+      }
+      if (comp === 'list-input' || comp === 'listinput' || comp === 'checklist') {
+        return {
+          ...col,
+          minWidth: col.minWidth ?? LIST_MIN_WIDTH,
+          maxWidth: col.maxWidth ?? LIST_MAX_WIDTH,
+          allowWrap: col.allowWrap !== false,
+        };
+      }
+      return col;
+    });
+  }, []);
 
   // Add dynamic columns for relatedCompanies and status if schema supports them
   const enhancedColumns = useMemo(() => {
@@ -363,12 +404,12 @@ export function TableWrapper<T = any>({
       }
       
       newColumns.splice(insertIndex, 0, ...additionalColumns);
-      return newColumns;
+      return applyWiderColumnWidths(newColumns);
     }
 
-    // If no additional columns, return as is
-    return baseColumns;
-  }, [columns, schema, highlightQuery, language, defaultLang]);
+    // If no additional columns, return as is (still apply wider widths)
+    return applyWiderColumnWidths(baseColumns);
+  }, [columns, schema, highlightQuery, language, defaultLang, applyWiderColumnWidths]);
 
   // Update tableConfig with enhanced columns
   const enhancedTableConfig = useMemo(() => ({

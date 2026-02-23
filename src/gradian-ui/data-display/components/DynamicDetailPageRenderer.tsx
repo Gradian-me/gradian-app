@@ -39,7 +39,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { getSchemasWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryClientContext } from '@tanstack/react-query';
 import { RepeatingTableRendererConfig } from '@/gradian-ui/schema-manager/types/form-schema';
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
 import { toast } from 'sonner';
@@ -415,7 +415,7 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
   customQuickActionHandler,
 }) => {
   const BackIcon = useBackIcon();
-  const queryClient = useQueryClient();
+  const queryClient = React.useContext(QueryClientContext);
   const language = useLanguageStore((s) => s.language);
   const defaultLang = getDefaultLanguage();
   const labelBack = getT(TRANSLATION_KEYS.BUTTON_BACK, language ?? undefined, defaultLang);
@@ -661,8 +661,10 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
               if (prev[schema.id]) return prev;
               return { ...prev, [schema.id]: schema };
             });
-            cacheSchemaClientSide(schema, { queryClient, persist: false });
-            queryClient.setQueryData(['schemas', schema.id], schema);
+            if (queryClient) {
+              cacheSchemaClientSide(schema, { queryClient, persist: false });
+              queryClient.setQueryData(['schemas', schema.id], schema);
+            }
           }
         });
       } catch (error) {

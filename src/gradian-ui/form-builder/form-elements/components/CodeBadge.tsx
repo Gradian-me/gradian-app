@@ -31,7 +31,7 @@ export const CodeBadge: React.FC<CodeBadgeProps> = ({
         <TooltipTrigger asChild>
           <span
             className={cn(
-              'inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded text-xs font-mono font-medium',
+              'inline-flex items-center gap-1.5 px-1.5 py-0.5 rounded-lg text-xs font-mono font-medium',
               'bg-cyan-50 text-cyan-700 border border-cyan-200',
               'select-none whitespace-nowrap',
               className

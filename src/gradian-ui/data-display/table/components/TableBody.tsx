@@ -59,6 +59,27 @@ export function TableBody<T = any>({
     setDialogOpen(true);
   };
 
+  /** Max list/checklist items shown in cell before "Show more". */
+  const MAX_LIST_PREVIEW_ITEMS = 5;
+
+  const formatListForDialog = (items: any[]): string => {
+    return items
+      .map((item: any) => {
+        if (item == null) return '';
+        if (typeof item === 'string') return item;
+        if (typeof item === 'object' && item !== null) {
+          const label =
+            item.content ?? item.text ?? item.label ?? item.name ?? item.title ?? item.value ?? (item.id != null ? String(item.id) : '');
+          const isDone = item.isCompleted === true || item.completed === true;
+          return isDone ? `☑ ${label}` : `☐ ${label}`;
+        }
+        return String(item);
+      })
+      .filter(Boolean)
+      .map((line) => `• ${line}`)
+      .join('\n');
+  };
+
   const applyHighlight = (node: React.ReactNode): React.ReactNode => {
     if (!highlightQuery || node === null || node === undefined || typeof node === 'boolean') {
       return node;
@@ -202,6 +223,16 @@ export function TableBody<T = any>({
               const shouldTruncate = isTextarea && textValue && textValue.length > 200;
               const truncatedText = shouldTruncate ? truncateText(textValue!, 200) : null;
 
+              // Check if this is a list/list-input/checklist with many items -> show preview + "Show more"
+              const isListField =
+                column.field?.component === 'list-input' ||
+                column.field?.component === 'listinput' ||
+                column.field?.component === 'checklist';
+              const listItems = Array.isArray(value) ? value : value != null ? [value] : [];
+              const shouldTruncateList = isListField && listItems.length > MAX_LIST_PREVIEW_ITEMS;
+              const listPreviewValue = shouldTruncateList ? listItems.slice(0, MAX_LIST_PREVIEW_ITEMS) : null;
+              const listFullContent = shouldTruncateList ? formatListForDialog(listItems) : null;
+
               const cellIsUrl = isUrlValue(value);
 
               return (
@@ -210,6 +241,8 @@ export function TableBody<T = any>({
                   className={cn(tdClasses(column, rowIndex, isSelected, row), cellClassName)}
                   {...(cellIsUrl ? { dir: 'ltr' as const } : {})}
                   style={{
+                    // Apply minWidth so columns (e.g. textarea) don't shrink too tight
+                    minWidth: column.minWidth ? `${column.minWidth}px` : undefined,
                     // Only set width if explicitly provided, otherwise let content determine width
                     width: column.width ? (typeof column.width === 'number' ? `${column.width}px` : column.width) : undefined,
                     // Only set maxWidth to prevent columns from being too wide
@@ -249,6 +282,17 @@ export function TableBody<T = any>({
                         <button
                           type="button"
                           onClick={(e) => handleShowMore(column.label, textValue!, e)}
+                          className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium"
+                        >
+                          Show more
+                        </button>
+                      </div>
+                    ) : shouldTruncateList && listPreviewValue !== null && listFullContent !== null ? (
+                      <div className="space-y-1" dir="auto">
+                        {applyHighlight(column.render(listPreviewValue, row, rowIndex))}
+                        <button
+                          type="button"
+                          onClick={(e) => handleShowMore(column.label, listFullContent, e)}
                           className="text-xs text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300 underline font-medium"
                         >
                           Show more

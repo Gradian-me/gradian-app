@@ -13,7 +13,7 @@ import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { formatJsonForMarkdown } from '@/gradian-ui/shared/utils/text-utils';
-import { Eye } from 'lucide-react';
+import { Eye, Sparkles } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import type { AiAgent } from '../types';
 import { AiBuilderWrapper } from './AiBuilderWrapper';
@@ -225,7 +225,12 @@ export function AiAgentDialog({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`AI Agent: ${agent.label}`}
+      title={
+        <span className="inline-flex items-center gap-2">
+          <Sparkles className="h-5 w-5 shrink-0 text-violet-400 dark:text-violet-400" aria-hidden />
+          <span>AI Agent: {agent.label}</span>
+        </span>
+      }
       description={agent.description}
       size={size}
       showCloseButton={true}
