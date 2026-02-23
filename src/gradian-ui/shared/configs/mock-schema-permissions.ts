@@ -6,7 +6,7 @@
  * To add more schemas or change permissions, edit the record below.
  */
 export const MOCK_SCHEMA_PERMISSIONS: Record<string, string[]> = {
-  'deviation-management': ['edit'],
+  'deviation-management': ['view'],
 };
 
 export function getMockPermissionsForSchema(schemaId: string): string[] | undefined {

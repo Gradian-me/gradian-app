@@ -30,6 +30,7 @@ import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { cn } from '@/gradian-ui/shared/utils';
 import { Skeleton } from '@/components/ui/skeleton';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { useTenantStore } from '@/stores/tenant.store';
 
 type AppViewMode = 'grid' | 'list';
@@ -77,8 +78,17 @@ const AppListItem: React.FC<AppListItemProps> = ({
           scale: 1.015,
           transition: { type: 'spring', stiffness: 380, damping: 26 },
         }}
+        className="relative h-full rounded-2xl"
       >
-        <Card className="group relative flex h-full flex-col overflow-hidden border border-violet-100/70 bg-gradient-to-br from-violet-50/70 via-white to-indigo-50/60 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-xl dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40">
+        <GlowingEffect
+          spread={40}
+          glow
+          disabled={false}
+          proximity={64}
+          inactiveZone={0.01}
+          borderWidth={2}
+        />
+        <Card className="group relative flex h-full flex-col overflow-hidden border border-violet-100/70 bg-gradient-to-br from-violet-50/70 via-white to-indigo-50/60 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40">
           <div
             className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-30"
             style={{
@@ -176,8 +186,16 @@ const AppListItem: React.FC<AppListItemProps> = ({
         scale: 1.01,
         transition: { type: 'spring', stiffness: 380, damping: 26 },
       }}
-      className="group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl border border-violet-100/70 bg-gradient-to-r from-violet-50/70 via-white to-indigo-50/60 p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-xl dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40"
+      className="group relative flex items-center justify-between gap-3 overflow-hidden rounded-xl border border-violet-100/70 bg-gradient-to-r from-violet-50/70 via-white to-indigo-50/60 p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl dark:border-violet-900/40 dark:from-gray-950/60 dark:via-gray-900 dark:to-violet-950/40"
     >
+      <GlowingEffect
+        spread={40}
+        glow
+        disabled={false}
+        proximity={64}
+        inactiveZone={0.01}
+        borderWidth={2}
+      />
       <div
         className="pointer-events-none absolute inset-0 opacity-40 dark:opacity-30"
         style={{
