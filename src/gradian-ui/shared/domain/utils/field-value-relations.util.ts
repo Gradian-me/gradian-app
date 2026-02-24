@@ -28,6 +28,28 @@ function toArray<T>(value: T | T[] | null | undefined): T[] {
 }
 
 /**
+ * Coerce option id/label to a string. Handles primitives and translation-style objects
+ * (e.g. [{ en: "x" }, { fa: "y" }] or { en: "x", fa: "y" }) so we never persist "[object object]".
+ */
+function optionValueToString(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string') return value.trim();
+  if (typeof value === 'number') return String(value);
+  if (Array.isArray(value) && value.length > 0) {
+    const first = value[0];
+    if (first && typeof first === 'object' && !Array.isArray(first)) {
+      const v = Object.values(first)[0];
+      if (typeof v === 'string') return v;
+    }
+  }
+  if (typeof value === 'object' && !Array.isArray(value)) {
+    const v = Object.values(value)[0];
+    if (typeof v === 'string') return v;
+  }
+  return String(value);
+}
+
+/**
  * Extract relation-supporting field values from form data or entity.
  * Returns a map of fieldName -> value for fields that support HAS_FIELD_VALUE relations.
  * Supports: picker, select, checkbox-list, radio, toggle-group
@@ -258,11 +280,14 @@ export async function syncHasFieldValueRelationsForEntity(params: {
       } else if (effectiveSourceUrl) {
         // External URL or lookup-options → map into external_nodes
         if (typeof option === 'object') {
+          const optionIdStr = optionValueToString((option as any).id) || optionValueToString((option as any).value);
+          const optionLabelStr = optionValueToString((option as any).label) || optionIdStr;
+          if (!optionIdStr) continue;
           const externalNode = upsertExternalNodeFromOption({
             sourceUrl: effectiveSourceUrl,
             option: {
-              id: option.id,
-              label: option.label,
+              id: optionIdStr,
+              label: optionLabelStr,
               icon: (option as any).icon,
               color: (option as any).color,
               metadata: (option as any).metadata,
@@ -311,9 +336,9 @@ export async function syncHasFieldValueRelationsForEntity(params: {
             optionLabel = String(option);
           }
         } else if (typeof option === 'object' && option !== null) {
-          // Option is already an object with id, label, etc.
-          optionId = option.id ?? (option as any).value ?? String(option);
-          optionLabel = option.label ?? optionId;
+          // Option is already an object (e.g. enriched with translation array label); coerce to string to avoid "[object object]"
+          optionId = optionValueToString((option as any).id) || optionValueToString((option as any).value) || undefined;
+          optionLabel = optionValueToString((option as any).label) || optionId;
           optionIcon = (option as any).icon;
           optionColor = (option as any).color;
         }

@@ -159,3 +159,10 @@ export interface SchemaAnnotation {
   annotations: AnnotationItem[];
 }
 
+/** Element-level annotation for app builder form results: schema + form field + annotation text. */
+export interface ElementAnnotation {
+  schema: { id: string; label: string; icon?: string };
+  formElement: string;
+  annotation: { id: string; label: string };
+}
+

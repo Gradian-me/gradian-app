@@ -182,12 +182,22 @@ async function callClearCacheAndNotifyClient(): Promise<void> {
 async function callLogoutAPI(): Promise<boolean> {
   try {
     loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGOUT_FLOW] Calling logout API...');
-    
+
+    const accessToken = authTokenManager.getAccessToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGOUT_FLOW] Authorization header added for logout request');
+    } else {
+      loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGOUT_FLOW] No access token in memory, sending logout request without Authorization header');
+    }
+
     const response = await fetch('/api/auth/logout', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       credentials: 'include', // Important: send cookies with request
     });
 

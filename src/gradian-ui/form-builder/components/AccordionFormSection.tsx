@@ -63,6 +63,9 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
   pendingAddedEntities = {},
   onAddPendingSelected,
   onRemovePending,
+  annotationMode,
+  onElementClick,
+  annotatedFields,
 }) => {
   // Get fields for this section from the schema
   const fields = getFieldsForSection(schema, section.id);
@@ -460,6 +463,9 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
             }
           }
 
+          const hasAnnotation =
+            Array.isArray(annotatedFields) && annotatedFields.includes(fieldName);
+
           return (
             <div
               key={field.id}
@@ -470,16 +476,35 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               )}
               style={{ order: field.order ?? (field as any).layout?.order }}
             >
-              <FormElementFactory
-                field={field as any}
-                value={fieldValue}
-                error={fieldError}
-                touched={fieldTouched}
-                onChange={(value) => onChange(fieldName, value)}
-                onBlur={() => onBlur(fieldName)}
-                onFocus={() => onFocus(fieldName)}
-                disabled={disabled || field.disabled || isNotApplicable}
-              />
+              <div
+                className={annotationMode ? 'cursor-target w-full' : undefined}
+                {...(annotationMode && onElementClick
+                  ? {
+                      'data-field-id': fieldName,
+                      onClick: (e: React.MouseEvent) => {
+                        const target = e.target as HTMLElement | null;
+                        const labelEl = target?.closest('[data-annotation-label="true"]');
+                        if (!labelEl) {
+                          return;
+                        }
+                        e.stopPropagation();
+                        onElementClick(fieldName, (field as any).label);
+                      },
+                    }
+                  : {})}
+              >
+                <FormElementFactory
+                  field={field as any}
+                  value={fieldValue}
+                  error={fieldError}
+                  touched={fieldTouched}
+                  onChange={(value) => onChange(fieldName, value)}
+                  onBlur={() => onBlur(fieldName)}
+                  onFocus={() => onFocus(fieldName)}
+                  disabled={disabled || field.disabled || isNotApplicable}
+                  hasAnnotation={hasAnnotation}
+                />
+              </div>
             </div>
           );
         })}

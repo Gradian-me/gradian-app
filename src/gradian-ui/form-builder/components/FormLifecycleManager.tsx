@@ -121,6 +121,16 @@ const ensureRepeatingItemIds = (
         newValues[section.id] = [];
       }
 
+      // Show one item on form load when empty for:
+      // - fieldRelationType "addFields", or
+      // - inline repeating sections (no relation config, e.g. tender-items)
+      const isAddFields = section.repeatingConfig?.fieldRelationType === 'addFields';
+      const isInlineRepeating = !section.repeatingConfig?.targetSchema && !section.repeatingConfig?.relationTypeId;
+      const shouldInitOneItem = (isAddFields || isInlineRepeating) && Array.isArray(newValues[section.id]) && newValues[section.id].length === 0;
+      if (shouldInitOneItem) {
+        newValues[section.id] = [{ id: ulid() }];
+      }
+
       const items = newValues[section.id];
       if (Array.isArray(items)) {
         newValues[section.id] = items.map((item: any, index: number) => {
@@ -435,6 +445,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   forceExpandedSections = false,
   hideGoToTopButton = false,
   discussionConfig,
+  annotationMode,
+  onElementClick,
+  annotatedFields,
   ...props
 }) => {
   // Normalize schema so sections/fields are always arrays (never null) - prevents "Cannot read properties of null (reading 'length')"
@@ -1594,6 +1607,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           pendingAddedEntities={pending?.addedEntities}
           onAddPendingSelected={isRelationBased ? (sid, ids, entities) => addPendingSelected(sid, ids, entities) : undefined}
           onRemovePending={isRelationBased ? removePending : undefined}
+          annotationMode={annotationMode}
+          onElementClick={onElementClick}
+          annotatedFields={annotatedFields}
         />
       );
     });

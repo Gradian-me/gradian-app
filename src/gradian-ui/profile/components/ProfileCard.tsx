@@ -16,7 +16,7 @@ export interface ProfileCardProps {
   language?: string;
 }
 
-const MotionCard = motion(Card);
+const MotionCard = motion.create(Card);
 
 export const ProfileCard: React.FC<ProfileCardProps> = ({ section, className, language }) => {
   const { title, description, icon, fields, layout } = section;

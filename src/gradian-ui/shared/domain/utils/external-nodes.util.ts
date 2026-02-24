@@ -62,6 +62,28 @@ function writeAllData(data: AllDataFile): void {
   }
 }
 
+/**
+ * Coerce option id/label to string to avoid persisting "[object object]"
+ * when callers pass objects (e.g. translation arrays).
+ */
+function optionValueToString(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string') return value.trim();
+  if (typeof value === 'number') return String(value);
+  if (Array.isArray(value) && value.length > 0) {
+    const first = value[0];
+    if (first && typeof first === 'object' && !Array.isArray(first)) {
+      const v = Object.values(first)[0];
+      if (typeof v === 'string') return v;
+    }
+  }
+  if (typeof value === 'object' && !Array.isArray(value)) {
+    const v = Object.values(value)[0];
+    if (typeof v === 'string') return v;
+  }
+  return String(value);
+}
+
 export function getExternalNodes(): ExternalNode[] {
   const data = readAllData();
   return data.external_nodes ?? [];
@@ -79,8 +101,10 @@ export function upsertExternalNodeFromOption(params: {
   const data = readAllData();
   const externalNodes: ExternalNode[] = data.external_nodes ?? [];
 
-  const optionId = params.option.id != null && params.option.id !== '' ? String(params.option.id) : undefined;
-  const businessId = optionId;
+  const optionIdRaw = params.option.id != null && params.option.id !== '' ? params.option.id : undefined;
+  const optionId = optionIdRaw != null ? optionValueToString(optionIdRaw) || undefined : undefined;
+  const businessId = optionId || undefined;
+  const label = optionValueToString(params.option.label) || businessId || '';
 
   const existingIndex = externalNodes.findIndex(
     (node) =>
@@ -89,7 +113,7 @@ export function upsertExternalNodeFromOption(params: {
   );
 
   const basePayload = {
-    label: params.option.label,
+    label: label || undefined,
     icon: params.option.icon,
     color: params.option.color,
     sourceUrl: params.sourceUrl,

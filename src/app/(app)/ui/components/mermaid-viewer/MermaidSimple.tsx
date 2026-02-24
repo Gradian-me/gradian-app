@@ -19,12 +19,7 @@ interface MermaidSimpleProps {
 let initialized = false;
 let currentTheme = '';
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (typeof error === 'string') return error;
-  return 'Unknown Mermaid rendering error';
-}
-
+/** Known Mermaid/dagre layout bug when positioning edge labels; we show a friendly message instead of throwing. */
 function isKnownMermaidLayoutError(message: string): boolean {
   return (
     message.includes('Could not find a suitable point for the given distance') ||
@@ -68,7 +63,6 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
     if (!initialized || currentTheme !== theme) {
       mermaid.initialize({
         startOnLoad: false,
-        logLevel: 'fatal',
         theme: theme,
         themeVariables: {
           // Violet-based color scheme for readability in both modes
@@ -242,8 +236,7 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
 
         img.onerror = (error) => {
           clearTimeout(timeout);
-          // Avoid noisy console errors in development overlays for recoverable failures
-          console.warn('SVG image load warning:', error);
+          console.error('SVG image load error:', error);
           reject(new Error('Failed to load SVG image. Make sure the SVG is valid.'));
         };
 
@@ -339,31 +332,23 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
         }
       }
 
-      // Ensure wrapper has minimum dimensions for Mermaid layout calculations
-      const wrapper = wrapperRef.current;
-      if (wrapper) {
-        const rect = wrapper.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) {
-          // Set temporary dimensions if container has none (Mermaid needs dimensions for layout)
-          const originalMinWidth = wrapper.style.minWidth;
-          const originalMinHeight = wrapper.style.minHeight;
-          wrapper.style.minWidth = '800px';
-          wrapper.style.minHeight = '600px';
-          
-          // Clean up temporary styles after a short delay (after Mermaid has calculated layout)
-          setTimeout(() => {
-            const currentWrapper = wrapperRef.current;
-            if (currentWrapper) {
-              currentWrapper.style.minWidth = originalMinWidth;
-              currentWrapper.style.minHeight = originalMinHeight;
-            }
-          }, 1000);
-        }
-      }
-
       const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
 
-      mermaid.render(id, diagram).then(async (result) => {
+      // Render in an off-screen container with explicit size so dagre has valid dimensions
+      // (avoids "Could not find a suitable point for the given distance" / positionEdgeLabel errors)
+      const mermaidContainer = document.createElement('div');
+      mermaidContainer.setAttribute('aria-hidden', 'true');
+      mermaidContainer.style.cssText = 'position:absolute;left:-9999px;width:800px;height:600px;overflow:hidden;pointer-events:none;';
+      document.body.appendChild(mermaidContainer);
+
+      const cleanup = () => {
+        try {
+          if (mermaidContainer.parentNode) mermaidContainer.parentNode.removeChild(mermaidContainer);
+        } catch (_) { /* ignore */ }
+      };
+
+      mermaid.render(id, diagram, mermaidContainer).then(async (result) => {
+        cleanup();
         if (!containerRef.current || !canvasRef.current) return;
 
         const svgString = result.svg || '';
@@ -521,24 +506,19 @@ export function MermaidSimple({ diagram, className, showZoomControls = true, sho
             });
           }
         } catch (err) {
-          const errorMessage = getErrorMessage(err);
-          setError(
-            isKnownMermaidLayoutError(errorMessage)
-              ? 'Unable to render this Mermaid layout. Showing diagram source is recommended.'
-              : 'Failed to render diagram'
-          );
+          console.error('Failed to convert SVG to canvas:', err);
+          setError('Failed to render diagram');
         }
       }
-      }).catch((err) => {
-        const errorMessage = getErrorMessage(err);
-        // Known Mermaid layout bug: keep UI stable and avoid console error spam
-        if (isKnownMermaidLayoutError(errorMessage)) {
-          setError('Unable to render this Mermaid layout. Showing diagram source is recommended.');
+      }).catch((err: unknown) => {
+        cleanup();
+        const message = err instanceof Error ? err.message : String(err);
+        if (isKnownMermaidLayoutError(message)) {
+          setError('Unable to render this diagram layout. Showing diagram source is recommended.');
         } else {
           console.warn('Mermaid render warning:', err);
-          setError(errorMessage || 'Failed to render diagram');
+          setError(message || 'Failed to render diagram');
         }
-        // Check if canvas still exists before accessing it
         const currentCanvas = canvasRef.current;
         if (currentCanvas) {
           const ctx = currentCanvas.getContext('2d');

@@ -74,6 +74,8 @@ export interface FormElementFactoryProps extends Omit<FormElementProps, 'config'
   touched?: boolean | boolean[];
   checked?: boolean; // For switch/checkbox components
   rows?: number; // For textarea components
+  /** When true, show an annotation indicator icon after the label. */
+  hasAnnotation?: boolean;
 }
 
 export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => {
@@ -89,8 +91,8 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   let restProps: any;
   
   if (isFieldInterface) {
-    // Convert field to config format
-    const { field, value, error, touched, onChange, onBlur, onFocus, disabled, ...otherProps } = props;
+    // Convert field to config format (hasAnnotation is consumed here, do not pass to DOM)
+    const { field, value, error, touched, onChange, onBlur, onFocus, disabled, hasAnnotation: _hasAnnotation, ...otherProps } = props;
     config = field;
     // Merge disabled from field.disabled with passed disabled prop
     const fieldDisabled = field?.disabled;
@@ -111,8 +113,8 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
       restProps.required = derivedRequired;
     }
   } else {
-    // Use config directly
-    const { config: configProp, ...otherProps } = props;
+    // Use config directly (hasAnnotation is consumed here, do not pass to DOM)
+    const { config: configProp, hasAnnotation: _hasAnnotation, ...otherProps } = props;
     config = configProp;
     // Merge disabled from config.disabled with passed disabled prop
     const configDisabled = configProp?.disabled;
@@ -153,6 +155,8 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   // Config for child: no label (we render it above), no schema placeholder (children use defaults)
   const configForChild = { ...config, label: '', placeholder: undefined };
 
+  const hasAnnotation = props.hasAnnotation ?? false;
+
   const labelCaptionBlock =
     resolvedLabel || resolvedPlaceholder ? (
       <div className="mb-2">
@@ -163,8 +167,20 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
               required: config.required ?? (config as any).validation?.required,
               error: Boolean(restProps.error),
             })}
+            data-annotation-label="true"
           >
-            {resolvedLabel}
+            <span className="inline-flex items-center gap-1">
+              <span>{resolvedLabel}</span>
+              {hasAnnotation && (
+                <span
+                  className="inline-flex items-center justify-center h-4 px-1 rounded-full bg-violet-100 text-violet-700 dark:bg-violet-900/60 dark:text-violet-200 text-[10px]"
+                  aria-label="Has annotation"
+                  title="Has annotation"
+                >
+                  ✎
+                </span>
+              )}
+            </span>
           </label>
         )}
         {resolvedPlaceholder && (
@@ -193,8 +209,8 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   // Extract loadingTextSwitches from restProps if it exists
   const loadingTextSwitches = (restProps as any)?.loadingTextSwitches;
   
-  // Remove canCopy, enableVoiceInput, and loadingTextSwitches from restProps to avoid conflicts when we explicitly pass them
-  const { canCopy: _, enableVoiceInput: __, loadingTextSwitches: ___, ...restPropsWithoutExtras } = restProps;
+  // Remove canCopy, enableVoiceInput, loadingTextSwitches, and hasAnnotation from restProps (hasAnnotation must not reach DOM)
+  const { canCopy: _, enableVoiceInput: __, loadingTextSwitches: ___, hasAnnotation: ___hasAnnotation, ...restPropsWithoutExtras } = restProps;
 
   // Common props to pass to all form elements
   const commonProps = {
@@ -939,9 +955,11 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   };
 
   return (
-    <div className="w-full nx-form-element">
+    <div className="w-full nx-form-element nx-form-element-target">
       {labelCaptionBlock}
-      {renderElement()}
+      <div>
+        {renderElement()}
+      </div>
     </div>
   );
 };

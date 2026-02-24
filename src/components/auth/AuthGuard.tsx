@@ -23,6 +23,14 @@ interface AuthGuardProps {
   children: React.ReactNode;
 }
 
+function isPublicPath(pathname: string): boolean {
+  for (const publicPage of PUBLIC_PAGES) {
+    if (pathname === publicPage) return true;
+    if (pathname.startsWith(publicPage + '/')) return true;
+  }
+  return false;
+}
+
 /**
  * Check authentication status via API with timeout.
  * Validate endpoint accepts access_token (header/cookie) or refresh_token (cookie).
@@ -64,70 +72,79 @@ function triggerForceLogout(reason: string) {
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
-  
-  // Determine if current path requires authentication
-  // Default to true (requires auth) if pathname is not yet available
-  const requiresAuth = useMemo(() => {
-    // Skip auth check if REQUIRE_LOGIN is false
-    if (!REQUIRE_LOGIN) {
-      return false;
-    }
-
-    // If pathname is not available yet, assume auth is required (will check once available)
-    if (!pathname) {
-      return true;
-    }
-
-    // Check if pathname matches any public page
-    for (const publicPage of PUBLIC_PAGES) {
-      // Exact match
-      if (pathname === publicPage) {
-        return false;
-      }
-      
-      // Prefix match (e.g., /authentication matches /authentication/login)
-      if (pathname.startsWith(publicPage + '/')) {
-        return false;
-      }
-    }
-
-    return true;
-  }, [pathname]);
-
-  const [isChecking, setIsChecking] = useState(requiresAuth); // Start checking if auth is required
-  const [isAuthenticated, setIsAuthenticated] = useState(!requiresAuth); // Assume authenticated if auth not required
+  // Fallback when router pathname is not yet available (e.g. during hydration) so we don't block login page
+  const [pathnameFallback, setPathnameFallback] = useState<string>('');
 
   useEffect(() => {
-    // If auth is not required, allow rendering immediately
+    if (pathname) return;
+    if (typeof window !== 'undefined') setPathnameFallback(window.location.pathname);
+  }, [pathname]);
+
+  const effectivePathname = (pathname && pathname.length > 0) ? pathname : pathnameFallback;
+
+  // Determine if current path requires authentication
+  const requiresAuth = useMemo(() => {
+    if (!REQUIRE_LOGIN) return false;
+    if (!effectivePathname) return true;
+    return !isPublicPath(effectivePathname);
+  }, [effectivePathname]);
+
+  const [isChecking, setIsChecking] = useState(requiresAuth);
+  const [isAuthenticated, setIsAuthenticated] = useState(!requiresAuth);
+
+  useEffect(() => {
     if (!requiresAuth) {
       setIsChecking(false);
       setIsAuthenticated(true);
       return;
     }
 
-    // Perform auth check: call validate API (with credentials) so server can see refresh_token cookie (including HttpOnly)
+    let cancelled = false;
+
     const checkAuth = async () => {
       try {
         const isValid = await checkAuthViaAPI();
+        if (cancelled) return;
 
         if (!isValid) {
-          triggerForceLogout('Session invalid or expired');
+          if (typeof window !== 'undefined' && isPublicPath(window.location.pathname)) {
+            setIsAuthenticated(true);
+          } else {
+            triggerForceLogout('Session invalid or expired');
+          }
           return;
         }
 
-        // Authentication verified - allow rendering
         setIsAuthenticated(true);
       } catch (error) {
+        if (cancelled) return;
         console.error('[AuthGuard] Error during auth check:', error);
-        triggerForceLogout('Auth check failed');
+        if (typeof window !== 'undefined' && isPublicPath(window.location.pathname)) {
+          setIsAuthenticated(true);
+        } else {
+          triggerForceLogout('Auth check failed');
+        }
       } finally {
-        setIsChecking(false);
+        if (!cancelled) setIsChecking(false);
       }
     };
 
-    // Run check immediately
     checkAuth();
-  }, [pathname, requiresAuth]);
+
+    // If auth check or API hangs, stop showing loading after timeout so user can at least see login
+    const safetyTimeout = setTimeout(() => {
+      if (cancelled) return;
+      setIsChecking(false);
+      if (typeof window !== 'undefined' && isPublicPath(window.location.pathname)) {
+        setIsAuthenticated(true);
+      }
+    }, AUTH_CHECK_TIMEOUT_MS + 2000);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(safetyTimeout);
+    };
+  }, [effectivePathname, requiresAuth]);
 
   // ALWAYS show loading spinner during auth check - this prevents any content flash
   if (isChecking) {
@@ -141,8 +158,6 @@ export function AuthGuard({ children }: AuthGuardProps) {
     );
   }
 
-  // Only render children if authenticated
-  // If not authenticated, we've already redirected, so this won't render
   if (!isAuthenticated) {
     return null;
   }

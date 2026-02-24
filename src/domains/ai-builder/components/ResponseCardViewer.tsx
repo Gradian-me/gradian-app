@@ -8,6 +8,7 @@
 import React, { useMemo } from 'react';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/gradian-ui/shared/utils';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 import type { ResponseCardConfig } from '../types';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
@@ -190,40 +191,49 @@ export function ResponseCardViewer({
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {cards.map((card) => (
-          <button
-            key={card.id}
-            onClick={() => onCardClick(card, card.schemaData)}
-            className={cn(
-              'relative overflow-hidden rounded-xl',
-              'bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50',
-              'dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30',
-              'border border-violet-200 dark:border-violet-400',
-              'shadow-sm hover:shadow-md',
-              'transition-all duration-200',
-              'text-start p-5',
-              'hover:scale-[1.02] hover:border-violet-300 dark:hover:border-violet-700',
-              'focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2'
-            )}
-          >
-            <div className="flex items-start gap-3">
-              {card.icon && (
-                <div className="p-2 rounded-lg bg-violet-100 dark:bg-violet-900/50 shrink-0">
-                  <IconRenderer
-                    iconName={card.icon}
-                    className="h-5 w-5 text-violet-600 dark:text-violet-400"
-                  />
-                </div>
+          <div key={card.id} className="relative rounded-xl h-full">
+            <GlowingEffect
+              spread={32}
+              glow
+              disabled={false}
+              proximity={64}
+              inactiveZone={0.01}
+              borderWidth={2}
+            />
+            <button
+              onClick={() => onCardClick(card, card.schemaData)}
+              className={cn(
+                'relative w-full h-full overflow-hidden rounded-xl',
+                'bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50',
+                'dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30',
+                'border border-violet-200 dark:border-violet-400',
+                'shadow-sm hover:shadow-md',
+                'transition-all duration-200',
+                'text-start p-5',
+                'hover:scale-[1.02] hover:border-violet-300 dark:hover:border-violet-700',
+                'focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2'
               )}
-              <div className="flex-1 min-w-0">
-                <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
-                  {card.label}
-                </h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                  Click to preview
-                </p>
+            >
+              <div className="flex items-start gap-3">
+                {card.icon && (
+                  <div className="p-2 rounded-lg bg-violet-100 dark:bg-violet-900/50 shrink-0">
+                    <IconRenderer
+                      iconName={card.icon}
+                      className="h-5 w-5 text-violet-600 dark:text-violet-400"
+                    />
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-base font-semibold text-gray-900 dark:text-gray-100 truncate">
+                    {card.label}
+                  </h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Click to preview
+                  </p>
+                </div>
               </div>
-            </div>
-          </button>
+            </button>
+          </div>
         ))}
       </div>
     </div>

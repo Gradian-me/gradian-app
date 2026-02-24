@@ -14,6 +14,7 @@ import { cn, validateField } from '@/gradian-ui/shared/utils';
 import { Sparkles, Loader2, Square, History, RotateCcw, PencilRuler } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 import { PromptPreviewSheet } from './PromptPreviewSheet';
@@ -1139,8 +1140,16 @@ export function AiBuilderForm({
   return (
     <div className="space-y-6">
       {showForm && (
-        <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200 dark:border-violet-400 shadow-sm">
-          <div className="relative p-4 md:p-6 space-y-4">
+        <div className="relative rounded-xl">
+          <GlowingEffect
+            spread={40}
+            glow
+            disabled={false}
+            proximity={64}
+            inactiveZone={0.01}
+            borderWidth={2}
+          />
+          <div className="relative overflow-hidden rounded-xl bg-linear-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 shadow-sm p-4 md:p-6 space-y-4">
             {/* Header Section */}
             {displayType === 'default' && (
               <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center flex-wrap gap-3 md:gap-4">

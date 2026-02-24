@@ -8,6 +8,7 @@ import { SecurityProvider } from "@/components/security/SecurityProvider";
 import { IdleTimeoutProvider } from "@/gradian-ui/shared/providers/IdleTimeoutProvider";
 import { AuthEventListener } from "@/gradian-ui/shared/components/AuthEventListener";
 import { AuthGuard } from "@/components/auth/AuthGuard";
+import { ChunkLoadRecovery } from "@/components/ChunkLoadRecovery";
 import { LayoutDirLang } from "@/components/layout/LayoutDirLang";
 import { SquircleProvider } from "@/components/squircle-provider";
 
@@ -66,6 +67,7 @@ export default function RootLayout({
                 disableTransitionOnChange
               >
                 <IdleTimeoutProvider idleTimeoutMs={15 * 60 * 1000}>
+                  <ChunkLoadRecovery />
                   <AuthEventListener />
                   <Toaster />
                   <AuthGuard>

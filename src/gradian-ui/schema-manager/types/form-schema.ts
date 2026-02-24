@@ -666,6 +666,12 @@ export interface FormWrapperProps {
   hideCollapseExpandButtons?: boolean; // Hide collapse/expand all buttons
   forceExpandedSections?: boolean; // Force all sections to be expanded
   hideGoToTopButton?: boolean; // Hide go to top button
+  /** When true, form fields are wrapped with cursor-target and onElementClick is used for annotation flow (e.g. app builder preview modal). */
+  annotationMode?: boolean;
+  /** Called when user clicks a form element in annotation mode. formElementId is field name or section[index].fieldName. */
+  onElementClick?: (formElementId: string, fieldLabel?: string) => void;
+  /** Optional list of field IDs that already have annotations (used in annotation preview UIs). */
+  annotatedFields?: string[];
 }
 
 export interface FormSectionProps {
@@ -699,6 +705,12 @@ export interface FormSectionProps {
   onAddPendingSelected?: (sectionId: string, ids: string[], entities?: any[]) => void;
   /** Called when user removes a pending item - if wasAdded, also deletes the orphan entity */
   onRemovePending?: (sectionId: string, targetId: string, wasAdded: boolean) => void;
+  /** When true, wrap each field in a cursor-target div and call onElementClick on click (for annotation flow). */
+  annotationMode?: boolean;
+  /** Called when user clicks a form element in annotation mode. formElementId is field name or section[index].fieldName. */
+  onElementClick?: (formElementId: string, fieldLabel?: string) => void;
+  /** Optional list of field IDs that already have annotations (used in annotation preview UIs). */
+  annotatedFields?: string[];
 }
 
 export interface RepeatingSectionProps {

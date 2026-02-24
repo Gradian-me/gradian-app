@@ -7265,5 +7265,24 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KG0V50006000000000000022",
+    "timestamp": "2026-02-24T00:00:00.000Z",
+    "version": "1.61.004",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "Updated package dependencies including mermaid and chevrotain packages for improved functionality. Enhanced GlobalError component to handle chunk load errors with a user-friendly message and reload option. Added ChunkLoadRecovery component to layout for better error management. Introduced glowing effect in AiBuilderForm and ResponseCardViewer components for improved visual feedback. Enhanced AuthGuard to manage public paths and improve authentication flow. This update enhances overall application performance and user experience in error handling and UI interactions.",
+        "priority": "High",
+        "affectedDomains": [
+          "ui",
+          "auth",
+          "ai-builder",
+          "infrastructure",
+          "error-handling"
+        ]
+      }
+    ]
   }
 ]

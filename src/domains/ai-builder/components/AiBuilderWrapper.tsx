@@ -13,10 +13,10 @@ import {
   useAiAgents,
   useAiBuilder,
 } from '@/domains/ai-builder';
-import type { AiAgent, AnnotationItem, SchemaAnnotation } from '@/domains/ai-builder/types';
+import type { AiAgent, AnnotationItem, SchemaAnnotation, ElementAnnotation } from '@/domains/ai-builder/types';
 import { Modal } from '@/gradian-ui/data-display/components/Modal';
+import { TargetCursor } from '@/gradian-ui/layout/target-cursor';
 import { SchemaFormWrapper } from '@/gradian-ui/form-builder/components/FormLifecycleManager';
-import { ListInput } from '@/gradian-ui/form-builder/form-elements';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
 import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
@@ -25,9 +25,21 @@ import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { useLanguageStore } from '@/stores/language.store';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ulid } from 'ulid';
 import { AiBuilderLoadingIndicator } from './AiBuilderLoadingIndicator';
 import { extractParametersBySectionId } from '../utils/ai-shared-utils';
+import { Pencil, Trash2, CheckCircle2 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/gradian-ui/form-builder/form-elements/components/Textarea';
 
 export interface AiBuilderWrapperProps {
   initialAgentId?: string;
@@ -122,6 +134,18 @@ export function AiBuilderWrapper({
     onLanguageChange?.(language);
   }, [onLanguageChange]);
   const [annotations, setAnnotations] = useState<Map<string, SchemaAnnotation>>(new Map());
+  /** Element-level annotations for preview form modal: [{ schema, formElement, annotation }] */
+  const [elementAnnotations, setElementAnnotations] = useState<ElementAnnotation[]>([]);
+  /** Annotation popup: add or edit annotation for a form element */
+  const [annotationPopup, setAnnotationPopup] = useState<{
+    open: boolean;
+    formElementId: string;
+    fieldLabel?: string;
+    editingId: string | null;
+    draftLabel: string;
+  }>({ open: false, formElementId: '', editingId: null, draftLabel: '' });
+  /** Index of element annotation to remove (confirmation before remove) */
+  const [removeAnnotationIndex, setRemoveAnnotationIndex] = useState<number | null>(null);
   const [lastPromptId, setLastPromptId] = useState<string | null>(null);
   const [firstPromptId, setFirstPromptId] = useState<string | null>(null);
   const [previousUserPrompt, setPreviousUserPrompt] = useState<string>('');
@@ -299,6 +323,7 @@ export function AiBuilderWrapper({
   useEffect(() => {
     clearResponse();
     setAnnotations(new Map());
+    setElementAnnotations([]);
     setFirstPromptId(null);
     setLastPromptId(null);
     setPreviousUserPrompt('');
@@ -322,6 +347,29 @@ export function AiBuilderWrapper({
   // Convert annotations map to array for ResponseAnnotationViewer
   const annotationsArray = Array.from(annotations.values());
 
+  /** Convert elementAnnotations to API shape (group by schema, labels include field context) */
+  const elementAnnotationsToSchemaAnnotations = useCallback((items: ElementAnnotation[]): SchemaAnnotation[] => {
+    const bySchema = new Map<string, SchemaAnnotation>();
+    for (const item of items) {
+      const existing = bySchema.get(item.schema.id);
+      const annotationWithField = {
+        id: item.annotation.id,
+        label: `Field "${item.formElement}": ${item.annotation.label}`,
+      };
+      if (existing) {
+        existing.annotations.push(annotationWithField);
+      } else {
+        bySchema.set(item.schema.id, {
+          schemaId: item.schema.id,
+          schemaLabel: item.schema.label,
+          schemaIcon: item.schema.icon,
+          annotations: [annotationWithField],
+        });
+      }
+    }
+    return Array.from(bySchema.values());
+  }, []);
+
   // Get the prompt that would be sent to LLM
   const getPromptForLLM = () => {
     if (!selectedAgent || !userPrompt.trim()) {
@@ -336,10 +384,22 @@ export function AiBuilderWrapper({
     systemPrompt += (preloadedContext || '');
 
     // Format user prompt - if annotations are present, include modification request
-    const basePrompt = (annotationsArray.length > 0 && previousUserPrompt) ? previousUserPrompt : userPrompt;
+    const basePrompt = (annotationsArray.length > 0 || elementAnnotations.length > 0) && previousUserPrompt ? previousUserPrompt : userPrompt;
     let finalUserPrompt = basePrompt.trim();
-    
-    if (annotationsArray.length > 0 && previousAiResponse) {
+
+    if (elementAnnotations.length > 0 && previousAiResponse) {
+      const annotationSections = elementAnnotations.reduce((acc, item) => {
+        const key = item.schema.label;
+        if (!acc[key]) acc[key] = [] as string[];
+        acc[key].push(`Field "${item.formElement}": ${item.annotation.label}`);
+        return acc;
+      }, {} as Record<string, string[]>);
+      const sectionsText = Object.entries(annotationSections)
+        .map(([schemaLabel, changes]) => `${schemaLabel}\n\n${changes.map(c => `- ${c}`).join('\n')}`)
+        .join('\n\n');
+      const modificationRequest = `\n\n---\n\n## MODIFY EXISTING SCHEMA(S)\n\nPlease update the following schema(s) based on the requested modifications. Apply ONLY the specified changes while keeping everything else exactly the same.\n\nRequested Modifications:\n\n${sectionsText}\n\nPrevious Schema(s):\n\`\`\`json\n${previousAiResponse}\n\`\`\`\n\n---\n\nIMPORTANT: You are the world's best schema editor. Apply these modifications precisely while preserving all other aspects of the schema(s). Output the complete updated schema(s) in the same format (single object or array).`;
+      finalUserPrompt = basePrompt.trim() + modificationRequest;
+    } else if (annotationsArray.length > 0 && previousAiResponse) {
       const annotationSections = annotationsArray.map(ann => {
         const changes = ann.annotations.map(a => `- ${a.label}`).join('\n');
         return `${ann.schemaLabel}\n\n${changes}`;
@@ -483,11 +543,14 @@ export function AiBuilderWrapper({
     setUserPrompt('');
     setSelectedAgentId('');
     setAnnotations(new Map());
+    setElementAnnotations([]);
     setPreviousUserPrompt('');
     setPreviousAiResponse('');
     setLastPromptId(null);
     setFirstPromptId(null);
     setPreviewSchema(null);
+    setAnnotationPopup({ open: false, formElementId: '', editingId: null, draftLabel: '' });
+    setRemoveAnnotationIndex(null);
     setIsApplyingAnnotations(false);
     clearResponse();
     setShowResetConfirm(false);
@@ -590,18 +653,92 @@ export function AiBuilderWrapper({
 
   const handleFormModalClose = useCallback(() => {
     setPreviewSchema(null);
+    setElementAnnotations([]);
+    setAnnotationPopup({ open: false, formElementId: '', editingId: null, draftLabel: '' });
+    setRemoveAnnotationIndex(null);
   }, []);
 
-  const currentSchemaAnnotation = previewSchema 
-    ? annotations.get(previewSchema.schema.id) 
-    : null;
+  const handleElementClick = useCallback(
+    (formElementId: string, fieldLabel?: string) => {
+      if (!previewSchema) {
+        return;
+      }
 
-  const handleModalAnnotationChange = useCallback((items: AnnotationItem[]) => {
-    if (previewSchema) {
-      const schemaId = previewSchema.schema.id;
-      handleAnnotationChange(schemaId, items);
+      const existing = elementAnnotations.find(
+        (item) => item.schema.id === previewSchema.schema.id && item.formElement === formElementId
+      );
+
+      if (existing) {
+        setAnnotationPopup({
+          open: true,
+          formElementId,
+          fieldLabel,
+          editingId: existing.annotation.id,
+          draftLabel: existing.annotation.label,
+        });
+      } else {
+        setAnnotationPopup({
+          open: true,
+          formElementId,
+          fieldLabel,
+          editingId: null,
+          draftLabel: '',
+        });
+      }
+    },
+    [previewSchema, elementAnnotations]
+  );
+
+  const openEditAnnotation = useCallback((index: number) => {
+    const item = elementAnnotations[index];
+    if (!item) return;
+    setAnnotationPopup({
+      open: true,
+      formElementId: item.formElement,
+      fieldLabel: undefined,
+      editingId: item.annotation.id,
+      draftLabel: item.annotation.label,
+    });
+  }, [elementAnnotations]);
+
+  const saveAnnotation = useCallback(() => {
+    if (!previewSchema) return;
+    const { formElementId, editingId, draftLabel } = annotationPopup;
+    const label = (draftLabel ?? '').trim();
+    if (!label) return;
+    const schemaInfo = {
+      id: previewSchema.schema.id,
+      label: previewSchema.schema.singular_name || previewSchema.schema.name || previewSchema.schema.id,
+      icon: (previewSchema.schema as any).icon,
+    };
+    if (editingId) {
+      setElementAnnotations((prev) =>
+        prev.map((item) =>
+          item.annotation.id === editingId
+            ? { ...item, annotation: { ...item.annotation, label } }
+            : item
+        )
+      );
+    } else {
+      setElementAnnotations((prev) => [
+        ...prev,
+        { schema: schemaInfo, formElement: formElementId, annotation: { id: ulid(), label } },
+      ]);
     }
-  }, [previewSchema, handleAnnotationChange]);
+    setAnnotationPopup({ open: false, formElementId: '', editingId: null, draftLabel: '' });
+  }, [previewSchema, annotationPopup]);
+
+  const handleRemoveAnnotationConfirm = useCallback(() => {
+    if (removeAnnotationIndex !== null) {
+      setElementAnnotations((prev) => prev.filter((_, i) => i !== removeAnnotationIndex));
+      setRemoveAnnotationIndex(null);
+    }
+  }, [removeAnnotationIndex]);
+
+  const handleApplyElementAnnotations = useCallback(async () => {
+    const converted = elementAnnotationsToSchemaAnnotations(elementAnnotations);
+    await handleApplyAnnotations(converted);
+  }, [elementAnnotations, elementAnnotationsToSchemaAnnotations, handleApplyAnnotations]);
 
   const promptForLLM = getPromptForLLM();
 
@@ -750,7 +887,22 @@ export function AiBuilderWrapper({
           description="Review the generated schema and add annotations"
           size="xl"
           showCloseButton={true}
+          footerLeftActions={
+            elementAnnotations.length > 0 ? (
+              <Button onClick={handleApplyElementAnnotations} disabled={isLoading} variant="gradient">
+                <CheckCircle2 className="h-4 w-4 me-2" />
+                Apply ({elementAnnotations.length}) & Regenerate
+              </Button>
+            ) : undefined
+          }
         >
+          <TargetCursor
+            targetSelector=".nx-form-element-target"
+            spinDuration={4.3}
+            hideDefaultCursor={false}
+            parallaxOn
+            hoverDuration={0.8}
+          />
           <div className="space-y-6">
             <SchemaFormWrapper
               schema={previewSchema.schema}
@@ -765,26 +917,156 @@ export function AiBuilderWrapper({
               hideCollapseExpandButtons={true}
               forceExpandedSections={true}
               hideGoToTopButton={true}
+              annotationMode={true}
+              onElementClick={handleElementClick}
+              annotatedFields={elementAnnotations
+                .filter((item) => item.schema.id === previewSchema.schema.id)
+                .map((item) => item.formElement)}
             />
-            
+
             <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 {getT(TRANSLATION_KEYS.AI_BUILDER_ADD_ANNOTATIONS, language, defaultLang)}
               </h4>
               <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
                 {getT(TRANSLATION_KEYS.AI_BUILDER_ADD_ANNOTATIONS_DESCRIPTION, language, defaultLang)}
               </p>
-              <ListInput
-                value={currentSchemaAnnotation?.annotations || []}
-                onChange={handleModalAnnotationChange}
-                placeholder={getT(TRANSLATION_KEYS.AI_BUILDER_ANNOTATION_PLACEHOLDER, language, defaultLang)}
-                addButtonText={getT(TRANSLATION_KEYS.AI_BUILDER_ADD_ANNOTATION_BUTTON, language, defaultLang)}
-                disabled={isLoading}
-              />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                Click a form field above to add an annotation, or edit/remove from the cards below.
+              </p>
+
+              {elementAnnotations.length > 0 && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+                    {elementAnnotations.map((item, index) => (
+                      <div
+                        key={item.annotation.id}
+                        className="flex items-start gap-2 rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50/50 dark:bg-violet-950/30 p-3 min-w-0 max-w-full"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-violet-700 dark:text-violet-300 truncate">
+                            {item.schema.label}
+                          </p>
+                          <p className="text-xs text-gray-600 dark:text-gray-400 truncate" title={item.formElement}>
+                            Field: {item.formElement}
+                          </p>
+                          <p className="text-sm text-gray-900 dark:text-gray-100 mt-1 wrap-break-word">
+                            {item.annotation.label}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => openEditAnnotation(index)}
+                            title="Edit"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/50"
+                            onClick={() => setRemoveAnnotationIndex(index)}
+                            title="Remove"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {elementAnnotations.length === 0 && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 italic">
+                  No annotations yet. Click a form field above to add one.
+                </p>
+              )}
             </div>
           </div>
         </Modal>
       )}
+
+      {/* Annotation popup: add or edit annotation for a form element */}
+      <Dialog
+        open={annotationPopup.open}
+        onOpenChange={(open) => {
+          if (!open) setAnnotationPopup({ open: false, formElementId: '', editingId: null, draftLabel: '' });
+        }}
+      >
+        <DialogContent className="w-full h-full rounded-none lg:rounded-2xl lg:max-w-[50vw] lg:max-h-[80vh] lg:h-fit flex flex-col">
+          <DialogHeader>
+            <DialogTitle>{annotationPopup.editingId ? 'Edit annotation' : 'Add annotation'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Element</Label>
+              <p className="text-sm font-mono text-gray-700 dark:text-gray-300 break-all" title={annotationPopup.formElementId}>
+                {annotationPopup.formElementId}
+              </p>
+              {annotationPopup.fieldLabel && (
+                <p className="text-xs text-gray-500 dark:text-gray-400">{annotationPopup.fieldLabel}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="annotation-label">Annotation</Label>
+              <Textarea
+                config={{
+                  name: 'annotation-label',
+                  label: '',
+                  placeholder: 'Describe the change for this field...',
+                  validation: undefined,
+                }}
+                value={annotationPopup.draftLabel}
+                onChange={(value: string) =>
+                  setAnnotationPopup((p) => ({ ...p, draftLabel: value }))
+                }
+                rows={4}
+                resize="vertical"
+                className="min-h-[88px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAnnotationPopup((p) => ({ ...p, open: false }))}>
+              Cancel
+            </Button>
+            <Button onClick={saveAnnotation} disabled={!annotationPopup.draftLabel?.trim()}>
+              {annotationPopup.editingId ? 'Save' : 'Add'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Remove annotation confirmation */}
+      <ConfirmationMessage
+        isOpen={removeAnnotationIndex !== null}
+        onOpenChange={(open) => !open && setRemoveAnnotationIndex(null)}
+        title={[{ en: 'Remove annotation' }, { fa: 'حذف حاشیه\u200cنویسی' }]}
+        message={[
+          { en: 'Are you sure you want to remove this annotation?' },
+          { fa: 'آیا مطمئن هستید که می\u200cخواهید این حاشیه\u200cنویسی را حذف کنید؟' },
+        ]}
+        variant="warning"
+        buttons={[
+          {
+            label: getT(TRANSLATION_KEYS.BUTTON_CANCEL, language, defaultLang),
+            variant: 'outline',
+            action: () => setRemoveAnnotationIndex(null),
+          },
+          {
+            label: getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang),
+            variant: 'destructive',
+            icon: 'Trash2',
+            action: handleRemoveAnnotationConfirm,
+          },
+        ]}
+        size="md"
+      />
 
       {/* Reset Confirmation Dialog */}
       {showResetButton && (
