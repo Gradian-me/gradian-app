@@ -1005,6 +1005,24 @@ input.bg-transparent:-webkit-autofill:active {
   margin: 1.5em 0;
 }
 
+/* Keep markdown viewer content inside container: wrap long words and avoid overflow */
+.prose {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+.prose p,
+.prose li,
+.prose td,
+.prose th,
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6,
+.prose blockquote {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  max-width: 100%;
+}
+
 /* React Day Picker: readable day cells, range start left-rounded only, range end right-rounded only */
 .rdp-root {
   --rdp-accent-color: rgb(139 92 246); /* violet-500 */

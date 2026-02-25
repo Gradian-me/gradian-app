@@ -25,6 +25,29 @@ export function validateAndTransformFormData(
   const errors: string[] = [];
   const transformedData: Record<string, any> = { ...data };
 
+  // Normalize keys so that either field.id or field.name from the schema
+  // can be used as JSON keys. The rest of the pipeline expects field.name.
+  if (schema?.fields && Array.isArray(schema.fields) && data && typeof data === 'object') {
+    schema.fields.forEach((field: FormField) => {
+      const fieldName = field.name;
+      const fieldId = (field as any).id as string | undefined;
+
+      if (!fieldName || !fieldId || fieldName === fieldId) {
+        return;
+      }
+
+      // If value was provided using the field id (e.g. "reports-to"),
+      // but not with the canonical field name (e.g. "reportsTo"),
+      // map it to the field name so downstream logic works correctly.
+      const hasNameKey = Object.prototype.hasOwnProperty.call(transformedData, fieldName);
+      const hasIdKey = Object.prototype.hasOwnProperty.call(transformedData, fieldId);
+
+      if (!hasNameKey && hasIdKey) {
+        transformedData[fieldName] = transformedData[fieldId];
+      }
+    });
+  }
+
   if (!schema || !schema.fields) {
     return {
       isValid: false,

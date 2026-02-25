@@ -5,36 +5,37 @@ import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsConte
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { RefreshCw } from 'lucide-react';
-import { sanitizeSvg } from '@/gradian-ui/shared/utils/html-sanitizer';
+import { MermaidViewerPure } from './MermaidViewerPure';
 
-const DEFAULT_DIAGRAM = `graph LR
-    A --- B
-    B-->C[fa:fa-ban forbidden]
-    B-->D(fa:fa-spinner);`;
+const DEFAULT_DIAGRAM = `flowchart TD
+    A[Christmas] -->|Get money| B[Go shopping]
+    B --> C{Let me think}
+    C -->|One| D[Laptop]
+    C -->|Two| E[iPhone]
+    C -->|Three| F[Car]`;
 
 export default function MermaidViewerNewPage() {
   const [mermaidCode, setMermaidCode] = useState(DEFAULT_DIAGRAM);
   const [displayCode, setDisplayCode] = useState(DEFAULT_DIAGRAM);
   const [mounted, setMounted] = useState(false);
-  const [svgContent, setSvgContent] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isRendering, setIsRendering] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useSetLayoutProps({
     title: 'Mermaid Viewer (New)',
-    subtitle: 'Simple integration with mermaid.render()',
+    subtitle: 'MermaidViewerPure + mermaid.run()',
     icon: 'Workflow',
   });
 
   const handleRender = () => {
+    setError(null);
     setDisplayCode(mermaidCode);
   };
 
   const handleClear = () => {
     setMermaidCode('');
     setDisplayCode('');
-    setSvgContent(null);
     setError(null);
   };
 
@@ -43,11 +44,7 @@ export default function MermaidViewerNewPage() {
   }, []);
 
   useEffect(() => {
-    if (!mounted || !displayCode.trim()) {
-      setSvgContent(null);
-      setError(null);
-      return;
-    }
+    if (!mounted || !displayCode.trim()) return;
 
     let cancelled = false;
     setError(null);
@@ -58,33 +55,42 @@ export default function MermaidViewerNewPage() {
         const { default: mermaid } = await import('mermaid');
         if (cancelled) return;
 
-        mermaid.initialize({ startOnLoad: false });
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'default',
+          securityLevel: 'loose',
+        });
 
-        const id = `mermaid-new-${Math.random().toString(36).slice(2, 11)}`;
-        const offscreen = document.createElement('div');
-        offscreen.setAttribute('aria-hidden', 'true');
-        offscreen.style.cssText = 'position:absolute;left:-9999px;width:800px;height:600px;overflow:hidden;pointer-events:none;';
-        document.body.appendChild(offscreen);
+        if (cancelled) return;
 
-        try {
-          const result = await mermaid.render(id, displayCode.trim(), offscreen);
-          if (cancelled) return;
-          const raw = result?.svg ?? '';
-          const sanitized = typeof window !== 'undefined' ? sanitizeSvg(raw) : raw;
-          setSvgContent(sanitized);
-          setError(null);
-        } finally {
-          try {
-            if (offscreen.parentNode) offscreen.parentNode.removeChild(offscreen);
-          } catch {
-            /* ignore */
-          }
-        }
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+        const container = containerRef.current;
+        if (!container) return;
+        if (cancelled) return;
+
+        const nodeList = container.querySelectorAll<HTMLElement>('.mermaid');
+        if (nodeList.length === 0) return;
+
+        await mermaid.run({
+          nodes: Array.from(nodeList),
+          suppressErrors: false,
+        });
       } catch (err) {
         if (!cancelled) {
-          const message = err instanceof Error ? err.message : String(err);
+          let message: string;
+          if (err instanceof Error) {
+            message = err.message;
+          } else if (typeof err === 'object' && err !== null && 'message' in err) {
+            const m = (err as { message?: unknown }).message;
+            message = typeof m === 'string' ? m : String(m ?? '');
+          } else {
+            message = String(err);
+          }
+          if (message === '[object Object]' || !message.trim()) {
+            message = 'Failed to render diagram';
+          }
           setError(message);
-          setSvgContent(null);
         }
       } finally {
         if (!cancelled) setIsRendering(false);
@@ -123,29 +129,31 @@ export default function MermaidViewerNewPage() {
         />
 
         <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-          Renders with <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">mermaid.render()</code> and sanitized SVG output.
+          Renders with <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">MermaidViewerPure</code> and <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">mermaid.run()</code>.
         </p>
       </div>
 
       {displayCode ? (
         <div
           ref={containerRef}
-          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 flex justify-center items-center min-h-[200px]"
+          className="w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 flex flex-col justify-center items-center min-h-[200px] relative"
         >
-          {!mounted ? (
+          {!mounted && (
             <div className="text-gray-400 dark:text-gray-500 text-sm">Loading…</div>
-          ) : isRendering ? (
-            <div className="text-gray-400 dark:text-gray-500 text-sm">Rendering diagram…</div>
-          ) : error ? (
-            <div className="text-red-600 dark:text-red-400 text-sm max-w-full overflow-auto">
+          )}
+          {mounted && isRendering && (
+            <div className="text-gray-400 dark:text-gray-500 text-sm absolute top-4 left-4">Rendering…</div>
+          )}
+          {mounted && error && (
+            <div className="text-red-600 dark:text-red-400 text-sm max-w-full overflow-auto w-full">
               {error}
             </div>
-          ) : svgContent ? (
-            <div
-              className="[&_svg]:max-w-full [&_svg]:h-auto"
-              dangerouslySetInnerHTML={{ __html: svgContent }}
-            />
-          ) : null}
+          )}
+          {mounted && (
+            <div className="w-full [&_svg]:max-w-full [&_svg]:h-auto [&_.mermaid]:min-h-[120px]">
+              <MermaidViewerPure definition={displayCode} />
+            </div>
+          )}
         </div>
       ) : (
         <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-12 text-center text-gray-500 dark:text-gray-400">

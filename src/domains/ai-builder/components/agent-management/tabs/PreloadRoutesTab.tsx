@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2 } from 'lucide-react';
-import { TextInput, Textarea, Select, ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements';
+import { TextInput, Textarea, Select, ConfirmationMessage, Switch } from '@/gradian-ui/form-builder/form-elements';
 import { AiAgent } from '../../../types';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
@@ -149,6 +149,20 @@ export function PreloadRoutesTab({ agent, onUpdate, readonly = false }: PreloadR
                       ]}
                       value={route.outputFormat || 'json'}
                       onValueChange={(value) => updateRoute(index, { outputFormat: value })}
+                      disabled={readonly}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg border p-4">
+                    <div>
+                      <p className="font-medium">Use integrated authentication</p>
+                      <p className="text-sm text-muted-foreground">
+                        When on, the app calls this route via its API (e.g. /api/lookups/fetch/[id]) so the server handles auth to the external URL.
+                      </p>
+                    </div>
+                    <Switch
+                      config={{ name: 'useIntegratedAuth', label: '' }}
+                      checked={route.useIntegratedAuthentication === true}
+                      onChange={(checked) => updateRoute(index, { useIntegratedAuthentication: checked ? true : undefined })}
                       disabled={readonly}
                     />
                   </div>

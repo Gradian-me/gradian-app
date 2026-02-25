@@ -358,7 +358,7 @@ export function MarkdownViewer({
   }, [onChange]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 min-w-0 w-full">
       {showToggle && (
         <MarkdownToolbox 
           viewMode={viewMode} 
@@ -399,7 +399,7 @@ export function MarkdownViewer({
         <article 
           ref={markdownContentRef} 
           dir="auto" 
-          className="prose prose-lg dark:prose-invert max-w-none"
+          className="prose prose-lg dark:prose-invert max-w-none min-w-0 w-full break-words"
           key={isStreaming ? 'streaming' : displayContent}
         >
           <ReactMarkdown

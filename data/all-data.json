@@ -3555,8 +3555,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-02-21T19:23:59.486Z",
-      "lastSynced": "2026-02-21T19:23:59.486Z",
+      "updatedAt": "2026-02-25T12:54:05.164Z",
+      "lastSynced": "2026-02-25T12:54:05.164Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -3568,7 +3568,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 40 schemas: 40 succeeded, 0 failed (0 created, 40 updated)"
+      "lastSyncMessage": "Processed 43 schemas: 43 succeeded, 0 failed (0 created, 43 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -7569,6 +7569,55 @@
       "id": "01KHJGYKSJH06ZNCD867SG7S47",
       "createdAt": "2026-02-16T06:07:08.085Z",
       "updatedAt": "2026-02-20T17:32:07.462Z"
+    },
+    {
+      "progressPercent": 0,
+      "taskTitle": "بررسی داده‌های عملیاتی تولید Somatropin Bulk",
+      "taskDescription": "بررسی و تحلیل فرآیند تولید Somatropin Bulk بین آوریل 2025 و فوریه 2026. فرآیند شامل دوازده Batch مجزا برای تولید محصول نهایی CinnaTropin است. میانگین پروتئین کل تولید شده در هر Batch حدود 3,594.6 گرم با غلظت ثابت 12.2 تا 12.5 mg/mL گزارش شده است. نوسانات تولید بین Batch شماره K012AM (بیشترین) و K072AM (کمترین) به حجم ورودی مراحل تولید بستگی دارد. هدف، اطمینان از تداوم تأمین بازار و حفظ استانداردهای GMP در فرآیندهای Downstream است.",
+      "definitionOfDone": [
+        {
+          "id": "dod-1",
+          "content": "",
+          "isCompleted": false
+        },
+        {
+          "id": "dod-2",
+          "content": "",
+          "isCompleted": false
+        },
+        {
+          "id": "dod-3",
+          "content": "",
+          "isCompleted": false
+        },
+        {
+          "id": "dod-4",
+          "content": "",
+          "isCompleted": false
+        }
+      ],
+      "actionsTaken": [],
+      "assignedTo": [],
+      "dueDate": "2026-02-27",
+      "status": {
+        "id": "01KBSVZ9NT2Z23FXK7B1G7AYS8",
+        "label": "Completed",
+        "color": "emerald",
+        "icon": "CheckCircle"
+      },
+      "entityType": [
+        {
+          "id": "01KCDZTASK001WORK000000000001",
+          "label": "Work",
+          "icon": "Briefcase",
+          "color": "blue"
+        }
+      ],
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KJAC4NM0DMSWAFH5T3AHDAK8",
+      "createdAt": "2026-02-25T12:24:50.048Z",
+      "updatedAt": "2026-02-25T12:25:49.157Z"
     }
   ],
   "change-procedure": [
@@ -21339,6 +21388,36 @@
       "label": "Automation / Digital",
       "icon": "Zap",
       "sourceUrl": "field-options:lean-management:lean-method-suggested"
+    },
+    {
+      "id": "01KJ9ZF1BFEF33PDDSQQWW14ZR",
+      "businessId": "01KJ9ZF1BFEF33PDDSQQWW14ZR",
+      "label": "Senior",
+      "color": "blue",
+      "sourceUrl": "field-options:job-descriptions:seniority"
+    },
+    {
+      "id": "01KJ9ZF1F77ZD1WP3PSZF84XNE",
+      "businessId": "01KJ9ZF1F77ZD1WP3PSZF84XNE",
+      "label": "Full Time",
+      "icon": "clock",
+      "sourceUrl": "field-options:job-descriptions:work-shift"
+    },
+    {
+      "id": "01KJ9ZF1J62K5FMKBTNFTD62PH",
+      "businessId": "01KJ9ZF1J62K5FMKBTNFTD62PH",
+      "label": "Pharmaceutical",
+      "icon": "pill",
+      "color": "emerald",
+      "sourceUrl": "field-options:job-descriptions:industry"
+    },
+    {
+      "id": "01KJABBWQQRQAHRPSVNX58JMN1",
+      "businessId": "operation",
+      "label": "Operation",
+      "icon": "Play",
+      "color": "blue",
+      "sourceUrl": "field-options:equipment-logbooks:operation-type"
     }
   ],
   "deviation-management": [
@@ -21703,7 +21782,7 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KGF6M26309P00Y0GJVBCN2QK",
       "createdAt": "2026-02-02T12:53:11.499Z",
-      "updatedAt": "2026-02-21T15:29:43.392Z",
+      "updatedAt": "2026-02-25T12:15:20.251Z",
       "isBookmarked": false,
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "checklist": [
@@ -21715,12 +21794,12 @@
         {
           "id": "item-1770039091444-hdndo2ico",
           "content": "asfdasd",
-          "isCompleted": false
+          "isCompleted": true
         },
         {
           "id": "item-1770064301767-vru8wrr9c",
           "content": "SDASDASD",
-          "isCompleted": false
+          "isCompleted": true
         },
         {
           "id": "item-1770039087625-bj3g60e46",
@@ -21728,12 +21807,15 @@
           "isCompleted": false
         }
       ],
-      "entityType": {
-        "id": "01KCDZTASK002PERSONAL000000002",
-        "label": "Personal",
-        "color": "purple",
-        "icon": "User"
-      }
+      "entityType": [
+        {
+          "id": "01KCDZTASK005EDUCATION0000005",
+          "label": "Education",
+          "icon": "GraduationCap",
+          "color": "indigo"
+        }
+      ],
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     }
   ],
   "change-managements": [],
@@ -21817,11 +21899,7 @@
       "changeNumber": "CHG-TEMP-2024-001",
       "issueDate": "2026-02-16",
       "changeTitle": "اصلاح و یکپارچه‌سازی افزونگی برای کنترل دمای بیوراکتورهای BR-12 و BR-14",
-      "changeCategory": [
-        {
-          "id": "01KD0683FSR5VCMC071QWHNVW7"
-        }
-      ],
+      "changeCategory": [],
       "changeDescription": "شکست ماژول‌های اصلی کنترل دما در بیوراکتورهای BR-12 و BR-14 نشان‌دهنده ریسک قابل‌توجهی برای بخش تولید Upstream است. موارد مشاهده شده شامل Signal Drift و قطع موقت ارتباط، بیانگر نقص در لایه‌ی تبدیل A/D یا تخریب فیزیکی Bus Interface در برد کنترلی است که مستقیماً بر CPPهایی مانند الگوهای گلیکوزیلاسیون mAb تأثیر می‌گذارد.",
       "proposedSolution": "۱. تعویض فوری ماژول‌های تخریب‌شده با واحدهای ارتقایافته دارای هیت‌سینک.\n۲. پیاده‌سازی منطق نظارتی Redundant Cross-Check در PLC/DCS با استفاده از سنسور کمکی PT100/RTD.\n۳. تنظیم مجدد پارامترهای PID و کالیبراسیون NIST.",
       "affectedEquipmentSystem": [
@@ -21830,76 +21908,125 @@
         "Temperature Control Module",
         "PLC/DCS Controller"
       ],
-      "affectedProcesses": [
-        {
-          "id": "01JGFJJZ00DE3B4WZZ6KYE37BB"
-        },
-        {
-          "id": "01JGFJJZ00KSPWSWMHSX4FMZKP"
-        }
-      ],
-      "impactProductQuality": [
-        {
-          "id": "critical"
-        }
-      ],
-      "impactPatientSafety": [
-        {
-          "id": "high"
-        }
-      ],
-      "impactDataIntegrity": [
-        {
-          "id": "medium"
-        }
-      ],
-      "impactRegulatoryCompliance": [
-        {
-          "id": "high"
-        }
-      ],
-      "changeProcedure": [
-        {
-          "id": "01KD079DB28A53ADBQAW0NMTMW"
-        }
-      ],
-      "changeClassification": [
-        {
-          "id": "01KBSR8J6EWGTQ6DPKGH5XR3VE"
-        }
-      ],
-      "relatedGuidelines": [
-        {
-          "id": "01KCHCHX8400000000000002HC"
-        },
-        {
-          "id": "01KCHCHX8100000000000002F8"
-        },
-        {
-          "id": "01KCHCHX8C00000000000002TS"
-        }
-      ],
+      "affectedProcesses": [],
+      "impactProductQuality": [],
+      "impactPatientSafety": [],
+      "impactDataIntegrity": [],
+      "impactRegulatoryCompliance": [],
+      "changeProcedure": [],
+      "changeClassification": [],
+      "relatedGuidelines": [],
       "changeClassificationJustification": "به دلیل تأثیر مستقیم بر CPP (پارامتر کنترلی بحرانی) و نیاز به Re-IQ/OQ سیستم‌های کنترلی طبق استانداردهای GAMP 5 و ASTM E2500، این تغییر در رده بحرانی/عمده دسته‌بندی می‌شود.",
       "changeIsEffective": true,
       "affectedProductMaterial": [
         "Monoclonal Antibodies (mAb)"
       ],
       "qaFinalReview": "بررسی نهایی باید شامل تایید صحت منطق Watchdog و تست Fail-Safe در هنگام قطع ارتباط ماژول باشد. اطمینان از کالیبراسیون همزمان هر دو سنسور برای جلوگیری از مثبت کاذب الزامی است.",
-      "status": [
-        {
-          "id": "01KBSSP49BTQXY12YW52SEW78B",
-          "label": "Closed",
-          "icon": "CircleCheckBig",
-          "color": "emerald"
-        }
-      ],
+      "status": {
+        "id": "01KBSSNSJXNCGYP6PMSEV3NAD2",
+        "label": "QA Effectiveness Evaluation",
+        "color": "emerald",
+        "icon": "BarChart"
+      },
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KHHVVNXTZ9P9YCZNAZ61ER4D",
       "createdAt": "2026-02-15T23:58:31.870Z",
-      "updatedAt": "2026-02-15T23:58:32.290Z"
+      "updatedAt": "2026-02-25T12:14:14.282Z"
     }
   ],
-  "lookups": []
+  "lookups": [],
+  "job-descriptions": [
+    {
+      "postTitle": "کارشناس سیستم مدیریت تغییر",
+      "department": "تضمین کیفیت (QA)",
+      "reportsTo": "مدیر تضمین کیفیت",
+      "seniority": [],
+      "workShift": [],
+      "industry": [],
+      "postDescription": "مسئول نظارت، ارزیابی و اجرای فرآیندهای مدیریت تغییر (Change Control) جهت اطمینان از انطباق با استانداردهای GMP و حفظ کیفیت محصول در تمامی مراحل تغییرات سیستمی، تجهیزاتی و فرآیندی.",
+      "tasks": [
+        "بررسی و ارزیابی درخواست‌های تغییر (Change Control) از واحدهای مختلف",
+        "هماهنگی جلسات ارزیابی ریسک برای تغییرات پیشنهادی",
+        "پیگیری اجرای اقدامات اصلاحی و پیشگیرانه (CAPA) مرتبط با تغییرات",
+        "اطمینان از به‌روزرسانی مستندات (SOPs) پس از تایید نهایی تغییرات",
+        "تهیه گزارش‌های دوره‌ای از وضعیت شاخص‌های مدیریت تغییر"
+      ],
+      "authorizations": [
+        "تایید یا رد اولیه درخواست‌های تغییر بر اساس الزامات کیفی",
+        "توقف فرآیندهای عملیاتی در صورت عدم رعایت پروتکل‌های مدیریت تغییر",
+        "دسترسی به سیستم‌های ثبت وقایع و مستندات محرمانه کیفیت"
+      ],
+      "educationLevel": [
+        "کارشناسی یا کارشناسی ارشد داروسازی",
+        "کارشناسی شیمی یا مهندسی شیمی",
+        "مدیریت کیفیت"
+      ],
+      "softSkills": [
+        "تفکر تحلیلی و حل مسئله",
+        "دقت بالا در جزئیات",
+        "توانایی مذاکره و هماهنگی بین بخشی",
+        "مدیریت زمان و اولویت‌بندی"
+      ],
+      "hardSkills": [
+        "تسلط بر اصول GMP و PICS",
+        "آشنایی با متدولوژی‌های ارزیابی ریسک (FMEA)",
+        "دانش کافی در زمینه اعتبارسنجی (Validation)",
+        "تسلط بر اصول مستندنویسی دارویی"
+      ],
+      "softwareSkills": [
+        "Microsoft Office (Word, Excel, PowerPoint)",
+        "نرم‌افزارهای مدیریت کیفیت (QMS Software)",
+        "نرم‌افزارهای مدیریت پروژه"
+      ],
+      "certifications": [
+        "گواهینامه دوره GMP پیشرفته",
+        "دوره تخصصی مدیریت تغییر در صنعت دارو",
+        "دوره ارزیابی ریسک کیفی (QRM)"
+      ],
+      "status": {
+        "id": "01KBHGZWFD2YC1F0QWGFS8F37Z",
+        "label": "Completed",
+        "color": "emerald",
+        "icon": "CircleCheckBig"
+      },
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KJ9ZF10856KD758XWS408PPW",
+      "createdAt": "2026-02-25T08:43:17.915Z",
+      "updatedAt": "2026-02-25T08:44:36.387Z"
+    }
+  ],
+  "equipment-logbooks": [
+    {
+      "logCode": "LOG-2026-02-25-001",
+      "equipment": "Fermantor FM-CC-5124",
+      "assignedTo": [
+        {
+          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+        }
+      ],
+      "operationType": [
+        {
+          "id": "operation"
+        }
+      ],
+      "startDateTime": "2026-02-24T08:00:00",
+      "endDateTime": "2026-02-25T11:00:00",
+      "activities": [
+        "اجرای فرآیند CIP بر روی دستگاه",
+        "اجرای فرآیند SIP بر روی دستگاه",
+        "بررسی کامل چک‌لیست‌های مربوطه"
+      ],
+      "isEffective": true,
+      "effectivenessRating": 5,
+      "comments": "تمامی عملیات SIP و CIP با موفقیت انجام شد. چک‌لیست‌ها بررسی و تایید شدند.",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KJABBWKNKV7GCPQD1DC0MPQE",
+      "createdAt": "2026-02-25T12:11:18.006Z",
+      "updatedAt": "2026-02-25T12:11:18.221Z"
+    }
+  ]
 }

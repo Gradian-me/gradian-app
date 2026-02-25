@@ -1967,8 +1967,8 @@ export function AiBuilderResponse({
             </div>
             <CopyContent content={displayContent} />
           </div>
-          <div className="w-full">
-            <div className="p-4">
+          <div className="w-full min-w-0">
+            <div className="p-4 min-w-0">
               <MarkdownViewer
                 content={cleanMarkdownResponse(displayContentForMarkdown)}
                 showToggle={true}
@@ -2012,8 +2012,8 @@ export function AiBuilderResponse({
             </div>
             <CopyContent content={displayContent} />
           </div>
-          <div className="w-full">
-            <div className="p-4">
+          <div className="w-full min-w-0">
+            <div className="p-4 min-w-0">
               <MarkdownViewer
                 content={cleanMarkdownResponse(displayContentForMarkdown)}
                 showToggle={true}

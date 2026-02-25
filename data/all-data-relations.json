@@ -3685,5 +3685,71 @@
     "fieldId": "authentication-type",
     "createdAt": "2026-02-16T07:55:58.663Z",
     "updatedAt": "2026-02-16T07:55:58.663Z"
+  },
+  {
+    "id": "01KJ9ZF1D97TC0YYGR4VBKQTEV",
+    "sourceSchema": "job-descriptions",
+    "sourceId": "01KJ9ZF10856KD758XWS408PPW",
+    "targetSchema": "external_nodes",
+    "targetId": "01KJ9ZF1BFEF33PDDSQQWW14ZR",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "seniority",
+    "createdAt": "2026-02-25T08:43:18.312Z",
+    "updatedAt": "2026-02-25T08:44:26.048Z"
+  },
+  {
+    "id": "01KJ9ZF1GN1EHJRAVBGDVGD641",
+    "sourceSchema": "job-descriptions",
+    "sourceId": "01KJ9ZF10856KD758XWS408PPW",
+    "targetSchema": "external_nodes",
+    "targetId": "01KJ9ZF1F77ZD1WP3PSZF84XNE",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "work-shift",
+    "createdAt": "2026-02-25T08:43:18.421Z",
+    "updatedAt": "2026-02-25T08:44:26.159Z"
+  },
+  {
+    "id": "01KJ9ZF1KG28V1FQTQMHCEJDSN",
+    "sourceSchema": "job-descriptions",
+    "sourceId": "01KJ9ZF10856KD758XWS408PPW",
+    "targetSchema": "external_nodes",
+    "targetId": "01KJ9ZF1J62K5FMKBTNFTD62PH",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "industry",
+    "createdAt": "2026-02-25T08:43:18.512Z",
+    "updatedAt": "2026-02-25T08:44:26.252Z"
+  },
+  {
+    "id": "01KJABBWQ8B7QB0MPQFMBM91BB",
+    "sourceSchema": "equipment-logbooks",
+    "sourceId": "01KJABBWKNKV7GCPQD1DC0MPQE",
+    "targetSchema": "users",
+    "targetId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "operator",
+    "createdAt": "2026-02-25T12:11:18.120Z",
+    "updatedAt": "2026-02-25T12:11:18.120Z"
+  },
+  {
+    "id": "01KJABBWR1PP4RB257Y9Q657EV",
+    "sourceSchema": "equipment-logbooks",
+    "sourceId": "01KJABBWKNKV7GCPQD1DC0MPQE",
+    "targetSchema": "external_nodes",
+    "targetId": "01KJABBWQQRQAHRPSVNX58JMN1",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "operation-type",
+    "createdAt": "2026-02-25T12:11:18.145Z",
+    "updatedAt": "2026-02-25T12:11:18.145Z"
+  },
+  {
+    "id": "01KJAC4NPFGZK5FKTQVE3ASMPG",
+    "sourceSchema": "tasks",
+    "sourceId": "01KJAC4NM0DMSWAFH5T3AHDAK8",
+    "targetSchema": "users",
+    "targetId": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "virtual-assignedTo-tasks",
+    "createdAt": "2026-02-25T12:24:50.127Z",
+    "updatedAt": "2026-02-25T12:24:50.127Z"
   }
 ]

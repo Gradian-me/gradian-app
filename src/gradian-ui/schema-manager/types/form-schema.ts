@@ -376,6 +376,8 @@ export interface QuickAction {
     queryParameters?: Record<string, string>; // Values support dynamic context variables
     outputFormat?: 'json' | 'string' | 'toon';
     includedFields?: string[];
+    /** When true, call via app API (e.g. /api/lookups/fetch/[id]) so the server handles auth to the external URL */
+    useIntegratedAuthentication?: boolean;
   }>; // Additional preload routes to fetch before running the agent
   displayType?: 'default' | 'hideForm' | 'showFooter'; // Control what parts of the form to show
   runType?: 'manual' | 'automatic'; // manual: user clicks "Do the Magic", automatic: auto-runs when dialog opens

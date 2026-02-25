@@ -24,6 +24,7 @@ import { formatSearchResultsToToon, type SearchResult } from '../utils/ai-search
 import { summarizePrompt, extractUserContentFromBuiltPrompt } from '../utils/ai-summarization-utils';
 import { buildStandardizedPrompt } from '../utils/prompt-builder';
 import { ORGANIZATION_RAG_PROMPT } from '../utils/ai-chat-utils';
+import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
 
 /**
  * Extract organization RAG data from preloaded context
@@ -157,6 +158,26 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
               routePath = queryString ? `${path}?${queryString}` : path;
             }
 
+            // When useIntegratedAuthentication is true, call via app API (e.g. /api/lookups/fetch/[id]) so the server handles auth
+            let useIntegratedAuth = route.useIntegratedAuthentication === true;
+            if (useIntegratedAuth && routePath.startsWith('http')) {
+              try {
+                const parsed = new URL(routePath);
+                const match = parsed.pathname.match(/\/integration\/lookups\/fetch\/([^/]+)/);
+                if (match) {
+                  const lookupId = encodeURIComponent(match[1]);
+                  routePath = `/api/lookups/fetch/${lookupId}`;
+                }
+              } catch {
+                // If URL parse fails, keep routePath; same-origin check below may fail
+              }
+            }
+            // Internal app proxy paths (e.g. /api/lookups/fetch/...) always use integrated auth so server can attach auth when proxying
+            const normalizedPath = routePath.startsWith('/') ? routePath : `/${routePath}`;
+            if (!routePath.startsWith('http') && normalizedPath.startsWith('/api/lookups/fetch/')) {
+              useIntegratedAuth = true;
+            }
+
             // Enforce same-origin: allow absolute URLs only when matching current origin
             let fullUrl: string;
             if (routePath.startsWith('http')) {
@@ -175,9 +196,42 @@ export function useAiBuilder(agents?: AiAgent[]): UseAiBuilderReturn {
               fullUrl = `${baseUrl}${routePath.startsWith('/') ? routePath : '/' + routePath}`;
             }
 
+            const headers: Record<string, string> = {
+              'Content-Type': 'application/json',
+            };
+
+            // When using integrated authentication, attach Bearer access token so the server can proxy to OCTA with auth
+            if (useIntegratedAuth) {
+              try {
+                let accessToken = await authTokenManager.getValidAccessToken();
+                // When REQUIRE_LOGIN is false, getValidAccessToken() returns null; fall back to in-memory token so we still send it if user logged in
+                if (!accessToken) {
+                  accessToken = authTokenManager.getAccessToken();
+                }
+                if (accessToken) {
+                  headers['Authorization'] = `Bearer ${accessToken}`;
+                } else {
+                  loggingCustom(
+                    LogType.CLIENT_LOG,
+                    'warn',
+                    '[AiBuilder] useIntegratedAuthentication is true but no access token is available (login or set REQUIRE_LOGIN for token refresh)'
+                  );
+                }
+              } catch (error) {
+                loggingCustom(
+                  LogType.CLIENT_LOG,
+                  'error',
+                  `[AiBuilder] Failed to resolve access token for integrated preload route: ${
+                    error instanceof Error ? error.message : String(error)
+                  }`
+                );
+              }
+            }
+
             const fetchOptions: RequestInit = {
               method,
-              headers: { 'Content-Type': 'application/json' },
+              headers,
+              ...(useIntegratedAuth ? { credentials: 'include' as RequestCredentials } : {}),
             };
 
             if (method === 'POST' && route.body) {

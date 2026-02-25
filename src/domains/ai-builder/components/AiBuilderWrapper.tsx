@@ -575,11 +575,34 @@ export function AiBuilderWrapper({
       return;
     }
 
-    const annotationsForSave = annotationsList.map(ann => ({
-      schemaId: ann.schemaId,
-      schemaName: ann.schemaLabel,
-      annotations: ann.annotations,
-    }));
+    // Merge schema-level annotations (from list view) with element-level annotations (from form preview)
+    const elementSchemaAnnotations = elementAnnotationsToSchemaAnnotations(elementAnnotations);
+    const mergedBySchema = new Map<string, { schemaId: string; schemaName: string; annotations: AnnotationItem[] }>();
+
+    // Start with annotations passed from the viewer
+    for (const ann of annotationsList) {
+      mergedBySchema.set(ann.schemaId, {
+        schemaId: ann.schemaId,
+        schemaName: ann.schemaLabel,
+        annotations: [...ann.annotations],
+      });
+    }
+
+    // Merge in element-level annotations
+    for (const ann of elementSchemaAnnotations) {
+      const existing = mergedBySchema.get(ann.schemaId);
+      if (existing) {
+        existing.annotations = [...existing.annotations, ...ann.annotations];
+      } else {
+        mergedBySchema.set(ann.schemaId, {
+          schemaId: ann.schemaId,
+          schemaName: ann.schemaLabel,
+          annotations: [...ann.annotations],
+        });
+      }
+    }
+
+    const annotationsForSave = Array.from(mergedBySchema.values());
 
     setIsApplyingAnnotations(true);
     
@@ -597,7 +620,7 @@ export function AiBuilderWrapper({
       setIsApplyingAnnotations(false);
       alert('Failed to generate response. Please try again.');
     }
-  }, [selectedAgentId, previousUserPrompt, previousAiResponse, firstPromptId, generateResponse, aiResponse, userPrompt]);
+  }, [selectedAgentId, previousUserPrompt, previousAiResponse, firstPromptId, generateResponse, aiResponse, userPrompt, elementAnnotations, elementAnnotationsToSchemaAnnotations]);
 
   const handleApprove = (editedContent?: string) => {
     if (!selectedAgent || !aiResponse) return;
@@ -653,7 +676,6 @@ export function AiBuilderWrapper({
 
   const handleFormModalClose = useCallback(() => {
     setPreviewSchema(null);
-    setElementAnnotations([]);
     setAnnotationPopup({ open: false, formElementId: '', editingId: null, draftLabel: '' });
     setRemoveAnnotationIndex(null);
   }, []);
@@ -887,14 +909,6 @@ export function AiBuilderWrapper({
           description="Review the generated schema and add annotations"
           size="xl"
           showCloseButton={true}
-          footerLeftActions={
-            elementAnnotations.length > 0 ? (
-              <Button onClick={handleApplyElementAnnotations} disabled={isLoading} variant="gradient">
-                <CheckCircle2 className="h-4 w-4 me-2" />
-                Apply ({elementAnnotations.length}) & Regenerate
-              </Button>
-            ) : undefined
-          }
         >
           <TargetCursor
             targetSelector=".nx-form-element-target"

@@ -16894,6 +16894,7 @@
         "label": "QA Final Review",
         "sectionId": "qa-review-closure",
         "component": "textarea",
+        "aiAgentId": "professional-writing",
         "translations": [
           {
             "en": "QA Final Review"
@@ -19364,6 +19365,7 @@
         "label": "Change Classification Justification",
         "sectionId": "change-classification",
         "component": "textarea",
+        "aiAgentId": "professional-writing",
         "translations": [
           {
             "en": "Change Classification Justification"
@@ -19429,6 +19431,7 @@
         "label": "QA Final Review",
         "sectionId": "qa-review-closure",
         "component": "textarea",
+        "aiAgentId": "professional-writing",
         "translations": [
           {
             "en": "QA Final Review"
@@ -22135,14 +22138,30 @@
         ],
         "placeholder": "Enter task title",
         "placeholderTranslations": [
-          { "en": "Enter task title" },
-          { "fa": "عنوان وظیفه را وارد کنید" },
-          { "ar": "أدخل عنوان المهمة" },
-          { "es": "Ingrese el título de la tarea" },
-          { "fr": "Entrez le titre de la tâche" },
-          { "de": "Aufgabentitel eingeben" },
-          { "it": "Inserisci il titolo dell'attività" },
-          { "ru": "Введите название задачи" }
+          {
+            "en": "Enter task title"
+          },
+          {
+            "fa": "عنوان وظیفه را وارد کنید"
+          },
+          {
+            "ar": "أدخل عنوان المهمة"
+          },
+          {
+            "es": "Ingrese el título de la tarea"
+          },
+          {
+            "fr": "Entrez le titre de la tâche"
+          },
+          {
+            "de": "Aufgabentitel eingeben"
+          },
+          {
+            "it": "Inserisci il titolo dell'attività"
+          },
+          {
+            "ru": "Введите название задачи"
+          }
         ],
         "validation": {
           "required": true,
@@ -35645,8 +35664,22 @@
     "description": "Lookup definitions (stored procedures and metadata)",
     "singular_name": "Lookup",
     "plural_name": "Lookups",
-    "singular_name_translations": [{"en": "Lookup"}, {"fa": "جستجو"}],
-    "plural_name_translations": [{"en": "Lookups"}, {"fa": "جستجوها"}],
+    "singular_name_translations": [
+      {
+        "en": "Lookup"
+      },
+      {
+        "fa": "جستجو"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "Lookups"
+      },
+      {
+        "fa": "جستجوها"
+      }
+    ],
     "isNotCompanyBased": true,
     "externalUrlSettings": [
       {
@@ -35657,34 +35690,265 @@
       }
     ],
     "fields": [
-      {"id": "id", "name": "id", "label": "ID", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 1},
-      {"id": "name", "name": "name", "label": "Name", "sectionId": "basic", "component": "text", "role": "title", "colSpan": 1, "order": 2},
-      {"id": "description", "name": "description", "label": "Description", "sectionId": "basic", "component": "textarea", "role": "description", "colSpan": 1, "order": 3},
-      {"id": "databaseId", "name": "databaseId", "label": "Database ID", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 4},
-      {"id": "storedProcedureName", "name": "storedProcedureName", "label": "Stored Procedure", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 5},
-      {"id": "resultKeyColumn", "name": "resultKeyColumn", "label": "Result Key Column", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 6},
-      {"id": "resultValueColumn", "name": "resultValueColumn", "label": "Result Value Column", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 7},
-      {"id": "resultValueColumnEN", "name": "resultValueColumnEN", "label": "Result Value Column (EN)", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 8},
-      {"id": "resultColorColumn", "name": "resultColorColumn", "label": "Result Color Column", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 9},
-      {"id": "resultIconColumn", "name": "resultIconColumn", "label": "Result Icon Column", "sectionId": "basic", "component": "text", "colSpan": 1, "order": 10},
-      {"id": "returnOriginalColumns", "name": "returnOriginalColumns", "label": "Return Original Columns", "sectionId": "basic", "component": "checkbox", "colSpan": 1, "order": 11},
-      {"id": "isActive", "name": "isActive", "label": "Active", "sectionId": "basic", "component": "switch", "colSpan": 1, "order": 12},
-      {"id": "cacheEnabled", "name": "cacheEnabled", "label": "Cache Enabled", "sectionId": "basic", "component": "switch", "colSpan": 1, "order": 13},
-      {"id": "cacheTTL", "name": "cacheTTL", "label": "Cache TTL", "sectionId": "basic", "component": "number", "colSpan": 1, "order": 14},
-      {"id": "createdAt", "name": "createdAt", "label": "Created", "sectionId": "basic", "component": "datetime", "colSpan": 1, "order": 15},
-      {"id": "updatedAt", "name": "updatedAt", "label": "Updated", "sectionId": "basic", "component": "datetime", "colSpan": 1, "order": 16},
-      {"id": "column_map_id", "name": "column_map_id", "label": "Column Map (ID)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 17, "caption": "Comma-separated column names for option id; values concatenated with \" | \""},
-      {"id": "column_map_title", "name": "column_map_title", "label": "Column Map (Title)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 18, "caption": "Comma-separated column names for option label; values concatenated with \" | \""},
-      {"id": "column_map_subtitle", "name": "column_map_subtitle", "label": "Column Map (Subtitle)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 19, "caption": "Comma-separated column names"},
-      {"id": "column_map_description", "name": "column_map_description", "label": "Column Map (Description)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 20, "caption": "Comma-separated column names"},
-      {"id": "column_map_color", "name": "column_map_color", "label": "Column Map (Color)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 21, "caption": "Column name for color"},
-      {"id": "column_map_icon", "name": "column_map_icon", "label": "Column Map (Icon)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 22, "caption": "Column name for icon"},
-      {"id": "column_map_url", "name": "column_map_url", "label": "Column Map (URL)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 23, "caption": "Column name for URL"},
-      {"id": "column_map_avatar", "name": "column_map_avatar", "label": "Column Map (Avatar)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 24, "caption": "Column name for avatar"},
-      {"id": "column_map_pagination_page", "name": "column_map_pagination_page", "label": "Column Map (Pagination Page)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 25, "caption": "Column name for page"},
-      {"id": "column_map_pagination_limit", "name": "column_map_pagination_limit", "label": "Column Map (Pagination Limit)", "sectionId": "column-mapping", "component": "text", "colSpan": 1, "order": 26, "caption": "Column name for limit"}
+      {
+        "id": "id",
+        "name": "id",
+        "label": "ID",
+        "sectionId": "basic",
+        "component": "text",
+        "colSpan": 1,
+        "order": 1
+      },
+      {
+        "id": "name",
+        "name": "name",
+        "label": "Name",
+        "sectionId": "basic",
+        "component": "text",
+        "role": "title",
+        "colSpan": 1,
+        "order": 2
+      },
+      {
+        "id": "description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic",
+        "component": "textarea",
+        "role": "description",
+        "colSpan": 1,
+        "order": 3
+      },
+      {
+        "id": "databaseId",
+        "name": "databaseId",
+        "label": "Database ID",
+        "sectionId": "basic",
+        "component": "text",
+        "colSpan": 1,
+        "order": 4
+      },
+      {
+        "id": "storedProcedureName",
+        "name": "storedProcedureName",
+        "label": "Stored Procedure",
+        "sectionId": "basic",
+        "component": "text",
+        "colSpan": 1,
+        "order": 5
+      },
+      {
+        "id": "resultKeyColumn",
+        "name": "resultKeyColumn",
+        "label": "Result Key Column",
+        "sectionId": "basic",
+        "component": "text",
+        "colSpan": 1,
+        "order": 6
+      },
+      {
+        "id": "resultValueColumn",
+        "name": "resultValueColumn",
+        "label": "Result Value Column",
+        "sectionId": "basic",
+        "component": "text",
+        "colSpan": 1,
+        "order": 7
+      },
+      {
+        "id": "resultValueColumnEN",
+        "name": "resultValueColumnEN",
+        "label": "Result Value Column (EN)",
+        "sectionId": "basic",
+        "component": "text",
+        "colSpan": 1,
+        "order": 8
+      },
+      {
+        "id": "resultColorColumn",
+        "name": "resultColorColumn",
+        "label": "Result Color Column",
+        "sectionId": "basic",
+        "component": "text",
+        "colSpan": 1,
+        "order": 9
+      },
+      {
+        "id": "resultIconColumn",
+        "name": "resultIconColumn",
+        "label": "Result Icon Column",
+        "sectionId": "basic",
+        "component": "text",
+        "colSpan": 1,
+        "order": 10
+      },
+      {
+        "id": "returnOriginalColumns",
+        "name": "returnOriginalColumns",
+        "label": "Return Original Columns",
+        "sectionId": "basic",
+        "component": "checkbox",
+        "colSpan": 1,
+        "order": 11
+      },
+      {
+        "id": "isActive",
+        "name": "isActive",
+        "label": "Active",
+        "sectionId": "basic",
+        "component": "switch",
+        "colSpan": 1,
+        "order": 12
+      },
+      {
+        "id": "cacheEnabled",
+        "name": "cacheEnabled",
+        "label": "Cache Enabled",
+        "sectionId": "basic",
+        "component": "switch",
+        "colSpan": 1,
+        "order": 13
+      },
+      {
+        "id": "cacheTTL",
+        "name": "cacheTTL",
+        "label": "Cache TTL",
+        "sectionId": "basic",
+        "component": "number",
+        "colSpan": 1,
+        "order": 14
+      },
+      {
+        "id": "createdAt",
+        "name": "createdAt",
+        "label": "Created",
+        "sectionId": "basic",
+        "component": "datetime",
+        "colSpan": 1,
+        "order": 15
+      },
+      {
+        "id": "updatedAt",
+        "name": "updatedAt",
+        "label": "Updated",
+        "sectionId": "basic",
+        "component": "datetime",
+        "colSpan": 1,
+        "order": 16
+      },
+      {
+        "id": "column_map_id",
+        "name": "column_map_id",
+        "label": "Column Map (ID)",
+        "sectionId": "column-mapping",
+        "component": "text",
+        "colSpan": 1,
+        "order": 17,
+        "caption": "Comma-separated column names for option id; values concatenated with \" | \""
+      },
+      {
+        "id": "column_map_title",
+        "name": "column_map_title",
+        "label": "Column Map (Title)",
+        "sectionId": "column-mapping",
+        "component": "text",
+        "colSpan": 1,
+        "order": 18,
+        "caption": "Comma-separated column names for option label; values concatenated with \" | \""
+      },
+      {
+        "id": "column_map_subtitle",
+        "name": "column_map_subtitle",
+        "label": "Column Map (Subtitle)",
+        "sectionId": "column-mapping",
+        "component": "text",
+        "colSpan": 1,
+        "order": 19,
+        "caption": "Comma-separated column names"
+      },
+      {
+        "id": "column_map_description",
+        "name": "column_map_description",
+        "label": "Column Map (Description)",
+        "sectionId": "column-mapping",
+        "component": "text",
+        "colSpan": 1,
+        "order": 20,
+        "caption": "Comma-separated column names"
+      },
+      {
+        "id": "column_map_color",
+        "name": "column_map_color",
+        "label": "Column Map (Color)",
+        "sectionId": "column-mapping",
+        "component": "text",
+        "colSpan": 1,
+        "order": 21,
+        "caption": "Column name for color"
+      },
+      {
+        "id": "column_map_icon",
+        "name": "column_map_icon",
+        "label": "Column Map (Icon)",
+        "sectionId": "column-mapping",
+        "component": "text",
+        "colSpan": 1,
+        "order": 22,
+        "caption": "Column name for icon"
+      },
+      {
+        "id": "column_map_url",
+        "name": "column_map_url",
+        "label": "Column Map (URL)",
+        "sectionId": "column-mapping",
+        "component": "text",
+        "colSpan": 1,
+        "order": 23,
+        "caption": "Column name for URL"
+      },
+      {
+        "id": "column_map_avatar",
+        "name": "column_map_avatar",
+        "label": "Column Map (Avatar)",
+        "sectionId": "column-mapping",
+        "component": "text",
+        "colSpan": 1,
+        "order": 24,
+        "caption": "Column name for avatar"
+      },
+      {
+        "id": "column_map_pagination_page",
+        "name": "column_map_pagination_page",
+        "label": "Column Map (Pagination Page)",
+        "sectionId": "column-mapping",
+        "component": "text",
+        "colSpan": 1,
+        "order": 25,
+        "caption": "Column name for page"
+      },
+      {
+        "id": "column_map_pagination_limit",
+        "name": "column_map_pagination_limit",
+        "label": "Column Map (Pagination Limit)",
+        "sectionId": "column-mapping",
+        "component": "text",
+        "colSpan": 1,
+        "order": 26,
+        "caption": "Column name for limit"
+      }
     ],
-    "sections": [{"id": "basic", "title": "Lookup", "order": 1}, {"id": "column-mapping", "title": "Column Mapping", "order": 2}],
+    "sections": [
+      {
+        "id": "basic",
+        "title": "Lookup",
+        "order": 1
+      },
+      {
+        "id": "column-mapping",
+        "title": "Column Mapping",
+        "order": 2
+      }
+    ],
     "detailPageMetadata": {
       "quickActions": [
         {
@@ -35698,5 +35962,414 @@
         }
       ]
     }
+  },
+  {
+    "id": "job-descriptions",
+    "singular_name": "Job Description",
+    "plural_name": "Job Descriptions",
+    "description": "Comprehensive system for defining job roles, responsibilities, authorities, and required qualifications.",
+    "icon": "briefcase",
+    "showInNavigation": true,
+    "allowDataAssignedTo": false,
+    "fields": [
+      {
+        "id": "post-title",
+        "name": "postTitle",
+        "label": "Post Title",
+        "sectionId": "basic-info",
+        "type": "text",
+        "component": "text",
+        "order": 1,
+        "required": true,
+        "role": "title",
+        "placeholder": "e.g. Senior Quality Assurance Manager"
+      },
+      {
+        "id": "department",
+        "name": "department",
+        "label": "Department",
+        "sectionId": "basic-info",
+        "type": "text",
+        "component": "text",
+        "order": 2,
+        "placeholder": "e.g. Production, IT, HR"
+      },
+      {
+        "id": "reports-to",
+        "name": "reportsTo",
+        "label": "Reports To",
+        "sectionId": "basic-info",
+        "type": "text",
+        "component": "text",
+        "order": 3,
+        "role": "subtitle"
+      },
+      {
+        "id": "seniority",
+        "name": "seniority",
+        "label": "Seniority Level",
+        "sectionId": "basic-info",
+        "type": "select",
+        "component": "select",
+        "order": 4,
+        "role": "badge",
+        "options": [
+          {
+            "id": "junior",
+            "label": "Junior",
+            "color": "slate"
+          },
+          {
+            "id": "senior",
+            "label": "Senior",
+            "color": "blue"
+          },
+          {
+            "id": "supervisor",
+            "label": "Supervisor",
+            "color": "emerald"
+          },
+          {
+            "id": "manager",
+            "label": "Manager",
+            "color": "amber"
+          },
+          {
+            "id": "deputy",
+            "label": "Deputy",
+            "color": "orange"
+          }
+        ]
+      },
+      {
+        "id": "work-shift",
+        "name": "workShift",
+        "label": "Work Shift",
+        "sectionId": "basic-info",
+        "type": "select",
+        "component": "select",
+        "order": 5,
+        "options": [
+          {
+            "id": "full-time",
+            "label": "Full Time",
+            "icon": "clock"
+          },
+          {
+            "id": "part-time",
+            "label": "Part Time",
+            "icon": "timer"
+          }
+        ]
+      },
+      {
+        "id": "industry",
+        "name": "industry",
+        "label": "Industry Focus",
+        "sectionId": "basic-info",
+        "type": "select",
+        "component": "select",
+        "order": 6,
+        "options": [
+          {
+            "id": "pharma",
+            "label": "Pharmaceutical",
+            "icon": "pill",
+            "color": "emerald"
+          },
+          {
+            "id": "automotive",
+            "label": "Automotive",
+            "icon": "car",
+            "color": "slate"
+          },
+          {
+            "id": "energy",
+            "label": "Energy",
+            "icon": "zap",
+            "color": "amber"
+          },
+          {
+            "id": "tech",
+            "label": "Technology",
+            "icon": "cpu",
+            "color": "blue"
+          }
+        ]
+      },
+      {
+        "id": "post-description",
+        "name": "postDescription",
+        "label": "Post Description Summary",
+        "sectionId": "job-summary",
+        "type": "textarea",
+        "component": "textarea",
+        "order": 1,
+        "role": "description",
+        "colSpan": 2,
+        "placeholder": "Overall definition of the post's purpose..."
+      },
+      {
+        "id": "tasks",
+        "name": "tasks",
+        "label": "Key Tasks",
+        "sectionId": "job-summary",
+        "type": "list",
+        "component": "list",
+        "order": 2,
+        "colSpan": 2
+      },
+      {
+        "id": "authorizations",
+        "name": "authorizations",
+        "label": "Authorizations & Delegated Powers",
+        "sectionId": "authorities",
+        "type": "list",
+        "component": "list",
+        "order": 1,
+        "colSpan": 2
+      },
+      {
+        "id": "education-level",
+        "name": "educationLevel",
+        "label": "Education Level and Majors",
+        "sectionId": "qualifications",
+        "type": "list",
+        "component": "list",
+        "order": 1
+      },
+      {
+        "id": "soft-skills",
+        "name": "softSkills",
+        "label": "Required Soft Skills",
+        "sectionId": "qualifications",
+        "type": "list",
+        "component": "list",
+        "order": 2
+      },
+      {
+        "id": "hard-skills",
+        "name": "hardSkills",
+        "label": "Required Hard Skills",
+        "sectionId": "qualifications",
+        "type": "list",
+        "component": "list",
+        "order": 3
+      },
+      {
+        "id": "software-skills",
+        "name": "softwareSkills",
+        "label": "Required Software Skills",
+        "sectionId": "qualifications",
+        "type": "list",
+        "component": "list",
+        "order": 4
+      },
+      {
+        "id": "certifications",
+        "name": "certifications",
+        "label": "Required Trainings or Certifications",
+        "sectionId": "qualifications",
+        "type": "list",
+        "component": "list",
+        "order": 5
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-info",
+        "title": "Classification & Context",
+        "columns": 2,
+        "description": "General metadata regarding the position and its place in the organization."
+      },
+      {
+        "id": "job-summary",
+        "title": "Job Description",
+        "columns": 2,
+        "description": "Summary of the overall definition and daily tasks."
+      },
+      {
+        "id": "authorities",
+        "title": "Authorities and Responsibilities",
+        "columns": 1,
+        "description": "Defined powers and accountability levels for this post."
+      },
+      {
+        "id": "qualifications",
+        "title": "Required Qualifications",
+        "columns": 2,
+        "description": "Educational and technical requirements to fulfill the role."
+      }
+    ],
+    "applications": [],
+    "statusGroup": [
+      {
+        "id": "01KBHD90EMZKAT502KNVVDQZC7",
+        "label": "Progress Status"
+      }
+    ]
+  },
+  {
+    "id": "equipment-logbooks",
+    "description": "GMP-compliant logbook for tracking equipment usage, cleaning, and maintenance operations within a pharmaceutical facility.",
+    "singular_name": "Equipment Logbook",
+    "plural_name": "Equipment Logbooks",
+    "icon": "BookOpen",
+    "showInNavigation": true,
+    "allowDataAssignedTo": true,
+    "fields": [
+      {
+        "id": "log-code",
+        "name": "logCode",
+        "label": "Log Reference Number",
+        "sectionId": "basic-info",
+        "type": "text",
+        "component": "text",
+        "order": 1,
+        "required": true,
+        "role": "code"
+      },
+      {
+        "id": "equipment-id",
+        "name": "equipment",
+        "label": "Equipment",
+        "sectionId": "basic-info",
+        "type": "text",
+        "component": "text",
+        "order": 2,
+        "required": true,
+        "role": "title"
+      },
+      {
+        "id": "operator",
+        "name": "assignedTo",
+        "label": "Operator (Assigned To)",
+        "sectionId": "basic-info",
+        "type": "text",
+        "component": "picker",
+        "targetSchema": "users",
+        "order": 3,
+        "required": true,
+        "role": "person"
+      },
+      {
+        "id": "operation-type",
+        "name": "operationType",
+        "label": "Operation Type",
+        "sectionId": "log-details",
+        "type": "select",
+        "component": "select",
+        "order": 1,
+        "required": true,
+        "role": "status",
+        "options": [
+          {
+            "id": "operation",
+            "label": "Operation",
+            "icon": "Play",
+            "color": "blue"
+          },
+          {
+            "id": "control",
+            "label": "Control",
+            "icon": "ShieldCheck",
+            "color": "emerald"
+          },
+          {
+            "id": "documentation",
+            "label": "Documentation",
+            "icon": "FileText",
+            "color": "slate"
+          }
+        ]
+      },
+      {
+        "id": "start-date-time",
+        "name": "startDateTime",
+        "label": "From Date/Time",
+        "sectionId": "log-details",
+        "type": "date",
+        "component": "date",
+        "order": 2,
+        "required": true
+      },
+      {
+        "id": "end-date-time",
+        "name": "endDateTime",
+        "label": "To Date/Time",
+        "sectionId": "log-details",
+        "type": "date",
+        "component": "date",
+        "order": 3,
+        "required": true,
+        "role": "duedate"
+      },
+      {
+        "id": "activity-list",
+        "name": "activities",
+        "label": "Detailed Activities",
+        "sectionId": "activities-section",
+        "type": "list",
+        "component": "list",
+        "order": 1,
+        "colSpan": 2
+      },
+      {
+        "id": "is-effective",
+        "name": "isEffective",
+        "label": "Operation Effective",
+        "sectionId": "effectiveness-section",
+        "type": "boolean",
+        "component": "switch",
+        "order": 1
+      },
+      {
+        "id": "effectiveness-rating",
+        "name": "effectivenessRating",
+        "label": "Effectiveness Rating",
+        "sectionId": "effectiveness-section",
+        "type": "number",
+        "component": "rating",
+        "order": 2,
+        "role": "rating"
+      },
+      {
+        "id": "comments",
+        "name": "comments",
+        "label": "Remarks / Observations",
+        "sectionId": "effectiveness-section",
+        "type": "textarea",
+        "component": "textarea",
+        "order": 3,
+        "colSpan": 2,
+        "role": "description"
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-info",
+        "title": "Header Information",
+        "columns": 2,
+        "description": "General identification of the equipment and operator."
+      },
+      {
+        "id": "log-details",
+        "title": "Log Timing & Type",
+        "columns": 2,
+        "description": "Duration and nature of the equipment task."
+      },
+      {
+        "id": "activities-section",
+        "title": "Activities",
+        "columns": 1,
+        "description": "Step-by-step list of activities performed."
+      },
+      {
+        "id": "effectiveness-section",
+        "title": "Effectiveness & Review",
+        "columns": 2,
+        "description": "Assessment of the operation outcome."
+      }
+    ]
   }
 ]

@@ -34,6 +34,8 @@ export interface AiAgent {
     queryParameters?: Record<string, string>;
     outputFormat?: 'json' | 'string' | 'toon'; // Format for output: json (default), string, or toon
     includedFields?: string[]; // Filter response to only include these fields (e.g., ["id", "description", "plural_name"])
+    /** When true, call via app API (e.g. /api/lookups/fetch/[id]) so the server handles auth to the external URL */
+    useIntegratedAuthentication?: boolean;
   }>;
   nextAction: {
     label: string;

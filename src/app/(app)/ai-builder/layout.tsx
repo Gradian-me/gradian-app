@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { GoToTop } from '@/gradian-ui/layout/go-to-top/components/GoToTop';
 
 export const metadata: Metadata = {
   title: 'AI Builder | Gradian',
@@ -10,6 +11,11 @@ export default function AiBuilderLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <GoToTop />
+    </>
+  );
 }
 
