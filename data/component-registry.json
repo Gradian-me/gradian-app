@@ -693,6 +693,119 @@
     }
   },
   {
+    "id": "signature-pad",
+    "label": "Signature Pad",
+    "color": "violet",
+    "icon": "PenLine",
+    "category": "form-elements",
+    "useInRAG": false,
+    "description": "Canvas-based signature capture with optional lock, undo/redo, color, eraser, and PNG export.",
+    "usecase": "Consent forms, agreements, approvals, and any form requiring a drawn signature.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/SignaturePad.tsx",
+    "configSchema": {
+      "fields": [
+        {
+          "name": "enableLock",
+          "label": "Enable Lock",
+          "type": "boolean",
+          "description": "Show lock/unlock toggle to prevent further changes after signing",
+          "defaultValue": false
+        },
+        {
+          "name": "enableExportPng",
+          "label": "Enable Export PNG",
+          "type": "boolean",
+          "description": "Show button to download signature as PNG",
+          "defaultValue": false
+        },
+        {
+          "name": "enableChangeColor",
+          "label": "Enable Change Color",
+          "type": "boolean",
+          "description": "Show color picker for stroke color",
+          "defaultValue": false
+        },
+        {
+          "name": "enableEraser",
+          "label": "Enable Eraser",
+          "type": "boolean",
+          "description": "Show eraser tool to remove strokes",
+          "defaultValue": false
+        },
+        {
+          "name": "enableRawData",
+          "label": "Enable Raw Data Preview",
+          "type": "boolean",
+          "description": "Show a JSON preview of the last signature point under the canvas",
+          "defaultValue": false
+        },
+        {
+          "name": "exportWithBackground",
+          "label": "Export PNG with background",
+          "type": "boolean",
+          "description": "When true, exported PNG includes the canvas background (e.g. white). Default false = transparent background.",
+          "defaultValue": false
+        },
+        {
+          "name": "enableUserBaseLog",
+          "label": "Enable user-based log",
+          "type": "boolean",
+          "description": "When enabled (with raw data), raw data includes userId and timestamps as ISO strings for querying.",
+          "defaultValue": false
+        }
+      ]
+    }
+  },
+  {
+    "id": "swipe-button",
+    "label": "SwipeButton",
+    "color": "emerald",
+    "icon": "Swipe",
+    "category": "form-elements",
+    "useInRAG": false,
+    "description": "Swipe-to-confirm button with success, warning, and error variants.",
+    "usecase": "Destructive confirmations (delete), important saves, or guarded actions that require an intentional swipe gesture.",
+    "directory": "src/gradian-ui/form-builder/form-elements/components/SwipeButton.tsx",
+    "configSchema": {
+      "fields": [
+        {
+          "name": "variant",
+          "label": "Variant",
+          "type": "select",
+          "description": "Visual style and intent of the swipe button",
+          "defaultValue": "success",
+          "options": [
+            { "value": "success", "label": "Success (confirm/save)" },
+            { "value": "warning", "label": "Warning (risky change)" },
+            { "value": "error", "label": "Error (destructive/delete)" }
+          ]
+        },
+        {
+          "name": "icon",
+          "label": "Icon",
+          "type": "string",
+          "description": "Lucide icon name to show next to the text (e.g. \"Save\", \"Trash2\")"
+        },
+        {
+          "name": "text",
+          "label": "Text",
+          "type": "string",
+          "description": "Label text inside the swipe track (defaults to field label or \"Swipe to confirm\")"
+        },
+        {
+          "name": "validationDuration",
+          "label": "Validation Duration (ms)",
+          "type": "number",
+          "description": "How long the validated state is shown before auto-reset",
+          "defaultValue": 1600,
+          "min": 500,
+          "max": 10000,
+          "step": 100
+        }
+      ]
+    }
+  },
+  {
     "id": "tag",
     "label": "Tag",
     "color": "cyan",

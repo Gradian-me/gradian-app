@@ -59,6 +59,8 @@ import { FormulaField } from './FormulaField';
 import { ImageViewer } from './ImageViewer';
 import { VideoViewer } from './VideoViewer';
 import { Slider } from './Slider';
+import { SignaturePad } from './SignaturePad';
+import { SwipeButton } from './SwipeButton';
 import {
   normalizeChecklistValue,
   checklistToListInputItems,
@@ -828,6 +830,51 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           fieldLabel={configForChild?.label ?? ''}
         />
       );
+
+    case 'signature-pad':
+    case 'signature': {
+      const signatureConfig = { ...configForChild, ...(config as any).componentTypeConfig };
+      return (
+        <SignaturePad
+          config={signatureConfig}
+          value={restProps.value ?? null}
+          onChange={(v) => restProps.onChange?.(v ?? null)}
+          onBlur={restProps.onBlur}
+          onFocus={restProps.onFocus}
+          error={restProps.error}
+          disabled={restProps.disabled}
+          required={restProps.required ?? config?.validation?.required ?? false}
+          className={restProps.className}
+          enableLock={(signatureConfig as any).enableLock}
+          enableExportPng={(signatureConfig as any).enableExportPng ?? false}
+          enableChangeColor={(signatureConfig as any).enableChangeColor}
+          enableEraser={(signatureConfig as any).enableEraser}
+          enableRawData={(signatureConfig as any).enableRawData}
+          exportWithBackground={(signatureConfig as any).exportWithBackground}
+          enableUserBaseLog={(signatureConfig as any).enableUserBaseLog}
+        />
+      );
+    }
+
+    case 'swipe-button': {
+      const swipeConfig = {
+        ...configForChild,
+        ...(config as any).componentTypeConfig,
+      };
+      const currentValue = Boolean(restProps.value);
+      return (
+        <SwipeButton
+          config={swipeConfig}
+          value={currentValue}
+          onChange={(next) => restProps.onChange?.(next)}
+          onBlur={restProps.onBlur}
+          onFocus={restProps.onFocus}
+          disabled={restProps.disabled}
+          required={restProps.required ?? config?.validation?.required ?? false}
+          className={restProps.className}
+        />
+      );
+    }
     
     case 'checklist': {
       const checklistItems = normalizeChecklistValue(restProps.value);

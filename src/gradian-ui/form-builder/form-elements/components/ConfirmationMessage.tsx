@@ -16,6 +16,7 @@ import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { SwipeButton } from './SwipeButton';
 
 /**
  * Title/message can be a plain string or inline translations:
@@ -106,6 +107,11 @@ export interface ConfirmationMessageProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
   variant?: 'default' | 'warning' | 'destructive';
+  /**
+   * When true, renders a swipe-to-confirm control instead of footer buttons.
+   * The primary action is taken from the last button in the buttons array.
+   */
+  showSwipe?: boolean;
 }
 
 export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
@@ -118,6 +124,7 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
   size = 'md',
   className,
   variant = 'default',
+  showSwipe = false,
 }) => {
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const defaultLang = getDefaultLanguage();
@@ -156,6 +163,17 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
     destructive: 'border-red-200',
   };
 
+  const primaryButton = finalButtons[finalButtons.length - 1];
+  const swipeVariant =
+    variant === 'destructive' ? 'error' : variant === 'warning' ? 'warning' : 'success';
+  const swipeIcon =
+    primaryButton?.icon ??
+    (variant === 'destructive'
+      ? 'RotateCcw'
+      : variant === 'warning'
+        ? 'AlertTriangle'
+        : 'Save');
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className={cn(sizeClasses[size], variantStyles[variant], className)}>
@@ -179,19 +197,35 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
         </div>
 
         <DialogFooter className="gap-2">
-          {finalButtons.map((button, index) => (
-            <Button
-              key={index}
-              variant={button.variant || 'default'}
-              onClick={button.action}
-              disabled={button.disabled}
-              className={button.className}
-              type="button"
-            >
-              {button.icon && <IconRenderer iconName={button.icon} className="h-4 w-4 me-2" />}
-              {button.label}
-            </Button>
-          ))}
+          {showSwipe && primaryButton ? (
+            <div className="w-full flex justify-center">
+              <SwipeButton
+                config={{
+                  variant: swipeVariant,
+                  icon: swipeIcon,
+                  text: primaryButton.label,
+                }}
+                onChange={(confirmed) => {
+                  if (!confirmed) return;
+                  primaryButton.action();
+                }}
+              />
+            </div>
+          ) : (
+            finalButtons.map((button, index) => (
+              <Button
+                key={index}
+                variant={button.variant || 'default'}
+                onClick={button.action}
+                disabled={button.disabled}
+                className={button.className}
+                type="button"
+              >
+                {button.icon && <IconRenderer iconName={button.icon} className="h-4 w-4 me-2" />}
+                {button.label}
+              </Button>
+            ))
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

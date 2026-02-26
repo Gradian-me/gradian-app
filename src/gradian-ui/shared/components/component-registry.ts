@@ -187,6 +187,7 @@ export function mapComponentTypeToId(componentType: string): string {
     'tag-input': 'tag',
     'list-input': 'list',
     'language': 'language-selector',
+    'signature': 'signature-pad',
   };
   return aliasMap[componentType] ?? componentType;
 }

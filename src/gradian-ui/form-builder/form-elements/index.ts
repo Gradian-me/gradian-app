@@ -41,6 +41,8 @@ export * from './components/Switch';
 export * from './components/Toggle';
 export * from './components/ToggleGroup';
 export * from './components/Slider';
+export * from './components/SignaturePad';
+export * from './components/SwipeButton';
 export * from './components/OTPInput';
 export * from './components/NameInput';
 export { Label } from './components/Label';

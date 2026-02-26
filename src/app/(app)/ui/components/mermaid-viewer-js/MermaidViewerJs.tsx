@@ -132,7 +132,6 @@ export function MermaidViewerJs() {
 
     const svg = container.querySelector('svg');
     if (!svg) {
-      // eslint-disable-next-line no-alert
       alert('No diagram to export');
       return;
     }

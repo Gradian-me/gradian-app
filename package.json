@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.61.005",
+  "version": "1.61.007",
   "private": true,
   "scripts": {
     "dev": "npm run clean:relations && cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack",
@@ -107,6 +107,7 @@
     "remark-parse": "^11.0.0",
     "remark-slug": "^7.0.1",
     "server-only": "^0.0.1",
+    "signature_pad": "^4.2.0",
     "sonner": "^1.6.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-react": "^5.31.0",
