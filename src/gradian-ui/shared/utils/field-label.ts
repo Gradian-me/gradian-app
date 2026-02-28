@@ -62,8 +62,32 @@ export function getSystemFieldsList(
 ): Array<{ id: string; name: string; label: string }> {
   const lang = options.language ?? getDefaultLanguage();
   const defLang = options.defaultLang ?? getDefaultLanguage();
-  const includeCompany = options.includeCompany ?? (options.schema ? !options.schema.isNotCompanyBased : true);
-  return SYSTEM_FIELDS_BASE.filter((f) => f.id !== 'companyId' || includeCompany).map((f) => ({
+  const schema = options.schema ?? undefined;
+  const includeCompany = options.includeCompany ?? (schema ? !schema.isNotCompanyBased : true);
+
+  const allowStatus = Array.isArray(schema?.statusGroup) && schema!.statusGroup.length > 0;
+  const allowEntityType = Array.isArray(schema?.entityTypeGroup) && schema!.entityTypeGroup.length > 0;
+  const allowAssignedTo = schema?.allowDataAssignedTo === true;
+  const allowDueDate = schema?.allowDataDueDate === true;
+
+  return SYSTEM_FIELDS_BASE.filter((f) => {
+    if (f.id === 'companyId') {
+      return includeCompany;
+    }
+    if (f.id === 'status') {
+      return allowStatus;
+    }
+    if (f.id === 'entityType') {
+      return allowEntityType;
+    }
+    if (f.id === 'assignedTo') {
+      return allowAssignedTo;
+    }
+    if (f.id === 'dueDate') {
+      return allowDueDate;
+    }
+    return true;
+  }).map((f) => ({
     id: f.id,
     name: f.name,
     label: f.labelKey === 'ID' ? 'ID' : getT(f.labelKey, lang, defLang),

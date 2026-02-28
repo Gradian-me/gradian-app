@@ -79,6 +79,7 @@ export const computeAssignmentCounts = (
     return {
       assignedTo: 0,
       initiatedBy: 0,
+      allItems: entities.length,
     };
   }
 
@@ -92,7 +93,7 @@ export const computeAssignmentCounts = (
       }
       return acc;
     },
-    { assignedTo: 0, initiatedBy: 0 }
+    { assignedTo: 0, initiatedBy: 0, allItems: entities.length }
   );
 };
 

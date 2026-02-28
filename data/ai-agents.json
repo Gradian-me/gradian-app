@@ -1793,8 +1793,7 @@
         "component": "textarea",
         "placeholder": "Paste your data table here (CSV, Excel table, or JSON). Include at least the following columns where possible: YearMonth, ProductName, ProductGroup, InventoryActual, InventoryPlan, DeliveryActual, DeliveryPlan, DeliveryLastMonth, ProductionActual, ProductionPlan, ProductionLastMonth. You may also add any business context (service level targets, strategic products, regulatory priorities, supply constraints, etc.).",
         "validation": {
-          "required": true,
-          "minLength": 20
+          "required": false
         },
         "colSpan": 2,
         "order": 1

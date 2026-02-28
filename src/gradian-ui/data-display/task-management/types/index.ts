@@ -1,4 +1,4 @@
-export type AssignmentView = 'assignedTo' | 'initiatedBy';
+export type AssignmentView = 'assignedTo' | 'initiatedBy' | 'allItems';
 
 export interface AssignmentUser {
   id: string;
@@ -10,6 +10,7 @@ export interface AssignmentUser {
 export interface AssignmentCounts {
   assignedTo: number;
   initiatedBy: number;
+  allItems: number;
 }
 
 export interface AssignmentFilterResult<T = any> {

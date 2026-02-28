@@ -18,9 +18,38 @@ function generateId(): string {
 /** Normalize legacy { text, completed } or partial items to ChecklistItemType[] */
 export function normalizeChecklistValue(value: unknown): ChecklistItemType[] {
   if (!value) return [];
+
+  // Support plain comma-separated string (e.g. "A,B") for AI/legacy fillers.
+  if (typeof value === 'string') {
+    const parts = value
+      .split(',')
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
+
+    return parts.map((content, index) => ({
+      id: generateId(),
+      content,
+      isCompleted: false,
+      order: index,
+    }));
+  }
+
   if (!Array.isArray(value)) return [];
+
   return value
     .map((item: unknown, index: number) => {
+      // Allow simple string/number arrays like ['A', 'B'] or [1, 2]
+      if (item == null || typeof item !== 'object') {
+        const content = String(item ?? '').trim();
+        if (!content) return null;
+        return {
+          id: generateId(),
+          content,
+          isCompleted: false,
+          order: index,
+        };
+      }
+
       const anyItem = item as Record<string, unknown> | null | undefined;
       const content = (anyItem?.content ?? anyItem?.text ?? '') as string;
       const isCompleted = (anyItem?.isCompleted ?? anyItem?.completed ?? false) as boolean;
@@ -28,6 +57,7 @@ export function normalizeChecklistValue(value: unknown): ChecklistItemType[] {
       const order = typeof anyItem?.order === 'number' ? (anyItem.order as number) : index;
       return { id, content: String(content), isCompleted: Boolean(isCompleted), order };
     })
+    .filter((item): item is ChecklistItemType => item !== null)
     .sort((a, b) => a.order - b.order);
 }
 

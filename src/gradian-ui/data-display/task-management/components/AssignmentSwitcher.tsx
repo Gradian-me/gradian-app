@@ -45,6 +45,7 @@ export const AssignmentSwitcher = ({
   const descriptionSwitchUser = getT(TRANSLATION_KEYS.DESCRIPTION_SWITCH_USER_PERSPECTIVE, language ?? undefined, defaultLang);
   const buttonReset = getT(TRANSLATION_KEYS.BUTTON_RESET, language ?? undefined, defaultLang);
   const buttonChange = getT(TRANSLATION_KEYS.BUTTON_CHANGE, language ?? undefined, defaultLang);
+  const labelAllItems = getT(TRANSLATION_KEYS.LABEL_ALL_ITEMS, language ?? undefined, defaultLang);
   const isRtl = isRTL(language ?? defaultLang);
 
   const handlePickerSelect = useCallback(
@@ -75,6 +76,13 @@ export const AssignmentSwitcher = ({
         count: counts.initiatedBy,
         disabled: !selectedUser,
       },
+      {
+        id: 'allItems' as const,
+        label: labelAllItems,
+        icon: <Sparkles className="h-3.5 w-3.5" />,
+        count: counts.allItems,
+        disabled: false,
+      },
     ] satisfies Array<{
       id: AssignmentView;
       label: string;
@@ -82,7 +90,7 @@ export const AssignmentSwitcher = ({
       count: number;
       disabled: boolean;
     }>;
-  }, [counts.assignedTo, counts.initiatedBy, selectedUser, labelAssignedTo, labelInitiatedBy, labelUser, language, defaultLang]);
+  }, [counts.assignedTo, counts.initiatedBy, counts.allItems, selectedUser, labelAssignedTo, labelInitiatedBy, labelUser, labelAllItems, language, defaultLang]);
 
   const userLabelDisplay = selectedUser?.label != null ? (typeof selectedUser.label === 'string' ? selectedUser.label : resolveDisplayLabel(selectedUser.label, language ?? defaultLang, defaultLang)) : labelNoUserSelected;
 
@@ -90,7 +98,7 @@ export const AssignmentSwitcher = ({
 
   const tabsContent = (
     <Tabs value={activeView} onValueChange={(value) => onViewChange(value as AssignmentView)}>
-      <TabsList className="flex w-full flex-wrap gap-2 bg-gray-50 p-1 dark:bg-gray-800/70" dir={isRtl ? 'rtl' : undefined}>
+      <TabsList className="flex w-full flex-wrap gap-2 bg-gray-100 p-1 dark:bg-gray-800/70" dir={isRtl ? 'rtl' : undefined}>
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.id}

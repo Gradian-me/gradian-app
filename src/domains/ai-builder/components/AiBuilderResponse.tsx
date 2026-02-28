@@ -13,7 +13,7 @@ import { Loader2, Sparkles, Timer, Download, ExternalLink } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { MetricCard } from '@/gradian-ui/analytics';
 import { ResponseCardViewer } from './ResponseCardViewer';
-import { ResponseAnnotationViewer } from './ResponseAnnotationViewer';
+import { ResponseAnnotationViewer } from '@/gradian-ui/communication/annotations';
 import { TableWrapper } from '@/gradian-ui/data-display/table/components/TableWrapper';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { MarkdownViewer } from '@/gradian-ui/data-display/markdown/components/MarkdownViewer';

@@ -149,22 +149,11 @@ export interface ResponseCardConfig {
   schemaPath: string; // JSON path to extract full schema data (e.g., "$" or "$[0]")
 }
 
-export interface AnnotationItem {
-  id: string;
-  label: string;
-}
-
-export interface SchemaAnnotation {
-  schemaId: string;
-  schemaLabel: string;
-  schemaIcon?: string;
-  annotations: AnnotationItem[];
-}
-
-/** Element-level annotation for app builder form results: schema + form field + annotation text. */
-export interface ElementAnnotation {
-  schema: { id: string; label: string; icon?: string };
-  formElement: string;
-  annotation: { id: string; label: string };
-}
+/** Re-export from shared annotations module for app builder and SignaturePad. */
+export type {
+  AnnotationItem,
+  SchemaAnnotation,
+  ElementAnnotation,
+  CanvasAnnotation,
+} from '@/gradian-ui/communication/annotations';
 

@@ -48,6 +48,7 @@ import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { TableWrapper, TableConfig, buildTableColumns, TableColumn } from '@/gradian-ui/data-display/table';
 import { AssignmentSwitcher } from '@/gradian-ui/data-display/task-management/components/AssignmentSwitcher';
 import { useAssignmentSwitcher } from '@/gradian-ui/data-display/task-management/hooks/useAssignmentSwitcher';
+import type { AssignmentView } from '@/gradian-ui/data-display/task-management/types';
 import { DynamicPagination } from './DynamicPagination';
 import { HierarchyView } from '@/gradian-ui/data-display/hierarchy/HierarchyView';
 import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/PopupPicker';
@@ -559,7 +560,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const allowAssignmentSwitcher =
     schema?.allowAssignTo === true || schema?.allowDataAssignedTo === true;
 
-  const [assignmentView, setAssignmentView] = useState<'assignedTo' | 'initiatedBy'>('assignedTo');
+  const [assignmentView, setAssignmentView] = useState<AssignmentView>('assignedTo');
   const [assignmentCountsFromApi, setAssignmentCountsFromApi] = useState<{
     assignedToCount: number;
     initiatedByCount: number;
@@ -1010,8 +1011,9 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   // Build filters object with company filter and optional assignment (createdByIds / assignedToIds)
   const buildFilters = useCallback(() => {
     // When assignment switcher is enabled but no user is selected yet,
-    // avoid fetching unfiltered data. User must pick a POV first.
-    if (allowAssignmentSwitcher && !assignmentSelectedUser?.id) {
+    // avoid fetching unfiltered data. User must pick a POV first,
+    // except for the "all items" view which intentionally shows everything.
+    if (allowAssignmentSwitcher && !assignmentSelectedUser?.id && assignmentView !== 'allItems') {
       return null;
     }
 
@@ -1021,8 +1023,9 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       category: currentFilters.category,
     };
 
-    // Assignment filter (backend): createdByIds or assignedToIds as comma-separated user ID(s)
-    if (allowAssignmentSwitcher && assignmentSelectedUser?.id) {
+    // Assignment filter (backend): createdByIds or assignedToIds as comma-separated user ID(s).
+    // For the "allItems" view we deliberately skip assignment filters to show all entities.
+    if (allowAssignmentSwitcher && assignmentSelectedUser?.id && assignmentView !== 'allItems') {
       if (assignmentView === 'assignedTo') {
         filters.assignedToIds = assignmentSelectedUser.id;
       } else {
@@ -2125,7 +2128,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           onViewModeChange={handleViewModeChange}
           onAddNew={handleOpenCreateModal}
           onRefresh={handleManualRefresh}
-          isRefreshing={(!(allowAssignmentSwitcher && !assignmentSelectedUser?.id) && (isLoading || isManualRefresh))}
+          isRefreshing={(!(allowAssignmentSwitcher && !assignmentSelectedUser?.id && assignmentView !== 'allItems') && (isLoading || isManualRefresh))}
           addButtonText={`${labelAdd} ${singularName}`}
           onExpandAllHierarchy={() => setHierarchyExpandToken((prev) => prev + 1)}
           onCollapseAllHierarchy={() => setHierarchyCollapseToken((prev) => prev + 1)}
@@ -2176,7 +2179,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
         )}
 
         {/* Entities List or Assignment Placeholder */}
-        {allowAssignmentSwitcher && !assignmentSelectedUser?.id ? (
+        {allowAssignmentSwitcher && !assignmentSelectedUser?.id && assignmentView !== 'allItems' ? (
           <motion.div
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}

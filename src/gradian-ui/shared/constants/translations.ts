@@ -92,6 +92,7 @@ export const TRANSLATION_KEYS = {
   PAGINATION_LOADING: 'PAGINATION_LOADING',
   LABEL_ASSIGNED_TO: 'LABEL_ASSIGNED_TO',
   LABEL_INITIATED_BY: 'LABEL_INITIATED_BY',
+  LABEL_ALL_ITEMS: 'LABEL_ALL_ITEMS',
   LABEL_USER: 'LABEL_USER',
   LABEL_VIEWING_AS: 'LABEL_VIEWING_AS',
   LABEL_NO_USER_SELECTED: 'LABEL_NO_USER_SELECTED',
@@ -1891,6 +1892,19 @@ export const TRANSLATIONS: TranslationEntry[] = [
       { de: 'Initiert von' },
       { it: 'Avviato da' },
       { ru: 'Инициировано' },
+    ],
+  },
+  {
+    key: TRANSLATION_KEYS.LABEL_ALL_ITEMS,
+    translations: [
+      { en: 'All items' },
+      { fa: 'همه موارد' },
+      { ar: 'كل العناصر' },
+      { es: 'Todos los elementos' },
+      { fr: 'Tous les éléments' },
+      { de: 'Alle Elemente' },
+      { it: 'Tutti gli elementi' },
+      { ru: 'Все элементы' },
     ],
   },
   {

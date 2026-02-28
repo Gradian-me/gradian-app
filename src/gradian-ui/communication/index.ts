@@ -45,6 +45,16 @@ export type {
   DiscussionMessage as DiscussionMessageType,
 } from './discussion';
 
+// Annotations (shared by app builder and SignaturePad)
+export * as Annotations from './annotations';
+export { ResponseAnnotationViewer } from './annotations';
+export type {
+  AnnotationItem,
+  SchemaAnnotation,
+  ElementAnnotation,
+  CanvasAnnotation,
+} from './annotations';
+
 // Future services can be added here:
 // export * as SMS from './sms';
 // export * as PushNotifications from './push-notifications';

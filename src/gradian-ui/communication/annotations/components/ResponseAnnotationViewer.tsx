@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ListInput, type AnnotationItem } from '@/gradian-ui/form-builder/form-elements';
+import { ListInput } from '@/gradian-ui/form-builder/form-elements';
 import { Button } from '@/components/ui/button';
 import { ButtonMinimal } from '@/gradian-ui/form-builder/form-elements';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -19,13 +19,13 @@ import {
 } from '@/components/ui/dialog';
 import { X, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/gradian-ui/shared/utils';
-import type { SchemaAnnotation } from '../types';
+import type { AnnotationItem, SchemaAnnotation } from '../types';
 
 interface ResponseAnnotationViewerProps {
   annotations: SchemaAnnotation[];
   onAnnotationsChange: (schemaId: string, annotations: AnnotationItem[]) => void;
   onRemoveSchema: (schemaId: string) => void;
-  onApply?: (annotations: SchemaAnnotation[]) => void; // Callback when Apply button is clicked
+  onApply?: (annotations: SchemaAnnotation[]) => void;
 }
 
 export function ResponseAnnotationViewer({
@@ -36,9 +36,8 @@ export function ResponseAnnotationViewer({
 }: ResponseAnnotationViewerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Filter out schemas with no annotations
-  const schemasWithAnnotations = annotations.filter(schema => schema.annotations.length > 0);
-  
+  const schemasWithAnnotations = annotations.filter((schema) => schema.annotations.length > 0);
+
   if (schemasWithAnnotations.length === 0) {
     return null;
   }
@@ -54,10 +53,7 @@ export function ResponseAnnotationViewer({
         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
           Schema Annotations
         </h3>
-        <Button
-          onClick={() => setIsDialogOpen(true)}
-          variant="gradient"
-        >
+        <Button onClick={() => setIsDialogOpen(true)} variant="gradient">
           <CheckCircle2 className="h-4 w-4 me-2" />
           Apply ({totalAnnotations})
         </Button>
@@ -67,7 +63,12 @@ export function ResponseAnnotationViewer({
         {schemasWithAnnotations.map((schemaAnnotation) => (
           <div
             key={schemaAnnotation.schemaId}
-            className="relative overflow-hidden rounded-xl bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30 border border-violet-200 dark:border-violet-400 shadow-sm p-5"
+            className={cn(
+              'relative overflow-hidden rounded-xl border shadow-sm p-5',
+              'bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50',
+              'dark:from-violet-950/30 dark:via-purple-950/30 dark:to-indigo-950/30',
+              'border-violet-200 dark:border-violet-400'
+            )}
           >
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
@@ -93,9 +94,7 @@ export function ResponseAnnotationViewer({
             </div>
             <ListInput
               value={schemaAnnotation.annotations}
-              onChange={(items) =>
-                onAnnotationsChange(schemaAnnotation.schemaId, items)
-              }
+              onChange={(items) => onAnnotationsChange(schemaAnnotation.schemaId, items)}
               placeholder="Enter annotation..."
               addButtonText="Add Annotation"
             />
@@ -103,7 +102,6 @@ export function ResponseAnnotationViewer({
         ))}
       </div>
 
-      {/* Apply Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -177,4 +175,3 @@ export function ResponseAnnotationViewer({
     </div>
   );
 }
-

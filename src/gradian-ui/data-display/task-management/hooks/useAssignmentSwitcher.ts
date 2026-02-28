@@ -124,12 +124,20 @@ export const useAssignmentSwitcher = ({
       return {
         assignedTo: countsFromApi.assignedToCount,
         initiatedBy: countsFromApi.initiatedByCount,
+        allItems: totalItems,
       };
     }
+
     if (activeView === 'assignedTo') {
-      return { assignedTo: totalItems, initiatedBy: 0 };
+      return { assignedTo: totalItems, initiatedBy: 0, allItems: totalItems };
     }
-    return { assignedTo: 0, initiatedBy: totalItems };
+
+    if (activeView === 'initiatedBy') {
+      return { assignedTo: 0, initiatedBy: totalItems, allItems: totalItems };
+    }
+
+    // activeView === 'allItems'
+    return { assignedTo: 0, initiatedBy: 0, allItems: totalItems };
   }, [countsFromApi, activeView, totalItems]);
 
   return {
