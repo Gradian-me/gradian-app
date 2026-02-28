@@ -20228,6 +20228,183 @@
       "createdAt": "2025-12-22T12:00:00.000Z",
       "updatedAt": "2025-12-22T12:00:00.000Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "سفارش عادی مطابق لیدتایم",
+      "icon": "CheckCircle",
+      "color": "blue",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KORDSTITM000000000000001",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "فورس - عدم تأیید کیفی اقلام قبلی",
+      "icon": "XCircle",
+      "color": "red",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KORDSTITM000000000000002",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "فورس - خرابی یا از کارافتادن تجهیز",
+      "icon": "AlertTriangle",
+      "color": "red",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KORDSTITM000000000000003",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "فورس - کمبود / اتمام موجودی",
+      "icon": "PackageX",
+      "color": "red",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KORDSTITM000000000000004",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "فورس - افزایش ناگهانی حجم کار",
+      "icon": "TrendingUp",
+      "color": "amber",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KORDSTITM000000000000005",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "فورس - تعریف پروژه جدید",
+      "icon": "FolderPlus",
+      "color": "emerald",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KORDSTITM000000000000006",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "فورس - تصمیم یا اولویت فوری مدیریت",
+      "icon": "Briefcase",
+      "color": "purple",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KORDSTITM000000000000007",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "Material",
+      "icon": "Box",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KPTITM000000000000000001",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "Product",
+      "icon": "Package",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KPTITM000000000000000002",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "Kit",
+      "icon": "Layers",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KPTITM000000000000000003",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "Equipment",
+      "icon": "Settings",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KPTITM000000000000000004",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "Tools",
+      "icon": "Wrench",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KPTITM000000000000000005",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "Others",
+      "icon": "MoreHorizontal",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KPTITM000000000000000006",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "جامد",
+      "icon": "Box",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KMTITM000000000000000001",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "مایع",
+      "icon": "Droplet",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KMTITM000000000000000002",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "گاز",
+      "icon": "Wind",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KMTITM000000000000000003",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "پودری",
+      "icon": "CircleDot",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KMTITM000000000000000004",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "parameter-groups": [
@@ -20306,6 +20483,54 @@
       "updatedAt": "2025-12-22T12:00:00.000Z",
       "parameter-items-section": [],
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
+    },
+    {
+      "title": "Ordering Status",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KORDSTGP0000000000000001",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "parameter-items-section": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
+    },
+    {
+      "title": "Part Type",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KPTGP00000000000000000001",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "parameter-items-section": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "relatedTenants": [
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        }
+      ]
+    },
+    {
+      "title": "Material Type",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KMTGP00000000000000000001",
+      "createdAt": "2026-02-28T12:00:00.000Z",
+      "updatedAt": "2026-02-28T12:00:00.000Z",
+      "parameter-items-section": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "relatedTenants": [
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
@@ -22028,5 +22253,6 @@
       "createdAt": "2026-02-25T12:11:18.006Z",
       "updatedAt": "2026-02-25T12:11:18.221Z"
     }
-  ]
+  ],
+  "purchase-request": []
 }

@@ -1166,6 +1166,176 @@
   },
   {
     "sourceSchema": "parameter-groups",
+    "sourceId": "01KORDSTGP0000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KORDSTITM000000000000001",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KORDSTREL0000000000000001",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KORDSTGP0000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KORDSTITM000000000000002",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KORDSTREL0000000000000002",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KORDSTGP0000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KORDSTITM000000000000003",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KORDSTREL0000000000000003",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KORDSTGP0000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KORDSTITM000000000000004",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KORDSTREL0000000000000004",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KORDSTGP0000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KORDSTITM000000000000005",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KORDSTREL0000000000000005",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KORDSTGP0000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KORDSTITM000000000000006",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KORDSTREL0000000000000006",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KORDSTGP0000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KORDSTITM000000000000007",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KORDSTREL0000000000000007",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KPTGP00000000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KPTITM000000000000000001",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KPTREL000000000000000001",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KPTGP00000000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KPTITM000000000000000002",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KPTREL000000000000000002",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KPTGP00000000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KPTITM000000000000000003",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KPTREL000000000000000003",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KPTGP00000000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KPTITM000000000000000004",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KPTREL000000000000000004",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KPTGP00000000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KPTITM000000000000000005",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KPTREL000000000000000005",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KPTGP00000000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KPTITM000000000000000006",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KPTREL000000000000000006",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KMTGP00000000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KMTITM000000000000000001",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KMTREL000000000000000001",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KMTGP00000000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KMTITM000000000000000002",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KMTREL000000000000000002",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KMTGP00000000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KMTITM000000000000000003",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KMTREL000000000000000003",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KMTGP00000000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KMTITM000000000000000004",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KMTREL000000000000000004",
+    "createdAt": "2026-02-28T12:00:00.000Z",
+    "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
     "sourceId": "01KD33VYXBTM8CR7NRAK76MS8M",
     "targetSchema": "parameter-items",
     "targetId": "01KD33VYSQP6SRYAQNX1YDMQ11",

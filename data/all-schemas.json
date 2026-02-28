@@ -36371,5 +36371,319 @@
         "description": "Assessment of the operation outcome."
       }
     ]
+  },
+  {
+    "id": "purchase-request",
+    "description": "Comprehensive purchase request form for materials, parts, and equipment with budget review and technical specifications.",
+    "singular_name": "Purchase Request",
+    "plural_name": "Purchase Requests",
+    "icon": "ShoppingCart",
+    "showInNavigation": true,
+    "allowDataForce": true,
+    "allowDataAssignedTo": true,
+    "fields": [
+      {
+        "id": "part-code",
+        "name": "partCode",
+        "label": "Part Code",
+        "sectionId": "general-info",
+        "type": "text",
+        "component": "text",
+        "role": "code",
+        "order": 1
+      },
+      {
+        "id": "part-name",
+        "name": "partName",
+        "label": "Part Name",
+        "sectionId": "general-info",
+        "type": "text",
+        "component": "text",
+        "role": "title",
+        "required": true,
+        "order": 2
+      },
+      {
+        "id": "cat-no",
+        "name": "catNo",
+        "label": "Cat. No",
+        "sectionId": "general-info",
+        "type": "text",
+        "component": "text",
+        "order": 3
+      },
+      {
+        "id": "manufacturer",
+        "name": "manufacturer",
+        "label": "Manufacturer",
+        "sectionId": "general-info",
+        "type": "text",
+        "component": "text",
+        "order": 4
+      },
+      {
+        "id": "part-type",
+        "name": "partType",
+        "label": "Part Type",
+        "sectionId": "general-info",
+        "type": "select",
+        "component": "select",
+        "order": 6,
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KPTGP00000000000000000001"
+      },
+      {
+        "id": "material-type",
+        "name": "materialType",
+        "label": "Material Type",
+        "sectionId": "general-info",
+        "type": "select",
+        "component": "select",
+        "order": 7,
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KMTGP00000000000000000001"
+      },
+      {
+        "id": "ordering-status",
+        "name": "orderingStatus",
+        "label": "Ordering Status",
+        "sectionId": "general-info",
+        "type": "select",
+        "component": "select",
+        "role": "status",
+        "order": 10,
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KORDSTGP0000000000000001"
+      },
+      {
+        "id": "quantity",
+        "name": "quantity",
+        "label": "Quantity",
+        "sectionId": "general-info",
+        "type": "number",
+        "component": "number",
+        "required": true,
+        "order": 8
+      },
+      {
+        "id": "unit",
+        "name": "unit",
+        "label": "Unit",
+        "sectionId": "general-info",
+        "type": "select",
+        "component": "select",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KCXXNWCDK18BACMC5CEPXJ7B",
+        "order": 5
+      },
+      {
+        "id": "request-description",
+        "name": "requestDescription",
+        "label": "Request Description",
+        "sectionId": "general-info",
+        "type": "textarea",
+        "component": "textarea",
+        "colSpan": 2,
+        "order": 11
+      },
+      {
+        "id": "cost-center",
+        "name": "costCenter",
+        "label": "Cost Center",
+        "sectionId": "financial-info",
+        "type": "picker",
+        "component": "picker",
+        "targetSchema": "cost-centers",
+        "order": 1
+      },
+      {
+        "id": "project",
+        "name": "project",
+        "label": "Project",
+        "sectionId": "financial-info",
+        "component": "picker",
+        "targetSchema": "projects",
+        "order": 2
+      },
+      {
+        "id": "budget-codes",
+        "name": "budgetCodes",
+        "label": "Budget Codes",
+        "sectionId": "financial-info",
+        "type": "list",
+        "component": "list",
+        "colSpan": 2,
+        "order": 3
+      },
+      {
+        "id": "storage-condition",
+        "name": "storageCondition",
+        "label": "Storage Condition",
+        "sectionId": "complementary-info",
+        "type": "select",
+        "component": "select",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KCXW1C9NT5D4TFDK511BKTSQ",
+        "order": 1
+      },
+      {
+        "id": "min-exp-months",
+        "name": "minExpirationMonths",
+        "label": "Minimum Expiration (Months)",
+        "sectionId": "complementary-info",
+        "type": "number",
+        "component": "number",
+        "order": 2
+      },
+      {
+        "id": "cas-no",
+        "name": "casNo",
+        "label": "CAS No",
+        "sectionId": "complementary-info",
+        "type": "text",
+        "component": "text",
+        "order": 3
+      },
+      {
+        "id": "needs-urs",
+        "name": "needsUrs",
+        "label": "Needs URS",
+        "sectionId": "complementary-info",
+        "component": "switch",
+        "order": 4
+      },
+      {
+        "id": "certifications",
+        "name": "certifications",
+        "label": "Certifications Required",
+        "sectionId": "complementary-info",
+        "type": "checkbox-list",
+        "component": "checkbox-list",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KCXV771ABGHR0ST7MZ03S6B1",
+        "order": 5
+      },
+      {
+        "id": "other-info",
+        "name": "otherInfo",
+        "label": "Additional Requirements",
+        "sectionId": "complementary-info",
+        "type": "checkbox-list",
+        "component": "checkbox-list",
+        "order": 6,
+        "options": [
+          {
+            "id": "sample-needed",
+            "label": "نیاز به دریافت نمونه"
+          },
+          {
+            "id": "datalogger",
+            "label": "نیاز به حمل با دیتالاگر"
+          }
+        ]
+      },
+      {
+        "id": "quantity-budget-status",
+        "name": "quantityBudgetStatus",
+        "label": "Quantity Budget Status",
+        "sectionId": "budget-review",
+        "type": "select",
+        "component": "select",
+        "order": 1,
+        "options": [
+          {
+            "id": "approved",
+            "label": "Approved",
+            "color": "emerald"
+          },
+          {
+            "id": "rejected",
+            "label": "Rejected",
+            "color": "red"
+          },
+          {
+            "id": "conditional",
+            "label": "Conditional",
+            "color": "amber"
+          }
+        ]
+      },
+      {
+        "id": "financial-budget-status",
+        "name": "financialBudgetStatus",
+        "label": "Financial Budget Status",
+        "sectionId": "budget-review",
+        "type": "select",
+        "component": "select",
+        "order": 2,
+        "options": [
+          {
+            "id": "approved",
+            "label": "Approved",
+            "color": "emerald"
+          },
+          {
+            "id": "rejected",
+            "label": "Rejected",
+            "color": "red"
+          },
+          {
+            "id": "conditional",
+            "label": "Conditional",
+            "color": "amber"
+          }
+        ]
+      },
+      {
+        "id": "budget-review-desc",
+        "name": "budgetReviewDescription",
+        "label": "Budget Review Description",
+        "sectionId": "budget-review",
+        "type": "textarea",
+        "component": "textarea",
+        "colSpan": 2,
+        "order": 3
+      }
+    ],
+    "sections": [
+      {
+        "id": "general-info",
+        "title": "General Request Information",
+        "columns": 2
+      },
+      {
+        "id": "financial-info",
+        "title": "Financial Information",
+        "columns": 2
+      },
+      {
+        "id": "complementary-info",
+        "title": "Complementary Information",
+        "columns": 2
+      },
+      {
+        "id": "budget-review",
+        "title": "Budget Review",
+        "columns": 2
+      }
+    ],
+    "relatedTenants":[
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ]
   }
 ]
