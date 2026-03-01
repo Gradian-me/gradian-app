@@ -2364,6 +2364,86 @@
     "inactive": true
   },
   {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KPR0GR0UP1PR0CHASEREQST01",
+    "targetSchema": "status-items",
+    "targetId": "01KPR0IT0EM01DRAFT00000001",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KPR0REL01DRAFT000000000001",
+    "createdAt": "2026-03-01T12:00:00.000Z",
+    "updatedAt": "2026-03-01T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KPR0GR0UP1PR0CHASEREQST01",
+    "targetSchema": "status-items",
+    "targetId": "01KPR0IT0EM02SUBMITTED00001",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KPR0REL02SUBMIT00000000001",
+    "createdAt": "2026-03-01T12:00:00.000Z",
+    "updatedAt": "2026-03-01T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KPR0GR0UP1PR0CHASEREQST01",
+    "targetSchema": "status-items",
+    "targetId": "01KPR0IT0EM03MGRAPPR000001",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KPR0REL03MGRAPPR000000001",
+    "createdAt": "2026-03-01T12:00:00.000Z",
+    "updatedAt": "2026-03-01T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KPR0GR0UP1PR0CHASEREQST01",
+    "targetSchema": "status-items",
+    "targetId": "01KPR0IT0EM04INVAPPR000001",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KPR0REL04INVAPPR000000001",
+    "createdAt": "2026-03-01T12:00:00.000Z",
+    "updatedAt": "2026-03-01T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KPR0GR0UP1PR0CHASEREQST01",
+    "targetSchema": "status-items",
+    "targetId": "01KPR0IT0EM05PROCURE000001",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KPR0REL05PROCURE000000001",
+    "createdAt": "2026-03-01T12:00:00.000Z",
+    "updatedAt": "2026-03-01T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KPR0GR0UP1PR0CHASEREQST01",
+    "targetSchema": "status-items",
+    "targetId": "01KPR0IT0EM06COMPLETE000001",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KPR0REL06COMPLETE000000001",
+    "createdAt": "2026-03-01T12:00:00.000Z",
+    "updatedAt": "2026-03-01T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KPR0GR0UP1PR0CHASEREQST01",
+    "targetSchema": "status-items",
+    "targetId": "01KPR0IT0EM07CANCELLED00001",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KPR0REL07CANCELLED000000001",
+    "createdAt": "2026-03-01T12:00:00.000Z",
+    "updatedAt": "2026-03-01T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KPR0GR0UP1PR0CHASEREQST01",
+    "targetSchema": "status-items",
+    "targetId": "01KPR0IT0EM08REJECTED000001",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KPR0REL08REJECTED000000001",
+    "createdAt": "2026-03-01T12:00:00.000Z",
+    "updatedAt": "2026-03-01T12:00:00.000Z"
+  },
+  {
     "sourceSchema": "inquiries",
     "sourceId": "01KCZVDJHHKT672CHJC27ZGF5C",
     "targetSchema": "tenders",

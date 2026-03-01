@@ -36377,6 +36377,58 @@
     "description": "Comprehensive purchase request form for materials, parts, and equipment with budget review and technical specifications.",
     "singular_name": "Purchase Request",
     "plural_name": "Purchase Requests",
+    "singular_name_translations": [
+      {
+        "en": "Purchase Request"
+      },
+      {
+        "fa": "درخواست خرید"
+      },
+      {
+        "ar": "طلب شراء"
+      },
+      {
+        "es": "Solicitud de compra"
+      },
+      {
+        "fr": "Demande d'achat"
+      },
+      {
+        "de": "Beschaffungsanfrage"
+      },
+      {
+        "it": "Richiesta d'acquisto"
+      },
+      {
+        "ru": "Заявка на закупку"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "Purchase Requests"
+      },
+      {
+        "fa": "درخواست‌های خرید"
+      },
+      {
+        "ar": "طلبات الشراء"
+      },
+      {
+        "es": "Solicitudes de compra"
+      },
+      {
+        "fr": "Demandes d'achat"
+      },
+      {
+        "de": "Beschaffungsanfragen"
+      },
+      {
+        "it": "Richieste d'acquisto"
+      },
+      {
+        "ru": "Заявки на закупку"
+      }
+    ],
     "icon": "ShoppingCart",
     "showInNavigation": true,
     "allowDataForce": true,
@@ -36386,6 +36438,32 @@
         "id": "part-code",
         "name": "partCode",
         "label": "Part Code",
+        "translations": [
+          {
+            "en": "Part Code"
+          },
+          {
+            "fa": "کد قطعه"
+          },
+          {
+            "ar": "رمز القطعة"
+          },
+          {
+            "es": "Código de pieza"
+          },
+          {
+            "fr": "Code pièce"
+          },
+          {
+            "de": "Teilenummer"
+          },
+          {
+            "it": "Codice parte"
+          },
+          {
+            "ru": "Код детали"
+          }
+        ],
         "sectionId": "general-info",
         "type": "text",
         "component": "text",
@@ -36396,6 +36474,32 @@
         "id": "part-name",
         "name": "partName",
         "label": "Part Name",
+        "translations": [
+          {
+            "en": "Part Name"
+          },
+          {
+            "fa": "نام قطعه"
+          },
+          {
+            "ar": "اسم القطعة"
+          },
+          {
+            "es": "Nombre de pieza"
+          },
+          {
+            "fr": "Nom de la pièce"
+          },
+          {
+            "de": "Teilename"
+          },
+          {
+            "it": "Nome parte"
+          },
+          {
+            "ru": "Название детали"
+          }
+        ],
         "sectionId": "general-info",
         "type": "text",
         "component": "text",
@@ -36407,6 +36511,32 @@
         "id": "cat-no",
         "name": "catNo",
         "label": "Cat. No",
+        "translations": [
+          {
+            "en": "Cat. No"
+          },
+          {
+            "fa": "شماره کاتالوگ"
+          },
+          {
+            "ar": "رقم الكاتالوغ"
+          },
+          {
+            "es": "Nº catálogo"
+          },
+          {
+            "fr": "N° catalogue"
+          },
+          {
+            "de": "Katalognr."
+          },
+          {
+            "it": "N. catalogo"
+          },
+          {
+            "ru": "Кат. №"
+          }
+        ],
         "sectionId": "general-info",
         "type": "text",
         "component": "text",
@@ -36416,6 +36546,32 @@
         "id": "manufacturer",
         "name": "manufacturer",
         "label": "Manufacturer",
+        "translations": [
+          {
+            "en": "Manufacturer"
+          },
+          {
+            "fa": "سازنده"
+          },
+          {
+            "ar": "الشركة المصنعة"
+          },
+          {
+            "es": "Fabricante"
+          },
+          {
+            "fr": "Fabricant"
+          },
+          {
+            "de": "Hersteller"
+          },
+          {
+            "it": "Produttore"
+          },
+          {
+            "ru": "Производитель"
+          }
+        ],
         "sectionId": "general-info",
         "type": "text",
         "component": "text",
@@ -36425,6 +36581,32 @@
         "id": "part-type",
         "name": "partType",
         "label": "Part Type",
+        "translations": [
+          {
+            "en": "Part Type"
+          },
+          {
+            "fa": "نوع قطعه"
+          },
+          {
+            "ar": "نوع القطعة"
+          },
+          {
+            "es": "Tipo de pieza"
+          },
+          {
+            "fr": "Type de pièce"
+          },
+          {
+            "de": "Teiletyp"
+          },
+          {
+            "it": "Tipo parte"
+          },
+          {
+            "ru": "Тип детали"
+          }
+        ],
         "sectionId": "general-info",
         "type": "select",
         "component": "select",
@@ -36438,6 +36620,32 @@
         "id": "material-type",
         "name": "materialType",
         "label": "Material Type",
+        "translations": [
+          {
+            "en": "Material Type"
+          },
+          {
+            "fa": "نوع مواد"
+          },
+          {
+            "ar": "نوع المواد"
+          },
+          {
+            "es": "Tipo de material"
+          },
+          {
+            "fr": "Type de matériau"
+          },
+          {
+            "de": "Materialtyp"
+          },
+          {
+            "it": "Tipo materiale"
+          },
+          {
+            "ru": "Тип материала"
+          }
+        ],
         "sectionId": "general-info",
         "type": "select",
         "component": "select",
@@ -36451,6 +36659,32 @@
         "id": "ordering-status",
         "name": "orderingStatus",
         "label": "Ordering Status",
+        "translations": [
+          {
+            "en": "Ordering Status"
+          },
+          {
+            "fa": "وضعیت سفارش"
+          },
+          {
+            "ar": "حالة الطلب"
+          },
+          {
+            "es": "Estado del pedido"
+          },
+          {
+            "fr": "Statut de la commande"
+          },
+          {
+            "de": "Bestellstatus"
+          },
+          {
+            "it": "Stato ordine"
+          },
+          {
+            "ru": "Статус заказа"
+          }
+        ],
         "sectionId": "general-info",
         "type": "select",
         "component": "select",
@@ -36465,6 +36699,32 @@
         "id": "quantity",
         "name": "quantity",
         "label": "Quantity",
+        "translations": [
+          {
+            "en": "Quantity"
+          },
+          {
+            "fa": "تعداد"
+          },
+          {
+            "ar": "الكمية"
+          },
+          {
+            "es": "Cantidad"
+          },
+          {
+            "fr": "Quantité"
+          },
+          {
+            "de": "Menge"
+          },
+          {
+            "it": "Quantità"
+          },
+          {
+            "ru": "Количество"
+          }
+        ],
         "sectionId": "general-info",
         "type": "number",
         "component": "number",
@@ -36475,6 +36735,32 @@
         "id": "unit",
         "name": "unit",
         "label": "Unit",
+        "translations": [
+          {
+            "en": "Unit"
+          },
+          {
+            "fa": "واحد"
+          },
+          {
+            "ar": "الوحدة"
+          },
+          {
+            "es": "Unidad"
+          },
+          {
+            "fr": "Unité"
+          },
+          {
+            "de": "Einheit"
+          },
+          {
+            "it": "Unità"
+          },
+          {
+            "ru": "Единица"
+          }
+        ],
         "sectionId": "general-info",
         "type": "select",
         "component": "select",
@@ -36488,6 +36774,32 @@
         "id": "request-description",
         "name": "requestDescription",
         "label": "Request Description",
+        "translations": [
+          {
+            "en": "Request Description"
+          },
+          {
+            "fa": "توضیحات درخواست"
+          },
+          {
+            "ar": "وصف الطلب"
+          },
+          {
+            "es": "Descripción del pedido"
+          },
+          {
+            "fr": "Description de la demande"
+          },
+          {
+            "de": "Anfragebeschreibung"
+          },
+          {
+            "it": "Descrizione richiesta"
+          },
+          {
+            "ru": "Описание заявки"
+          }
+        ],
         "sectionId": "general-info",
         "type": "textarea",
         "component": "textarea",
@@ -36498,6 +36810,32 @@
         "id": "cost-center",
         "name": "costCenter",
         "label": "Cost Center",
+        "translations": [
+          {
+            "en": "Cost Center"
+          },
+          {
+            "fa": "مرکز هزینه"
+          },
+          {
+            "ar": "مركز التكلفة"
+          },
+          {
+            "es": "Centro de coste"
+          },
+          {
+            "fr": "Centre de coût"
+          },
+          {
+            "de": "Kostenstelle"
+          },
+          {
+            "it": "Centro di costo"
+          },
+          {
+            "ru": "Центр затрат"
+          }
+        ],
         "sectionId": "financial-info",
         "type": "picker",
         "component": "picker",
@@ -36508,6 +36846,32 @@
         "id": "project",
         "name": "project",
         "label": "Project",
+        "translations": [
+          {
+            "en": "Project"
+          },
+          {
+            "fa": "پروژه"
+          },
+          {
+            "ar": "المشروع"
+          },
+          {
+            "es": "Proyecto"
+          },
+          {
+            "fr": "Projet"
+          },
+          {
+            "de": "Projekt"
+          },
+          {
+            "it": "Progetto"
+          },
+          {
+            "ru": "Проект"
+          }
+        ],
         "sectionId": "financial-info",
         "component": "picker",
         "targetSchema": "projects",
@@ -36517,6 +36881,32 @@
         "id": "budget-codes",
         "name": "budgetCodes",
         "label": "Budget Codes",
+        "translations": [
+          {
+            "en": "Budget Codes"
+          },
+          {
+            "fa": "کدهای بودجه"
+          },
+          {
+            "ar": "رموز الميزانية"
+          },
+          {
+            "es": "Códigos presupuestarios"
+          },
+          {
+            "fr": "Codes budgétaires"
+          },
+          {
+            "de": "Budgetcodes"
+          },
+          {
+            "it": "Codici budget"
+          },
+          {
+            "ru": "Коды бюджета"
+          }
+        ],
         "sectionId": "financial-info",
         "type": "list",
         "component": "list",
@@ -36534,7 +36924,33 @@
         "referenceSchema": "parameter-groups",
         "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
         "referenceEntityId": "01KCXW1C9NT5D4TFDK511BKTSQ",
-        "order": 1
+        "order": 1,
+        "translations": [
+          {
+            "en": "Storage Condition"
+          },
+          {
+            "fa": "شرایط نگهداری"
+          },
+          {
+            "ar": "شرط التخزين"
+          },
+          {
+            "es": "Condición de almacenamiento"
+          },
+          {
+            "fr": "Condition de stockage"
+          },
+          {
+            "de": "Lagerbedingung"
+          },
+          {
+            "it": "Condizione di conservazione"
+          },
+          {
+            "ru": "Условие хранения"
+          }
+        ]
       },
       {
         "id": "min-exp-months",
@@ -36543,7 +36959,33 @@
         "sectionId": "complementary-info",
         "type": "number",
         "component": "number",
-        "order": 2
+        "order": 2,
+        "translations": [
+          {
+            "en": "Minimum Expiration (Months)"
+          },
+          {
+            "fa": "حداقل انقضا (ماه)"
+          },
+          {
+            "ar": "الحد الأدنى للانتهاء (بالأشهر)"
+          },
+          {
+            "es": "Vencimiento mínimo (meses)"
+          },
+          {
+            "fr": "Expiration minimale (mois)"
+          },
+          {
+            "de": "Mindesthaltbarkeit (Monate)"
+          },
+          {
+            "it": "Scadenza minima (mesi)"
+          },
+          {
+            "ru": "Минимальный срок годности (месяцы)"
+          }
+        ]
       },
       {
         "id": "cas-no",
@@ -36552,7 +36994,33 @@
         "sectionId": "complementary-info",
         "type": "text",
         "component": "text",
-        "order": 3
+        "order": 3,
+        "translations": [
+          {
+            "en": "CAS No"
+          },
+          {
+            "fa": "شماره CAS"
+          },
+          {
+            "ar": "رقم CAS"
+          },
+          {
+            "es": "Nº CAS"
+          },
+          {
+            "fr": "N° CAS"
+          },
+          {
+            "de": "CAS-Nr."
+          },
+          {
+            "it": "N° CAS"
+          },
+          {
+            "ru": "№ CAS"
+          }
+        ]
       },
       {
         "id": "needs-urs",
@@ -36560,7 +37028,33 @@
         "label": "Needs URS",
         "sectionId": "complementary-info",
         "component": "switch",
-        "order": 4
+        "order": 4,
+        "translations": [
+          {
+            "en": "Needs URS"
+          },
+          {
+            "fa": "نیاز به URS"
+          },
+          {
+            "ar": "يحتاج URS"
+          },
+          {
+            "es": "Requiere URS"
+          },
+          {
+            "fr": "Nécessite URS"
+          },
+          {
+            "de": "URS erforderlich"
+          },
+          {
+            "it": "Richiede URS"
+          },
+          {
+            "ru": "Требуется URS"
+          }
+        ]
       },
       {
         "id": "certifications",
@@ -36573,7 +37067,33 @@
         "referenceSchema": "parameter-groups",
         "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
         "referenceEntityId": "01KCXV771ABGHR0ST7MZ03S6B1",
-        "order": 5
+        "order": 5,
+        "translations": [
+          {
+            "en": "Certifications Required"
+          },
+          {
+            "fa": "گواهینامه‌های مورد نیاز"
+          },
+          {
+            "ar": "الشهادات المطلوبة"
+          },
+          {
+            "es": "Certificaciones requeridas"
+          },
+          {
+            "fr": "Certifications requises"
+          },
+          {
+            "de": "Erforderliche Zertifizierungen"
+          },
+          {
+            "it": "Certificazioni richieste"
+          },
+          {
+            "ru": "Требуемые сертификаты"
+          }
+        ]
       },
       {
         "id": "other-info",
@@ -36583,14 +37103,92 @@
         "type": "checkbox-list",
         "component": "checkbox-list",
         "order": 6,
+        "translations": [
+          {
+            "en": "Additional Requirements"
+          },
+          {
+            "fa": "الزامات تکمیلی"
+          },
+          {
+            "ar": "متطلبات إضافية"
+          },
+          {
+            "es": "Requisitos adicionales"
+          },
+          {
+            "fr": "Exigences supplémentaires"
+          },
+          {
+            "de": "Zusätzliche Anforderungen"
+          },
+          {
+            "it": "Requisiti aggiuntivi"
+          },
+          {
+            "ru": "Дополнительные требования"
+          }
+        ],
         "options": [
           {
             "id": "sample-needed",
-            "label": "نیاز به دریافت نمونه"
+            "label": "Sample needed",
+            "translations": [
+              {
+                "en": "Sample needed"
+              },
+              {
+                "fa": "نیاز به دریافت نمونه"
+              },
+              {
+                "ar": "الحاجة إلى عينة"
+              },
+              {
+                "es": "Muestra necesaria"
+              },
+              {
+                "fr": "Échantillon requis"
+              },
+              {
+                "de": "Probe erforderlich"
+              },
+              {
+                "it": "Campione richiesto"
+              },
+              {
+                "ru": "Требуется образец"
+              }
+            ]
           },
           {
             "id": "datalogger",
-            "label": "نیاز به حمل با دیتالاگر"
+            "label": "Transport with datalogger required",
+            "translations": [
+              {
+                "en": "Transport with datalogger required"
+              },
+              {
+                "fa": "نیاز به حمل با دیتالاگر"
+              },
+              {
+                "ar": "النقل مع مسجل البيانات مطلوب"
+              },
+              {
+                "es": "Transporte con datalogger requerido"
+              },
+              {
+                "fr": "Transport avec enregistreur requis"
+              },
+              {
+                "de": "Transport mit Datenlogger erforderlich"
+              },
+              {
+                "it": "Trasporto con datalogger richiesto"
+              },
+              {
+                "ru": "Требуется перевозка с регистратором данных"
+              }
+            ]
           }
         ]
       },
@@ -36602,21 +37200,125 @@
         "type": "select",
         "component": "select",
         "order": 1,
+        "translations": [
+          {
+            "en": "Quantity Budget Status"
+          },
+          {
+            "fa": "وضعیت بودجه تعداد"
+          },
+          {
+            "ar": "حالة ميزانية الكمية"
+          },
+          {
+            "es": "Estado del presupuesto de cantidad"
+          },
+          {
+            "fr": "Statut du budget quantité"
+          },
+          {
+            "de": "Mengenbudget-Status"
+          },
+          {
+            "it": "Stato budget quantità"
+          },
+          {
+            "ru": "Статус бюджета по количеству"
+          }
+        ],
         "options": [
           {
             "id": "approved",
             "label": "Approved",
-            "color": "emerald"
+            "color": "emerald",
+            "translations": [
+              {
+                "en": "Approved"
+              },
+              {
+                "fa": "تأیید شده"
+              },
+              {
+                "ar": "معتمد"
+              },
+              {
+                "es": "Aprobado"
+              },
+              {
+                "fr": "Approuvé"
+              },
+              {
+                "de": "Genehmigt"
+              },
+              {
+                "it": "Approvato"
+              },
+              {
+                "ru": "Утверждено"
+              }
+            ]
           },
           {
             "id": "rejected",
             "label": "Rejected",
-            "color": "red"
+            "color": "red",
+            "translations": [
+              {
+                "en": "Rejected"
+              },
+              {
+                "fa": "رد شده"
+              },
+              {
+                "ar": "مرفوض"
+              },
+              {
+                "es": "Rechazado"
+              },
+              {
+                "fr": "Rejeté"
+              },
+              {
+                "de": "Abgelehnt"
+              },
+              {
+                "it": "Rifiutato"
+              },
+              {
+                "ru": "Отклонено"
+              }
+            ]
           },
           {
             "id": "conditional",
             "label": "Conditional",
-            "color": "amber"
+            "color": "amber",
+            "translations": [
+              {
+                "en": "Conditional"
+              },
+              {
+                "fa": "مشروط"
+              },
+              {
+                "ar": "مشروط"
+              },
+              {
+                "es": "Condicional"
+              },
+              {
+                "fr": "Conditionnel"
+              },
+              {
+                "de": "Bedingt"
+              },
+              {
+                "it": "Condizionale"
+              },
+              {
+                "ru": "Условно"
+              }
+            ]
           }
         ]
       },
@@ -36628,21 +37330,125 @@
         "type": "select",
         "component": "select",
         "order": 2,
+        "translations": [
+          {
+            "en": "Financial Budget Status"
+          },
+          {
+            "fa": "وضعیت بودجه مالی"
+          },
+          {
+            "ar": "حالة الميزانية المالية"
+          },
+          {
+            "es": "Estado del presupuesto financiero"
+          },
+          {
+            "fr": "Statut du budget financier"
+          },
+          {
+            "de": "Finanzbudget-Status"
+          },
+          {
+            "it": "Stato budget finanziario"
+          },
+          {
+            "ru": "Статус финансового бюджета"
+          }
+        ],
         "options": [
           {
             "id": "approved",
             "label": "Approved",
-            "color": "emerald"
+            "color": "emerald",
+            "translations": [
+              {
+                "en": "Approved"
+              },
+              {
+                "fa": "تأیید شده"
+              },
+              {
+                "ar": "معتمد"
+              },
+              {
+                "es": "Aprobado"
+              },
+              {
+                "fr": "Approuvé"
+              },
+              {
+                "de": "Genehmigt"
+              },
+              {
+                "it": "Approvato"
+              },
+              {
+                "ru": "Утверждено"
+              }
+            ]
           },
           {
             "id": "rejected",
             "label": "Rejected",
-            "color": "red"
+            "color": "red",
+            "translations": [
+              {
+                "en": "Rejected"
+              },
+              {
+                "fa": "رد شده"
+              },
+              {
+                "ar": "مرفوض"
+              },
+              {
+                "es": "Rechazado"
+              },
+              {
+                "fr": "Rejeté"
+              },
+              {
+                "de": "Abgelehnt"
+              },
+              {
+                "it": "Rifiutato"
+              },
+              {
+                "ru": "Отклонено"
+              }
+            ]
           },
           {
             "id": "conditional",
             "label": "Conditional",
-            "color": "amber"
+            "color": "amber",
+            "translations": [
+              {
+                "en": "Conditional"
+              },
+              {
+                "fa": "مشروط"
+              },
+              {
+                "ar": "مشروط"
+              },
+              {
+                "es": "Condicional"
+              },
+              {
+                "fr": "Conditionnel"
+              },
+              {
+                "de": "Bedingt"
+              },
+              {
+                "it": "Condizionale"
+              },
+              {
+                "ru": "Условно"
+              }
+            ]
           }
         ]
       },
@@ -36654,35 +37460,202 @@
         "type": "textarea",
         "component": "textarea",
         "colSpan": 2,
-        "order": 3
+        "order": 3,
+        "translations": [
+          {
+            "en": "Budget Review Description"
+          },
+          {
+            "fa": "توضیحات بررسی بودجه"
+          },
+          {
+            "ar": "وصف مراجعة الميزانية"
+          },
+          {
+            "es": "Descripción de la revisión presupuestaria"
+          },
+          {
+            "fr": "Description de l'examen budgétaire"
+          },
+          {
+            "de": "Beschreibung der Budgetprüfung"
+          },
+          {
+            "it": "Descrizione revisione budget"
+          },
+          {
+            "ru": "Описание проверки бюджета"
+          }
+        ]
       }
     ],
     "sections": [
       {
         "id": "general-info",
         "title": "General Request Information",
+        "titleTranslations": [
+          {
+            "en": "General Request Information"
+          },
+          {
+            "fa": "اطلاعات کلی درخواست"
+          },
+          {
+            "ar": "معلومات الطلب العامة"
+          },
+          {
+            "es": "Información general del pedido"
+          },
+          {
+            "fr": "Informations générales sur la demande"
+          },
+          {
+            "de": "Allgemeine Anforderungsinformationen"
+          },
+          {
+            "it": "Informazioni generali richiesta"
+          },
+          {
+            "ru": "Общая информация о заявке"
+          }
+        ],
         "columns": 2
       },
       {
         "id": "financial-info",
         "title": "Financial Information",
+        "titleTranslations": [
+          {
+            "en": "Financial Information"
+          },
+          {
+            "fa": "اطلاعات مالی"
+          },
+          {
+            "ar": "المعلومات المالية"
+          },
+          {
+            "es": "Información financiera"
+          },
+          {
+            "fr": "Informations financières"
+          },
+          {
+            "de": "Finanzinformationen"
+          },
+          {
+            "it": "Informazioni finanziarie"
+          },
+          {
+            "ru": "Финансовая информация"
+          }
+        ],
         "columns": 2
       },
       {
         "id": "complementary-info",
         "title": "Complementary Information",
+        "titleTranslations": [
+          {
+            "en": "Complementary Information"
+          },
+          {
+            "fa": "اطلاعات تکمیلی"
+          },
+          {
+            "ar": "المعلومات التكميلية"
+          },
+          {
+            "es": "Información complementaria"
+          },
+          {
+            "fr": "Informations complémentaires"
+          },
+          {
+            "de": "Zusatzinformationen"
+          },
+          {
+            "it": "Informazioni complementari"
+          },
+          {
+            "ru": "Дополнительная информация"
+          }
+        ],
         "columns": 2
       },
       {
         "id": "budget-review",
         "title": "Budget Review",
+        "titleTranslations": [
+          {
+            "en": "Budget Review"
+          },
+          {
+            "fa": "بررسی بودجه"
+          },
+          {
+            "ar": "مراجعة الميزانية"
+          },
+          {
+            "es": "Revisión presupuestaria"
+          },
+          {
+            "fr": "Examen budgétaire"
+          },
+          {
+            "de": "Haushaltsprüfung"
+          },
+          {
+            "it": "Revisione budget"
+          },
+          {
+            "ru": "Проверка бюджета"
+          }
+        ],
         "columns": 2
       }
     ],
-    "relatedTenants":[
+    "description_translations": [
+      {
+        "en": "Comprehensive purchase request form for materials, parts, and equipment with budget review and technical specifications."
+      },
+      {
+        "fa": "فرم جامع درخواست خرید برای مواد، قطعات و تجهیزات با بررسی بودجه و مشخصات فنی."
+      },
+      {
+        "ar": "نموذج طلب شراء شامل للمواد والأجزاء والمعدات مع مراجعة الميزانية والمواصفات الفنية."
+      },
+      {
+        "es": "Formulario completo de solicitud de compra para materiales, piezas y equipos con revisión presupuestaria y especificaciones técnicas."
+      },
+      {
+        "fr": "Formulaire de demande d'achat pour matières, pièces et équipements avec revue budgétaire et spécifications techniques."
+      },
+      {
+        "de": "Umfassendes Beschaffungsanfrageformular für Materialien, Teile und Ausrüstung mit Budgetprüfung und technischen Spezifikationen."
+      },
+      {
+        "it": "Modulo completo di richiesta d'acquisto per materiali, parti e attrezzature con revisione del budget e specifiche tecniche."
+      },
+      {
+        "ru": "Комплексная форма заявки на закупку материалов, запчастей и оборудования с проверкой бюджета и техническими спецификациями."
+      }
+    ],
+    "relatedTenants": [
       {
         "id": "01KBFBD109G6CYRT7RA04TMMXC",
         "label": "AryoGen"
+      },
+      {
+        "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+        "label": "Supply Chain Management"
+      }
+    ],
+    "applications": [],
+    "statusGroup": [
+      {
+        "id": "01KPR0GR0UP1PR0CHASEREQST01",
+        "label": "Purchase Request Status"
       }
     ]
   }

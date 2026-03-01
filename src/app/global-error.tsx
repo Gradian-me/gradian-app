@@ -46,7 +46,7 @@ export default function GlobalError({
           </h1>
           <p style={{ marginBottom: '2rem', color: '#666' }}>
             {isChunkError
-              ? 'The app may have been updated. Reload the page to get the latest version.'
+              ? 'The app may have been updated. Reload the page to get the latest version. Your session will be preserved if it is still valid.'
               : error.message || 'An unexpected error occurred'}
           </p>
           <button

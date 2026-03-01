@@ -17,7 +17,8 @@ import { AuthEventType, dispatchAuthEvent } from '@/gradian-ui/shared/utils/auth
  * UserProfileSelector visibility is driven only by useUserStore().user (persisted in localStorage).
  * To get "force logout" (redirect to login when cookies/storage are cleared), set REQUIRE_LOGIN=true.
  */
-const AUTH_CHECK_TIMEOUT_MS = 15_000;
+const AUTH_CHECK_TIMEOUT_MS = 20_000;
+const AUTH_CHECK_RETRY_DELAY_MS = 800;
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -32,37 +33,57 @@ function isPublicPath(pathname: string): boolean {
 }
 
 /**
- * Check authentication status via API with timeout.
+ * Single attempt: check authentication status via API with timeout.
  * Validate endpoint accepts access_token (header/cookie) or refresh_token (cookie).
  * Returns true only when response is ok and data.valid === true.
  */
-async function checkAuthViaAPI(): Promise<boolean> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), AUTH_CHECK_TIMEOUT_MS);
+async function checkAuthViaAPIOnce(signal: AbortSignal | undefined): Promise<boolean> {
+  const response = await fetch('/api/auth/token/validate', {
+    method: 'GET',
+    credentials: 'include',
+    signal,
+  });
 
-  try {
-    const response = await fetch('/api/auth/token/validate', {
-      method: 'GET',
-      credentials: 'include',
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-
-    if (response.ok) {
-      const data = await response.json();
-      return data.valid === true;
-    }
-    // 401 Unauthorized or 400 Bad Request (e.g. missing token) → not authenticated
-    return false;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error instanceof Error && error.name === 'AbortError') {
-      console.warn('[AuthGuard] Auth check timed out');
-    } else {
-      console.error('[AuthGuard] Error checking auth via API:', error);
-    }
-    return false;
+  if (response.ok) {
+    const data = await response.json();
+    return data.valid === true;
   }
+  return false;
+}
+
+/**
+ * Check authentication status via API with timeout and one retry on failure/timeout.
+ * Reduces spurious logouts when validate is slow or briefly fails (e.g. cold start, network blip).
+ */
+async function checkAuthViaAPI(): Promise<boolean> {
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), AUTH_CHECK_TIMEOUT_MS);
+
+    try {
+      const valid = await checkAuthViaAPIOnce(controller.signal);
+      clearTimeout(timeoutId);
+      if (valid) return true;
+      if (attempt === 1) {
+        await new Promise((r) => setTimeout(r, AUTH_CHECK_RETRY_DELAY_MS));
+      } else {
+        return false;
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.warn(`[AuthGuard] Auth check timed out (attempt ${attempt}/2)`);
+      } else {
+        console.error('[AuthGuard] Error checking auth via API:', error);
+      }
+      if (attempt === 1) {
+        await new Promise((r) => setTimeout(r, AUTH_CHECK_RETRY_DELAY_MS));
+      } else {
+        return false;
+      }
+    }
+  }
+  return false;
 }
 
 /** Trigger centralized logout (clear cookies, stores, redirect to login). Used when session is invalid or check times out. */
@@ -131,14 +152,15 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
     checkAuth();
 
-    // If auth check or API hangs, stop showing loading after timeout so user can at least see login
+    // If auth check or API hangs (e.g. both attempts timeout), stop showing loading so user can see login
+    const safetyTimeoutMs = AUTH_CHECK_TIMEOUT_MS * 2 + AUTH_CHECK_RETRY_DELAY_MS + 3000;
     const safetyTimeout = setTimeout(() => {
       if (cancelled) return;
       setIsChecking(false);
       if (typeof window !== 'undefined' && isPublicPath(window.location.pathname)) {
         setIsAuthenticated(true);
       }
-    }, AUTH_CHECK_TIMEOUT_MS + 2000);
+    }, safetyTimeoutMs);
 
     return () => {
       cancelled = true;

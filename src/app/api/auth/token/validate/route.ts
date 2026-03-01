@@ -6,6 +6,7 @@ import { validateToken, extractTokenFromHeader, extractTokenFromCookies } from '
 import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { getAccessToken } from '@/app/api/auth/helpers/server-token-cache';
 
 export async function POST(request: NextRequest) {
   try {
@@ -78,11 +79,13 @@ export async function POST(request: NextRequest) {
 }
 
 // GET endpoint for convenience (reads from cookies/header)
-// Used by AuthGuard: accepts access_token (header or cookie) or refresh_token (cookie) so session check works when only refresh cookie is present
+// Used by AuthGuard: accepts access_token (header or cookie) or refresh_token (cookie) so session check works when only refresh cookie is present.
+// When only refresh_token is present: if ServerTokenCache has a valid access token for it, we consider the session valid (consistent with proxy/RSC flows).
 export async function GET(request: NextRequest) {
   try {
     // Try to get token from header or cookies
     let token: string | null = null;
+    let usedRefreshTokenOnly = false;
     const cookies = request.headers.get('cookie');
 
     // Try Authorization header
@@ -93,9 +96,9 @@ export async function GET(request: NextRequest) {
       token = extractTokenFromCookies(cookies, AUTH_CONFIG.ACCESS_TOKEN_COOKIE);
     }
 
-    // If no access token, try refresh token cookie (AuthGuard sends credentials; server may only have refresh_token set)
     if (!token) {
       token = extractTokenFromCookies(cookies, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
+      usedRefreshTokenOnly = !!token;
     }
 
     if (!token) {
@@ -109,7 +112,31 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Validate token
+    // When we only have refresh token: if server has a valid access token in cache for this refresh token, session is valid (avoids kicking user out when RSC/proxy already succeeded with same cookie)
+    if (usedRefreshTokenOnly) {
+      const cachedAccess = getAccessToken(token);
+      if (cachedAccess) {
+        const accessResult = validateToken(cachedAccess);
+        if (accessResult.valid) {
+          loggingCustom(
+            LogType.LOGIN_LOG,
+            'debug',
+            '[VALIDATE] Session valid via ServerTokenCache (refresh token had cached access token)',
+          );
+          return NextResponse.json(
+            {
+              success: true,
+              valid: true,
+              payload: accessResult.payload,
+            },
+            { status: 200 }
+          );
+        }
+      }
+      // Fall through to validate refresh token JWT as fallback (e.g. first request, or cache miss)
+    }
+
+    // Validate token (access or refresh JWT)
     const result = validateToken(token);
 
     if (!result.valid) {

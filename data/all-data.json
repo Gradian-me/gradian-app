@@ -3555,8 +3555,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-02-25T12:54:05.164Z",
-      "lastSynced": "2026-02-25T12:54:05.164Z",
+      "updatedAt": "2026-03-01T11:12:53.784Z",
+      "lastSynced": "2026-03-01T11:12:53.784Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -3568,7 +3568,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 43 schemas: 43 succeeded, 0 failed (0 created, 43 updated)"
+      "lastSyncMessage": "Processed 41 schemas: 41 succeeded, 0 failed (0 created, 41 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -3596,7 +3596,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-02-21T08:40:10.286Z",
+      "updatedAt": "2026-03-01T10:57:07.430Z",
       "isTenantBased": true,
       "category": [
         {
@@ -3606,8 +3606,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-02-21T08:40:10.286Z",
-      "lastSyncMessage": "Generated relations for 44 out of 44 schemas",
+      "lastSynced": "2026-03-01T10:57:07.430Z",
+      "lastSyncMessage": "Generated relations for 40 out of 40 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -3657,7 +3657,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2026-02-21T08:40:28.920Z",
+      "updatedAt": "2026-03-01T11:09:51.095Z",
       "category": [
         {
           "id": "production-integration",
@@ -3666,8 +3666,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-02-21T08:40:28.920Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 227, edges created: 102, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2026-03-01T11:09:51.095Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 314, edges created: 160, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -5549,6 +5549,37 @@
       "updatedAt": "2026-01-05T08:21:12.807Z",
       "status-items-section": [],
       "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
+        }
+      ],
+      "title": "Purchase Request Status",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KPR0GR0UP1PR0CHASEREQST01",
+      "createdAt": "2026-03-01T12:00:00.000Z",
+      "updatedAt": "2026-03-01T12:00:00.000Z",
+      "status-items-section": [],
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
     }
   ],
   "status-items": [
@@ -5938,6 +5969,102 @@
       "id": "01KE6Q5VWW26YNBA67BH07R9TN",
       "createdAt": "2026-01-05T09:17:58.560Z",
       "updatedAt": "2026-01-05T09:17:58.560Z"
+    },
+    {
+      "label": "Draft",
+      "icon": "FileText",
+      "color": "yellow",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KPR0IT0EM01DRAFT00000001",
+      "createdAt": "2026-03-01T12:00:00.000Z",
+      "updatedAt": "2026-03-01T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Submitted",
+      "icon": "Send",
+      "color": "sky",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KPR0IT0EM02SUBMITTED00001",
+      "createdAt": "2026-03-01T12:00:00.000Z",
+      "updatedAt": "2026-03-01T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "In Manager Approval",
+      "icon": "UserCheck",
+      "color": "blue",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KPR0IT0EM03MGRAPPR000001",
+      "createdAt": "2026-03-01T12:00:00.000Z",
+      "updatedAt": "2026-03-01T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "In Inventory Approval",
+      "icon": "PackageCheck",
+      "color": "amber",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KPR0IT0EM04INVAPPR000001",
+      "createdAt": "2026-03-01T12:00:00.000Z",
+      "updatedAt": "2026-03-01T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "In Procurement",
+      "icon": "ShoppingCart",
+      "color": "orange",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KPR0IT0EM05PROCURE000001",
+      "createdAt": "2026-03-01T12:00:00.000Z",
+      "updatedAt": "2026-03-01T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Completed",
+      "icon": "CircleCheckBig",
+      "color": "emerald",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KPR0IT0EM06COMPLETE000001",
+      "createdAt": "2026-03-01T12:00:00.000Z",
+      "updatedAt": "2026-03-01T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Cancelled",
+      "icon": "Ban",
+      "color": "slate",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KPR0IT0EM07CANCELLED00001",
+      "createdAt": "2026-03-01T12:00:00.000Z",
+      "updatedAt": "2026-03-01T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Rejected",
+      "icon": "XCircle",
+      "color": "red",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KPR0IT0EM08REJECTED000001",
+      "createdAt": "2026-03-01T12:00:00.000Z",
+      "updatedAt": "2026-03-01T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
     }
   ],
   "tenants": [
@@ -20307,7 +20434,14 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "label": "Material",
+      "label": [
+        {
+          "en": "Material"
+        },
+        {
+          "fa": "مواد"
+        }
+      ],
       "icon": "Box",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -20317,7 +20451,14 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "label": "Product",
+      "label": [
+        {
+          "en": "Product"
+        },
+        {
+          "fa": "محصول"
+        }
+      ],
       "icon": "Package",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -20327,7 +20468,14 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "label": "Kit",
+      "label": [
+        {
+          "en": "Kit"
+        },
+        {
+          "fa": "کیت"
+        }
+      ],
       "icon": "Layers",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -20337,7 +20485,14 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "label": "Equipment",
+      "label": [
+        {
+          "en": "Equipment"
+        },
+        {
+          "fa": "تجهیزات"
+        }
+      ],
       "icon": "Settings",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -20347,7 +20502,14 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "label": "Tools",
+      "label": [
+        {
+          "en": "Tools"
+        },
+        {
+          "fa": "ابزار"
+        }
+      ],
       "icon": "Wrench",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -20357,7 +20519,14 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "label": "Others",
+      "label": [
+        {
+          "en": "Others"
+        },
+        {
+          "fa": "سایر"
+        }
+      ],
       "icon": "MoreHorizontal",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -20367,7 +20536,14 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "label": "جامد",
+      "label": [
+        {
+          "en": "Solid"
+        },
+        {
+          "fa": "جامد"
+        }
+      ],
       "icon": "Box",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -20377,7 +20553,14 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "label": "مایع",
+      "label": [
+        {
+          "en": "Liquid"
+        },
+        {
+          "fa": "مایع"
+        }
+      ],
       "icon": "Droplet",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -20387,7 +20570,14 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "label": "گاز",
+      "label": [
+        {
+          "en": "Gas"
+        },
+        {
+          "fa": "گاز"
+        }
+      ],
       "icon": "Wind",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -20397,7 +20587,14 @@
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
-      "label": "پودری",
+      "label": [
+        {
+          "en": "Powder"
+        },
+        {
+          "fa": "پودری"
+        }
+      ],
       "icon": "CircleDot",
       "incomplete": false,
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
