@@ -142,17 +142,17 @@ export function useOptionsFromSchemaOrUrl({
       if (transform) {
         data = transform(data);
       } else {
-        // Default transform: assume array of objects with id, label, name, or title
+        // Default transform: keep label as-is (string or localized array) so normalizeOptionArray can resolve it
         data = data.map((item: any) => {
           const id = item.id ?? item.value ?? String(item._id ?? '');
           const label = item.label ?? item.name ?? item.title ?? item.singular_name ?? item.plural_name ?? id;
           return {
             id: String(id),
-            label: String(label),
+            label: label,
             icon: item.icon,
             color: item.color,
             disabled: item.disabled,
-            value: item.value ?? id,
+            value: item.value != null ? String(item.value) : (id != null ? String(id) : undefined),
           };
         });
       }
