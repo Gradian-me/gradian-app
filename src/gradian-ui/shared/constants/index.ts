@@ -121,8 +121,6 @@ export { SCHEMA_SUMMARY_EXCLUDED_KEYS } from '../configs/general-config';
 export { 
   DEMO_MODE, 
   DEMO_MODE_PARAMS, 
-  LOGIN_LOCALLY, 
-  LOGIN_LOCALLY_PARAMS, 
   AD_MODE, 
   AD_MODE_PARAMS, 
   REQUIRE_LOGIN,

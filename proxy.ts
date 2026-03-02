@@ -4,7 +4,6 @@ import { extractTokenFromCookiesEdge } from '@/gradian-ui/shared/utils/edge-toke
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { decryptSkipKey } from '@/gradian-ui/shared/utils/decrypt-skip-key';
-import { LOGIN_LOCALLY } from '@/gradian-ui/shared/configs/env-config';
 import {
   EXCLUDED_LOGIN_ROUTES,
   AUTH_CONFIG,

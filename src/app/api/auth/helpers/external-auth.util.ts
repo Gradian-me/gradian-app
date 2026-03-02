@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
-import { LOGIN_LOCALLY, DEMO_MODE } from '@/gradian-ui/shared/configs/env-config';
 
 export function isServerDemoMode(): boolean {
   try {
-    // For auth flows, prefer LOGIN_LOCALLY flag; fall back to DEMO_MODE for backward compatibility
-    return Boolean(LOGIN_LOCALLY ?? DEMO_MODE);
+    // Authentication should always use the external backend; demo/local login is disabled.
+    return false;
   } catch (error) {
     loggingCustom(
       LogType.LOGIN_LOG,

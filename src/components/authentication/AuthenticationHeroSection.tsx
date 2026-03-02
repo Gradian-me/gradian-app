@@ -20,7 +20,7 @@ export function AuthenticationHeroSection({
       {heroImageSrc ? (
         <>
           <div
-            className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center"
+            className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center border border-gray-200/50 dark:border-violet-300/50"
             style={{ backgroundImage: `url(${heroImageSrc})` }}
           />
           {showTestimonials && <TestimonialsSection testimonials={SAMPLE_TESTIMONIALS} />}

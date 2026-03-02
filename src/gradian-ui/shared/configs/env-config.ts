@@ -64,18 +64,6 @@ export const DEFAULT_TENANT: string | undefined = (() => {
   return value && String(value).trim() ? String(value).trim() : undefined;
 })();
 
-// ===========================================
-// Authentication Configuration
-// ===========================================
-
-/**
- * Login locally flag (use local demo users instead of external auth)
- */
-export const LOGIN_LOCALLY: boolean = toBoolean(
-  getEnvVar('LOGIN_LOCALLY'),
-  false
-);
-
 /**
  * Active Directory mode flag
  */
@@ -175,6 +163,5 @@ export function getAvailableLanguageCodes(): string[] {
 // ===========================================
 
 export const DEMO_MODE_PARAMS = { DEMO_MODE } as const;
-export const LOGIN_LOCALLY_PARAMS = { LOGIN_LOCALLY } as const;
 export const AD_MODE_PARAMS = { AD_MODE } as const;
 

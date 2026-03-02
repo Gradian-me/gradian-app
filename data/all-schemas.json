@@ -36610,7 +36610,7 @@
         "sectionId": "general-info",
         "type": "select",
         "component": "select",
-        "order": 6,
+        "order": 5,
         "targetSchema": "parameter-items",
         "referenceSchema": "parameter-groups",
         "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
@@ -36649,7 +36649,7 @@
         "sectionId": "general-info",
         "type": "select",
         "component": "select",
-        "order": 7,
+        "order": 6,
         "targetSchema": "parameter-items",
         "referenceSchema": "parameter-groups",
         "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
@@ -36689,7 +36689,7 @@
         "type": "select",
         "component": "select",
         "role": "status",
-        "order": 10,
+        "order": 7,
         "targetSchema": "parameter-items",
         "referenceSchema": "parameter-groups",
         "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
@@ -36768,7 +36768,7 @@
         "referenceSchema": "parameter-groups",
         "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
         "referenceEntityId": "01KCXXNWCDK18BACMC5CEPXJ7B",
-        "order": 5
+        "order": 9
       },
       {
         "id": "request-description",
@@ -36804,7 +36804,7 @@
         "type": "textarea",
         "component": "textarea",
         "colSpan": 2,
-        "order": 11
+        "order": 10
       },
       {
         "id": "cost-center",

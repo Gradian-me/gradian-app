@@ -251,42 +251,66 @@ export async function POST(request: NextRequest) {
     })}`);
 
     loggingCustom(LogType.LOGIN_LOG, 'debug', 'Parsing external auth service response...');
-    const upstreamJson = upstreamResponse.data ?? null;
-    loggingCustom(LogType.LOGIN_LOG, 'debug', `External auth service response data: ${JSON.stringify({
+    const upstreamBody = upstreamResponse.data ?? null;
+
+    // Detect HTML error pages from upstream (e.g. gateway 404/502 HTML)
+    const isHtmlLike =
+      typeof upstreamBody === 'string' &&
+      /<html[^>]*>/i.test(upstreamBody);
+
+    const upstreamJson = !isHtmlLike && upstreamBody && typeof upstreamBody === 'object'
+      ? upstreamBody
+      : null;
+
+    loggingCustom(LogType.LOGIN_LOG, 'debug', `External auth service response data (sanitized): ${JSON.stringify({
+      isHtmlLike,
       success: upstreamJson?.success,
       hasUser: !!upstreamJson?.user,
       hasTokens: !!upstreamJson?.tokens,
       error: upstreamJson?.error,
       message: upstreamJson?.message,
-      fullData: JSON.stringify(upstreamJson, null, 2),
+      bodyPreview: typeof upstreamBody === 'string'
+        ? `${upstreamBody.substring(0, 200)}...`
+        : undefined,
     })}`);
 
     if (upstreamResponse.status < 200 || upstreamResponse.status >= 300) {
       const is5xx = upstreamResponse.status >= 500;
 
-      // Extract user-friendly message: prefer error_description over error/message
-      let errorDescription = upstreamJson?.error_description;
-      if (!errorDescription && typeof upstreamJson?.fullData === 'string') {
-        try {
-          const parsed = JSON.parse(upstreamJson.fullData) as { error_description?: string };
-          errorDescription = parsed?.error_description;
-        } catch {
-          // fullData not parseable, ignore
-        }
+      // Treat unexpected HTML error pages from upstream (404/5xx HTML) as gateway/auth service errors.
+      const isHtmlGatewayError =
+        isHtmlLike &&
+        (upstreamResponse.status === 404 ||
+          upstreamResponse.status === 500 ||
+          upstreamResponse.status === 502 ||
+          upstreamResponse.status === 503 ||
+          upstreamResponse.status === 504);
+
+      // Extract user-friendly message: prefer error_description over error/message (when JSON)
+      let errorDescription: string | undefined;
+      if (upstreamJson) {
+        errorDescription = (upstreamJson as any).error_description;
       }
+
       const upstreamMessage =
-        errorDescription || upstreamJson?.error || upstreamJson?.message;
+        errorDescription ||
+        (upstreamJson as any)?.error ||
+        (upstreamJson as any)?.message;
 
       loggingCustom(LogType.LOGIN_LOG, 'error', `External auth service returned error: ${JSON.stringify({
         status: upstreamResponse.status,
-        error: upstreamJson?.error,
-        error_description: errorDescription ?? upstreamJson?.error_description,
-        message: upstreamJson?.message,
-        ...(is5xx && upstreamJson ? { fullUpstreamBody: upstreamJson } : {}),
+        isHtmlLike,
+        isHtmlGatewayError,
+        error: (upstreamJson as any)?.error,
+        error_description: errorDescription ?? (upstreamJson as any)?.error_description,
+        message: (upstreamJson as any)?.message,
+        ...(is5xx || isHtmlGatewayError
+          ? { fullUpstreamBodyPreview: typeof upstreamBody === 'string' ? upstreamBody.substring(0, 500) : upstreamJson }
+          : {}),
       })}`);
 
       const clientError =
-        is5xx && !upstreamMessage
+        (is5xx || isHtmlGatewayError) && !upstreamMessage
           ? 'The authentication service is temporarily unavailable. Please try again later.'
           : upstreamMessage || `Authentication service responded with status ${upstreamResponse.status}`;
 
@@ -295,7 +319,7 @@ export async function POST(request: NextRequest) {
         error: clientError,
       };
 
-      const responseStatus = is5xx ? 502 : upstreamResponse.status;
+      const responseStatus = (is5xx || isHtmlGatewayError) ? 502 : upstreamResponse.status;
       const errorNextResponse = NextResponse.json(errorResponse, { status: responseStatus });
       loggingCustom(LogType.LOGIN_LOG, 'debug', 'Forwarding set-cookie headers from external auth (error response)...');
       forwardSetCookieHeadersFromAxios(upstreamResponse.headers, errorNextResponse);
