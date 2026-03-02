@@ -216,15 +216,20 @@ function LoginModalContent() {
         ...(tenantDomain ? { 'x-tenant-domain': tenantDomain } : {}),
       };
 
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          emailOrUsername: email,
-          password,
-          deviceFingerprint: fingerprintValue,
-        }),
+      const body = JSON.stringify({
+        emailOrUsername: email,
+        password,
+        deviceFingerprint: fingerprintValue,
       });
+
+      const doLoginFetch = () =>
+        fetch('/api/auth/login', { method: 'POST', headers, body });
+
+      let response = await doLoginFetch();
+      if (response.status === 502) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        response = await doLoginFetch();
+      }
 
       let data: { success?: boolean; error?: string; message?: string; tokens?: { accessToken?: string }; user?: Record<string, unknown> };
       try {

@@ -181,16 +181,26 @@ function LoginPageContent() {
 
       let response: Response;
       let data: any;
-      
-      try {
-        loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Sending fetch request to /api/auth/login...');
-        const fetchStartTime = Date.now();
-        
-        response = await fetch('/api/auth/login', {
+
+      const doLoginFetch = () =>
+        fetch('/api/auth/login', {
           method: 'POST',
           headers,
           body: JSON.stringify(requestBody),
         });
+
+      try {
+        loggingCustom(LogType.CLIENT_LOG, 'log', '[LOGIN] Sending fetch request to /api/auth/login...');
+        const fetchStartTime = Date.now();
+
+        response = await doLoginFetch();
+
+        if (response.status === 502) {
+          loggingCustom(LogType.CLIENT_LOG, 'warn', '[LOGIN] Received 502 Bad Gateway, retrying after 2 seconds...');
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          response = await doLoginFetch();
+          loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Retry completed: status=${response.status}`);
+        }
 
         const fetchDuration = Date.now() - fetchStartTime;
         loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGIN] Fetch completed: ${JSON.stringify({

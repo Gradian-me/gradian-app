@@ -513,7 +513,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
 
 
   const cardClasses = cn(
-    'group cursor-pointer transition-all duration-100 h-full rounded-xl',
+    'group cursor-pointer transition-all duration-100 h-full rounded-2xl',
     viewMode === 'list' && 'w-full',
     className
   );
@@ -530,7 +530,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
         animate={disableAnimation ? false : { opacity: 1, y: 0 }}
         transition={disableAnimation ? {} : { duration: 0.2 }}
         className={cn(
-          'rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900',
+          'rounded-2xl border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900',
           kanbanDragging && 'border-violet-300 bg-violet-50/80 dark:border-violet-500 dark:bg-violet-900/30',
           className
         )}
@@ -683,12 +683,12 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           }
         }}
         className={cn(
-          "h-full overflow-hidden rounded-xl",
+          "h-full overflow-hidden rounded-2xl",
           colorBgClass || "bg-white dark:bg-gray-800",
           isInDialog 
-            ? "rounded-lg sm:rounded-xl" 
+            ? "rounded-lg sm:rounded-2xl" 
             : viewMode === 'list'
-              ? "rounded-xl" // Match container roundness in list mode
+              ? "rounded-2xl" // Match container roundness in list mode
               : "rounded-2xl",
           !className?.includes('border-none') && !className?.includes('border ') && "border",
           // Amber border and background for incomplete items
@@ -703,7 +703,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           isIncomplete && !disableAnimation && !isInDialog && "hover:bg-amber-100/40 dark:hover:bg-amber-950/30",
           className?.includes('border-none') 
             ? "focus-within:ring-0 border-none" 
-            : !isInDialog && "focus-within:ring-2 focus-within:ring-violet-400 focus-within:ring-offset-0 focus-within:rounded-xl"
+            : !isInDialog && "focus-within:ring-2 focus-within:ring-violet-400 focus-within:ring-offset-0 focus-within:rounded-2xl"
         )}
         onKeyDown={(e: KeyboardEvent) => {
           if (isInDialog) return;

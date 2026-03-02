@@ -2547,6 +2547,19 @@
       "application-schemas": []
     },
     {
+      "name": [
+        {
+          "en": "Human Resource Management"
+        }
+      ],
+      "icon": "Users",
+      "incomplete": false,
+      "id": "01KHRM00000000000000000001",
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z",
+      "application-schemas": []
+    },
+    {
       "application-schemas": [],
       "name": [
         {
@@ -2651,6 +2664,41 @@
       "id": "01KGVJXCKW8X0GHS7EPFVK9KTX",
       "createdAt": "2026-02-07T08:18:53.193Z",
       "updatedAt": "2026-02-07T08:21:16.672Z"
+    },
+    {
+      "application-schemas": [],
+      "name": [
+        {
+          "en": "Quality Control Management"
+        },
+        {
+          "fa": "مدیریت کنترل کیفیت"
+        },
+        {
+          "ar": "إدارة مراقبة الجودة"
+        },
+        {
+          "es": "Gestión de control de calidad"
+        },
+        {
+          "fr": "Gestion du contrôle qualité"
+        },
+        {
+          "de": "Qualitätskontrollmanagement"
+        },
+        {
+          "it": "Gestione controllo qualità"
+        },
+        {
+          "ru": "Управление контролем качества"
+        }
+      ],
+      "icon": "FlaskConical",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KQCLQM0000000000000000QC",
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
     }
   ],
   "production-actuals": [],
@@ -20602,6 +20650,83 @@
       "createdAt": "2026-02-28T12:00:00.000Z",
       "updatedAt": "2026-02-28T12:00:00.000Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "Analytical",
+      "icon": "FlaskConical",
+      "color": "blue",
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "id": "01KLIMSCAT0000000000000001",
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Physicochemical",
+      "icon": "Droplets",
+      "color": "indigo",
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "id": "01KLIMSCAT0000000000000002",
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Microbial",
+      "icon": "Bacteria",
+      "color": "green",
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "id": "01KLIMSCAT0000000000000003",
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Biochemical",
+      "icon": "Dna",
+      "color": "violet",
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "id": "01KLIMSCAT0000000000000004",
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Biological",
+      "icon": "Activity",
+      "color": "emerald",
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "id": "01KLIMSCAT0000000000000005",
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Packaging",
+      "icon": "Package",
+      "color": "amber",
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "id": "01KLIMSCAT0000000000000006",
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Raw Material",
+      "icon": "Boxes",
+      "color": "slate",
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "id": "01KLIMSCAT0000000000000007",
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
   "parameter-groups": [
@@ -20782,6 +20907,23 @@
           "label": "Supply Chain Management"
         }
       ]
+    },
+    {
+      "title": "LIMS Test Categories",
+      "incomplete": false,
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "id": "01KLIMSCATGP00000000000001",
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T11:31:00.966Z",
+      "parameter-items-section": [],
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "relatedTenants": [
+        {
+          "id": "01KH39DYCW17SXF2APAV1KZZQT",
+          "label": "Gradian App"
+        }
+      ],
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     }
   ],
   "tender-items": [
@@ -22420,36 +22562,6 @@
       "updatedAt": "2026-02-25T08:44:36.387Z"
     }
   ],
-  "equipment-logbooks": [
-    {
-      "logCode": "LOG-2026-02-25-001",
-      "equipment": "Fermantor FM-CC-5124",
-      "assignedTo": [
-        {
-          "id": "01K9ABA6MQ9K64MY7M4AEBCAP2"
-        }
-      ],
-      "operationType": [
-        {
-          "id": "operation"
-        }
-      ],
-      "startDateTime": "2026-02-24T08:00:00",
-      "endDateTime": "2026-02-25T11:00:00",
-      "activities": [
-        "اجرای فرآیند CIP بر روی دستگاه",
-        "اجرای فرآیند SIP بر روی دستگاه",
-        "بررسی کامل چک‌لیست‌های مربوطه"
-      ],
-      "isEffective": true,
-      "effectivenessRating": 5,
-      "comments": "تمامی عملیات SIP و CIP با موفقیت انجام شد. چک‌لیست‌ها بررسی و تایید شدند.",
-      "incomplete": false,
-      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
-      "id": "01KJABBWKNKV7GCPQD1DC0MPQE",
-      "createdAt": "2026-02-25T12:11:18.006Z",
-      "updatedAt": "2026-02-25T12:11:18.221Z"
-    }
-  ],
-  "purchase-request": []
+  "purchase-request": [],
+  "lims-tests": []
 }

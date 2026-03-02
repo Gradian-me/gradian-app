@@ -36201,174 +36201,17 @@
         "description": "Educational and technical requirements to fulfill the role."
       }
     ],
-    "applications": [],
+    "applications": [
+      {
+        "id": "01KHRM00000000000000000001",
+        "name": "Human Resource Management",
+        "icon": "Users"
+      }
+    ],
     "statusGroup": [
       {
         "id": "01KBHD90EMZKAT502KNVVDQZC7",
         "label": "Progress Status"
-      }
-    ]
-  },
-  {
-    "id": "equipment-logbooks",
-    "description": "GMP-compliant logbook for tracking equipment usage, cleaning, and maintenance operations within a pharmaceutical facility.",
-    "singular_name": "Equipment Logbook",
-    "plural_name": "Equipment Logbooks",
-    "icon": "BookOpen",
-    "showInNavigation": true,
-    "allowDataAssignedTo": true,
-    "fields": [
-      {
-        "id": "log-code",
-        "name": "logCode",
-        "label": "Log Reference Number",
-        "sectionId": "basic-info",
-        "type": "text",
-        "component": "text",
-        "order": 1,
-        "required": true,
-        "role": "code"
-      },
-      {
-        "id": "equipment-id",
-        "name": "equipment",
-        "label": "Equipment",
-        "sectionId": "basic-info",
-        "type": "text",
-        "component": "text",
-        "order": 2,
-        "required": true,
-        "role": "title"
-      },
-      {
-        "id": "operator",
-        "name": "assignedTo",
-        "label": "Operator (Assigned To)",
-        "sectionId": "basic-info",
-        "type": "text",
-        "component": "picker",
-        "targetSchema": "users",
-        "order": 3,
-        "required": true,
-        "role": "person"
-      },
-      {
-        "id": "operation-type",
-        "name": "operationType",
-        "label": "Operation Type",
-        "sectionId": "log-details",
-        "type": "select",
-        "component": "select",
-        "order": 1,
-        "required": true,
-        "role": "status",
-        "options": [
-          {
-            "id": "operation",
-            "label": "Operation",
-            "icon": "Play",
-            "color": "blue"
-          },
-          {
-            "id": "control",
-            "label": "Control",
-            "icon": "ShieldCheck",
-            "color": "emerald"
-          },
-          {
-            "id": "documentation",
-            "label": "Documentation",
-            "icon": "FileText",
-            "color": "slate"
-          }
-        ]
-      },
-      {
-        "id": "start-date-time",
-        "name": "startDateTime",
-        "label": "From Date/Time",
-        "sectionId": "log-details",
-        "type": "date",
-        "component": "date",
-        "order": 2,
-        "required": true
-      },
-      {
-        "id": "end-date-time",
-        "name": "endDateTime",
-        "label": "To Date/Time",
-        "sectionId": "log-details",
-        "type": "date",
-        "component": "date",
-        "order": 3,
-        "required": true,
-        "role": "duedate"
-      },
-      {
-        "id": "activity-list",
-        "name": "activities",
-        "label": "Detailed Activities",
-        "sectionId": "activities-section",
-        "type": "list",
-        "component": "list",
-        "order": 1,
-        "colSpan": 2
-      },
-      {
-        "id": "is-effective",
-        "name": "isEffective",
-        "label": "Operation Effective",
-        "sectionId": "effectiveness-section",
-        "type": "boolean",
-        "component": "switch",
-        "order": 1
-      },
-      {
-        "id": "effectiveness-rating",
-        "name": "effectivenessRating",
-        "label": "Effectiveness Rating",
-        "sectionId": "effectiveness-section",
-        "type": "number",
-        "component": "rating",
-        "order": 2,
-        "role": "rating"
-      },
-      {
-        "id": "comments",
-        "name": "comments",
-        "label": "Remarks / Observations",
-        "sectionId": "effectiveness-section",
-        "type": "textarea",
-        "component": "textarea",
-        "order": 3,
-        "colSpan": 2,
-        "role": "description"
-      }
-    ],
-    "sections": [
-      {
-        "id": "basic-info",
-        "title": "Header Information",
-        "columns": 2,
-        "description": "General identification of the equipment and operator."
-      },
-      {
-        "id": "log-details",
-        "title": "Log Timing & Type",
-        "columns": 2,
-        "description": "Duration and nature of the equipment task."
-      },
-      {
-        "id": "activities-section",
-        "title": "Activities",
-        "columns": 1,
-        "description": "Step-by-step list of activities performed."
-      },
-      {
-        "id": "effectiveness-section",
-        "title": "Effectiveness & Review",
-        "columns": 2,
-        "description": "Assessment of the operation outcome."
       }
     ]
   },
@@ -37132,8 +36975,7 @@
         "options": [
           {
             "id": "sample-needed",
-            "label": "Sample needed",
-            "translations": [
+            "label": [
               {
                 "en": "Sample needed"
               },
@@ -37162,8 +37004,7 @@
           },
           {
             "id": "datalogger",
-            "label": "Transport with datalogger required",
-            "translations": [
+            "label": [
               {
                 "en": "Transport with datalogger required"
               },
@@ -37651,11 +37492,816 @@
         "label": "Supply Chain Management"
       }
     ],
-    "applications": [],
+    "applications": [
+      {
+        "id": "01KFTVYHWWEHFEQDME72PKNA75",
+        "name": "Supply Chain Management",
+        "icon": "LucidePlaneTakeoff"
+      }
+    ],
     "statusGroup": [
       {
         "id": "01KPR0GR0UP1PR0CHASEREQST01",
         "label": "Purchase Request Status"
+      }
+    ]
+  },
+  {
+    "id": "lims-test-parameters",
+    "description": "Define and manage LIMS test parameters",
+    "singular_name": "LIMS Test Parameter",
+    "plural_name": "LIMS Test Parameters",
+    "singular_name_translations": [
+      {
+        "en": "LIMS Test Parameter"
+      },
+      {
+        "fa": "پارامتر آزمون LIMS"
+      },
+      {
+        "ar": "معامل اختبار LIMS"
+      },
+      {
+        "es": "Parámetro de prueba LIMS"
+      },
+      {
+        "fr": "Paramètre de test LIMS"
+      },
+      {
+        "de": "LIMS-Testparameter"
+      },
+      {
+        "it": "Parametro di test LIMS"
+      },
+      {
+        "ru": "Параметр теста LIMS"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "LIMS Test Parameters"
+      },
+      {
+        "fa": "پارامترهای آزمون LIMS"
+      },
+      {
+        "ar": "معاملات اختبار LIMS"
+      },
+      {
+        "es": "Parámetros de prueba LIMS"
+      },
+      {
+        "fr": "Paramètres de test LIMS"
+      },
+      {
+        "de": "LIMS-Testparameter"
+      },
+      {
+        "it": "Parametri di test LIMS"
+      },
+      {
+        "ru": "Параметры теста LIMS"
+      }
+    ],
+    "fields": [
+      {
+        "id": "lims-test-parameter-title",
+        "name": "title",
+        "label": "Parameter Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "role": "title",
+        "allowTranslation": true,
+        "translations": [
+          {
+            "en": "Parameter Title"
+          },
+          {
+            "fa": "عنوان پارامتر"
+          },
+          {
+            "ar": "عنوان المعامل"
+          },
+          {
+            "es": "Título del parámetro"
+          },
+          {
+            "fr": "Titre du paramètre"
+          },
+          {
+            "de": "Parameter-Titel"
+          },
+          {
+            "it": "Titolo parametro"
+          },
+          {
+            "ru": "Название параметра"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "caption": "Enter parameter title",
+        "captionTranslations": [
+          {
+            "en": "Enter parameter title"
+          },
+          {
+            "fa": "عنوان پارامتر را وارد کنید"
+          },
+          {
+            "ar": "أدخل عنوان المعامل"
+          },
+          {
+            "es": "Ingrese el título del parámetro"
+          },
+          {
+            "fr": "Entrez le titre du paramètre"
+          },
+          {
+            "de": "Parametertitel eingeben"
+          },
+          {
+            "it": "Inserisci il titolo del parametro"
+          },
+          {
+            "ru": "Введите название параметра"
+          }
+        ]
+      },
+      {
+        "id": "lims-test-parameter-type",
+        "name": "parameterType",
+        "label": "Parameter Type",
+        "sectionId": "basic-information",
+        "type": "select",
+        "component": "select",
+        "translations": [
+          {
+            "en": "Parameter Type"
+          },
+          {
+            "fa": "نوع پارامتر"
+          },
+          {
+            "ar": "نوع المعامل"
+          },
+          {
+            "es": "Tipo de parámetro"
+          },
+          {
+            "fr": "Type de paramètre"
+          },
+          {
+            "de": "Parametertyp"
+          },
+          {
+            "it": "Tipo di parametro"
+          },
+          {
+            "ru": "Тип параметра"
+          }
+        ],
+        "options": [
+          {
+            "id": "quantitative",
+            "label": "Quantitative"
+          },
+          {
+            "id": "qualitative",
+            "label": "Qualitative"
+          },
+          {
+            "id": "combined",
+            "label": "Combined"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2,
+        "caption": "Select parameter type",
+        "captionTranslations": [
+          {
+            "en": "Select parameter type"
+          },
+          {
+            "fa": "نوع پارامتر را انتخاب کنید"
+          },
+          {
+            "ar": "اختر نوع المعامل"
+          },
+          {
+            "es": "Seleccione el tipo de parámetro"
+          },
+          {
+            "fr": "Sélectionnez le type de paramètre"
+          },
+          {
+            "de": "Parametertyp auswählen"
+          },
+          {
+            "it": "Seleziona il tipo di parametro"
+          },
+          {
+            "ru": "Выберите тип параметра"
+          }
+        ]
+      },
+      {
+        "id": "lims-test-parameter-measurement-unit",
+        "name": "measurementUnit",
+        "label": "Measurement Unit",
+        "sectionId": "basic-information",
+        "component": "text",
+        "translations": [
+          {
+            "en": "Measurement Unit"
+          },
+          {
+            "fa": "واحد اندازه‌گیری"
+          },
+          {
+            "ar": "وحدة القياس"
+          },
+          {
+            "es": "Unidad de medida"
+          },
+          {
+            "fr": "Unité de mesure"
+          },
+          {
+            "de": "Maßeinheit"
+          },
+          {
+            "it": "Unità di misura"
+          },
+          {
+            "ru": "Единица измерения"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3,
+        "caption": "Enter measurement unit (e.g., mg/mL)",
+        "captionTranslations": [
+          {
+            "en": "Enter measurement unit (e.g., mg/mL)"
+          },
+          {
+            "fa": "واحد اندازه‌گیری را وارد کنید (مثلاً mg/mL)"
+          },
+          {
+            "ar": "أدخل وحدة القياس (مثل mg/mL)"
+          },
+          {
+            "es": "Ingrese la unidad de medida (por ejemplo, mg/mL)"
+          },
+          {
+            "fr": "Entrez l'unité de mesure (ex : mg/mL)"
+          },
+          {
+            "de": "Geben Sie die Maßeinheit ein (z. B. mg/mL)"
+          },
+          {
+            "it": "Inserisci l'unità di misura (es. mg/mL)"
+          },
+          {
+            "ru": "Введите единицу измерения (например, мг/мл)"
+          }
+        ]
+      },
+      {
+        "id": "lims-test-parameter-decimal-points",
+        "name": "decimalPoints",
+        "label": "Decimal Points",
+        "sectionId": "basic-information",
+        "component": "number",
+        "translations": [
+          {
+            "en": "Decimal Points"
+          },
+          {
+            "fa": "تعداد اعشار"
+          },
+          {
+            "ar": "عدد المنازل العشرية"
+          },
+          {
+            "es": "Decimales"
+          },
+          {
+            "fr": "Chiffres décimaux"
+          },
+          {
+            "de": "Dezimalstellen"
+          },
+          {
+            "it": "Cifre decimali"
+          },
+          {
+            "ru": "Десятичные знаки"
+          }
+        ],
+        "validation": {
+          "required": false,
+          "min": 0,
+          "max": 6
+        },
+        "colSpan": 1,
+        "order": 4,
+        "caption": "Enter number of decimal points (0-6)",
+        "captionTranslations": [
+          {
+            "en": "Enter number of decimal points (0-6)"
+          },
+          {
+            "fa": "تعداد اعشار را وارد کنید (۰ تا ۶)"
+          },
+          {
+            "ar": "أدخل عدد المنازل العشرية (0-6)"
+          },
+          {
+            "es": "Ingrese el número de decimales (0-6)"
+          },
+          {
+            "fr": "Entrez le nombre de décimales (0-6)"
+          },
+          {
+            "de": "Anzahl der Dezimalstellen eingeben (0-6)"
+          },
+          {
+            "it": "Inserisci il numero di cifre decimali (0-6)"
+          },
+          {
+            "ru": "Введите количество десятичных знаков (0–6)"
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Test Parameter Information",
+        "titleTranslations": [
+          {
+            "en": "Test Parameter Information"
+          },
+          {
+            "fa": "اطلاعات پارامتر آزمون"
+          },
+          {
+            "ar": "معلومات معامل الاختبار"
+          },
+          {
+            "es": "Información del parámetro de prueba"
+          },
+          {
+            "fr": "Informations sur le paramètre de test"
+          },
+          {
+            "de": "Informationen zum Testparameter"
+          },
+          {
+            "it": "Informazioni sul parametro di test"
+          },
+          {
+            "ru": "Информация о параметре теста"
+          }
+        ],
+        "description": "Configure basic properties for LIMS test parameters",
+        "descriptionTranslations": [
+          {
+            "en": "Configure basic properties for LIMS test parameters"
+          },
+          {
+            "fa": "ویژگی‌های پایه پارامترهای آزمون LIMS را پیکربندی کنید"
+          },
+          {
+            "ar": "قم بتكوين الخصائص الأساسية لمعاملات اختبار LIMS"
+          },
+          {
+            "es": "Configure las propiedades básicas para los parámetros de prueba LIMS"
+          },
+          {
+            "fr": "Configurez les propriétés de base des paramètres de test LIMS"
+          },
+          {
+            "de": "Konfigurieren Sie grundlegende Eigenschaften für LIMS-Testparameter"
+          },
+          {
+            "it": "Configura le proprietà di base dei parametri di test LIMS"
+          },
+          {
+            "ru": "Настройте основные свойства параметров теста LIMS"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "Sliders",
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ],
+    "description_translations": [
+      {
+        "en": "Define and manage LIMS test parameters"
+      },
+      {
+        "fa": "پارامترهای آزمون LIMS را تعریف و مدیریت کنید"
+      },
+      {
+        "ar": "تعريف وإدارة معاملات اختبار LIMS"
+      },
+      {
+        "es": "Defina y gestione los parámetros de prueba LIMS"
+      },
+      {
+        "fr": "Définissez et gérez les paramètres de test LIMS"
+      },
+      {
+        "de": "Definieren und verwalten Sie LIMS-Testparameter"
+      },
+      {
+        "it": "Definisci e gestisci i parametri di test LIMS"
+      },
+      {
+        "ru": "Определяйте и управляйте параметрами тестов LIMS"
+      }
+    ]
+  },
+  {
+    "id": "lims-tests",
+    "description": "Define and manage LIMS tests with categories and parameters",
+    "singular_name": "LIMS Test",
+    "plural_name": "LIMS Tests",
+    "singular_name_translations": [
+      {
+        "en": "LIMS Test"
+      },
+      {
+        "fa": "آزمون LIMS"
+      },
+      {
+        "ar": "اختبار LIMS"
+      },
+      {
+        "es": "Prueba LIMS"
+      },
+      {
+        "fr": "Test LIMS"
+      },
+      {
+        "de": "LIMS-Test"
+      },
+      {
+        "it": "Test LIMS"
+      },
+      {
+        "ru": "Тест LIMS"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "LIMS Tests"
+      },
+      {
+        "fa": "آزمون‌های LIMS"
+      },
+      {
+        "ar": "اختبارات LIMS"
+      },
+      {
+        "es": "Pruebas LIMS"
+      },
+      {
+        "fr": "Tests LIMS"
+      },
+      {
+        "de": "LIMS-Tests"
+      },
+      {
+        "it": "Test LIMS"
+      },
+      {
+        "ru": "Тесты LIMS"
+      }
+    ],
+    "fields": [
+      {
+        "id": "lims-test-title",
+        "name": "title",
+        "label": "Test Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "role": "title",
+        "allowTranslation": true,
+        "translations": [
+          {
+            "en": "Test Title"
+          },
+          {
+            "fa": "عنوان آزمون"
+          },
+          {
+            "ar": "عنوان الاختبار"
+          },
+          {
+            "es": "Título de la prueba"
+          },
+          {
+            "fr": "Titre du test"
+          },
+          {
+            "de": "Testtitel"
+          },
+          {
+            "it": "Titolo del test"
+          },
+          {
+            "ru": "Название теста"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "caption": "Enter test title",
+        "captionTranslations": [
+          {
+            "en": "Enter test title"
+          },
+          {
+            "fa": "عنوان آزمون را وارد کنید"
+          },
+          {
+            "ar": "أدخل عنوان الاختبار"
+          },
+          {
+            "es": "Ingrese el título de la prueba"
+          },
+          {
+            "fr": "Entrez le titre du test"
+          },
+          {
+            "de": "Testtitel eingeben"
+          },
+          {
+            "it": "Inserisci il titolo del test"
+          },
+          {
+            "ru": "Введите название теста"
+          }
+        ]
+      },
+      {
+        "id": "lims-test-category",
+        "name": "testCategory",
+        "label": "Test Category",
+        "sectionId": "basic-information",
+        "type": "select",
+        "component": "select",
+        "translations": [
+          {
+            "en": "Test Category"
+          },
+          {
+            "fa": "دسته‌بندی آزمون"
+          },
+          {
+            "ar": "فئة الاختبار"
+          },
+          {
+            "es": "Categoría de prueba"
+          },
+          {
+            "fr": "Catégorie de test"
+          },
+          {
+            "de": "Testkategorie"
+          },
+          {
+            "it": "Categoria di test"
+          },
+          {
+            "ru": "Категория теста"
+          }
+        ],
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KLIMSCATGP00000000000001",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 2,
+        "caption": "Select test category",
+        "captionTranslations": [
+          {
+            "en": "Select test category"
+          },
+          {
+            "fa": "دسته‌بندی آزمون را انتخاب کنید"
+          },
+          {
+            "ar": "اختر فئة الاختبار"
+          },
+          {
+            "es": "Seleccione la categoría de prueba"
+          },
+          {
+            "fr": "Sélectionnez la catégorie de test"
+          },
+          {
+            "de": "Testkategorie auswählen"
+          },
+          {
+            "it": "Seleziona la categoria di test"
+          },
+          {
+            "ru": "Выберите категорию теста"
+          }
+        ]
+      },
+      {
+        "id": "lims-test-parameters-picker",
+        "name": "testParameters",
+        "label": "Test Parameters",
+        "sectionId": "basic-information",
+        "component": "picker",
+        "description": "Select test parameters from popup picker",
+        "targetSchema": "lims-test-parameters",
+        "allowMultiselect": true,
+        "translations": [
+          {
+            "en": "Test Parameters"
+          },
+          {
+            "fa": "پارامترهای آزمون"
+          },
+          {
+            "ar": "معاملات الاختبار"
+          },
+          {
+            "es": "Parámetros de prueba"
+          },
+          {
+            "fr": "Paramètres de test"
+          },
+          {
+            "de": "Testparameter"
+          },
+          {
+            "it": "Parametri di test"
+          },
+          {
+            "ru": "Параметры теста"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 3,
+        "caption": "Click to select test parameters",
+        "captionTranslations": [
+          {
+            "en": "Click to select test parameters"
+          },
+          {
+            "fa": "برای انتخاب پارامترهای آزمون کلیک کنید"
+          },
+          {
+            "ar": "انقر لاختيار معاملات الاختبار"
+          },
+          {
+            "es": "Haga clic para seleccionar los parámetros de prueba"
+          },
+          {
+            "fr": "Cliquez pour sélectionner les paramètres de test"
+          },
+          {
+            "de": "Klicken Sie, um Testparameter auszuwählen"
+          },
+          {
+            "it": "Fai clic per selezionare i parametri di test"
+          },
+          {
+            "ru": "Нажмите, чтобы выбрать параметры теста"
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Test Information",
+        "titleTranslations": [
+          {
+            "en": "Test Information"
+          },
+          {
+            "fa": "اطلاعات آزمون"
+          },
+          {
+            "ar": "معلومات الاختبار"
+          },
+          {
+            "es": "Información de la prueba"
+          },
+          {
+            "fr": "Informations sur le test"
+          },
+          {
+            "de": "Testinformationen"
+          },
+          {
+            "it": "Informazioni sul test"
+          },
+          {
+            "ru": "Информация о тесте"
+          }
+        ],
+        "description": "Define LIMS test title, category, and parameters",
+        "descriptionTranslations": [
+          {
+            "en": "Define LIMS test title, category, and parameters"
+          },
+          {
+            "fa": "عنوان، دسته‌بندی و پارامترهای آزمون LIMS را تعریف کنید"
+          },
+          {
+            "ar": "حدد عنوان واختيار وفئات ومعاملات اختبار LIMS"
+          },
+          {
+            "es": "Defina el título, categoría y parámetros de la prueba LIMS"
+          },
+          {
+            "fr": "Définissez le titre, la catégorie et les paramètres du test LIMS"
+          },
+          {
+            "de": "Definieren Sie Titel, Kategorie und Parameter des LIMS-Tests"
+          },
+          {
+            "it": "Definisci titolo, categoria e parametri del test LIMS"
+          },
+          {
+            "ru": "Определите название, категорию и параметры теста LIMS"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "FlaskConical",
+    "allowDataInactive": true,
+    "schemaType": "business",
+    "relatedTenants": [
+      {
+        "id": "01KBFBD109G6CYRT7RA04TMMXC",
+        "label": "AryoGen"
+      }
+    ],
+    "description_translations": [
+      {
+        "en": "Define and manage LIMS tests with categories and parameters"
+      },
+      {
+        "fa": "آزمون‌های LIMS را همراه با دسته‌بندی و پارامترها تعریف و مدیریت کنید"
+      },
+      {
+        "ar": "تعريف وإدارة اختبارات LIMS مع الفئات والمعاملات"
+      },
+      {
+        "es": "Defina y gestione las pruebas LIMS con categorías y parámetros"
+      },
+      {
+        "fr": "Définissez et gérez les tests LIMS avec catégories et paramètres"
+      },
+      {
+        "de": "Definieren und verwalten Sie LIMS-Tests mit Kategorien und Parametern"
+      },
+      {
+        "it": "Definisci e gestisci i test LIMS con categorie e parametri"
+      },
+      {
+        "ru": "Определяйте и управляйте тестами LIMS с категориями и параметрами"
       }
     ]
   }

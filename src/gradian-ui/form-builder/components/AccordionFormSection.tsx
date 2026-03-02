@@ -108,6 +108,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     open: boolean;
     index: number | null;
   }>({ open: false, index: null });
+  const [sectionView, setSectionView] = useState<'grid' | 'list'>('grid');
   const queryClient = useQueryClient();
   const editTitle = getT(TRANSLATION_KEYS.BUTTON_EDIT, language, defaultLang);
   const deleteTitle = getT(TRANSLATION_KEYS.BUTTON_DELETE, language, defaultLang);
@@ -334,6 +335,8 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     }
   };
 
+  const effectiveColumns = isRepeatingSection ? (sectionView === 'list' ? 1 : columns) : columns;
+
   const sectionClasses = cn(
     'space-y-3',
     styling?.className
@@ -341,14 +344,19 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
 
   const gridClasses = cn(
     'grid gap-3',
-    columns === 1 && 'grid-cols-1',
-    columns === 2 && 'grid-cols-1 md:grid-cols-2',
-    columns === 3 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
-    columns === 4 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
-    columns === 6 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-6',
-    columns === 12 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-12',
+    effectiveColumns === 1 && 'grid-cols-1',
+    effectiveColumns === 2 && 'grid-cols-1 md:grid-cols-2',
+    effectiveColumns === 3 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
+    effectiveColumns === 4 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4',
+    effectiveColumns === 6 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-6',
+    effectiveColumns === 12 && 'grid-cols-1 md:grid-cols-2 lg:grid-cols-12',
     gap !== undefined && gap !== null && gap !== 0 && `gap-${gap}`
   );
+
+  const repeatingItemsContainerClass =
+    sectionView === 'list'
+      ? 'space-y-3'
+      : 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4';
 
   // Helper function to determine column span based on width
   const getColSpan = (field: any): number => {
@@ -366,17 +374,17 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     const width = field.layout?.width;
     
     if (width === '100%') {
-      return columns; // Full width spans all columns
+      return effectiveColumns; // Full width spans all columns
     } else if (width === '50%') {
-      return Math.ceil(columns / 2); // Half width
+      return Math.ceil(effectiveColumns / 2); // Half width
     } else if (width === '33.33%' || width === '33.3%') {
-      return Math.ceil(columns / 3); // One third width
+      return Math.ceil(effectiveColumns / 3); // One third width
     } else if (width === '25%') {
-      return Math.ceil(columns / 4); // One fourth width
+      return Math.ceil(effectiveColumns / 4); // One fourth width
     } else if (width === '66.66%' || width === '66.6%') {
-      return Math.ceil((columns / 3) * 2); // Two thirds width
+      return Math.ceil((effectiveColumns / 3) * 2); // Two thirds width
     } else if (width === '75%') {
-      return Math.ceil((columns / 4) * 3); // Three fourths width
+      return Math.ceil((effectiveColumns / 4) * 3); // Three fourths width
     }
     
     // Default to 1 column if no width specified
@@ -437,25 +445,25 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
           // Default to single column on mobile to avoid overlap,
           // and apply the actual span at md and up.
           let colSpanClass = 'col-span-1';
-          if (colSpan === columns) {
+          if (colSpan === effectiveColumns) {
             colSpanClass = 'col-span-1 md:col-span-full';
           } else {
             // For responsive layouts at md+
-            if (columns === 3) {
+            if (effectiveColumns === 3) {
               if (colSpan === 2) {
                 colSpanClass = 'col-span-1 md:col-span-2';
               }
-            } else if (columns === 2) {
+            } else if (effectiveColumns === 2) {
               if (colSpan === 2) {
                 colSpanClass = 'col-span-1 md:col-span-2';
               }
-            } else if (columns === 4) {
+            } else if (effectiveColumns === 4) {
               if (colSpan === 2) {
                 colSpanClass = 'col-span-1 md:col-span-2';
               } else if (colSpan === 3) {
                 colSpanClass = 'col-span-1 md:col-span-3';
               }
-            } else if (columns === 6 || columns === 12) {
+            } else if (effectiveColumns === 6 || effectiveColumns === 12) {
               colSpanClass = `col-span-1 md:col-span-${colSpan}`;
             } else {
               // Default for other column counts
@@ -1242,6 +1250,14 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                   </Button>
                 </div>
                 <div className="flex items-center gap-2">
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <ViewSwitcher
+                      currentView={sectionView}
+                      onViewChange={(view) => setSectionView((view === 'grid' || view === 'list') ? view : 'grid')}
+                      showOnly={['grid', 'list']}
+                      className="shrink-0"
+                    />
+                  </div>
                   {/* N.A Switch */}
                   {showNotApplicableSwitch && (
                     <div 
@@ -1404,7 +1420,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                           </motion.div>
                         ) : (
                         <motion.div 
-                          className="space-y-3"
+                          className={repeatingItemsContainerClass}
                           initial="hidden"
                           animate="visible"
                           variants={{
@@ -1473,7 +1489,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                                     schema={targetSchemaData}
                                     data={entityWithTitle}
                                     index={0}
-                                    viewMode="list"
+                                    viewMode={sectionView}
                                     onView={(data) => {
                                       const id = (data as any).id;
                                       if (relation) handleEditEntity(id, relation.id);
@@ -1709,7 +1725,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                               schema={targetSchemaData}
                               data={entityWithTitle}
                               index={0}
-                              viewMode="list"
+                              viewMode={sectionView}
                               onView={(data) => {
                                 const id = (data as any).id;
                                 if (relation) handleEditEntity(id, relation.id);
@@ -1946,6 +1962,14 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
               )}
             </div>
             <div className="flex items-center gap-2">
+              <div onClick={(e) => e.stopPropagation()}>
+                <ViewSwitcher
+                  currentView={sectionView}
+                  onViewChange={(view) => setSectionView((view === 'grid' || view === 'list') ? view : 'grid')}
+                  showOnly={['grid', 'list']}
+                  className="shrink-0"
+                />
+              </div>
               {/* N.A Switch */}
               {showNotApplicableSwitch && (
                 <div 
@@ -2007,7 +2031,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                       <p className="text-sm">{noItemsAddedYet}</p>
                     </div>
                   ) : (
-                    <div className="space-y-4">
+                    <div className={repeatingItemsContainerClass}>
                       {(repeatingItems || []).map((item, index) => (
                         <div
                           key={item.id || `item-${index}`}
@@ -2075,7 +2099,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
                 <p className="text-sm">{noItemsAddedYet}</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className={repeatingItemsContainerClass}>
                 {(repeatingItems || []).map((item, index) => (
                   <div
                     key={item.id || `item-${index}`}
