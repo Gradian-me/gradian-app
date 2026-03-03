@@ -2444,16 +2444,114 @@
     "updatedAt": "2026-03-01T12:00:00.000Z"
   },
   {
-    "sourceSchema": "inquiries",
-    "sourceId": "01KCZVDJHHKT672CHJC27ZGF5C",
-    "targetSchema": "tenders",
-    "targetId": "01KE6NDNSEFMWNY3D4EAGR7Q3W",
-    "relationTypeId": "HAS_TENDER",
-    "incomplete": true,
-    "id": "01KE6NDNVZQJ98QFWN4B707DEV",
-    "createdAt": "2026-01-05T08:47:17.375Z",
-    "updatedAt": "2026-01-06T07:26:05.469Z",
-    "inactive": true
+    "sourceSchema": "status-groups",
+    "sourceId": "01KLIMSSTATGP00000000000001",
+    "targetSchema": "status-items",
+    "targetId": "01KLIMSSTAT0000000000000001",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KLIMSREL01DRAFT00000000001",
+    "createdAt": "2026-03-03T12:00:00.000Z",
+    "updatedAt": "2026-03-03T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KLIMSSTATGP00000000000001",
+    "targetSchema": "status-items",
+    "targetId": "01KLIMSSTAT0000000000000002",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KLIMSREL02LABAPPR000000001",
+    "createdAt": "2026-03-03T12:00:00.000Z",
+    "updatedAt": "2026-03-03T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KLIMSSTATGP00000000000001",
+    "targetSchema": "status-items",
+    "targetId": "01KLIMSSTAT0000000000000003",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KLIMSREL03FINQUOTE00000001",
+    "createdAt": "2026-03-03T12:00:00.000Z",
+    "updatedAt": "2026-03-03T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KLIMSSTATGP00000000000001",
+    "targetSchema": "status-items",
+    "targetId": "01KLIMSSTAT0000000000000004",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KLIMSREL04CUSTAPPR00000001",
+    "createdAt": "2026-03-03T12:00:00.000Z",
+    "updatedAt": "2026-03-03T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KLIMSSTATGP00000000000001",
+    "targetSchema": "status-items",
+    "targetId": "01KLIMSSTAT0000000000000005",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KLIMSREL05LABTEST000000001",
+    "createdAt": "2026-03-03T12:00:00.000Z",
+    "updatedAt": "2026-03-03T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KLIMSSTATGP00000000000001",
+    "targetSchema": "status-items",
+    "targetId": "01KLIMSSTAT0000000000000006",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KLIMSREL06FININV000000001",
+    "createdAt": "2026-03-03T12:00:00.000Z",
+    "updatedAt": "2026-03-03T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KLIMSSTATGP00000000000001",
+    "targetSchema": "status-items",
+    "targetId": "01KLIMSSTAT0000000000000007",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KLIMSREL07CUSTPAY000000001",
+    "createdAt": "2026-03-03T12:00:00.000Z",
+    "updatedAt": "2026-03-03T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KLIMSSTATGP00000000000001",
+    "targetSchema": "status-items",
+    "targetId": "01KLIMSSTAT0000000000000008",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KLIMSREL08TESTRES000000001",
+    "createdAt": "2026-03-03T12:00:00.000Z",
+    "updatedAt": "2026-03-03T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KLIMSSTATGP00000000000001",
+    "targetSchema": "status-items",
+    "targetId": "01KLIMSSTAT0000000000000009",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KLIMSREL09COMPLETE00000001",
+    "createdAt": "2026-03-03T12:00:00.000Z",
+    "updatedAt": "2026-03-03T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KLIMSSTATGP00000000000001",
+    "targetSchema": "status-items",
+    "targetId": "01KLIMSSTAT0000000000000010",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KLIMSREL10CANCELLED0000001",
+    "createdAt": "2026-03-03T12:00:00.000Z",
+    "updatedAt": "2026-03-03T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "status-groups",
+    "sourceId": "01KLIMSSTATGP00000000000001",
+    "targetSchema": "status-items",
+    "targetId": "01KLIMSSTAT0000000000000011",
+    "relationTypeId": "HAS_STATUS_ITEM",
+    "id": "01KLIMSREL11REJECTED0000001",
+    "createdAt": "2026-03-03T12:00:00.000Z",
+    "updatedAt": "2026-03-03T12:00:00.000Z"
   },
   {
     "id": "01KE6NG0YKY5ES2KWA9B0P6PS5",

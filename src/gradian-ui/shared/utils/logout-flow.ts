@@ -61,11 +61,18 @@ function clearLocalStorageStores(): void {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
 
   const keysToRemove = [
+    // Plain persisted store keys (legacy / fallback)
     'user-store',
     'company-store',
     'menu-items-store',
     'tenant-store',
     'language-store',
+    // Encrypted persisted store keys used by createEncryptedStorage (authoritative)
+    'encrypted:user-store',
+    'encrypted:company-store',
+    'encrypted:menu-items-store',
+    'encrypted:tenant-store',
+    'encrypted:language-store',
     'access_token', // Legacy
     'refresh_token', // Legacy
     'last_interaction', // Idle timeout tracking

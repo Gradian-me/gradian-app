@@ -37911,8 +37911,8 @@
     "schemaType": "business",
     "relatedTenants": [
       {
-        "id": "01KBFBD109G6CYRT7RA04TMMXC",
-        "label": "AryoGen"
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
       }
     ],
     "description_translations": [
@@ -37939,6 +37939,38 @@
       },
       {
         "ru": "Определяйте и управляйте параметрами тестов LIMS"
+      }
+    ],
+    "applications": [
+      {
+        "id": "01KQCLQM0000000000000000QC",
+        "name": [
+          {
+            "en": "Quality Control Management"
+          },
+          {
+            "fa": "مدیریت کنترل کیفیت"
+          },
+          {
+            "ar": "إدارة مراقبة الجودة"
+          },
+          {
+            "es": "Gestión de control de calidad"
+          },
+          {
+            "fr": "Gestion du contrôle qualité"
+          },
+          {
+            "de": "Qualitätskontrollmanagement"
+          },
+          {
+            "it": "Gestione controllo qualità"
+          },
+          {
+            "ru": "Управление контролем качества"
+          }
+        ],
+        "icon": "FlaskConical"
       }
     ]
   },
@@ -38274,8 +38306,8 @@
     "schemaType": "business",
     "relatedTenants": [
       {
-        "id": "01KBFBD109G6CYRT7RA04TMMXC",
-        "label": "AryoGen"
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
       }
     ],
     "description_translations": [
@@ -38302,6 +38334,1274 @@
       },
       {
         "ru": "Определяйте и управляйте тестами LIMS с категориями и параметрами"
+      }
+    ],
+    "applications": [
+      {
+        "id": "01KQCLQM0000000000000000QC",
+        "name": [
+          {
+            "en": "Quality Control Management"
+          },
+          {
+            "fa": "مدیریت کنترل کیفیت"
+          },
+          {
+            "ar": "إدارة مراقبة الجودة"
+          },
+          {
+            "es": "Gestión de control de calidad"
+          },
+          {
+            "fr": "Gestion du contrôle qualité"
+          },
+          {
+            "de": "Qualitätskontrollmanagement"
+          },
+          {
+            "it": "Gestione controllo qualità"
+          },
+          {
+            "ru": "Управление контролем качества"
+          }
+        ],
+        "icon": "FlaskConical"
+      }
+    ]
+  },
+  {
+    "id": "lims-external-fraction-tests",
+    "description": "Manage external LIMS fraction test results",
+    "singular_name": "LIMS External Fraction Test",
+    "plural_name": "LIMS External Fraction Tests",
+    "singular_name_translations": [
+      { "en": "LIMS External Fraction Test" },
+      { "fa": "آزمون جزء خارجی LIMS" },
+      { "ar": "اختبار جزء خارجي لنظام LIMS" },
+      { "es": "Prueba de fracción externa LIMS" },
+      { "fr": "Test de fraction externe LIMS" },
+      { "de": "Externer LIMS-Fraktionstest" },
+      { "it": "Test di frazione esterna LIMS" },
+      { "ru": "Внешний фракционный тест LIMS" }
+    ],
+    "plural_name_translations": [
+      { "en": "LIMS External Fraction Tests" },
+      { "fa": "آزمون‌های جزء خارجی LIMS" },
+      { "ar": "اختبارات الأجزاء الخارجية لنظام LIMS" },
+      { "es": "Pruebas de fracción externa LIMS" },
+      { "fr": "Tests de fraction externe LIMS" },
+      { "de": "Externe LIMS-Fraktionstests" },
+      { "it": "Test di frazione esterna LIMS" },
+      { "ru": "Внешние фракционные тесты LIMS" }
+    ],
+    "fields": [
+      {
+        "id": "lims-external-request-lab-test",
+        "name": "labTest",
+        "label": "Lab Test",
+        "sectionId": "test-result-item",
+        "component": "picker",
+        "description": "Select related lab test",
+        "targetSchema": "lims-tests",
+        "allowMultiselect": false,
+        "translations": [
+          { "en": "Lab Test" },
+          { "fa": "آزمون آزمایشگاهی" },
+          { "ar": "الاختبار المخبري" },
+          { "es": "Prueba de laboratorio" },
+          { "fr": "Test de laboratoire" },
+          { "de": "Labortest" },
+          { "it": "Test di laboratorio" },
+          { "ru": "Лабораторный тест" }
+        ],
+        "validation": { "required": false },
+        "colSpan": 2,
+        "order": 1,
+        "caption": "Click to select lab test",
+        "captionTranslations": [
+          { "en": "Click to select lab test" },
+          { "fa": "برای انتخاب آزمون آزمایشگاهی کلیک کنید" },
+          { "ar": "انقر لاختيار الاختبار المخبري" },
+          { "es": "Haga clic para seleccionar la prueba de laboratorio" },
+          { "fr": "Cliquez pour sélectionner le test de laboratoire" },
+          { "de": "Klicken Sie, um den Labortest auszuwählen" },
+          { "it": "Fai clic per selezionare il test di laboratorio" },
+          { "ru": "Нажмите, чтобы выбрать лабораторный тест" }
+        ]
+      },
+      {
+        "id": "lims-external-fraction-integration-id",
+        "name": "integrationId",
+        "label": "Integration ID",
+        "sectionId": "test-result-item",
+        "component": "number",
+        "translations": [
+          { "en": "Integration ID" },
+          { "fa": "شناسه یکپارچه‌سازی" },
+          { "ar": "معرف التكامل" },
+          { "es": "ID de integración" },
+          { "fr": "ID d'intégration" },
+          { "de": "Integrations-ID" },
+          { "it": "ID di integrazione" },
+          { "ru": "ID интеграции" }
+        ],
+        "validation": { "required": false, "min": 0 },
+        "colSpan": 1,
+        "order": 2,
+        "caption": "Enter integration ID",
+        "captionTranslations": [
+          { "en": "Enter integration ID" },
+          { "fa": "شناسه یکپارچه‌سازی را وارد کنید" },
+          { "ar": "أدخل معرف التكامل" },
+          { "es": "Ingrese el ID de integración" },
+          { "fr": "Entrez l'ID d'intégration" },
+          { "de": "Integrations-ID eingeben" },
+          { "it": "Inserisci l'ID di integrazione" },
+          { "ru": "Введите ID интеграции" }
+        ]
+      },
+      {
+        "id": "lims-external-fraction-test-result-description",
+        "name": "testResultDescription",
+        "label": "Test Result Description",
+        "sectionId": "test-result-item",
+        "component": "textarea",
+        "translations": [
+          { "en": "Test Result Description" },
+          { "fa": "توضیحات نتیجه آزمون" },
+          { "ar": "وصف نتيجة الاختبار" },
+          { "es": "Descripción del resultado de la prueba" },
+          { "fr": "Description du résultat du test" },
+          { "de": "Beschreibung des Testergebnisses" },
+          { "it": "Descrizione del risultato del test" },
+          { "ru": "Описание результата теста" }
+        ],
+        "validation": { "required": false },
+        "colSpan": 2,
+        "order": 3,
+        "caption": "Enter test result description",
+        "captionTranslations": [
+          { "en": "Enter test result description" },
+          { "fa": "توضیحات نتیجه آزمون را وارد کنید" },
+          { "ar": "أدخل وصف نتيجة الاختبار" },
+          { "es": "Ingrese la descripción del resultado de la prueba" },
+          { "fr": "Entrez la description du résultat du test" },
+          { "de": "Beschreibung des Testergebnisses eingeben" },
+          { "it": "Inserisci la descrizione del risultato del test" },
+          { "ru": "Введите описание результата теста" }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "test-result-item",
+        "title": "Test Result Item",
+        "titleTranslations": [
+          { "en": "Test Result Item" },
+          { "fa": "آیتم نتیجه آزمون" },
+          { "ar": "عنصر نتيجة الاختبار" },
+          { "es": "Ítem de resultado de prueba" },
+          { "fr": "Élément de résultat de test" },
+          { "de": "Testergebnis-Element" },
+          { "it": "Elemento risultato del test" },
+          { "ru": "Элемент результата теста" }
+        ],
+        "description": "Single test result item for an external LIMS request",
+        "descriptionTranslations": [
+          { "en": "Single test result item for an external LIMS request" },
+          { "fa": "یک آیتم نتیجه آزمون برای درخواست خارجی LIMS" },
+          { "ar": "عنصر واحد لنتيجة اختبار لطلب LIMS خارجي" },
+          { "es": "Ítem único de resultado de prueba para una solicitud externa LIMS" },
+          { "fr": "Élément de résultat de test pour une demande externe LIMS" },
+          { "de": "Ein Testergebnis-Element für eine externe LIMS-Anfrage" },
+          { "it": "Singolo elemento risultato del test per una richiesta esterna LIMS" },
+          { "ru": "Отдельный элемент результата теста для внешнего запроса LIMS" }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "FlaskConical",
+    "schemaType": "business",
+    "allowDataInactive": true,
+    "relatedTenants": [
+      {
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
+      }
+    ],
+    "description_translations": [
+      {
+        "en": "Manage external LIMS fraction test results"
+      },
+      {
+        "fa": "نتایج آزمون‌های جزء خارجی LIMS را مدیریت کنید"
+      },
+      {
+        "ar": "إدارة نتائج اختبارات الأجزاء الخارجية لنظام LIMS"
+      },
+      {
+        "es": "Gestione resultados de pruebas de fracción externa LIMS"
+      },
+      {
+        "fr": "Gérez les résultats de tests de fraction externe LIMS"
+      },
+      {
+        "de": "Verwalten Sie Ergebnisse externer LIMS-Fraktionstests"
+      },
+      {
+        "it": "Gestisci i risultati dei test di frazione esterna LIMS"
+      },
+      {
+        "ru": "Управляйте результатами внешних фракционных тестов LIMS"
+      }
+    ],
+    "applications": [
+      {
+        "id": "01KQCLQM0000000000000000QC",
+        "name": [
+          { "en": "Quality Control Management" },
+          { "fa": "مدیریت کنترل کیفیت" },
+          { "ar": "إدارة مراقبة الجودة" },
+          { "es": "Gestión de control de calidad" },
+          { "fr": "Gestion du contrôle qualité" },
+          { "de": "Qualitätskontrollmanagement" },
+          { "it": "Gestione controllo qualità" },
+          { "ru": "Управление контролем качества" }
+        ],
+        "icon": "FlaskConical"
+      }
+    ]
+  },
+  {
+    "id": "lims-external-requests",
+    "description": "Manage external LIMS test requests with financial quotation and test results",
+    "singular_name": "LIMS External Request",
+    "plural_name": "LIMS External Requests",
+    "singular_name_translations": [
+      {
+        "en": "LIMS External Request"
+      },
+      {
+        "fa": "درخواست خارجی LIMS"
+      },
+      {
+        "ar": "طلب خارجي لنظام LIMS"
+      },
+      {
+        "es": "Solicitud externa LIMS"
+      },
+      {
+        "fr": "Demande externe LIMS"
+      },
+      {
+        "de": "Externe LIMS-Anfrage"
+      },
+      {
+        "it": "Richiesta esterna LIMS"
+      },
+      {
+        "ru": "Внешний запрос LIMS"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "LIMS External Requests"
+      },
+      {
+        "fa": "درخواست‌های خارجی LIMS"
+      },
+      {
+        "ar": "طلبات خارجية لنظام LIMS"
+      },
+      {
+        "es": "Solicitudes externas LIMS"
+      },
+      {
+        "fr": "Demandes externes LIMS"
+      },
+      {
+        "de": "Externe LIMS-Anfragen"
+      },
+      {
+        "it": "Richieste esterne LIMS"
+      },
+      {
+        "ru": "Внешние запросы LIMS"
+      }
+    ],
+    "fields": [
+      {
+        "id": "lims-external-request-sample-name",
+        "name": "sampleName",
+        "label": "Sample Name",
+        "sectionId": "general-information",
+        "component": "text",
+        "role": "title",
+        "allowTranslation": true,
+        "translations": [
+          {
+            "en": "Sample Name"
+          },
+          {
+            "fa": "نام نمونه"
+          },
+          {
+            "ar": "اسم العينة"
+          },
+          {
+            "es": "Nombre de la muestra"
+          },
+          {
+            "fr": "Nom de l'échantillon"
+          },
+          {
+            "de": "Probenname"
+          },
+          {
+            "it": "Nome del campione"
+          },
+          {
+            "ru": "Название образца"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "caption": "Enter sample name",
+        "captionTranslations": [
+          {
+            "en": "Enter sample name"
+          },
+          {
+            "fa": "نام نمونه را وارد کنید"
+          },
+          {
+            "ar": "أدخل اسم العينة"
+          },
+          {
+            "es": "Ingrese el nombre de la muestra"
+          },
+          {
+            "fr": "Saisissez le nom de l'échantillon"
+          },
+          {
+            "de": "Probenname eingeben"
+          },
+          {
+            "it": "Inserisci il nome del campione"
+          },
+          {
+            "ru": "Введите название образца"
+          }
+        ]
+      },
+      {
+        "id": "lims-external-request-batch-number",
+        "name": "batchNumber",
+        "label": "Batch Number",
+        "sectionId": "general-information",
+        "component": "text",
+        "translations": [
+          {
+            "en": "Batch Number"
+          },
+          {
+            "fa": "شماره بچ"
+          },
+          {
+            "ar": "رقم الدفعة"
+          },
+          {
+            "es": "Número de lote"
+          },
+          {
+            "fr": "Numéro de lot"
+          },
+          {
+            "de": "Chargennummer"
+          },
+          {
+            "it": "Numero di lotto"
+          },
+          {
+            "ru": "Номер серии"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2,
+        "caption": "Enter batch number",
+        "captionTranslations": [
+          {
+            "en": "Enter batch number"
+          },
+          {
+            "fa": "شماره بچ را وارد کنید"
+          },
+          {
+            "ar": "أدخل رقم الدفعة"
+          },
+          {
+            "es": "Ingrese el número de lote"
+          },
+          {
+            "fr": "Entrez le numéro de lot"
+          },
+          {
+            "de": "Chargennummer eingeben"
+          },
+          {
+            "it": "Inserisci il numero di lotto"
+          },
+          {
+            "ru": "Введите номер серии"
+          }
+        ]
+      },
+      {
+        "id": "lims-external-request-expiration-date",
+        "name": "expirationDate",
+        "label": "Expiration Date",
+        "sectionId": "general-information",
+        "component": "date",
+        "translations": [
+          {
+            "en": "Expiration Date"
+          },
+          {
+            "fa": "تاریخ انقضا"
+          },
+          {
+            "ar": "تاريخ الانتهاء"
+          },
+          {
+            "es": "Fecha de vencimiento"
+          },
+          {
+            "fr": "Date d'expiration"
+          },
+          {
+            "de": "Ablaufdatum"
+          },
+          {
+            "it": "Data di scadenza"
+          },
+          {
+            "ru": "Срок годности"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3,
+        "caption": "Enter expiration date",
+        "captionTranslations": [
+          {
+            "en": "Enter expiration date"
+          },
+          {
+            "fa": "تاریخ انقضا را وارد کنید"
+          },
+          {
+            "ar": "أدخل تاريخ الانتهاء"
+          },
+          {
+            "es": "Ingrese la fecha de vencimiento"
+          },
+          {
+            "fr": "Saisissez la date d'expiration"
+          },
+          {
+            "de": "Ablaufdatum eingeben"
+          },
+          {
+            "it": "Inserisci la data di scadenza"
+          },
+          {
+            "ru": "Введите срок годности"
+          }
+        ]
+      },
+      {
+        "id": "lims-external-request-sample-description",
+        "name": "sampleDescription",
+        "label": "Sample Description",
+        "sectionId": "general-information",
+        "component": "textarea",
+        "translations": [
+          {
+            "en": "Sample Description"
+          },
+          {
+            "fa": "توضیحات نمونه"
+          },
+          {
+            "ar": "وصف العينة"
+          },
+          {
+            "es": "Descripción de la muestra"
+          },
+          {
+            "fr": "Description de l'échantillon"
+          },
+          {
+            "de": "Probenbeschreibung"
+          },
+          {
+            "it": "Descrizione del campione"
+          },
+          {
+            "ru": "Описание образца"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4,
+        "caption": "Enter sample description",
+        "captionTranslations": [
+          {
+            "en": "Enter sample description"
+          },
+          {
+            "fa": "توضیحات نمونه را وارد کنید"
+          },
+          {
+            "ar": "أدخل وصف العينة"
+          },
+          {
+            "es": "Ingrese la descripción de la muestra"
+          },
+          {
+            "fr": "Entrez la description de l'échantillon"
+          },
+          {
+            "de": "Probenbeschreibung eingeben"
+          },
+          {
+            "it": "Inserisci la descrizione del campione"
+          },
+          {
+            "ru": "Введите описание образца"
+          }
+        ]
+      },
+      {
+        "id": "lims-external-request-requested-tests",
+        "name": "requestedTests",
+        "label": "Requested Tests",
+        "sectionId": "requested-tests",
+        "component": "picker",
+        "description": "Select requested LIMS tests",
+        "targetSchema": "lims-tests",
+        "allowMultiselect": true,
+        "translations": [
+          {
+            "en": "Requested Tests"
+          },
+          {
+            "fa": "آزمون‌های درخواستی"
+          },
+          {
+            "ar": "الاختبارات المطلوبة"
+          },
+          {
+            "es": "Pruebas solicitadas"
+          },
+          {
+            "fr": "Tests demandés"
+          },
+          {
+            "de": "Angeforderte Tests"
+          },
+          {
+            "it": "Test richiesti"
+          },
+          {
+            "ru": "Запрошенные тесты"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 1,
+        "caption": "Click to select requested tests",
+        "captionTranslations": [
+          {
+            "en": "Click to select requested tests"
+          },
+          {
+            "fa": "برای انتخاب آزمون‌های درخواستی کلیک کنید"
+          },
+          {
+            "ar": "انقر لاختيار الاختبارات المطلوبة"
+          },
+          {
+            "es": "Haga clic para seleccionar las pruebas solicitadas"
+          },
+          {
+            "fr": "Cliquez pour sélectionner les tests demandés"
+          },
+          {
+            "de": "Klicken Sie, um angeforderte Tests auszuwählen"
+          },
+          {
+            "it": "Fai clic per selezionare i test richiesti"
+          },
+          {
+            "ru": "Нажмите, чтобы выбрать запрошенные тесты"
+          }
+        ]
+      },
+      {
+        "id": "lims-external-request-tests-description",
+        "name": "testsDescription",
+        "label": "Tests Description",
+        "sectionId": "requested-tests",
+        "component": "textarea",
+        "translations": [
+          {
+            "en": "Tests Description"
+          },
+          {
+            "fa": "توضیحات آزمون‌ها"
+          },
+          {
+            "ar": "وصف الاختبارات"
+          },
+          {
+            "es": "Descripción de las pruebas"
+          },
+          {
+            "fr": "Description des tests"
+          },
+          {
+            "de": "Testbeschreibung"
+          },
+          {
+            "it": "Descrizione dei test"
+          },
+          {
+            "ru": "Описание тестов"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 2,
+        "caption": "Enter tests description",
+        "captionTranslations": [
+          {
+            "en": "Enter tests description"
+          },
+          {
+            "fa": "توضیحات آزمون‌ها را وارد کنید"
+          },
+          {
+            "ar": "أدخل وصف الاختبارات"
+          },
+          {
+            "es": "Ingrese la descripción de las pruebas"
+          },
+          {
+            "fr": "Entrez la description des tests"
+          },
+          {
+            "de": "Testbeschreibung eingeben"
+          },
+          {
+            "it": "Inserisci la descrizione dei test"
+          },
+          {
+            "ru": "Введите описание тестов"
+          }
+        ]
+      },
+      {
+        "id": "lims-external-request-gross-amount",
+        "name": "grossAmount",
+        "label": "Gross Amount (IRR)",
+        "sectionId": "financial-quotation",
+        "component": "number",
+        "translations": [
+          {
+            "en": "Gross Amount (IRR)"
+          },
+          {
+            "fa": "مبلغ ناخالص (ریال)"
+          },
+          {
+            "ar": "المبلغ الإجمالي (ريال إيراني)"
+          },
+          {
+            "es": "Importe bruto (IRR)"
+          },
+          {
+            "fr": "Montant brut (IRR)"
+          },
+          {
+            "de": "Bruttobetrag (IRR)"
+          },
+          {
+            "it": "Importo lordo (IRR)"
+          },
+          {
+            "ru": "Валовая сумма (IRR)"
+          }
+        ],
+        "validation": {
+          "required": false,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 1,
+        "caption": "Enter gross amount in IRR",
+        "captionTranslations": [
+          {
+            "en": "Enter gross amount in IRR"
+          },
+          {
+            "fa": "مبلغ ناخالص را به ریال وارد کنید"
+          },
+          {
+            "ar": "أدخل المبلغ الإجمالي بالريال الإيراني"
+          },
+          {
+            "es": "Ingrese el importe bruto en IRR"
+          },
+          {
+            "fr": "Entrez le montant brut en IRR"
+          },
+          {
+            "de": "Geben Sie den Bruttobetrag in IRR ein"
+          },
+          {
+            "it": "Inserisci l'importo lordo in IRR"
+          },
+          {
+            "ru": "Введите валовую сумму в IRR"
+          }
+        ]
+      },
+      {
+        "id": "lims-external-request-discount",
+        "name": "discount",
+        "label": "Discount (IRR)",
+        "sectionId": "financial-quotation",
+        "component": "number",
+        "translations": [
+          {
+            "en": "Discount (IRR)"
+          },
+          {
+            "fa": "تخفیف (ریال)"
+          },
+          {
+            "ar": "الخصم (ريال إيراني)"
+          },
+          {
+            "es": "Descuento (IRR)"
+          },
+          {
+            "fr": "Remise (IRR)"
+          },
+          {
+            "de": "Rabatt (IRR)"
+          },
+          {
+            "it": "Sconto (IRR)"
+          },
+          {
+            "ru": "Скидка (IRR)"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2,
+        "caption": "Enter discount amount in IRR",
+        "captionTranslations": [
+          {
+            "en": "Enter discount amount in IRR"
+          },
+          {
+            "fa": "مبلغ تخفیف را به ریال وارد کنید"
+          },
+          {
+            "ar": "أدخل مبلغ الخصم بالريال الإيراني"
+          },
+          {
+            "es": "Ingrese el importe del descuento en IRR"
+          },
+          {
+            "fr": "Entrez le montant de la remise en IRR"
+          },
+          {
+            "de": "Geben Sie den Rabattbetrag in IRR ein"
+          },
+          {
+            "it": "Inserisci l'importo dello sconto in IRR"
+          },
+          {
+            "ru": "Введите сумму скидки в IRR"
+          }
+        ]
+      },
+      {
+        "id": "lims-external-request-net-amount",
+        "name": "netAmount",
+        "label": "Net Amount (IRR)",
+        "sectionId": "financial-quotation",
+        "component": "number",
+        "translations": [
+          {
+            "en": "Net Amount (IRR)"
+          },
+          {
+            "fa": "مبلغ خالص (ریال)"
+          },
+          {
+            "ar": "المبلغ الصافي (ريال إيراني)"
+          },
+          {
+            "es": "Importe neto (IRR)"
+          },
+          {
+            "fr": "Montant net (IRR)"
+          },
+          {
+            "de": "Nettobetrag (IRR)"
+          },
+          {
+            "it": "Importo netto (IRR)"
+          },
+          {
+            "ru": "Чистая сумма (IRR)"
+          }
+        ],
+        "validation": {
+          "required": false,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 3,
+        "caption": "Enter net amount in IRR",
+        "captionTranslations": [
+          {
+            "en": "Enter net amount in IRR"
+          },
+          {
+            "fa": "مبلغ خالص را به ریال وارد کنید"
+          },
+          {
+            "ar": "أدخل المبلغ الصافي بالريال الإيراني"
+          },
+          {
+            "es": "Ingrese el importe neto en IRR"
+          },
+          {
+            "fr": "Entrez le montant net en IRR"
+          },
+          {
+            "de": "Geben Sie den Nettobetrag in IRR ein"
+          },
+          {
+            "it": "Inserisci l'importo netto in IRR"
+          },
+          {
+            "ru": "Введите чистую сумму в IRR"
+          }
+        ]
+      },
+      {
+        "id": "lims-external-request-quotation-description",
+        "name": "quotationDescription",
+        "label": "Quotation Description",
+        "sectionId": "financial-quotation",
+        "component": "textarea",
+        "translations": [
+          {
+            "en": "Quotation Description"
+          },
+          {
+            "fa": "توضیحات پیشنهاد قیمت"
+          },
+          {
+            "ar": "وصف عرض السعر"
+          },
+          {
+            "es": "Descripción de la cotización"
+          },
+          {
+            "fr": "Description du devis"
+          },
+          {
+            "de": "Angebotsbeschreibung"
+          },
+          {
+            "it": "Descrizione del preventivo"
+          },
+          {
+            "ru": "Описание котировки"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 4,
+        "caption": "Enter quotation description",
+        "captionTranslations": [
+          {
+            "en": "Enter quotation description"
+          },
+          {
+            "fa": "توضیحات پیشنهاد قیمت را وارد کنید"
+          },
+          {
+            "ar": "أدخل وصف عرض السعر"
+          },
+          {
+            "es": "Ingrese la descripción de la cotización"
+          },
+          {
+            "fr": "Entrez la description du devis"
+          },
+          {
+            "de": "Angebotsbeschreibung eingeben"
+          },
+          {
+            "it": "Inserisci la descrizione del preventivo"
+          },
+          {
+            "ru": "Введите описание котировки"
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "general-information",
+        "title": "General Information",
+        "titleTranslations": [
+          {
+            "en": "General Information"
+          },
+          {
+            "fa": "اطلاعات عمومی"
+          },
+          {
+            "ar": "معلومات عامة"
+          },
+          {
+            "es": "Información general"
+          },
+          {
+            "fr": "Informations générales"
+          },
+          {
+            "de": "Allgemeine Informationen"
+          },
+          {
+            "it": "Informazioni generali"
+          },
+          {
+            "ru": "Общая информация"
+          }
+        ],
+        "description": "General information about the external LIMS request and sample",
+        "descriptionTranslations": [
+          {
+            "en": "General information about the external LIMS request and sample"
+          },
+          {
+            "fa": "اطلاعات عمومی درباره درخواست خارجی LIMS و نمونه"
+          },
+          {
+            "ar": "معلومات عامة حول طلب LIMS الخارجي والعينة"
+          },
+          {
+            "es": "Información general sobre la solicitud externa LIMS y la muestra"
+          },
+          {
+            "fr": "Informations générales sur la demande externe LIMS et l'échantillon"
+          },
+          {
+            "de": "Allgemeine Informationen zur externen LIMS-Anfrage und Probe"
+          },
+          {
+            "it": "Informazioni generali sulla richiesta esterna LIMS e il campione"
+          },
+          {
+            "ru": "Общая информация о внешнем запросе LIMS и образце"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "requested-tests",
+        "title": "Requested Tests",
+        "titleTranslations": [
+          {
+            "en": "Requested Tests"
+          },
+          {
+            "fa": "آزمون‌های درخواستی"
+          },
+          {
+            "ar": "الاختبارات المطلوبة"
+          },
+          {
+            "es": "Pruebas solicitadas"
+          },
+          {
+            "fr": "Tests demandés"
+          },
+          {
+            "de": "Angeforderte Tests"
+          },
+          {
+            "it": "Test richiesti"
+          },
+          {
+            "ru": "Запрошенные тесты"
+          }
+        ],
+        "description": "Requested LIMS tests and related descriptions",
+        "descriptionTranslations": [
+          {
+            "en": "Requested LIMS tests and related descriptions"
+          },
+          {
+            "fa": "آزمون‌های درخواستی LIMS و توضیحات مرتبط"
+          },
+          {
+            "ar": "اختبارات LIMS المطلوبة والأوصاف ذات الصلة"
+          },
+          {
+            "es": "Pruebas LIMS solicitadas y descripciones relacionadas"
+          },
+          {
+            "fr": "Tests LIMS demandés et descriptions associées"
+          },
+          {
+            "de": "Angeforderte LIMS-Tests und zugehörige Beschreibungen"
+          },
+          {
+            "it": "Test LIMS richiesti e descrizioni correlate"
+          },
+          {
+            "ru": "Запрошенные тесты LIMS и связанные описания"
+          }
+        ],
+        "initialState": "collapsed",
+        "columns": 2
+      },
+      {
+        "id": "financial-quotation",
+        "title": "Financial Quotation",
+        "titleTranslations": [
+          {
+            "en": "Financial Quotation"
+          },
+          {
+            "fa": "پیشنهاد مالی"
+          },
+          {
+            "ar": "عرض مالي"
+          },
+          {
+            "es": "Cotización financiera"
+          },
+          {
+            "fr": "Devis financier"
+          },
+          {
+            "de": "Finanzangebot"
+          },
+          {
+            "it": "Offerta finanziaria"
+          },
+          {
+            "ru": "Финансовое предложение"
+          }
+        ],
+        "description": "Financial quotation amounts and description",
+        "descriptionTranslations": [
+          {
+            "en": "Financial quotation amounts and description"
+          },
+          {
+            "fa": "مبالغ و توضیحات پیشنهاد مالی"
+          },
+          {
+            "ar": "مبالغ ووصف العرض المالي"
+          },
+          {
+            "es": "Importes y descripción de la cotización financiera"
+          },
+          {
+            "fr": "Montants et description du devis financier"
+          },
+          {
+            "de": "Beträge und Beschreibung des Finanzangebots"
+          },
+          {
+            "it": "Importi e descrizione dell'offerta finanziaria"
+          },
+          {
+            "ru": "Суммы и описание финансового предложения"
+          }
+        ],
+        "initialState": "collapsed",
+        "columns": 2
+      },
+      {
+        "id": "test-results",
+        "title": "Test Results",
+        "titleTranslations": [
+          {
+            "en": "Test Results"
+          },
+          {
+            "fa": "نتایج آزمون"
+          },
+          {
+            "ar": "نتائج الاختبار"
+          },
+          {
+            "es": "Resultados de la prueba"
+          },
+          {
+            "fr": "Résultats du test"
+          },
+          {
+            "de": "Testergebnisse"
+          },
+          {
+            "it": "Risultati del test"
+          },
+          {
+            "ru": "Результаты теста"
+          }
+        ],
+        "description": "Test results linked to external LIMS fraction tests",
+        "descriptionTranslations": [
+          {
+            "en": "Test results linked to external LIMS fraction tests"
+          },
+          {
+            "fa": "نتایج آزمون مرتبط با آزمون‌های جزء خارجی LIMS"
+          },
+          {
+            "ar": "نتائج الاختبار المرتبطة باختبارات الأجزاء الخارجية لنظام LIMS"
+          },
+          {
+            "es": "Resultados de pruebas vinculados a pruebas de fracción externa LIMS"
+          },
+          {
+            "fr": "Résultats de tests liés aux tests de fraction externe LIMS"
+          },
+          {
+            "de": "Testergebnisse, die mit externen LIMS-Fraktionstests verknüpft sind"
+          },
+          {
+            "it": "Risultati dei test collegati a test di frazione esterna LIMS"
+          },
+          {
+            "ru": "Результаты тестов, связанные с внешними фракционными тестами LIMS"
+          }
+        ],
+        "initialState": "collapsed",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "connectToSchema",
+          "minItems": 0,
+          "targetSchema": "lims-external-fraction-tests",
+          "relationTypeId": "HAS_LIMS_EXTERNAL_FRACTION_TEST"
+        }
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "FlaskConical",
+    "schemaType": "business",
+    "allowDataInactive": true,
+    "relatedTenants": [
+      {
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
+      }
+    ],
+    "description_translations": [
+      {
+        "en": "Manage external LIMS test requests with financial quotation and test results"
+      },
+      {
+        "fa": "درخواست‌های خارجی LIMS را همراه با پیشنهاد مالی و نتایج آزمون مدیریت کنید"
+      },
+      {
+        "ar": "إدارة طلبات اختبارات LIMS الخارجية مع العروض المالية ونتائج الاختبار"
+      },
+      {
+        "es": "Gestione solicitudes externas LIMS con cotización financiera y resultados de pruebas"
+      },
+      {
+        "fr": "Gérez les demandes externes LIMS avec devis financier et résultats de tests"
+      },
+      {
+        "de": "Verwalten Sie externe LIMS-Testanforderungen mit Finanzangebot und Testergebnissen"
+      },
+      {
+        "it": "Gestisci richieste esterne LIMS con offerta finanziaria e risultati dei test"
+      },
+      {
+        "ru": "Управляйте внешними запросами LIMS с финансовыми предложениями и результатами тестов"
+      }
+    ],
+    "applications": [
+      {
+        "id": "01KQCLQM0000000000000000QC",
+        "name": [
+          {
+            "en": "Quality Control Management"
+          },
+          {
+            "fa": "مدیریت کنترل کیفیت"
+          },
+          {
+            "ar": "إدارة مراقبة الجودة"
+          },
+          {
+            "es": "Gestión de control de calidad"
+          },
+          {
+            "fr": "Gestion du contrôle qualité"
+          },
+          {
+            "de": "Qualitätskontrollmanagement"
+          },
+          {
+            "it": "Gestione controllo qualità"
+          },
+          {
+            "ru": "Управление контролем качества"
+          }
+        ],
+        "icon": "FlaskConical"
       }
     ]
   }

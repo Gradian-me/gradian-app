@@ -3603,8 +3603,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-03-01T11:12:53.784Z",
-      "lastSynced": "2026-03-01T11:12:53.784Z",
+      "updatedAt": "2026-03-03T08:40:30.085Z",
+      "lastSynced": "2026-03-03T08:40:30.085Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -3616,7 +3616,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 41 schemas: 41 succeeded, 0 failed (0 created, 41 updated)"
+      "lastSyncMessage": "Processed 35 schemas: 35 succeeded, 0 failed (0 created, 35 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -5628,6 +5628,37 @@
       "updatedAt": "2026-03-01T12:00:00.000Z",
       "status-items-section": [],
       "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
+        }
+      ],
+      "title": "LIMS External Request Status",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTATGP00000000000001",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
+      "status-items-section": [],
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
     }
   ],
   "status-items": [
@@ -6112,6 +6143,138 @@
       "id": "01KPR0IT0EM08REJECTED000001",
       "createdAt": "2026-03-01T12:00:00.000Z",
       "updatedAt": "2026-03-01T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Draft",
+      "icon": "FileText",
+      "color": "yellow",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTAT0000000000000001",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Waiting for Laboratory Approval",
+      "icon": "FlaskConical",
+      "color": "sky",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTAT0000000000000002",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Waiting for Financial Quotation",
+      "icon": "FileSpreadsheet",
+      "color": "violet",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTAT0000000000000003",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Waiting for Customer Approval",
+      "icon": "UserCheck",
+      "color": "blue",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTAT0000000000000004",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "In Laboratory Testing",
+      "icon": "CircleCheckBig",
+      "color": "sky",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTAT0000000000000005",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Waiting for Financial Invoice",
+      "icon": "ReceiptText",
+      "color": "violet",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTAT0000000000000006",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Waiting for Customer Payment",
+      "icon": "WalletCards",
+      "color": "orange",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTAT0000000000000007",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Waiting for Test Results",
+      "icon": "ScanSearch",
+      "color": "cyan",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTAT0000000000000008",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Completed",
+      "icon": "CircleCheckBig",
+      "color": "emerald",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTAT0000000000000009",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Cancelled",
+      "icon": "Ban",
+      "color": "slate",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTAT0000000000000010",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
+      "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
+    },
+    {
+      "label": "Rejected",
+      "icon": "XCircle",
+      "color": "red",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01KCXHNSPY34Y3T6HKRMS8CC8A",
+      "id": "01KLIMSSTAT0000000000000011",
+      "createdAt": "2026-03-03T12:00:00.000Z",
+      "updatedAt": "2026-03-03T12:00:00.000Z",
       "updatedBy": "01KCXHNSPY34Y3T6HKRMS8CC8A"
     }
   ],

@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { PUBLIC_PAGES } from '@/gradian-ui/shared/configs/auth-config';
 import { REQUIRE_LOGIN } from '@/gradian-ui/shared/configs/env-config';
 import { AuthEventType, dispatchAuthEvent } from '@/gradian-ui/shared/utils/auth-events';
+import { useUserStore } from '@/stores/user.store';
 
 /**
  * AuthGuard Component
@@ -113,6 +114,18 @@ export function AuthGuard({ children }: AuthGuardProps) {
   const [isChecking, setIsChecking] = useState(requiresAuth);
   const [isAuthenticated, setIsAuthenticated] = useState(!requiresAuth);
 
+  // Track whether the user store has finished rehydrating from (encrypted) localStorage.
+  // Until hydration completes, user may legitimately be null even for a valid session.
+  const hasUser = useUserStore((state) => state.user !== null);
+  const userStorePersist = (useUserStore as typeof useUserStore & {
+    persist?: {
+      hasHydrated?: () => boolean;
+    };
+  }).persist;
+  const hasUserStoreHydrated = typeof window === 'undefined'
+    ? true
+    : userStorePersist?.hasHydrated?.() ?? false;
+
   useEffect(() => {
     if (!requiresAuth) {
       setIsChecking(false);
@@ -167,6 +180,19 @@ export function AuthGuard({ children }: AuthGuardProps) {
       clearTimeout(safetyTimeout);
     };
   }, [effectivePathname, requiresAuth]);
+
+  // After auth check succeeds on a protected route, ensure that the user store is also populated.
+  // If encrypted user-store is missing/corrupted (or manually cleared) while tokens are still present,
+  // treat this as an inconsistent/unsafe state and trigger a centralized logout so the user is
+  // redirected back to the login page instead of silently rendering without a profile.
+  useEffect(() => {
+    if (!requiresAuth) return;
+    if (!isAuthenticated) return;
+    if (!hasUserStoreHydrated) return;
+    if (hasUser) return;
+
+    triggerForceLogout('Authenticated route requires user but user store is empty or corrupted');
+  }, [requiresAuth, isAuthenticated, hasUser, hasUserStoreHydrated]);
 
   // ALWAYS show loading spinner during auth check - this prevents any content flash
   if (isChecking) {
