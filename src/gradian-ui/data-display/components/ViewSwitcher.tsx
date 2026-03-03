@@ -43,9 +43,14 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
     <div className={cn('flex items-center space-x-1', className)}>
       {shouldShowView('hierarchy') && (
         <Button
+          type="button"
           variant={currentView === 'hierarchy' ? 'default' : 'ghost'}
           size="sm"
-          onClick={() => onViewChange('hierarchy')}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onViewChange('hierarchy');
+          }}
           className={cn(
             'h-10 w-10 shrink-0 p-0 rounded-xl',
             currentView === 'hierarchy'
@@ -58,9 +63,14 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
       )}
       {shouldShowView('table') && (
         <Button
+          type="button"
           variant={currentView === 'table' ? 'default' : 'ghost'}
           size="sm"
-          onClick={() => onViewChange('table')}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onViewChange('table');
+          }}
           className={cn(
             'h-10 w-10 shrink-0 p-0 rounded-xl',
             currentView === 'table' 
@@ -73,9 +83,14 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
       )}
       {shouldShowView('list') && (
         <Button
+          type="button"
           variant={currentView === 'list' ? 'default' : 'ghost'}
           size="sm"
-          onClick={() => onViewChange('list')}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onViewChange('list');
+          }}
           className={cn(
             'h-10 w-10 shrink-0 p-0 rounded-xl',
             currentView === 'list' 
@@ -88,9 +103,14 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
       )}
       {shouldShowView('grid') && (
         <Button
+          type="button"
           variant={currentView === 'grid' ? 'default' : 'ghost'}
           size="sm"
-          onClick={() => onViewChange('grid')}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onViewChange('grid');
+          }}
           className={cn(
             'h-10 w-10 shrink-0 p-0 rounded-xl',
             currentView === 'grid' 
@@ -103,9 +123,14 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
       )}
       {shouldShowView('kanban') && (
         <Button
+          type="button"
           variant={currentView === 'kanban' ? 'default' : 'ghost'}
           size="sm"
-          onClick={() => onViewChange('kanban')}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onViewChange('kanban');
+          }}
           className={cn(
             'h-10 w-10 shrink-0 p-0 rounded-xl',
             currentView === 'kanban'

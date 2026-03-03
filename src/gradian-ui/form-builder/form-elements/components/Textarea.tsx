@@ -115,6 +115,12 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       onChange?.(arr);
     };
 
+    const readOnlyTranslationClasses = allowTranslation
+      ? error
+        ? 'read-only:bg-white read-only:border-red-500 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-red-500 read-only:dark:text-gray-300 read-only:cursor-default'
+        : 'read-only:bg-white read-only:border-gray-300 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-gray-600 read-only:dark:text-gray-300 read-only:cursor-default'
+      : '';
+
     const textareaClasses = cn(
       textareaBaseClasses,
       error
@@ -124,7 +130,7 @@ export const Textarea = forwardRef<FormElementRef, TextareaProps>(
       resize === 'horizontal' && 'resize-x',
       resize === 'vertical' && 'resize-y',
       resize === 'both' && 'resize',
-      allowTranslation && 'read-only:bg-white read-only:border-gray-300 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-gray-600 read-only:dark:text-gray-300 read-only:cursor-default',
+      readOnlyTranslationClasses,
       (contentToCopy.trim() || (allowTranslation && !disabled) || (aiAgentId && !allowTranslation) || (enableVoiceInput && !allowTranslation)) && 'pb-10',
       className
     );

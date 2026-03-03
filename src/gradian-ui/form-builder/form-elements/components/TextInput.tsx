@@ -103,6 +103,12 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
           ? 'pe-10' /* space for one button */
           : '';
 
+    const readOnlyTranslationClasses = allowTranslation
+      ? error
+        ? 'read-only:bg-white read-only:border-red-500 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-red-500 read-only:dark:text-gray-300 read-only:cursor-default'
+        : 'read-only:bg-white read-only:border-gray-300 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-gray-600 read-only:dark:text-gray-300 read-only:cursor-default'
+      : '';
+
     const inputClasses = cn(
       baseInputClasses,
       'direction-auto text-xs',
@@ -110,7 +116,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',
       paddingEndClass,
-      allowTranslation && 'read-only:bg-white read-only:border-gray-300 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-gray-600 read-only:dark:text-gray-300 read-only:cursor-default',
+      readOnlyTranslationClasses,
       className
     );
 

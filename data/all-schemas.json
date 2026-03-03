@@ -39359,7 +39359,8 @@
         "name": "netAmount",
         "label": "Net Amount (IRR)",
         "sectionId": "financial-quotation",
-        "component": "number",
+        "component": "formula",
+        "formula": "{{formData.grossAmount}} - {{formData.discount}}",
         "translations": [
           {
             "en": "Net Amount (IRR)"
