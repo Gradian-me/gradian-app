@@ -214,9 +214,16 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   // Remove canCopy, enableVoiceInput, loadingTextSwitches, and hasAnnotation from restProps (hasAnnotation must not reach DOM)
   const { canCopy: _, enableVoiceInput: __, loadingTextSwitches: ___, hasAnnotation: ___hasAnnotation, ...restPropsWithoutExtras } = restProps;
 
+  // Generic per-field extra props bag from config; this lets us avoid
+  // touching the factory every time we add a new component-level prop.
+  const extraProps = (config as any)?.extraProps ?? {};
+
   // Common props to pass to all form elements
   const commonProps = {
     ...restPropsWithoutExtras,
+    // extraProps are merged last so they can intentionally override
+    // defaults from restProps when needed (e.g. custom handlers/flags).
+    ...extraProps,
   };
 
   const renderElement = () => {

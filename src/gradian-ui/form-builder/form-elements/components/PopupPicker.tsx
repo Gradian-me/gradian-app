@@ -1750,7 +1750,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       if (effectiveSchema) {
         candidateFields.push(
           getValueByRole(effectiveSchema, data, 'title'),
-          getSchemaSubtitleDisplay(effectiveSchema, data)
+          getConcatenatedValueByRole(effectiveSchema, data, 'subtitle', ' | ')
         );
       } else if (effectiveSourceColumnRoles) {
         candidateFields.push(

@@ -22159,6 +22159,14 @@
       "icon": "BarChart3",
       "color": "cyan",
       "sourceUrl": "field-options:lims-test-parameters:lims-test-parameter-type"
+    },
+    {
+      "id": "01KJT4S4QUALITATIVE00000001",
+      "businessId": "qualitative",
+      "label": "Qualitative",
+      "icon": "ToggleLeft",
+      "color": "violet",
+      "sourceUrl": "field-options:lims-test-parameters:lims-test-parameter-type"
     }
   ],
   "deviation-management": [
@@ -22782,6 +22790,621 @@
       "id": "01KJT5B41MWDDY7PEW7S13WSN0",
       "createdAt": "2026-03-03T15:33:52.309Z",
       "updatedAt": "2026-03-03T15:33:52.465Z"
+    },
+    {
+      "title": "Size Exclusion Chromatography (SEC-HPLC)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000001"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5M0MONOMERCONTENT00001"
+        },
+        {
+          "id": "01KJT5M1HIGHMWSPCIES000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5T0SECHPLC00000000001",
+      "createdAt": "2026-03-03T15:50:00.000Z",
+      "updatedAt": "2026-03-03T15:50:00.000Z"
+    },
+    {
+      "title": "Ion Exchange Chromatography (IEX)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000001"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5M2MAINPEAKAREA000001"
+        },
+        {
+          "id": "01KJT5M3ACIDICVARIANTS0001"
+        },
+        {
+          "id": "01KJT5M4BASICVARIANTS00001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5T1IEXHPLC0000000001",
+      "createdAt": "2026-03-03T15:50:05.000Z",
+      "updatedAt": "2026-03-03T15:50:05.000Z"
+    },
+    {
+      "title": "UV-Vis Spectroscopy",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000001"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5M5PROTCONC0000000001"
+        },
+        {
+          "id": "01KJT5M6A260A280RATIO00001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5T2UVVIS0000000000001",
+      "createdAt": "2026-03-03T15:50:10.000Z",
+      "updatedAt": "2026-03-03T15:50:10.000Z"
+    },
+    {
+      "title": "pH Measurement",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000002"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5M7PHVALUE00000000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5T3PHMEASURE000000001",
+      "createdAt": "2026-03-03T15:50:15.000Z",
+      "updatedAt": "2026-03-03T15:50:15.000Z"
+    },
+    {
+      "title": "Osmolality",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000002"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5M8OSMOLALITY0000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5T4OSMOLALITY00000001",
+      "createdAt": "2026-03-03T15:50:20.000Z",
+      "updatedAt": "2026-03-03T15:50:20.000Z"
+    },
+    {
+      "title": "Subvisible Particles (USP <788>)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000002"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5M9GE10UMPARTICLES001"
+        },
+        {
+          "id": "01KJT5N0GE25UMPARTICLES001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5T5SUBVISPART0000001",
+      "createdAt": "2026-03-03T15:50:25.000Z",
+      "updatedAt": "2026-03-03T15:50:25.000Z"
+    },
+    {
+      "title": "Dynamic Light Scattering (DLS)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000002"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5N1ZAVERAGEDIAMETER001"
+        },
+        {
+          "id": "01KJT5N2POLDISPINDEX000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5T6DLSTEST0000000001",
+      "createdAt": "2026-03-03T15:50:30.000Z",
+      "updatedAt": "2026-03-03T15:50:30.000Z"
+    },
+    {
+      "title": "Differential Scanning Calorimetry (DSC)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000002"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5N3MELTTEMP0000000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5T7DSCTEST0000000001",
+      "createdAt": "2026-03-03T15:50:35.000Z",
+      "updatedAt": "2026-03-03T15:50:35.000Z"
+    },
+    {
+      "title": "Conductivity",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000002"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5N4CONDUCTIVITY000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5T8CONDUCTIVITYTEST01",
+      "createdAt": "2026-03-03T15:50:40.000Z",
+      "updatedAt": "2026-03-03T15:50:40.000Z"
+    },
+    {
+      "title": "Sterility Test (USP <71>)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000003"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5N5STERILITYRESULT0001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5T9STERILITYTEST0001",
+      "createdAt": "2026-03-03T15:50:45.000Z",
+      "updatedAt": "2026-03-03T15:50:45.000Z"
+    },
+    {
+      "title": "Bacterial Endotoxin Test (LAL)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000003"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5N6ENDOTOXINLEVEL0001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5U0ENDOTOXINTEST00001",
+      "createdAt": "2026-03-03T15:50:50.000Z",
+      "updatedAt": "2026-03-03T15:50:50.000Z"
+    },
+    {
+      "title": "Total Yeast & Mold Count",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000003"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5N7YEASTCOUNT0000001"
+        },
+        {
+          "id": "01KJT5N8MOLDCOUNT00000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5U1YEASTMOLDCOUNT001",
+      "createdAt": "2026-03-03T15:50:55.000Z",
+      "updatedAt": "2026-03-03T15:50:55.000Z"
+    },
+    {
+      "title": "Mycoplasma Test",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000003"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5N9MYCOPLASMAPRES0001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5U2MYCOPLASMATEST0001",
+      "createdAt": "2026-03-03T15:51:00.000Z",
+      "updatedAt": "2026-03-03T15:51:00.000Z"
+    },
+    {
+      "title": "ELISA Potency Assay",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000004"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5P0RELATIVEPOTENCY0001"
+        },
+        {
+          "id": "01KJT5P1EC5000000000000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5U3ELISAPOTENCY000001",
+      "createdAt": "2026-03-03T15:51:05.000Z",
+      "updatedAt": "2026-03-03T15:51:05.000Z"
+    },
+    {
+      "title": "Enzyme Activity Assay",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000004"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5P2SPECIFACTIVITY0001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5U4ENZYMEACTIVITY0001",
+      "createdAt": "2026-03-03T15:51:10.000Z",
+      "updatedAt": "2026-03-03T15:51:10.000Z"
+    },
+    {
+      "title": "Glycan Analysis (HILIC-UPLC)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000004"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5P3G0FCONTENT00000001"
+        },
+        {
+          "id": "01KJT5P4G1FCONTENT00000001"
+        },
+        {
+          "id": "01KJT5P5G2FCONTENT00000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5U5GLYCANANALYSIS0001",
+      "createdAt": "2026-03-03T15:51:15.000Z",
+      "updatedAt": "2026-03-03T15:51:15.000Z"
+    },
+    {
+      "title": "Capillary Electrophoresis (CE-SDS)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000004"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5P6NONREDPURITY000001"
+        },
+        {
+          "id": "01KJT5P7REDHEAVYCHAIN0001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5U6CESDSTEST00000001",
+      "createdAt": "2026-03-03T15:51:20.000Z",
+      "updatedAt": "2026-03-03T15:51:20.000Z"
+    },
+    {
+      "title": "Cell-Based Potency Assay",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000005"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5P8RELATIVEACTIVITY001"
+        },
+        {
+          "id": "01KJT5P1EC5000000000000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5U7CELLBASEDPOTENCY01",
+      "createdAt": "2026-03-03T15:51:25.000Z",
+      "updatedAt": "2026-03-03T15:51:25.000Z"
+    },
+    {
+      "title": "Cell Viability (Trypan Blue)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000005"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5P9VIABLECELLS0000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5U8CELLVIABILITY0001",
+      "createdAt": "2026-03-03T15:51:30.000Z",
+      "updatedAt": "2026-03-03T15:51:30.000Z"
+    },
+    {
+      "title": "Adventitious Virus Test",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000005"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5Q0VIRUSDETECTION0001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5U9ADVVIRUSTEST00001",
+      "createdAt": "2026-03-03T15:51:35.000Z",
+      "updatedAt": "2026-03-03T15:51:35.000Z"
+    },
+    {
+      "title": "In Vivo Bioassay",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000005"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5Q1BIOLRESPONSE000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5V0INVIVOBIOASSAY001",
+      "createdAt": "2026-03-03T15:51:40.000Z",
+      "updatedAt": "2026-03-03T15:51:40.000Z"
+    },
+    {
+      "title": "Apoptosis Assay",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000005"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5Q2APOPTCELLS0000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5V1APOPASSAY00000001",
+      "createdAt": "2026-03-03T15:51:45.000Z",
+      "updatedAt": "2026-03-03T15:51:45.000Z"
+    },
+    {
+      "title": "Container Closure Integrity (CCI)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000006"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5Q3LEAKRATE000000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5V2CCITEST0000000001",
+      "createdAt": "2026-03-03T15:51:50.000Z",
+      "updatedAt": "2026-03-03T15:51:50.000Z"
+    },
+    {
+      "title": "Visual Inspection",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000006"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5Q4PARTICPRESENCE0001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5V3VISUALINSPECTION01",
+      "createdAt": "2026-03-03T15:51:55.000Z",
+      "updatedAt": "2026-03-03T15:51:55.000Z"
+    },
+    {
+      "title": "Extractables & Leachables",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000006"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5Q5IDCOMPOUNLEVEL0001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5V4EXTRLEACH000000001",
+      "createdAt": "2026-03-03T15:52:00.000Z",
+      "updatedAt": "2026-03-03T15:52:00.000Z"
+    },
+    {
+      "title": "Seal Strength Test",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000006"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5Q6SEALSTRENGTH000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5V5SEALSTRENGTHTEST01",
+      "createdAt": "2026-03-03T15:52:05.000Z",
+      "updatedAt": "2026-03-03T15:52:05.000Z"
+    },
+    {
+      "title": "Dye Ingress Test",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000006"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5Q7INTEGRITYRES00001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5V6DYEINGRESSTEST001",
+      "createdAt": "2026-03-03T15:52:10.000Z",
+      "updatedAt": "2026-03-03T15:52:10.000Z"
+    },
+    {
+      "title": "HPLC Identity",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000007"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5Q8RETTIMEMATCH00001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5V7HPLCIDENTITY000001",
+      "createdAt": "2026-03-03T15:52:15.000Z",
+      "updatedAt": "2026-03-03T15:52:15.000Z"
+    },
+    {
+      "title": "HPLC Assay (Raw Material)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000007"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5Q9PURITY000000000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5V8HPLCRAWMATASSAY01",
+      "createdAt": "2026-03-03T15:52:20.000Z",
+      "updatedAt": "2026-03-03T15:52:20.000Z"
+    },
+    {
+      "title": "Residual Solvent (GC)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000007"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5R0METHANOLCONTENT001"
+        },
+        {
+          "id": "01KJT5R1ETHANOLCONTENT001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5V9RESIDSOLVENTGC0001",
+      "createdAt": "2026-03-03T15:52:25.000Z",
+      "updatedAt": "2026-03-03T15:52:25.000Z"
+    },
+    {
+      "title": "Heavy Metals (ICP-MS)",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000007"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5R2LEAD00000000000001"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5W0HEAVYMETALS0000001",
+      "createdAt": "2026-03-03T15:52:30.000Z",
+      "updatedAt": "2026-03-03T15:52:30.000Z"
+    },
+    {
+      "title": "Bioburden",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000007"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT5R3TOTALCOUNTRAWMAT01"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5W1BIOBURDEN000000001",
+      "createdAt": "2026-03-03T15:52:35.000Z",
+      "updatedAt": "2026-03-03T15:52:35.000Z"
     }
   ],
   "lims-external-requests": [],
@@ -22846,6 +23469,710 @@
       "id": "01KJT51X87NCYB27F67QYR6QP0",
       "createdAt": "2026-03-03T15:28:50.440Z",
       "updatedAt": "2026-03-03T15:28:51.148Z"
+    },
+    {
+      "title": "Monomer Content",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5M0MONOMERCONTENT00001",
+      "createdAt": "2026-03-03T15:40:00.000Z",
+      "updatedAt": "2026-03-03T15:40:00.000Z"
+    },
+    {
+      "title": "High Molecular Weight Species",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5M1HIGHMWSPCIES000001",
+      "createdAt": "2026-03-03T15:40:05.000Z",
+      "updatedAt": "2026-03-03T15:40:05.000Z"
+    },
+    {
+      "title": "Main Peak Area",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5M2MAINPEAKAREA000001",
+      "createdAt": "2026-03-03T15:40:10.000Z",
+      "updatedAt": "2026-03-03T15:40:10.000Z"
+    },
+    {
+      "title": "Acidic Variants",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5M3ACIDICVARIANTS0001",
+      "createdAt": "2026-03-03T15:40:15.000Z",
+      "updatedAt": "2026-03-03T15:40:15.000Z"
+    },
+    {
+      "title": "Basic Variants",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5M4BASICVARIANTS00001",
+      "createdAt": "2026-03-03T15:40:20.000Z",
+      "updatedAt": "2026-03-03T15:40:20.000Z"
+    },
+    {
+      "title": "Protein Concentration",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "mg/mL",
+      "decimalPoints": 3,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5M5PROTCONC0000000001",
+      "createdAt": "2026-03-03T15:40:25.000Z",
+      "updatedAt": "2026-03-03T15:40:25.000Z"
+    },
+    {
+      "title": "A260/A280 Ratio",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "Ratio",
+      "decimalPoints": 3,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5M6A260A280RATIO00001",
+      "createdAt": "2026-03-03T15:40:30.000Z",
+      "updatedAt": "2026-03-03T15:40:30.000Z"
+    },
+    {
+      "title": "pH Value",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "pH",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5M7PHVALUE00000000001",
+      "createdAt": "2026-03-03T15:40:35.000Z",
+      "updatedAt": "2026-03-03T15:40:35.000Z"
+    },
+    {
+      "title": "Osmolality",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "mOsm/kg",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5M8OSMOLALITY0000001",
+      "createdAt": "2026-03-03T15:40:40.000Z",
+      "updatedAt": "2026-03-03T15:40:40.000Z"
+    },
+    {
+      "title": "\u226510 \u00b5m Particles",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "particles/mL",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5M9GE10UMPARTICLES001",
+      "createdAt": "2026-03-03T15:40:45.000Z",
+      "updatedAt": "2026-03-03T15:40:45.000Z"
+    },
+    {
+      "title": "\u226525 \u00b5m Particles",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "particles/mL",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5N0GE25UMPARTICLES001",
+      "createdAt": "2026-03-03T15:40:50.000Z",
+      "updatedAt": "2026-03-03T15:40:50.000Z"
+    },
+    {
+      "title": "Z-Average Diameter",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "nm",
+      "decimalPoints": 1,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5N1ZAVERAGEDIAMETER001",
+      "createdAt": "2026-03-03T15:40:55.000Z",
+      "updatedAt": "2026-03-03T15:40:55.000Z"
+    },
+    {
+      "title": "Polydispersity Index",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "PDI",
+      "decimalPoints": 3,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5N2POLDISPINDEX000001",
+      "createdAt": "2026-03-03T15:41:00.000Z",
+      "updatedAt": "2026-03-03T15:41:00.000Z"
+    },
+    {
+      "title": "Melting Temperature (Tm)",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "\u00b0C",
+      "decimalPoints": 1,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5N3MELTTEMP0000000001",
+      "createdAt": "2026-03-03T15:41:05.000Z",
+      "updatedAt": "2026-03-03T15:41:05.000Z"
+    },
+    {
+      "title": "Conductivity",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "mS/cm",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5N4CONDUCTIVITY000001",
+      "createdAt": "2026-03-03T15:41:10.000Z",
+      "updatedAt": "2026-03-03T15:41:10.000Z"
+    },
+    {
+      "title": "Sterility Result",
+      "parameterType": [
+        {
+          "id": "qualitative"
+        }
+      ],
+      "measurementUnit": "Pass/Fail",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5N5STERILITYRESULT0001",
+      "createdAt": "2026-03-03T15:41:15.000Z",
+      "updatedAt": "2026-03-03T15:41:15.000Z"
+    },
+    {
+      "title": "Endotoxin Level",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "EU/mL",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5N6ENDOTOXINLEVEL0001",
+      "createdAt": "2026-03-03T15:41:20.000Z",
+      "updatedAt": "2026-03-03T15:41:20.000Z"
+    },
+    {
+      "title": "Yeast Count",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "CFU/mL",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5N7YEASTCOUNT0000001",
+      "createdAt": "2026-03-03T15:41:25.000Z",
+      "updatedAt": "2026-03-03T15:41:25.000Z"
+    },
+    {
+      "title": "Mold Count",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "CFU/mL",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5N8MOLDCOUNT00000001",
+      "createdAt": "2026-03-03T15:41:30.000Z",
+      "updatedAt": "2026-03-03T15:41:30.000Z"
+    },
+    {
+      "title": "Mycoplasma Presence",
+      "parameterType": [
+        {
+          "id": "qualitative"
+        }
+      ],
+      "measurementUnit": "N/A",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5N9MYCOPLASMAPRES0001",
+      "createdAt": "2026-03-03T15:41:35.000Z",
+      "updatedAt": "2026-03-03T15:41:35.000Z"
+    },
+    {
+      "title": "Relative Potency",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5P0RELATIVEPOTENCY0001",
+      "createdAt": "2026-03-03T15:41:40.000Z",
+      "updatedAt": "2026-03-03T15:41:40.000Z"
+    },
+    {
+      "title": "EC50",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "ng/mL",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5P1EC5000000000000001",
+      "createdAt": "2026-03-03T15:41:45.000Z",
+      "updatedAt": "2026-03-03T15:41:45.000Z"
+    },
+    {
+      "title": "Specific Activity",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "U/mg",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5P2SPECIFACTIVITY0001",
+      "createdAt": "2026-03-03T15:41:50.000Z",
+      "updatedAt": "2026-03-03T15:41:50.000Z"
+    },
+    {
+      "title": "G0F Content",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5P3G0FCONTENT00000001",
+      "createdAt": "2026-03-03T15:41:55.000Z",
+      "updatedAt": "2026-03-03T15:41:55.000Z"
+    },
+    {
+      "title": "G1F Content",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5P4G1FCONTENT00000001",
+      "createdAt": "2026-03-03T15:42:00.000Z",
+      "updatedAt": "2026-03-03T15:42:00.000Z"
+    },
+    {
+      "title": "G2F Content",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5P5G2FCONTENT00000001",
+      "createdAt": "2026-03-03T15:42:05.000Z",
+      "updatedAt": "2026-03-03T15:42:05.000Z"
+    },
+    {
+      "title": "Non-reduced Purity",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5P6NONREDPURITY000001",
+      "createdAt": "2026-03-03T15:42:10.000Z",
+      "updatedAt": "2026-03-03T15:42:10.000Z"
+    },
+    {
+      "title": "Reduced Heavy Chain",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5P7REDHEAVYCHAIN0001",
+      "createdAt": "2026-03-03T15:42:15.000Z",
+      "updatedAt": "2026-03-03T15:42:15.000Z"
+    },
+    {
+      "title": "Relative Activity",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5P8RELATIVEACTIVITY001",
+      "createdAt": "2026-03-03T15:42:20.000Z",
+      "updatedAt": "2026-03-03T15:42:20.000Z"
+    },
+    {
+      "title": "Viable Cells",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 1,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5P9VIABLECELLS0000001",
+      "createdAt": "2026-03-03T15:42:25.000Z",
+      "updatedAt": "2026-03-03T15:42:25.000Z"
+    },
+    {
+      "title": "Virus Detection",
+      "parameterType": [
+        {
+          "id": "qualitative"
+        }
+      ],
+      "measurementUnit": "Detected/Not Detected",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5Q0VIRUSDETECTION0001",
+      "createdAt": "2026-03-03T15:42:30.000Z",
+      "updatedAt": "2026-03-03T15:42:30.000Z"
+    },
+    {
+      "title": "Biological Response",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "IU/mg",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5Q1BIOLRESPONSE000001",
+      "createdAt": "2026-03-03T15:42:35.000Z",
+      "updatedAt": "2026-03-03T15:42:35.000Z"
+    },
+    {
+      "title": "Apoptotic Cells",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 1,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5Q2APOPTCELLS0000001",
+      "createdAt": "2026-03-03T15:42:40.000Z",
+      "updatedAt": "2026-03-03T15:42:40.000Z"
+    },
+    {
+      "title": "Leak Rate",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "mbar·L/s",
+      "decimalPoints": 3,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5Q3LEAKRATE000000001",
+      "createdAt": "2026-03-03T15:42:45.000Z",
+      "updatedAt": "2026-03-03T15:42:45.000Z"
+    },
+    {
+      "title": "Particulate Presence",
+      "parameterType": [
+        {
+          "id": "qualitative"
+        }
+      ],
+      "measurementUnit": "Pass/Fail",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5Q4PARTICPRESENCE0001",
+      "createdAt": "2026-03-03T15:42:50.000Z",
+      "updatedAt": "2026-03-03T15:42:50.000Z"
+    },
+    {
+      "title": "Identified Compound Level",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "\u00b5g/container",
+      "decimalPoints": 3,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5Q5IDCOMPOUNLEVEL0001",
+      "createdAt": "2026-03-03T15:42:55.000Z",
+      "updatedAt": "2026-03-03T15:42:55.000Z"
+    },
+    {
+      "title": "Seal Strength",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "N",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5Q6SEALSTRENGTH000001",
+      "createdAt": "2026-03-03T15:43:00.000Z",
+      "updatedAt": "2026-03-03T15:43:00.000Z"
+    },
+    {
+      "title": "Integrity Result",
+      "parameterType": [
+        {
+          "id": "qualitative"
+        }
+      ],
+      "measurementUnit": "Pass/Fail",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5Q7INTEGRITYRES00001",
+      "createdAt": "2026-03-03T15:43:05.000Z",
+      "updatedAt": "2026-03-03T15:43:05.000Z"
+    },
+    {
+      "title": "Retention Time Match",
+      "parameterType": [
+        {
+          "id": "qualitative"
+        }
+      ],
+      "measurementUnit": "Conforms/Not Conforms",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5Q8RETTIMEMATCH00001",
+      "createdAt": "2026-03-03T15:43:10.000Z",
+      "updatedAt": "2026-03-03T15:43:10.000Z"
+    },
+    {
+      "title": "Purity",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5Q9PURITY000000000001",
+      "createdAt": "2026-03-03T15:43:15.000Z",
+      "updatedAt": "2026-03-03T15:43:15.000Z"
+    },
+    {
+      "title": "Methanol Content",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "ppm",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5R0METHANOLCONTENT001",
+      "createdAt": "2026-03-03T15:43:20.000Z",
+      "updatedAt": "2026-03-03T15:43:20.000Z"
+    },
+    {
+      "title": "Ethanol Content",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "ppm",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5R1ETHANOLCONTENT001",
+      "createdAt": "2026-03-03T15:43:25.000Z",
+      "updatedAt": "2026-03-03T15:43:25.000Z"
+    },
+    {
+      "title": "Lead",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "ppm",
+      "decimalPoints": 3,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5R2LEAD00000000000001",
+      "createdAt": "2026-03-03T15:43:30.000Z",
+      "updatedAt": "2026-03-03T15:43:30.000Z"
+    },
+    {
+      "title": "Total Count (Raw Material)",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "CFU/g",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5R3TOTALCOUNTRAWMAT01",
+      "createdAt": "2026-03-03T15:43:35.000Z",
+      "updatedAt": "2026-03-03T15:43:35.000Z"
     }
   ],
   "lims-external-fraction-tests": []

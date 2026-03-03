@@ -173,6 +173,12 @@ export interface FileInputProps extends FormElementProps {
 export interface FormElementConfig extends FormFieldConfig {
   component: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea' | 'json' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'file' | 'picker' | 'toggle' | 'toggle-group' | 'language-selector';
   required?: boolean;
+  /**
+   * Generic bag of component-specific props that should be forwarded
+   * to the rendered form element without changing the factory each time.
+   * Use this only for non-sensitive, non-structural UI behavior.
+   */
+  extraProps?: Record<string, unknown>;
   metadata?: {
     allowMultiselect?: boolean;
     [key: string]: any;

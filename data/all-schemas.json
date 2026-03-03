@@ -38833,7 +38833,7 @@
         "sectionId": "general-information",
         "component": "text",
         "role": "title",
-        "allowTranslation": true,
+        "allowTranslation": false,
         "translations": [
           {
             "en": "Sample Name"
@@ -39098,6 +39098,7 @@
         "description": "Select requested LIMS tests",
         "targetSchema": "lims-tests",
         "allowMultiselect": true,
+        "sortType": "ASC",
         "translations": [
           {
             "en": "Requested Tests"

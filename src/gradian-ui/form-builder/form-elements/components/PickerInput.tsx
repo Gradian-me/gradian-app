@@ -170,7 +170,8 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     return undefined;
   }, [(config as any).columnMap, referenceBasedSourceUrl, targetSchemaId]);
   const pageSize = (config as any).pageSize;
-  const sortType = (config as any).sortType;
+  // Allow sortType to be defined either directly on config or inside config.extraProps
+  const sortType = (config as any).sortType ?? (config as any)?.extraProps?.sortType;
   const sourceColumnRoles = (config as any).sourceColumnRoles;
   
   // Use static options if available and no schemaId/sourceUrl is provided
