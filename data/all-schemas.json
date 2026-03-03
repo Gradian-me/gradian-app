@@ -37982,7 +37982,8 @@
         "icon": "FlaskConical"
       }
     ],
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "lims-tests",
@@ -38378,7 +38379,8 @@
         "icon": "FlaskConical"
       }
     ],
-    "isNotCompanyBased": true
+    "isNotCompanyBased": true,
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "lims-external-fraction-tests",
@@ -39798,6 +39800,12 @@
           }
         ],
         "icon": "FlaskConical"
+      }
+    ],
+    "statusGroup": [
+      {
+        "id": "01KLIMSSTATGP00000000000001",
+        "label": "LIMS External Request Status"
       }
     ]
   }

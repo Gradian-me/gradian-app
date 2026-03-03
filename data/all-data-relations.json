@@ -4130,7 +4130,7 @@
     "id": "01KLIMSCATREL00000000000001",
     "createdAt": "2026-03-02T00:00:00.000Z",
     "updatedAt": "2026-03-02T10:36:41.666Z",
-    "inactive": true
+    "inactive": false
   },
   {
     "sourceSchema": "parameter-groups",
@@ -4141,7 +4141,7 @@
     "id": "01KLIMSCATREL00000000000002",
     "createdAt": "2026-03-02T00:00:00.000Z",
     "updatedAt": "2026-03-02T10:36:41.673Z",
-    "inactive": true
+    "inactive": false
   },
   {
     "sourceSchema": "parameter-groups",
@@ -4152,7 +4152,7 @@
     "id": "01KLIMSCATREL00000000000003",
     "createdAt": "2026-03-02T00:00:00.000Z",
     "updatedAt": "2026-03-02T10:36:41.679Z",
-    "inactive": true
+    "inactive": false
   },
   {
     "sourceSchema": "parameter-groups",
@@ -4163,7 +4163,7 @@
     "id": "01KLIMSCATREL00000000000004",
     "createdAt": "2026-03-02T00:00:00.000Z",
     "updatedAt": "2026-03-02T10:36:41.685Z",
-    "inactive": true
+    "inactive": false
   },
   {
     "sourceSchema": "parameter-groups",
@@ -4174,7 +4174,7 @@
     "id": "01KLIMSCATREL00000000000005",
     "createdAt": "2026-03-02T00:00:00.000Z",
     "updatedAt": "2026-03-02T10:36:41.693Z",
-    "inactive": true
+    "inactive": false
   },
   {
     "sourceSchema": "parameter-groups",
@@ -4185,7 +4185,7 @@
     "id": "01KLIMSCATREL00000000000006",
     "createdAt": "2026-03-02T00:00:00.000Z",
     "updatedAt": "2026-03-02T10:36:41.701Z",
-    "inactive": true
+    "inactive": false
   },
   {
     "sourceSchema": "parameter-groups",
@@ -4196,7 +4196,7 @@
     "id": "01KLIMSCATREL00000000000007",
     "createdAt": "2026-03-02T00:00:00.000Z",
     "updatedAt": "2026-03-02T10:36:41.711Z",
-    "inactive": true
+    "inactive": false
   },
   {
     "sourceSchema": "applications",

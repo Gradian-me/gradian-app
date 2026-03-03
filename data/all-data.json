@@ -3609,8 +3609,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-03-03T08:40:30.085Z",
-      "lastSynced": "2026-03-03T08:40:30.085Z",
+      "updatedAt": "2026-03-03T19:15:59.555Z",
+      "lastSynced": "2026-03-03T19:15:59.555Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -3622,7 +3622,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 35 schemas: 35 succeeded, 0 failed (0 created, 35 updated)"
+      "lastSyncMessage": "Processed 39 schemas: 39 succeeded, 0 failed (0 created, 39 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -3650,7 +3650,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-03-01T10:57:07.430Z",
+      "updatedAt": "2026-03-03T18:37:56.169Z",
       "isTenantBased": true,
       "category": [
         {
@@ -3660,8 +3660,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-03-01T10:57:07.430Z",
-      "lastSyncMessage": "Generated relations for 40 out of 40 schemas",
+      "lastSynced": "2026-03-03T18:37:56.169Z",
+      "lastSyncMessage": "Generated relations for 39 out of 39 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -3711,7 +3711,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2026-03-01T11:09:51.095Z",
+      "updatedAt": "2026-03-03T19:15:31.834Z",
       "category": [
         {
           "id": "production-integration",
@@ -3720,8 +3720,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-03-01T11:09:51.095Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 314, edges created: 160, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2026-03-03T19:15:31.834Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 351, edges created: 233, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -23615,7 +23615,7 @@
       "updatedAt": "2026-03-03T15:40:40.000Z"
     },
     {
-      "title": "\u226510 \u00b5m Particles",
+      "title": "≥10 µm Particles",
       "parameterType": [
         {
           "id": "quantitative"
@@ -23631,7 +23631,7 @@
       "updatedAt": "2026-03-03T15:40:45.000Z"
     },
     {
-      "title": "\u226525 \u00b5m Particles",
+      "title": "≥25 µm Particles",
       "parameterType": [
         {
           "id": "quantitative"
@@ -23685,7 +23685,7 @@
           "id": "quantitative"
         }
       ],
-      "measurementUnit": "\u00b0C",
+      "measurementUnit": "°C",
       "decimalPoints": 1,
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -24037,7 +24037,7 @@
           "id": "quantitative"
         }
       ],
-      "measurementUnit": "\u00b5g/container",
+      "measurementUnit": "µg/container",
       "decimalPoints": 3,
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
