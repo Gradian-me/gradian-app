@@ -206,7 +206,8 @@ export const loggingCustom = (logType: LogType, level: LogLevel, message: string
 
   const prefix = `[${logType}]`;
   const sanitizedMessage = maskSensitiveMessage(logType, message);
-  const formattedMessage = `${prefix} ${sanitizedMessage}`;
+  const timestamp = new Date().toISOString();
+  const formattedMessage = `${prefix} ${timestamp} | ${sanitizedMessage}`;
 
   switch (level) {
     case 'log':

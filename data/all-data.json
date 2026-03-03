@@ -2550,14 +2550,19 @@
       "name": [
         {
           "en": "Human Resource Management"
+        },
+        {
+          "fa": "مدیریت منابع انسانی"
         }
       ],
       "icon": "Users",
       "incomplete": false,
       "id": "01KHRM00000000000000000001",
       "createdAt": "2026-03-02T00:00:00.000Z",
-      "updatedAt": "2026-03-02T00:00:00.000Z",
-      "application-schemas": []
+      "updatedAt": "2026-03-03T14:31:14.060Z",
+      "application-schemas": [],
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "application-schemas": [],
@@ -2698,7 +2703,8 @@
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "id": "01KQCLQM0000000000000000QC",
       "createdAt": "2026-03-02T00:00:00.000Z",
-      "updatedAt": "2026-03-02T00:00:00.000Z"
+      "updatedAt": "2026-03-03T14:30:51.081Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "production-actuals": [],
@@ -22145,6 +22151,14 @@
       "icon": "Play",
       "color": "blue",
       "sourceUrl": "field-options:equipment-logbooks:operation-type"
+    },
+    {
+      "id": "01KJT4S4S02S66NRSST013A0PT",
+      "businessId": "quantitative",
+      "label": "Quantitative",
+      "icon": "BarChart3",
+      "color": "cyan",
+      "sourceUrl": "field-options:lims-test-parameters:lims-test-parameter-type"
     }
   ],
   "deviation-management": [
@@ -22726,5 +22740,113 @@
     }
   ],
   "purchase-request": [],
-  "lims-tests": []
+  "lims-tests": [
+    {
+      "title": "HPLC Assay",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000001"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT505BJ05FSE9588JMJXZ1C"
+        },
+        {
+          "id": "01KJT4S4AK69R27AYX96BGTC6G"
+        },
+        {
+          "id": "01KJT4Z4D97NFY0JHV83RJBZA7"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5AAKYBARAGAF98RY1X7AS",
+      "createdAt": "2026-03-03T15:33:26.270Z",
+      "updatedAt": "2026-03-03T15:33:26.437Z"
+    },
+    {
+      "title": "Total Aerobic Microbial Count",
+      "testCategory": [
+        {
+          "id": "01KLIMSCAT0000000000000003"
+        }
+      ],
+      "testParameters": [
+        {
+          "id": "01KJT51X87NCYB27F67QYR6QP0"
+        }
+      ],
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT5B41MWDDY7PEW7S13WSN0",
+      "createdAt": "2026-03-03T15:33:52.309Z",
+      "updatedAt": "2026-03-03T15:33:52.465Z"
+    }
+  ],
+  "lims-external-requests": [],
+  "lims-test-parameters": [
+    {
+      "title": "Active Ingredient Assay",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT4S4AK69R27AYX96BGTC6G",
+      "createdAt": "2026-03-03T15:24:02.773Z",
+      "updatedAt": "2026-03-03T15:24:03.611Z"
+    },
+    {
+      "title": "Related Substance A",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "decimalPoints": 3,
+      "measurementUnit": "%",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT4Z4D97NFY0JHV83RJBZA7",
+      "createdAt": "2026-03-03T15:27:19.467Z",
+      "updatedAt": "2026-03-03T15:27:20.253Z"
+    },
+    {
+      "title": "Total Impurities",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 3,
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT505BJ05FSE9588JMJXZ1C",
+      "createdAt": "2026-03-03T15:27:53.203Z",
+      "updatedAt": "2026-03-03T15:27:53.800Z"
+    },
+    {
+      "title": "Total Count",
+      "parameterType": [
+        {
+          "id": "quantitative"
+        }
+      ],
+      "measurementUnit": "CFU/mL",
+      "decimalPoints": 0,
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KJT51X87NCYB27F67QYR6QP0",
+      "createdAt": "2026-03-03T15:28:50.440Z",
+      "updatedAt": "2026-03-03T15:28:51.148Z"
+    }
+  ],
+  "lims-external-fraction-tests": []
 }

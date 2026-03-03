@@ -8,6 +8,7 @@ import {
   getDefaultLanguage,
 } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
+import { getDisplayStrings } from '@/gradian-ui/data-display/utils/value-display';
 
 /**
  * Apply default properties to a field if they are not specified
@@ -212,6 +213,24 @@ export const getSingleValueByRole = (schema: FormSchema, data: any, role: string
     .filter(Boolean);
   
   return fallbackStrings.length > 0 ? fallbackStrings[0] : defaultValue;
+};
+
+/**
+ * Get concatenated display string(s) for all fields with the given role.
+ * Uses getValueByRole for role resolution and getDisplayStrings for robust label extraction.
+ */
+export const getConcatenatedValueByRole = (
+  schema: FormSchema,
+  data: any,
+  role: string,
+  separator = ' | '
+): string => {
+  const raw = getValueByRole(schema, data, role);
+  const strings = getDisplayStrings(raw);
+  if (strings.length === 0) {
+    return '';
+  }
+  return strings.join(separator);
 };
 
 /**

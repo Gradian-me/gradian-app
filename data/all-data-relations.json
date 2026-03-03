@@ -4118,7 +4118,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KHRMRELJOBDESC00000000001",
     "createdAt": "2026-03-02T00:00:00.000Z",
-    "updatedAt": "2026-03-02T00:00:00.000Z"
+    "updatedAt": "2026-03-03T14:31:14.353Z",
+    "inactive": true
   },
   {
     "sourceSchema": "parameter-groups",
@@ -4196,5 +4197,135 @@
     "createdAt": "2026-03-02T00:00:00.000Z",
     "updatedAt": "2026-03-02T10:36:41.711Z",
     "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KQCLQM0000000000000000QC",
+    "targetSchema": "schemas",
+    "targetId": "lims-external-requests",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KJT1QQVBBX7J40030PZXY2CK",
+    "createdAt": "2026-03-03T14:30:51.497Z",
+    "updatedAt": "2026-03-03T14:30:51.497Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KQCLQM0000000000000000QC",
+    "targetSchema": "schemas",
+    "targetId": "lims-external-fraction-tests",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KJT1QS3NRTGPPP1X9WXW6W90",
+    "createdAt": "2026-03-03T14:30:52.789Z",
+    "updatedAt": "2026-03-03T14:30:52.789Z"
+  },
+  {
+    "id": "01KJT4S4TXY8ZD2NK0KJW6F1PT",
+    "sourceSchema": "lims-test-parameters",
+    "sourceId": "01KJT4S4AK69R27AYX96BGTC6G",
+    "targetSchema": "external_nodes",
+    "targetId": "01KJT4S4S02S66NRSST013A0PT",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-test-parameter-type",
+    "createdAt": "2026-03-03T15:24:03.290Z",
+    "updatedAt": "2026-03-03T15:24:03.290Z"
+  },
+  {
+    "id": "01KJT4Z4X97ZJJV6F3MECPB2FN",
+    "sourceSchema": "lims-test-parameters",
+    "sourceId": "01KJT4Z4D97NFY0JHV83RJBZA7",
+    "targetSchema": "external_nodes",
+    "targetId": "01KJT4S4S02S66NRSST013A0PT",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-test-parameter-type",
+    "createdAt": "2026-03-03T15:27:19.976Z",
+    "updatedAt": "2026-03-03T15:27:19.976Z"
+  },
+  {
+    "id": "01KJT505PPVE5Q82MF37ZHXJXG",
+    "sourceSchema": "lims-test-parameters",
+    "sourceId": "01KJT505BJ05FSE9588JMJXZ1C",
+    "targetSchema": "external_nodes",
+    "targetId": "01KJT4S4S02S66NRSST013A0PT",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-test-parameter-type",
+    "createdAt": "2026-03-03T15:27:53.558Z",
+    "updatedAt": "2026-03-03T15:27:53.558Z"
+  },
+  {
+    "id": "01KJT51XNPEYK9J2GZV6Q9PJ2F",
+    "sourceSchema": "lims-test-parameters",
+    "sourceId": "01KJT51X87NCYB27F67QYR6QP0",
+    "targetSchema": "external_nodes",
+    "targetId": "01KJT4S4S02S66NRSST013A0PT",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-test-parameter-type",
+    "createdAt": "2026-03-03T15:28:50.869Z",
+    "updatedAt": "2026-03-03T15:28:50.869Z"
+  },
+  {
+    "id": "01KJT5AAPNDEYDB6WZ87YZW3QM",
+    "sourceSchema": "lims-tests",
+    "sourceId": "01KJT5AAKYBARAGAF98RY1X7AS",
+    "targetSchema": "parameter-items",
+    "targetId": "01KLIMSCAT0000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-test-category",
+    "createdAt": "2026-03-03T15:33:26.357Z",
+    "updatedAt": "2026-03-03T15:33:26.357Z"
+  },
+  {
+    "id": "01KJT5AAQ088QV9VYG5SWTK4CT",
+    "sourceSchema": "lims-tests",
+    "sourceId": "01KJT5AAKYBARAGAF98RY1X7AS",
+    "targetSchema": "lims-test-parameters",
+    "targetId": "01KJT505BJ05FSE9588JMJXZ1C",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "test-parameters",
+    "createdAt": "2026-03-03T15:33:26.368Z",
+    "updatedAt": "2026-03-03T15:33:26.368Z"
+  },
+  {
+    "id": "01KJT5AAQ1DQVQCH3CE1A2H74R",
+    "sourceSchema": "lims-tests",
+    "sourceId": "01KJT5AAKYBARAGAF98RY1X7AS",
+    "targetSchema": "lims-test-parameters",
+    "targetId": "01KJT4S4AK69R27AYX96BGTC6G",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "test-parameters",
+    "createdAt": "2026-03-03T15:33:26.368Z",
+    "updatedAt": "2026-03-03T15:33:26.368Z"
+  },
+  {
+    "id": "01KJT5AAQ1YGMSNYCSY4YPSHSN",
+    "sourceSchema": "lims-tests",
+    "sourceId": "01KJT5AAKYBARAGAF98RY1X7AS",
+    "targetSchema": "lims-test-parameters",
+    "targetId": "01KJT4Z4D97NFY0JHV83RJBZA7",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "test-parameters",
+    "createdAt": "2026-03-03T15:33:26.368Z",
+    "updatedAt": "2026-03-03T15:33:26.368Z"
+  },
+  {
+    "id": "01KJT5B4487VM1KCNWKYG4H22P",
+    "sourceSchema": "lims-tests",
+    "sourceId": "01KJT5B41MWDDY7PEW7S13WSN0",
+    "targetSchema": "parameter-items",
+    "targetId": "01KLIMSCAT0000000000000003",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-test-category",
+    "createdAt": "2026-03-03T15:33:52.391Z",
+    "updatedAt": "2026-03-03T15:33:52.391Z"
+  },
+  {
+    "id": "01KJT5B44HXBSX69QCA9MHE3KH",
+    "sourceSchema": "lims-tests",
+    "sourceId": "01KJT5B41MWDDY7PEW7S13WSN0",
+    "targetSchema": "lims-test-parameters",
+    "targetId": "01KJT51X87NCYB27F67QYR6QP0",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "test-parameters",
+    "createdAt": "2026-03-03T15:33:52.401Z",
+    "updatedAt": "2026-03-03T15:33:52.401Z"
   }
 ]

@@ -37571,7 +37571,7 @@
         "sectionId": "basic-information",
         "component": "text",
         "role": "title",
-        "allowTranslation": true,
+        "allowTranslation": false,
         "translations": [
           {
             "en": "Parameter Title"
@@ -37668,15 +37668,21 @@
         "options": [
           {
             "id": "quantitative",
-            "label": "Quantitative"
+            "label": "Quantitative",
+            "icon": "BarChart3",
+            "color": "cyan"
           },
           {
             "id": "qualitative",
-            "label": "Qualitative"
+            "label": "Qualitative",
+            "icon": "MessageCircle",
+            "color": "violet"
           },
           {
             "id": "combined",
-            "label": "Combined"
+            "label": "Combined",
+            "icon": "Layers",
+            "color": "emerald"
           }
         ],
         "validation": {
@@ -37710,7 +37716,8 @@
           {
             "ru": "Выберите тип параметра"
           }
-        ]
+        ],
+        "role": "subtitle"
       },
       {
         "id": "lims-test-parameter-measurement-unit",
@@ -37745,7 +37752,7 @@
           }
         ],
         "validation": {
-          "required": false
+          "required": true
         },
         "colSpan": 1,
         "order": 3,
@@ -37775,7 +37782,8 @@
           {
             "ru": "Введите единицу измерения (например, мг/мл)"
           }
-        ]
+        ],
+        "role": "subtitle"
       },
       {
         "id": "lims-test-parameter-decimal-points",
@@ -37810,7 +37818,7 @@
           }
         ],
         "validation": {
-          "required": false,
+          "required": true,
           "min": 0,
           "max": 6
         },
@@ -37842,7 +37850,8 @@
           {
             "ru": "Введите количество десятичных знаков (0–6)"
           }
-        ]
+        ],
+        "role": "subtitle"
       }
     ],
     "sections": [
@@ -37972,7 +37981,8 @@
         ],
         "icon": "FlaskConical"
       }
-    ]
+    ],
+    "isNotCompanyBased": true
   },
   {
     "id": "lims-tests",
@@ -38039,7 +38049,7 @@
         "sectionId": "basic-information",
         "component": "text",
         "role": "title",
-        "allowTranslation": true,
+        "allowTranslation": false,
         "translations": [
           {
             "en": "Test Title"
@@ -38171,7 +38181,7 @@
         ]
       },
       {
-        "id": "lims-test-parameters-picker",
+        "id": "test-parameters",
         "name": "testParameters",
         "label": "Test Parameters",
         "sectionId": "basic-information",
@@ -38367,7 +38377,8 @@
         ],
         "icon": "FlaskConical"
       }
-    ]
+    ],
+    "isNotCompanyBased": true
   },
   {
     "id": "lims-external-fraction-tests",
@@ -38375,24 +38386,56 @@
     "singular_name": "LIMS External Fraction Test",
     "plural_name": "LIMS External Fraction Tests",
     "singular_name_translations": [
-      { "en": "LIMS External Fraction Test" },
-      { "fa": "آزمون جزء خارجی LIMS" },
-      { "ar": "اختبار جزء خارجي لنظام LIMS" },
-      { "es": "Prueba de fracción externa LIMS" },
-      { "fr": "Test de fraction externe LIMS" },
-      { "de": "Externer LIMS-Fraktionstest" },
-      { "it": "Test di frazione esterna LIMS" },
-      { "ru": "Внешний фракционный тест LIMS" }
+      {
+        "en": "LIMS External Fraction Test"
+      },
+      {
+        "fa": "آزمون جزء خارجی LIMS"
+      },
+      {
+        "ar": "اختبار جزء خارجي لنظام LIMS"
+      },
+      {
+        "es": "Prueba de fracción externa LIMS"
+      },
+      {
+        "fr": "Test de fraction externe LIMS"
+      },
+      {
+        "de": "Externer LIMS-Fraktionstest"
+      },
+      {
+        "it": "Test di frazione esterna LIMS"
+      },
+      {
+        "ru": "Внешний фракционный тест LIMS"
+      }
     ],
     "plural_name_translations": [
-      { "en": "LIMS External Fraction Tests" },
-      { "fa": "آزمون‌های جزء خارجی LIMS" },
-      { "ar": "اختبارات الأجزاء الخارجية لنظام LIMS" },
-      { "es": "Pruebas de fracción externa LIMS" },
-      { "fr": "Tests de fraction externe LIMS" },
-      { "de": "Externe LIMS-Fraktionstests" },
-      { "it": "Test di frazione esterna LIMS" },
-      { "ru": "Внешние фракционные тесты LIMS" }
+      {
+        "en": "LIMS External Fraction Tests"
+      },
+      {
+        "fa": "آزمون‌های جزء خارجی LIMS"
+      },
+      {
+        "ar": "اختبارات الأجزاء الخارجية لنظام LIMS"
+      },
+      {
+        "es": "Pruebas de fracción externa LIMS"
+      },
+      {
+        "fr": "Tests de fraction externe LIMS"
+      },
+      {
+        "de": "Externe LIMS-Fraktionstests"
+      },
+      {
+        "it": "Test di frazione esterna LIMS"
+      },
+      {
+        "ru": "Внешние фракционные тесты LIMS"
+      }
     ],
     "fields": [
       {
@@ -38405,28 +38448,62 @@
         "targetSchema": "lims-tests",
         "allowMultiselect": false,
         "translations": [
-          { "en": "Lab Test" },
-          { "fa": "آزمون آزمایشگاهی" },
-          { "ar": "الاختبار المخبري" },
-          { "es": "Prueba de laboratorio" },
-          { "fr": "Test de laboratoire" },
-          { "de": "Labortest" },
-          { "it": "Test di laboratorio" },
-          { "ru": "Лабораторный тест" }
+          {
+            "en": "Lab Test"
+          },
+          {
+            "fa": "آزمون آزمایشگاهی"
+          },
+          {
+            "ar": "الاختبار المخبري"
+          },
+          {
+            "es": "Prueba de laboratorio"
+          },
+          {
+            "fr": "Test de laboratoire"
+          },
+          {
+            "de": "Labortest"
+          },
+          {
+            "it": "Test di laboratorio"
+          },
+          {
+            "ru": "Лабораторный тест"
+          }
         ],
-        "validation": { "required": false },
+        "validation": {
+          "required": false
+        },
         "colSpan": 2,
         "order": 1,
         "caption": "Click to select lab test",
         "captionTranslations": [
-          { "en": "Click to select lab test" },
-          { "fa": "برای انتخاب آزمون آزمایشگاهی کلیک کنید" },
-          { "ar": "انقر لاختيار الاختبار المخبري" },
-          { "es": "Haga clic para seleccionar la prueba de laboratorio" },
-          { "fr": "Cliquez pour sélectionner le test de laboratoire" },
-          { "de": "Klicken Sie, um den Labortest auszuwählen" },
-          { "it": "Fai clic per selezionare il test di laboratorio" },
-          { "ru": "Нажмите, чтобы выбрать лабораторный тест" }
+          {
+            "en": "Click to select lab test"
+          },
+          {
+            "fa": "برای انتخاب آزمون آزمایشگاهی کلیک کنید"
+          },
+          {
+            "ar": "انقر لاختيار الاختبار المخبري"
+          },
+          {
+            "es": "Haga clic para seleccionar la prueba de laboratorio"
+          },
+          {
+            "fr": "Cliquez pour sélectionner le test de laboratoire"
+          },
+          {
+            "de": "Klicken Sie, um den Labortest auszuwählen"
+          },
+          {
+            "it": "Fai clic per selezionare il test di laboratorio"
+          },
+          {
+            "ru": "Нажмите, чтобы выбрать лабораторный тест"
+          }
         ]
       },
       {
@@ -38436,28 +38513,63 @@
         "sectionId": "test-result-item",
         "component": "number",
         "translations": [
-          { "en": "Integration ID" },
-          { "fa": "شناسه یکپارچه‌سازی" },
-          { "ar": "معرف التكامل" },
-          { "es": "ID de integración" },
-          { "fr": "ID d'intégration" },
-          { "de": "Integrations-ID" },
-          { "it": "ID di integrazione" },
-          { "ru": "ID интеграции" }
+          {
+            "en": "Integration ID"
+          },
+          {
+            "fa": "شناسه یکپارچه‌سازی"
+          },
+          {
+            "ar": "معرف التكامل"
+          },
+          {
+            "es": "ID de integración"
+          },
+          {
+            "fr": "ID d'intégration"
+          },
+          {
+            "de": "Integrations-ID"
+          },
+          {
+            "it": "ID di integrazione"
+          },
+          {
+            "ru": "ID интеграции"
+          }
         ],
-        "validation": { "required": false, "min": 0 },
+        "validation": {
+          "required": false,
+          "min": 0
+        },
         "colSpan": 1,
         "order": 2,
         "caption": "Enter integration ID",
         "captionTranslations": [
-          { "en": "Enter integration ID" },
-          { "fa": "شناسه یکپارچه‌سازی را وارد کنید" },
-          { "ar": "أدخل معرف التكامل" },
-          { "es": "Ingrese el ID de integración" },
-          { "fr": "Entrez l'ID d'intégration" },
-          { "de": "Integrations-ID eingeben" },
-          { "it": "Inserisci l'ID di integrazione" },
-          { "ru": "Введите ID интеграции" }
+          {
+            "en": "Enter integration ID"
+          },
+          {
+            "fa": "شناسه یکپارچه‌سازی را وارد کنید"
+          },
+          {
+            "ar": "أدخل معرف التكامل"
+          },
+          {
+            "es": "Ingrese el ID de integración"
+          },
+          {
+            "fr": "Entrez l'ID d'intégration"
+          },
+          {
+            "de": "Integrations-ID eingeben"
+          },
+          {
+            "it": "Inserisci l'ID di integrazione"
+          },
+          {
+            "ru": "Введите ID интеграции"
+          }
         ]
       },
       {
@@ -38467,28 +38579,62 @@
         "sectionId": "test-result-item",
         "component": "textarea",
         "translations": [
-          { "en": "Test Result Description" },
-          { "fa": "توضیحات نتیجه آزمون" },
-          { "ar": "وصف نتيجة الاختبار" },
-          { "es": "Descripción del resultado de la prueba" },
-          { "fr": "Description du résultat du test" },
-          { "de": "Beschreibung des Testergebnisses" },
-          { "it": "Descrizione del risultato del test" },
-          { "ru": "Описание результата теста" }
+          {
+            "en": "Test Result Description"
+          },
+          {
+            "fa": "توضیحات نتیجه آزمون"
+          },
+          {
+            "ar": "وصف نتيجة الاختبار"
+          },
+          {
+            "es": "Descripción del resultado de la prueba"
+          },
+          {
+            "fr": "Description du résultat du test"
+          },
+          {
+            "de": "Beschreibung des Testergebnisses"
+          },
+          {
+            "it": "Descrizione del risultato del test"
+          },
+          {
+            "ru": "Описание результата теста"
+          }
         ],
-        "validation": { "required": false },
+        "validation": {
+          "required": false
+        },
         "colSpan": 2,
         "order": 3,
         "caption": "Enter test result description",
         "captionTranslations": [
-          { "en": "Enter test result description" },
-          { "fa": "توضیحات نتیجه آزمون را وارد کنید" },
-          { "ar": "أدخل وصف نتيجة الاختبار" },
-          { "es": "Ingrese la descripción del resultado de la prueba" },
-          { "fr": "Entrez la description du résultat du test" },
-          { "de": "Beschreibung des Testergebnisses eingeben" },
-          { "it": "Inserisci la descrizione del risultato del test" },
-          { "ru": "Введите описание результата теста" }
+          {
+            "en": "Enter test result description"
+          },
+          {
+            "fa": "توضیحات نتیجه آزمون را وارد کنید"
+          },
+          {
+            "ar": "أدخل وصف نتيجة الاختبار"
+          },
+          {
+            "es": "Ingrese la descripción del resultado de la prueba"
+          },
+          {
+            "fr": "Entrez la description du résultat du test"
+          },
+          {
+            "de": "Beschreibung des Testergebnisses eingeben"
+          },
+          {
+            "it": "Inserisci la descrizione del risultato del test"
+          },
+          {
+            "ru": "Введите описание результата теста"
+          }
         ]
       }
     ],
@@ -38497,25 +38643,57 @@
         "id": "test-result-item",
         "title": "Test Result Item",
         "titleTranslations": [
-          { "en": "Test Result Item" },
-          { "fa": "آیتم نتیجه آزمون" },
-          { "ar": "عنصر نتيجة الاختبار" },
-          { "es": "Ítem de resultado de prueba" },
-          { "fr": "Élément de résultat de test" },
-          { "de": "Testergebnis-Element" },
-          { "it": "Elemento risultato del test" },
-          { "ru": "Элемент результата теста" }
+          {
+            "en": "Test Result Item"
+          },
+          {
+            "fa": "آیتم نتیجه آزمون"
+          },
+          {
+            "ar": "عنصر نتيجة الاختبار"
+          },
+          {
+            "es": "Ítem de resultado de prueba"
+          },
+          {
+            "fr": "Élément de résultat de test"
+          },
+          {
+            "de": "Testergebnis-Element"
+          },
+          {
+            "it": "Elemento risultato del test"
+          },
+          {
+            "ru": "Элемент результата теста"
+          }
         ],
         "description": "Single test result item for an external LIMS request",
         "descriptionTranslations": [
-          { "en": "Single test result item for an external LIMS request" },
-          { "fa": "یک آیتم نتیجه آزمون برای درخواست خارجی LIMS" },
-          { "ar": "عنصر واحد لنتيجة اختبار لطلب LIMS خارجي" },
-          { "es": "Ítem único de resultado de prueba para una solicitud externa LIMS" },
-          { "fr": "Élément de résultat de test pour une demande externe LIMS" },
-          { "de": "Ein Testergebnis-Element für eine externe LIMS-Anfrage" },
-          { "it": "Singolo elemento risultato del test per una richiesta esterna LIMS" },
-          { "ru": "Отдельный элемент результата теста для внешнего запроса LIMS" }
+          {
+            "en": "Single test result item for an external LIMS request"
+          },
+          {
+            "fa": "یک آیتم نتیجه آزمون برای درخواست خارجی LIMS"
+          },
+          {
+            "ar": "عنصر واحد لنتيجة اختبار لطلب LIMS خارجي"
+          },
+          {
+            "es": "Ítem único de resultado de prueba para una solicitud externa LIMS"
+          },
+          {
+            "fr": "Élément de résultat de test pour une demande externe LIMS"
+          },
+          {
+            "de": "Ein Testergebnis-Element für eine externe LIMS-Anfrage"
+          },
+          {
+            "it": "Singolo elemento risultato del test per una richiesta esterna LIMS"
+          },
+          {
+            "ru": "Отдельный элемент результата теста для внешнего запроса LIMS"
+          }
         ],
         "initialState": "expanded",
         "columns": 2
@@ -38561,14 +38739,30 @@
       {
         "id": "01KQCLQM0000000000000000QC",
         "name": [
-          { "en": "Quality Control Management" },
-          { "fa": "مدیریت کنترل کیفیت" },
-          { "ar": "إدارة مراقبة الجودة" },
-          { "es": "Gestión de control de calidad" },
-          { "fr": "Gestion du contrôle qualité" },
-          { "de": "Qualitätskontrollmanagement" },
-          { "it": "Gestione controllo qualità" },
-          { "ru": "Управление контролем качества" }
+          {
+            "en": "Quality Control Management"
+          },
+          {
+            "fa": "مدیریت کنترل کیفیت"
+          },
+          {
+            "ar": "إدارة مراقبة الجودة"
+          },
+          {
+            "es": "Gestión de control de calidad"
+          },
+          {
+            "fr": "Gestion du contrôle qualité"
+          },
+          {
+            "de": "Qualitätskontrollmanagement"
+          },
+          {
+            "it": "Gestione controllo qualità"
+          },
+          {
+            "ru": "Управление контролем качества"
+          }
         ],
         "icon": "FlaskConical"
       }

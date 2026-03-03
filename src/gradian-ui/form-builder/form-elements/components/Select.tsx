@@ -692,17 +692,21 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
         : undefined);
 
     const handleRadixChange = (selectedId: string) => {
+      // Toggle behavior: if the user re-selects the currently selected option, clear the selection.
+      const isReselect = selectValue != null && selectedId === String(selectValue);
+      const nextId = isReselect ? '' : selectedId;
+
       // Don't clear search here - let handleOpenChange do it when closing
       // This prevents showing all items again before the select closes
       if (onValueChange) {
-        onValueChange(selectedId);
+        onValueChange(nextId);
       }
       if (onNormalizedChange) {
-        if (!selectedId) {
+        if (!nextId) {
           onNormalizedChange([]);
           return;
         }
-        const matched = normalizedOptions.find((opt) => opt.id === selectedId);
+        const matched = normalizedOptions.find((opt) => opt.id === nextId);
         onNormalizedChange(matched ? [matched] : []);
       }
       // Close the select immediately after selection

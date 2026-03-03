@@ -18,7 +18,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, List, Loader2, RefreshCw } from
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { getArrayValuesByRole, getFieldsByRole, getSingleValueByRole, getValueByRole } from '../utils/field-resolver';
+import { getArrayValuesByRole, getFieldsByRole, getSingleValueByRole, getValueByRole, getConcatenatedValueByRole } from '../utils/field-resolver';
 import { Avatar } from './Avatar';
 import { CodeBadge } from './CodeBadge';
 import { SearchInput } from './SearchInput';
@@ -1090,9 +1090,8 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       }
 
       const rawTitle = getValueByRole(effectiveSchema, item, 'title') || item.name || '';
-      const rawSubtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
       const title = resolveDisplayLabel(rawTitle, filterLang, filterDefaultLang);
-      const subtitle = resolveDisplayLabel(rawSubtitle, filterLang, filterDefaultLang);
+      const subtitle = getConcatenatedValueByRole(effectiveSchema, item, 'subtitle', ' | ');
       return title.toLowerCase().includes(query) || subtitle.toLowerCase().includes(query);
     });
 
@@ -1453,10 +1452,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const lang = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
     const dLang = getDefaultLanguage();
     const rawTitle = getValueByRole(effectiveSchema, item, 'title') || item.name || `Item ${index + 1}`;
-    const rawSubtitle = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
     const rawAvatarField = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
     const title = resolveDisplayLabel(rawTitle, lang, dLang);
-    const subtitle = resolveDisplayLabel(rawSubtitle, lang, dLang);
+    const subtitle = getConcatenatedValueByRole(effectiveSchema, item, 'subtitle', ' | ');
     const avatarField = resolveDisplayLabel(rawAvatarField, lang, dLang);
 
     // Extract color for avatar/icon styling
@@ -1633,7 +1631,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                       {renderHighlightedText(title, highlightQuery)}
                     </h4>
                   </div>
-                  {(typeof subtitle === 'string' ? subtitle : String(subtitle ?? '')).trim() && (
+                  {(subtitle || '').trim() && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 text-wrap wrap-break-words line-clamp-2 mt-0.5">
                       {renderHighlightedText(subtitle, highlightQuery)}
                     </p>
@@ -1752,7 +1750,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
       if (effectiveSchema) {
         candidateFields.push(
           getValueByRole(effectiveSchema, data, 'title'),
-          getSingleValueByRole(effectiveSchema, data, 'subtitle', data.email)
+          getSchemaSubtitleDisplay(effectiveSchema, data)
         );
       } else if (effectiveSourceColumnRoles) {
         candidateFields.push(
@@ -1908,10 +1906,9 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     const langNode = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
     const dLangNode = getDefaultLanguage();
     const rawTitleNode = getValueByRole(effectiveSchema, item, 'title') || item.name || `Item ${index + 1}`;
-    const rawSubtitleNode = getSingleValueByRole(effectiveSchema, item, 'subtitle', item.email) || item.email || '';
     const rawAvatarNode = getSingleValueByRole(effectiveSchema, item, 'avatar', item.name) || item.name || '?';
     const title = resolveDisplayLabel(rawTitleNode, langNode, dLangNode);
-    const subtitle = resolveDisplayLabel(rawSubtitleNode, langNode, dLangNode);
+    const subtitle = getConcatenatedValueByRole(effectiveSchema, item, 'subtitle', ' | ');
     const avatarField = resolveDisplayLabel(rawAvatarNode, langNode, dLangNode);
 
     // Extract color for avatar styling
