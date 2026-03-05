@@ -189,6 +189,15 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
+      "color": "violet",
+      "label": "Has OKR Target Item",
+      "description": "An OKR Target has one or more monthly target items.",
+      "icon": "Target",
+      "id": "HAS_OKR_TARGET_ITEM",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
       "label": "Has Field Value",
       "color": "zinc",
       "icon": "FormInput",
@@ -2633,6 +2642,42 @@
       "id": "01KGH1TMXDH89EPZRWA1MYR12Z",
       "createdAt": "2026-02-03T06:07:53.278Z",
       "updatedAt": "2026-02-07T08:22:53.806Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "application-schemas": [],
+      "name": [
+        {
+          "en": "Strategic Management"
+        },
+        {
+          "fa": "مدیریت استراتژیک"
+        },
+        {
+          "ar": "الإدارة الاستراتيجية"
+        },
+        {
+          "es": "Gestión estratégica"
+        },
+        {
+          "fr": "Gestion stratégique"
+        },
+        {
+          "de": "Strategisches Management"
+        },
+        {
+          "it": "Gestione strategica"
+        },
+        {
+          "ru": "Стратегический менеджмент"
+        }
+      ],
+      "icon": "Target",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSTMGT000000000000000001",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T07:50:00.066Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
@@ -20896,6 +20941,390 @@
       "createdAt": "2026-03-02T00:00:00.000Z",
       "updatedAt": "2026-03-02T00:00:00.000Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Increase"
+        },
+        {
+          "fa": "افزایش"
+        },
+        {
+          "ar": "زيادة"
+        },
+        {
+          "es": "Aumentar"
+        },
+        {
+          "fr": "Augmenter"
+        },
+        {
+          "de": "Erhöhen"
+        },
+        {
+          "it": "Aumentare"
+        },
+        {
+          "ru": "Увеличить"
+        }
+      ],
+      "icon": "TrendingUp",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KOKRTRDITM000000000000001",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T05:20:32.279Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "color": "teal"
+    },
+    {
+      "label": [
+        {
+          "en": "Decrease"
+        },
+        {
+          "fa": "کاهش"
+        },
+        {
+          "ar": "تقليل"
+        },
+        {
+          "es": "Disminuir"
+        },
+        {
+          "fr": "Diminuer"
+        },
+        {
+          "de": "Verringern"
+        },
+        {
+          "it": "Diminuire"
+        },
+        {
+          "ru": "Уменьшить"
+        }
+      ],
+      "icon": "TrendingDown",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KOKRTRDITM000000000000002",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T05:20:43.131Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "color": "pink"
+    },
+    {
+      "label": [
+        {
+          "en": "Maintain"
+        },
+        {
+          "fa": "حفظ"
+        },
+        {
+          "ar": "الحفاظ"
+        },
+        {
+          "es": "Mantener"
+        },
+        {
+          "fr": "Maintenir"
+        },
+        {
+          "de": "Beibehalten"
+        },
+        {
+          "it": "Mantenere"
+        },
+        {
+          "ru": "Сохранить"
+        }
+      ],
+      "icon": "Minus",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KOKRTRDITM000000000000003",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T05:20:54.765Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "color": "amber"
+    },
+    {
+      "label": [
+        {
+          "en": "Launch"
+        },
+        {
+          "fa": "راه‌اندازی"
+        },
+        {
+          "ar": "إطلاق"
+        },
+        {
+          "es": "Lanzar"
+        },
+        {
+          "fr": "Lancer"
+        },
+        {
+          "de": "Starten"
+        },
+        {
+          "it": "Lanciare"
+        },
+        {
+          "ru": "Запуск"
+        }
+      ],
+      "icon": "Rocket",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KOKRTRDITM000000000000004",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T05:21:09.922Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "color": "purple"
+    },
+    {
+      "label": "01-فروردین",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000001",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "02-اردیبهشت",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000002",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "03-خرداد",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000003",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "04-تیر",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000004",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "05-مرداد",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000005",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "06-شهریور",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000006",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "07-مهر",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000007",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "08-آبان",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000008",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "09-آذر",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000009",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "10-دی",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000010",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "11-بهمن",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000011",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "12-اسفند",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTH000000000000012",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "01-January",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000001",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "02-February",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000002",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "03-March",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000003",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "04-April",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000004",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "05-May",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000005",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "06-June",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000006",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "07-July",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000007",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "08-August",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000008",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "09-September",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000009",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "10-October",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000010",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "11-November",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000011",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": "12-December",
+      "icon": "CalendarDays",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTH000000000000012",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "parameter-groups": [
@@ -20912,6 +21341,21 @@
         {
           "id": "01KBFBAZR3K04CS80DMHGPHMHF",
           "label": "Supply Chain Management"
+        }
+      ]
+    },
+    {
+      "title": "OKR Trend Types",
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KOKRTRDGP000000000000001",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T05:21:14.449Z",
+      "parameter-items-section": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "relatedTenants": [
+        {
+          "id": "01KH39DYCW17SXF2APAV1KZZQT",
+          "label": "Gradian App"
         }
       ]
     },
@@ -20980,6 +21424,28 @@
           "label": "Supply Chain Management"
         }
       ]
+    },
+    {
+      "title": "Shamsi Months",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KSHMSMTHGP00000000000001",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "parameter-items-section": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "relatedTenants": []
+    },
+    {
+      "title": "Gregorian Months",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KGRGMTHGP00000000000001",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "parameter-items-section": [],
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "relatedTenants": []
     },
     {
       "title": "Ordering Status",
@@ -21093,6 +21559,27 @@
         }
       ],
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+    }
+  ],
+  "kpi-libraries": [
+    {
+      "kpiTitle": [
+        {
+          "en": "Sales Amount Per Capita"
+        },
+        {
+          "fa": "فروش به ازای هر نفر"
+        }
+      ],
+      "kpiFormula": "Total Sales / Headcount",
+      "kpiUnit": "Currency per person",
+      "kpiDescription": "Average sales amount per capita (per employee or person).",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KKPILIB00000000000000001",
+      "createdAt": "2026-03-04T00:00:00.000Z",
+      "updatedAt": "2026-03-04T00:00:00.000Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "tender-items": [
@@ -22164,7 +22651,7 @@
       "id": "01KJT4S4QUALITATIVE00000001",
       "businessId": "qualitative",
       "label": "Qualitative",
-      "icon": "ToggleLeft",
+      "icon": "MessageCircle",
       "color": "violet",
       "sourceUrl": "field-options:lims-test-parameters:lims-test-parameter-type"
     }
@@ -22686,6 +23173,77 @@
     }
   ],
   "lookups": [],
+  "okr-targets": [
+    {
+      "monthly-targets": [],
+      "kpi": [
+        {
+          "id": "01KKPILIB00000000000000001"
+        }
+      ],
+      "year": 1405,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KJVXVWTR6TSZ5E4GTEVRZ38T",
+      "createdAt": "2026-03-04T08:01:42.234Z",
+      "updatedAt": "2026-03-04T08:22:11.151Z"
+    },
+    {
+      "monthly-targets": [],
+      "kpi": [
+        {
+          "id": "01KKPILIB00000000000000001"
+        }
+      ],
+      "year": 1405,
+      "incomplete": true,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KJW10AR03C7DVKH10DCE67P3",
+      "createdAt": "2026-03-04T08:56:33.283Z",
+      "updatedAt": "2026-03-04T08:56:33.946Z"
+    }
+  ],
+  "okr-target-items": [
+    {
+      "month": [
+        {
+          "id": "01KSHMSMTH000000000000001"
+        }
+      ],
+      "targetValue": 120000000000,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KJVYYB2SD75X0NP8CBZG4YYG",
+      "createdAt": "2026-03-04T08:20:30.939Z",
+      "updatedAt": "2026-03-04T08:20:31.620Z"
+    },
+    {
+      "month": [
+        {
+          "id": "01KSHMSMTH000000000000002"
+        }
+      ],
+      "targetValue": 140000000000,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KJVZ180EEBNZBXZN47H7N4EG",
+      "createdAt": "2026-03-04T08:22:06.110Z",
+      "updatedAt": "2026-03-04T08:22:06.774Z"
+    },
+    {
+      "month": [
+        {
+          "id": "01KSHMSMTH000000000000001"
+        }
+      ],
+      "targetValue": 80000000000,
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KJW10Y82DWYB53T4V57CPJRG",
+      "createdAt": "2026-03-04T08:56:53.251Z",
+      "updatedAt": "2026-03-04T08:56:53.817Z"
+    }
+  ],
   "job-descriptions": [
     {
       "postTitle": "کارشناس سیستم مدیریت تغییر",
@@ -23407,7 +23965,31 @@
       "updatedAt": "2026-03-03T15:52:35.000Z"
     }
   ],
-  "lims-external-requests": [],
+  "lims-external-requests": [
+    {
+      "test-results": [],
+      "netAmount": 80000000,
+      "sampleName": "Sample A",
+      "batchNumber": "BTCH-M01254",
+      "expirationDate": "2026-04-04",
+      "sampleDescription": "Is Toxic",
+      "status": {
+        "id": "01KLIMSSTAT0000000000000009",
+        "label": "Completed",
+        "color": "emerald",
+        "icon": "CircleCheckBig"
+      },
+      "requestedTests": [],
+      "testsDescription": "Test Description",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KJW36ZT09GW3V5675AYRP68C",
+      "createdAt": "2026-03-04T09:35:08.609Z",
+      "updatedAt": "2026-03-04T09:44:39.208Z",
+      "grossAmount": 100000000,
+      "discount": 20000000
+    }
+  ],
   "lims-test-parameters": [
     {
       "title": "Active Ingredient Assay",
@@ -24173,6 +24755,21 @@
       "id": "01KJT5R3TOTALCOUNTRAWMAT01",
       "createdAt": "2026-03-03T15:43:35.000Z",
       "updatedAt": "2026-03-03T15:43:35.000Z"
+    },
+    {
+      "title": "Test Test",
+      "parameterType": [
+        {
+          "id": "qualitative"
+        }
+      ],
+      "measurementUnit": "%",
+      "decimalPoints": 2,
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KJW2AEPG8WY9KFHJY6D6NTER",
+      "createdAt": "2026-03-04T09:19:33.587Z",
+      "updatedAt": "2026-03-04T09:19:34.313Z"
     }
   ],
   "lims-external-fraction-tests": []

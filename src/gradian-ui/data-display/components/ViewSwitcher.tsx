@@ -50,6 +50,7 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
             e.preventDefault();
             e.stopPropagation();
             onViewChange('hierarchy');
+            (e.currentTarget as HTMLElement).blur();
           }}
           className={cn(
             'h-10 w-10 shrink-0 p-0 rounded-xl',
@@ -70,6 +71,7 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
             e.preventDefault();
             e.stopPropagation();
             onViewChange('table');
+            (e.currentTarget as HTMLElement).blur();
           }}
           className={cn(
             'h-10 w-10 shrink-0 p-0 rounded-xl',
@@ -90,6 +92,7 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
             e.preventDefault();
             e.stopPropagation();
             onViewChange('list');
+            (e.currentTarget as HTMLElement).blur();
           }}
           className={cn(
             'h-10 w-10 shrink-0 p-0 rounded-xl',
@@ -110,6 +113,7 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
             e.preventDefault();
             e.stopPropagation();
             onViewChange('grid');
+            (e.currentTarget as HTMLElement).blur();
           }}
           className={cn(
             'h-10 w-10 shrink-0 p-0 rounded-xl',
@@ -130,6 +134,7 @@ export const ViewSwitcher: React.FC<ViewSwitcherProps> = ({
             e.preventDefault();
             e.stopPropagation();
             onViewChange('kanban');
+            (e.currentTarget as HTMLElement).blur();
           }}
           className={cn(
             'h-10 w-10 shrink-0 p-0 rounded-xl',

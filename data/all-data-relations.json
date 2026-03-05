@@ -926,6 +926,46 @@
   },
   {
     "sourceSchema": "parameter-groups",
+    "sourceId": "01KOKRTRDGP000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KOKRTRDITM000000000000001",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KOKRTRDREL0000000000000001",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KOKRTRDGP000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KOKRTRDITM000000000000002",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KOKRTRDREL0000000000000002",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KOKRTRDGP000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KOKRTRDITM000000000000003",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KOKRTRDREL0000000000000003",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KOKRTRDGP000000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KOKRTRDITM000000000000004",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KOKRTRDREL0000000000000004",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
     "sourceId": "01KCXV771ABGHR0ST7MZ03S6B1",
     "targetSchema": "parameter-items",
     "targetId": "01KCXV8VPYF3PTEZC539WDEM28",
@@ -1333,6 +1373,246 @@
     "id": "01KMTREL000000000000000004",
     "createdAt": "2026-02-28T12:00:00.000Z",
     "updatedAt": "2026-02-28T12:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000001",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000001",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000002",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000002",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000003",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000003",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000004",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000004",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000005",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000005",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000006",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000006",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000007",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000007",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000008",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000008",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000009",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000009",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000010",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000010",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000011",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000011",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KSHMSMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000012",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KSHMSMTHREL0000000000012",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000001",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000001",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000002",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000002",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000003",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000003",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000004",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000004",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000005",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000005",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000006",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000006",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000007",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000007",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000008",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000008",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000009",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000009",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000010",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000010",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000011",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000011",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KGRGMTHGP00000000000001",
+    "targetSchema": "parameter-items",
+    "targetId": "01KGRGMTH000000000000012",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KGRGMTHREL0000000000012",
+    "createdAt": "2026-03-04T00:00:00.000Z",
+    "updatedAt": "2026-03-04T00:00:00.000Z"
   },
   {
     "sourceSchema": "parameter-groups",
@@ -5658,5 +5938,177 @@
     "fieldId": "test-parameters",
     "createdAt": "2026-03-03T15:52:35.000Z",
     "updatedAt": "2026-03-03T15:52:35.000Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KSTMGT000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "kpi-libraries",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KJVX6FDZBZ72YR3Q2RWEEH97",
+    "createdAt": "2026-03-04T07:50:00.381Z",
+    "updatedAt": "2026-03-04T07:50:00.381Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KSTMGT000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "okr-targets",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KJVX6GSGABZZ3EQTD7K8GZZR",
+    "createdAt": "2026-03-04T07:50:01.775Z",
+    "updatedAt": "2026-03-04T07:50:01.775Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KSTMGT000000000000000001",
+    "targetSchema": "schemas",
+    "targetId": "okr-target-items",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KJVX6GWBMH2FYTN67W5CRTGG",
+    "createdAt": "2026-03-04T07:50:01.867Z",
+    "updatedAt": "2026-03-04T07:50:01.867Z"
+  },
+  {
+    "id": "01KJVXVX7T8RRP5QFXT4TSZ7S2",
+    "sourceSchema": "okr-targets",
+    "sourceId": "01KJVXVWTR6TSZ5E4GTEVRZ38T",
+    "targetSchema": "kpi-libraries",
+    "targetId": "01KKPILIB00000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "okr-kpi",
+    "createdAt": "2026-03-04T08:01:42.648Z",
+    "updatedAt": "2026-03-04T08:22:10.861Z"
+  },
+  {
+    "id": "01KJVYYBE89GE3Z8JK2JH2TT0M",
+    "sourceSchema": "okr-target-items",
+    "sourceId": "01KJVYYB2SD75X0NP8CBZG4YYG",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "okr-month",
+    "createdAt": "2026-03-04T08:20:31.303Z",
+    "updatedAt": "2026-03-04T08:20:31.303Z"
+  },
+  {
+    "sourceSchema": "okr-targets",
+    "sourceId": "01KJVXVWTR6TSZ5E4GTEVRZ38T",
+    "targetSchema": "okr-target-items",
+    "targetId": "01KJVYYB2SD75X0NP8CBZG4YYG",
+    "relationTypeId": "HAS_OKR_TARGET_ITEM",
+    "id": "01KJVYYG3C9948FD8F95E3Q7FF",
+    "createdAt": "2026-03-04T08:20:36.075Z",
+    "updatedAt": "2026-03-04T08:22:11.309Z",
+    "inactive": true
+  },
+  {
+    "id": "01KJVZ18CBKZSNT4HSDME96932",
+    "sourceSchema": "okr-target-items",
+    "sourceId": "01KJVZ180EEBNZBXZN47H7N4EG",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000002",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "okr-month",
+    "createdAt": "2026-03-04T08:22:06.474Z",
+    "updatedAt": "2026-03-04T08:22:06.474Z"
+  },
+  {
+    "sourceSchema": "okr-targets",
+    "sourceId": "01KJVXVWTR6TSZ5E4GTEVRZ38T",
+    "targetSchema": "okr-target-items",
+    "targetId": "01KJVZ180EEBNZBXZN47H7N4EG",
+    "relationTypeId": "HAS_OKR_TARGET_ITEM",
+    "id": "01KJVZ1D75Y1ZBERQ7X9XDAEYW",
+    "createdAt": "2026-03-04T08:22:11.429Z",
+    "updatedAt": "2026-03-04T08:22:11.429Z"
+  },
+  {
+    "id": "01KJW10B3MTHA9HY2WK903236S",
+    "sourceSchema": "okr-targets",
+    "sourceId": "01KJW10AR03C7DVKH10DCE67P3",
+    "targetSchema": "kpi-libraries",
+    "targetId": "01KKPILIB00000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "okr-kpi",
+    "createdAt": "2026-03-04T08:56:33.646Z",
+    "updatedAt": "2026-03-04T08:56:33.646Z"
+  },
+  {
+    "id": "01KJW10YGZK0PBZWA37B8JZ478",
+    "sourceSchema": "okr-target-items",
+    "sourceId": "01KJW10Y82DWYB53T4V57CPJRG",
+    "targetSchema": "parameter-items",
+    "targetId": "01KSHMSMTH000000000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "okr-month",
+    "createdAt": "2026-03-04T08:56:53.535Z",
+    "updatedAt": "2026-03-04T08:56:53.535Z"
+  },
+  {
+    "id": "01KJW2AF4G0CSMCDKMDC13ESK7",
+    "sourceSchema": "lims-test-parameters",
+    "sourceId": "01KJW2AEPG8WY9KFHJY6D6NTER",
+    "targetSchema": "external_nodes",
+    "targetId": "01KJT4S4QUALITATIVE00000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-test-parameter-type",
+    "createdAt": "2026-03-04T09:19:34.030Z",
+    "updatedAt": "2026-03-04T09:19:34.030Z"
+  },
+  {
+    "id": "01KJW370327XZM0YQ4FGYHG9XG",
+    "sourceSchema": "lims-external-requests",
+    "sourceId": "01KJW36ZT09GW3V5675AYRP68C",
+    "targetSchema": "lims-tests",
+    "targetId": "01KJT5V1APOPASSAY00000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-external-request-requested-tests",
+    "createdAt": "2026-03-04T09:35:08.897Z",
+    "updatedAt": "2026-03-04T09:43:54.950Z"
+  },
+  {
+    "id": "01KJW37034R3T6YT1MZ25Y7GS5",
+    "sourceSchema": "lims-external-requests",
+    "sourceId": "01KJW36ZT09GW3V5675AYRP68C",
+    "targetSchema": "lims-tests",
+    "targetId": "01KJT5U3ELISAPOTENCY000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-external-request-requested-tests",
+    "createdAt": "2026-03-04T09:35:08.897Z",
+    "updatedAt": "2026-03-04T09:43:54.950Z"
+  },
+  {
+    "id": "01KJW37035BV1B5JR18MD4SF1V",
+    "sourceSchema": "lims-external-requests",
+    "sourceId": "01KJW36ZT09GW3V5675AYRP68C",
+    "targetSchema": "lims-tests",
+    "targetId": "01KJT5U4ENZYMEACTIVITY0001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-external-request-requested-tests",
+    "createdAt": "2026-03-04T09:35:08.897Z",
+    "updatedAt": "2026-03-04T09:43:54.950Z"
+  },
+  {
+    "id": "01KJW37036ASNK38XVP02J9C13",
+    "sourceSchema": "lims-external-requests",
+    "sourceId": "01KJW36ZT09GW3V5675AYRP68C",
+    "targetSchema": "lims-tests",
+    "targetId": "01KJT5T3PHMEASURE000000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-external-request-requested-tests",
+    "createdAt": "2026-03-04T09:35:08.897Z",
+    "updatedAt": "2026-03-04T09:43:54.950Z"
+  },
+  {
+    "id": "01KJW370375H33ZP9DGNG1QDC3",
+    "sourceSchema": "lims-external-requests",
+    "sourceId": "01KJW36ZT09GW3V5675AYRP68C",
+    "targetSchema": "lims-tests",
+    "targetId": "01KJT5U6CESDSTEST00000001",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "lims-external-request-requested-tests",
+    "createdAt": "2026-03-04T09:35:08.897Z",
+    "updatedAt": "2026-03-04T09:43:54.950Z"
   }
 ]

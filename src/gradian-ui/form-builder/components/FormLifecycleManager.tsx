@@ -2005,7 +2005,11 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           schemaId={relationModalState.targetSchema}
           mode="create"
           enrichData={(formData) => {
-            // enrichData is called with form data before submission
+            // Inherit companyId from parent entity for better UX & data integrity
+            const parentCompanyId = state.values?.companyId;
+            if (parentCompanyId && !formData.companyId) {
+              return { ...formData, companyId: String(parentCompanyId) };
+            }
             return formData;
           }}
           onSuccess={async (createdEntity) => {

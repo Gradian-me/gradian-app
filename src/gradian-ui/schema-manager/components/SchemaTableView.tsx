@@ -10,6 +10,7 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 import { getT } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { highlightText } from '../utils/schema-utils';
 
 interface SchemaTableViewProps {
   schemas: FormSchema[];
@@ -22,6 +23,7 @@ interface SchemaTableViewProps {
    * when statistics are available on the schema.
    */
   showStatistics?: boolean;
+  searchQuery?: string;
 }
 
 export function SchemaTableView({
@@ -31,6 +33,7 @@ export function SchemaTableView({
   onDelete,
   isLoading = false,
   showStatistics = false,
+  searchQuery,
 }: SchemaTableViewProps) {
   const tableColumns = useMemo<TableColumn<FormSchema>[]>(() => [
     {
@@ -152,7 +155,7 @@ export function SchemaTableView({
         return (
           <div className="flex items-center gap-2">
             <span className={`font-medium ${row.inactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'}`}>
-              {row.plural_name}
+              {highlightText(row.plural_name ?? '', searchQuery)}
             </span>
             {row.inactive && (
               <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-gray-300 text-gray-600">
@@ -383,8 +386,8 @@ export function SchemaTableView({
         }
         return (
           <span className={`text-sm line-clamp-2 ${row.inactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-400'}`}>
-            {row.description || '-'}
-            </span>
+            {highlightText(row.description || '-', searchQuery)}
+          </span>
         );
       },
     },
@@ -567,7 +570,7 @@ export function SchemaTableView({
         );
       },
     },
-  ], [onEdit, onView, onDelete, showStatistics]);
+  ], [onEdit, onView, onDelete, showStatistics, searchQuery]);
 
   const tableConfig: TableConfig<FormSchema> = useMemo(
     () => ({

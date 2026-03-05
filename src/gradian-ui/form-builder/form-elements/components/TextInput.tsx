@@ -105,8 +105,8 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
 
     const readOnlyTranslationClasses = allowTranslation
       ? error
-        ? 'read-only:bg-white read-only:border-red-500 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-red-500 read-only:dark:text-gray-300 read-only:cursor-default'
-        : 'read-only:bg-white read-only:border-gray-300 read-only:text-gray-900 read-only:dark:bg-gray-900/60 read-only:dark:border-gray-600 read-only:dark:text-gray-300 read-only:cursor-default'
+        ? 'read-only:bg-gray-100 read-only:text-gray-500 read-only:border-red-500 read-only:cursor-not-allowed read-only:opacity-70 read-only:dark:bg-gray-800/30 read-only:dark:text-gray-300 read-only:dark:border-red-500'
+        : 'read-only:bg-gray-100 read-only:text-gray-500 read-only:border-gray-300 read-only:cursor-not-allowed read-only:opacity-70 read-only:dark:bg-gray-800/30 read-only:dark:text-gray-300 read-only:dark:border-gray-600'
       : '';
 
     const inputClasses = cn(
@@ -124,6 +124,9 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
     const fieldLabel = (config as any).label;
     const fieldPlaceholder = resolveSchemaFieldPlaceholder(config as any, language, defaultLang) || undefined;
     const fieldReadOnly = (config as any).readonly ?? (config as any).readOnly ?? false;
+    const placeholderKey = allowTranslation
+      ? TRANSLATION_KEYS.PLACEHOLDER_ENTER_TRANSLATED_VALUES
+      : TRANSLATION_KEYS.PLACEHOLDER_ENTER_VALUE;
 
     if (!config) {
       loggingCustom(LogType.CLIENT_LOG, 'error', 'TextInput: config is required');
@@ -150,7 +153,7 @@ export const TextInput = forwardRef<FormElementRef, TextInputProps>(
             onChange={handleChange}
             onBlur={handleBlur}
             onFocus={handleFocus}
-            placeholder={placeholder || fieldPlaceholder || getT(TRANSLATION_KEYS.PLACEHOLDER_ENTER_VALUE, language, defaultLang)}
+            placeholder={placeholder || fieldPlaceholder || getT(placeholderKey, language, defaultLang)}
             maxLength={allowTranslation ? undefined : (maxLength || (config as any).validation?.maxLength)}
             minLength={minLength || (config as any).validation?.minLength}
             pattern={pattern}

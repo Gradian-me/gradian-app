@@ -179,7 +179,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
       queryParams.append('sourceId', currentEntityId);
       queryParams.append('targetSchema', targetSchema);
       queryParams.append('relationTypeId', relationTypeId);
-      queryParams.append('includeInactive', 'true');
+      // Do not pass includeInactive so the API excludes inactive relations (same as validation count)
       // If id needs to be added, append it here as the last parameter
       
       // Fetch relations
@@ -832,9 +832,47 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     }
 
     // Extract data similar to DynamicCardRenderer
-    const title = getValueByRole(targetSchemaData, entity, 'title') || entity.name || `Item ${index + 1}`;
+    const rawTitle = getValueByRole(targetSchemaData, entity, 'title') || entity.name || `Item ${index + 1}`;
     // Get subtitle value(s) - concatenate multiple fields with same role using |
-    const subtitle = getValueByRole(targetSchemaData, entity, 'subtitle') || entity.email || '';
+    const rawSubtitle = getValueByRole(targetSchemaData, entity, 'subtitle') || entity.email || '';
+
+    // Ensure title is never just a bare id – prefer meaningful fallback
+    const title =
+      (typeof rawTitle === 'string' && rawTitle.trim() && rawTitle !== String((entity as any)?.id))
+        ? rawTitle
+        : (targetSchemaData.singular_name
+            ? `${targetSchemaData.singular_name} ${index + 1}`
+            : `Item ${index + 1}`);
+
+    // Format numeric subtitles with thousand separators (for number subtitle fields)
+    const formatNumericSubtitle = (value: any): string => {
+      if (value == null) return '';
+      const formatOne = (v: any): string => {
+        if (typeof v === 'number' && Number.isFinite(v)) {
+          return new Intl.NumberFormat().format(v);
+        }
+        if (typeof v === 'string') {
+          const cleaned = v.replace(/,/g, '').trim();
+          if (cleaned && !Number.isNaN(Number(cleaned))) {
+            return new Intl.NumberFormat().format(Number(cleaned));
+          }
+          return v;
+        }
+        return String(v);
+      };
+
+      // If multiple subtitle fields are concatenated with "|", format each part
+      if (typeof value === 'string' && value.includes('|')) {
+        return value
+          .split('|')
+          .map(part => formatOne(part.trim()))
+          .join(' | ');
+      }
+
+      return formatOne(value);
+    };
+
+    const subtitle = formatNumericSubtitle(rawSubtitle);
     const avatarField = getSingleValueByRole(targetSchemaData, entity, 'avatar', entity.name) || entity.name || '?';
     const statusField = getSingleValueByRole(targetSchemaData, entity, 'status') || entity.status || '';
     const ratingField = getSingleValueByRole(targetSchemaData, entity, 'rating') || entity.rating || 0;

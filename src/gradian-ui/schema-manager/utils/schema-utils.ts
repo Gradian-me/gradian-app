@@ -1,3 +1,4 @@
+import React from 'react';
 import { FormSchema as SharedFormSchema } from '../types/form-schema';
 import { FormSchema as FormBuilderFormSchema } from '../types/form-schema';
 import { resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
@@ -81,6 +82,50 @@ export function getSchemaTranslatedDescription(
   const base = typeof raw === 'string' ? raw : fallback;
   const resolved = resolveFromNameTranslations(schema.description_translations, lang, base);
   return typeof resolved === 'string' ? resolved : base;
+}
+
+/**
+ * Splits `text` on every case-insensitive occurrence of `query` and returns
+ * an array of React nodes where each match is wrapped in a yellow highlight
+ * `<mark>` span.  Returns the plain string when query is empty/blank so the
+ * caller can keep a consistent React-node signature without extra branches.
+ */
+export function highlightText(
+  text: string,
+  query: string | undefined,
+): React.ReactNode {
+  const trimmed = query?.trim() ?? '';
+  if (!trimmed || !text) return text;
+
+  // Escape special regex characters in the query to prevent injection
+  const escaped = trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  // Use a capturing group so split() preserves the matched segments in the parts array.
+  // Odd-indexed parts (1, 3, 5…) are the matched substrings; even-indexed are non-matches.
+  const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
+
+  if (parts.length <= 1) return text;
+
+  // Use a fresh case-insensitive (non-global) regex just for the match check so
+  // there is no lastIndex state that could cause alternating false results.
+  const matchRegex = new RegExp(`^${escaped}$`, 'i');
+
+  return React.createElement(
+    React.Fragment,
+    null,
+    ...parts.map((part, i) =>
+      matchRegex.test(part)
+        ? React.createElement(
+            'mark',
+            {
+              key: i,
+              className:
+                'bg-yellow-200 text-yellow-900 dark:bg-yellow-400/30 dark:text-yellow-200 rounded-[2px] px-0',
+            },
+            part,
+          )
+        : part,
+    ),
+  );
 }
 
 /** Section with title/description as string or translation array */

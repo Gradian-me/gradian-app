@@ -18,13 +18,14 @@ import { LoadingSkeleton } from '@/gradian-ui/layout/components';
 import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { useLanguageStore } from '@/stores/language.store';
-import { getSchemaTranslatedPluralName, getSchemaTranslatedDescription } from '../utils/schema-utils';
+import { getSchemaTranslatedPluralName, getSchemaTranslatedDescription, highlightText } from '../utils/schema-utils';
 
 interface SchemaCardGridProps {
   schemas: FormSchema[];
   onEdit: (schema: FormSchema) => void;
   onView: (schema: FormSchema) => void;
   onDelete: (schema: FormSchema) => void;
+  searchQuery?: string;
 }
 
 interface SchemaCardProps {
@@ -33,13 +34,14 @@ interface SchemaCardProps {
   onEdit: (schema: FormSchema) => void;
   onView: (schema: FormSchema) => void;
   onDelete: (schema: FormSchema) => void;
+  searchQuery?: string;
 }
 
 interface SchemaCardSkeletonGridProps {
   count?: number;
 }
 
-const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: SchemaCardProps) => {
+const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete, searchQuery }: SchemaCardProps) => {
   const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
   const defaultLang = getDefaultLanguage();
   const animationDelay = Math.min(index * UI_PARAMS.CARD_INDEX_DELAY.STEP, UI_PARAMS.CARD_INDEX_DELAY.MAX);
@@ -96,7 +98,10 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
                     isInactive ? 'text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-gray-100'
                   }`}
                 >
-                  {getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? schema.singular_name ?? schema.id ?? '')}
+                  {highlightText(
+                    getSchemaTranslatedPluralName(schema, language, schema.plural_name ?? schema.singular_name ?? schema.id ?? ''),
+                    searchQuery,
+                  )}
                 </CardTitle>
                 {schema.showInNavigation && (
                   <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
@@ -113,7 +118,10 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
                 <p className={`text-xs line-clamp-1 mt-1 ${
                   isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'
                 }`}>
-                  {getSchemaTranslatedDescription(schema, language, schema.description ?? '')}
+                  {highlightText(
+                    getSchemaTranslatedDescription(schema, language, schema.description ?? ''),
+                    searchQuery,
+                  )}
                 </p>
               )}
             </div>
@@ -204,7 +212,7 @@ const SchemaCardComponent = memo(({ schema, index, onEdit, onView, onDelete }: S
 
 SchemaCardComponent.displayName = 'SchemaCardComponent';
 
-export function SchemaCardGrid({ schemas, onEdit, onView, onDelete }: SchemaCardGridProps) {
+export function SchemaCardGrid({ schemas, onEdit, onView, onDelete, searchQuery }: SchemaCardGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {schemas.map((schema, index) => (
@@ -215,6 +223,7 @@ export function SchemaCardGrid({ schemas, onEdit, onView, onDelete }: SchemaCard
           onEdit={onEdit}
           onView={onView}
           onDelete={onDelete}
+          searchQuery={searchQuery}
         />
       ))}
     </div>

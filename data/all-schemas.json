@@ -10569,6 +10569,333 @@
     ]
   },
   {
+    "id": "kpi-libraries",
+    "description": "KPI definitions with title, formula, unit and description",
+    "singular_name": "KPI Library",
+    "plural_name": "KPI Libraries",
+    "singular_name_translations": [
+      {
+        "en": "KPI Library"
+      },
+      {
+        "fa": "کتابخانه KPI"
+      },
+      {
+        "ar": "مكتبة مؤشرات الأداء"
+      },
+      {
+        "es": "Biblioteca KPI"
+      },
+      {
+        "fr": "Bibliothèque KPI"
+      },
+      {
+        "de": "KPI-Bibliothek"
+      },
+      {
+        "it": "Libreria KPI"
+      },
+      {
+        "ru": "Библиотека KPI"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "KPI Libraries"
+      },
+      {
+        "fa": "کتابخانه‌های KPI"
+      },
+      {
+        "ar": "مكتبات مؤشرات الأداء"
+      },
+      {
+        "es": "Bibliotecas KPI"
+      },
+      {
+        "fr": "Bibliothèques KPI"
+      },
+      {
+        "de": "KPI-Bibliotheken"
+      },
+      {
+        "it": "Librerie KPI"
+      },
+      {
+        "ru": "Библиотеки KPI"
+      }
+    ],
+    "fields": [
+      {
+        "id": "kpi-title",
+        "name": "kpiTitle",
+        "label": "KPI Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "allowTranslation": true,
+        "translations": [
+          {
+            "en": "KPI Title"
+          },
+          {
+            "fa": "عنوان KPI"
+          },
+          {
+            "ar": "عنوان مؤشر الأداء"
+          },
+          {
+            "es": "Título KPI"
+          },
+          {
+            "fr": "Titre KPI"
+          },
+          {
+            "de": "KPI-Titel"
+          },
+          {
+            "it": "Titolo KPI"
+          },
+          {
+            "ru": "Название KPI"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title",
+        "caption": "Enter KPI title",
+        "captionTranslations": [
+          {
+            "en": "Enter KPI title"
+          },
+          {
+            "fa": "عنوان KPI را وارد کنید"
+          }
+        ]
+      },
+      {
+        "id": "kpi-formula",
+        "name": "kpiFormula",
+        "label": "KPI Formula",
+        "sectionId": "basic-information",
+        "component": "text",
+        "translations": [
+          {
+            "en": "KPI Formula"
+          },
+          {
+            "fa": "فرمول KPI"
+          },
+          {
+            "ar": "صيغة مؤشر الأداء"
+          },
+          {
+            "es": "Fórmula KPI"
+          },
+          {
+            "fr": "Formule KPI"
+          },
+          {
+            "de": "KPI-Formel"
+          },
+          {
+            "it": "Formula KPI"
+          },
+          {
+            "ru": "Формула KPI"
+          }
+        ],
+        "colSpan": 1,
+        "order": 2,
+        "caption": "Enter formula or expression",
+        "captionTranslations": [
+          {
+            "en": "Enter formula or expression"
+          },
+          {
+            "fa": "فرمول یا عبارت را وارد کنید"
+          }
+        ]
+      },
+      {
+        "id": "kpi-unit",
+        "name": "kpiUnit",
+        "label": "KPI Unit",
+        "sectionId": "basic-information",
+        "component": "text",
+        "translations": [
+          {
+            "en": "KPI Unit"
+          },
+          {
+            "fa": "واحد KPI"
+          },
+          {
+            "ar": "وحدة مؤشر الأداء"
+          },
+          {
+            "es": "Unidad KPI"
+          },
+          {
+            "fr": "Unité KPI"
+          },
+          {
+            "de": "KPI-Einheit"
+          },
+          {
+            "it": "Unità KPI"
+          },
+          {
+            "ru": "Единица KPI"
+          }
+        ],
+        "colSpan": 1,
+        "order": 3,
+        "caption": "Enter unit (e.g. %, count, currency)",
+        "captionTranslations": [
+          {
+            "en": "Enter unit (e.g. %, count, currency)"
+          },
+          {
+            "fa": "واحد را وارد کنید (مثلاً %، تعداد، ارز)"
+          }
+        ]
+      },
+      {
+        "id": "kpi-description",
+        "name": "kpiDescription",
+        "label": "KPI Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "role": "description",
+        "translations": [
+          {
+            "en": "KPI Description"
+          },
+          {
+            "fa": "توضیحات KPI"
+          },
+          {
+            "ar": "وصف مؤشر الأداء"
+          },
+          {
+            "es": "Descripción KPI"
+          },
+          {
+            "fr": "Description KPI"
+          },
+          {
+            "de": "KPI-Beschreibung"
+          },
+          {
+            "it": "Descrizione KPI"
+          },
+          {
+            "ru": "Описание KPI"
+          }
+        ],
+        "colSpan": 2,
+        "order": 4,
+        "caption": "Enter description of the KPI",
+        "captionTranslations": [
+          {
+            "en": "Enter description of the KPI"
+          },
+          {
+            "fa": "توضیحات KPI را وارد کنید"
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "titleTranslations": [
+          {
+            "en": "Basic Information"
+          },
+          {
+            "fa": "اطلاعات پایه"
+          },
+          {
+            "ar": "المعلومات الأساسية"
+          },
+          {
+            "es": "Información básica"
+          },
+          {
+            "fr": "Informations de base"
+          },
+          {
+            "de": "Grundinformationen"
+          },
+          {
+            "it": "Informazioni di base"
+          },
+          {
+            "ru": "Основная информация"
+          }
+        ],
+        "description": "KPI title, formula, unit and description",
+        "descriptionTranslations": [
+          {
+            "en": "KPI title, formula, unit and description"
+          },
+          {
+            "fa": "عنوان، فرمول، واحد و توضیحات KPI"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "Calculator",
+    "isNotCompanyBased": true,
+    "applications": [
+      {
+        "id": "01KSTMGT000000000000000001",
+        "name": [
+          {
+            "en": "Strategic Management"
+          },
+          {
+            "fa": "مدیریت استراتژیک"
+          },
+          {
+            "ar": "الإدارة الاستراتيجية"
+          },
+          {
+            "es": "Gestión estratégica"
+          },
+          {
+            "fr": "Gestion stratégique"
+          },
+          {
+            "de": "Strategisches Management"
+          },
+          {
+            "it": "Gestione strategica"
+          },
+          {
+            "ru": "Стратегический менеджмент"
+          }
+        ],
+        "icon": "Target"
+      }
+    ],
+    "relatedTenants": [
+      {
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
+      }
+    ]
+  },
+  {
     "id": "logical-operators",
     "description": "Manage logical operators with their symbols, SQL and Cypher equivalents",
     "singular_name": "Logical Operator",
@@ -36212,6 +36539,382 @@
       {
         "id": "01KBHD90EMZKAT502KNVVDQZC7",
         "label": "Progress Status"
+      }
+    ]
+  },
+  {
+    "id": "okr-targets",
+    "description": "Define yearly OKR targets linked to KPI Libraries with monthly breakdowns.",
+    "singular_name": "OKR Target",
+    "plural_name": "OKR Targets",
+    "singular_name_translations": [
+      {
+        "en": "OKR Target"
+      },
+      {
+        "fa": "هدف OKR"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "OKR Targets"
+      },
+      {
+        "fa": "اهداف OKR"
+      }
+    ],
+    "fields": [
+      {
+        "id": "okr-kpi",
+        "name": "kpi",
+        "label": "KPI",
+        "sectionId": "basic-information",
+        "component": "picker",
+        "description": "Select KPI from KPI Libraries",
+        "translations": [
+          {
+            "en": "KPI"
+          },
+          {
+            "fa": "KPI"
+          }
+        ],
+        "targetSchema": "kpi-libraries",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 2,
+        "order": 1,
+        "role": "title",
+        "caption": "Click to select KPI from KPI Libraries",
+        "captionTranslations": [
+          {
+            "en": "Click to select KPI from KPI Libraries"
+          },
+          {
+            "fa": "برای انتخاب KPI از کتابخانه‌های KPI کلیک کنید"
+          }
+        ]
+      },
+      {
+        "id": "okr-year",
+        "name": "year",
+        "label": "Year",
+        "sectionId": "basic-information",
+        "component": "number",
+        "translations": [
+          {
+            "en": "Year"
+          },
+          {
+            "fa": "سال"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "min": 1404,
+          "max": 1420
+        },
+        "colSpan": 1,
+        "order": 2,
+        "caption": "Enter year (1404–1420)",
+        "captionTranslations": [
+          {
+            "en": "Enter year (1404–1420)"
+          },
+          {
+            "fa": "سال را بین ۱۴۰۴ تا ۱۴۲۰ وارد کنید"
+          }
+        ]
+      },
+      {
+        "id": "okr-description",
+        "name": "description",
+        "label": "Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "translations": [
+          {
+            "en": "Description"
+          },
+          {
+            "fa": "توضیحات"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 3,
+        "role": "description",
+        "caption": "Optional description for this OKR target",
+        "captionTranslations": [
+          {
+            "en": "Optional description for this OKR target"
+          },
+          {
+            "fa": "توضیحات اختیاری برای این هدف OKR"
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "titleTranslations": [
+          {
+            "en": "Basic Information"
+          },
+          {
+            "fa": "اطلاعات پایه"
+          }
+        ],
+        "description": "KPI, year and description for this OKR target",
+        "descriptionTranslations": [
+          {
+            "en": "KPI, year and description for this OKR target"
+          },
+          {
+            "fa": "KPI، سال و توضیحات این هدف OKR"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "monthly-targets",
+        "title": "Monthly Targets",
+        "titleTranslations": [
+          {
+            "en": "Monthly Targets"
+          },
+          {
+            "fa": "اهداف ماهانه"
+          }
+        ],
+        "description": "Monthly OKR target values per month",
+        "descriptionTranslations": [
+          {
+            "en": "Monthly OKR target values per month"
+          },
+          {
+            "fa": "مقادیر هدف OKR برای هر ماه"
+          }
+        ],
+        "initialState": "collapsed",
+        "columns": 1,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "connectToSchema",
+          "minItems": 1,
+          "maxItems": 12,
+          "itemTitle": null,
+          "targetSchema": "okr-target-items",
+          "relationTypeId": "HAS_OKR_TARGET_ITEM",
+          "deleteType": "itemAndRelation",
+          "addType": "addOnly",
+          "isUnique": false
+        }
+      }
+    ],
+    "showInNavigation": true,
+    "icon": "Target",
+    "schemaType": "business",
+    "allowDataInactive": true,
+    "applications": [
+      {
+        "id": "01KSTMGT000000000000000001",
+        "name": [
+          {
+            "en": "Strategic Management"
+          },
+          {
+            "fa": "مدیریت استراتژیک"
+          },
+          {
+            "ar": "الإدارة الاستراتيجية"
+          },
+          {
+            "es": "Gestión estratégica"
+          },
+          {
+            "fr": "Gestion stratégique"
+          },
+          {
+            "de": "Strategisches Management"
+          },
+          {
+            "it": "Gestione strategica"
+          },
+          {
+            "ru": "Стратегический менеджмент"
+          }
+        ],
+        "icon": "Target"
+      }
+    ],
+    "relatedTenants": [
+      {
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
+      }
+    ]
+  },
+  {
+    "id": "okr-target-items",
+    "description": "Monthly OKR target values linked to Shamsi months.",
+    "singular_name": "OKR Target Item",
+    "plural_name": "OKR Target Items",
+    "singular_name_translations": [
+      {
+        "en": "OKR Target Item"
+      },
+      {
+        "fa": "آیتم هدف OKR"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "OKR Target Items"
+      },
+      {
+        "fa": "آیتم‌های هدف OKR"
+      }
+    ],
+    "fields": [
+      {
+        "id": "okr-month",
+        "name": "month",
+        "label": "Month",
+        "sectionId": "basic-information",
+        "component": "select",
+        "description": "Select Shamsi month from parameter items",
+        "translations": [
+          {
+            "en": "Month"
+          },
+          {
+            "fa": "ماه"
+          }
+        ],
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KSHMSMTHGP00000000000001",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 1,
+        "caption": "Select Shamsi month",
+        "captionTranslations": [
+          {
+            "en": "Select Shamsi month"
+          },
+          {
+            "fa": "ماه شمسی را انتخاب کنید"
+          }
+        ],
+        "role": "title"
+      },
+      {
+        "id": "okr-target-value",
+        "name": "targetValue",
+        "label": "Target Value",
+        "sectionId": "basic-information",
+        "component": "number",
+        "translations": [
+          {
+            "en": "Target Value"
+          },
+          {
+            "fa": "مقدار هدف"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 2,
+        "caption": "Enter target value",
+        "captionTranslations": [
+          {
+            "en": "Enter target value"
+          },
+          {
+            "fa": "مقدار هدف را وارد کنید"
+          }
+        ],
+        "role": "subtitle"
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "titleTranslations": [
+          {
+            "en": "Basic Information"
+          },
+          {
+            "fa": "اطلاعات پایه"
+          }
+        ],
+        "description": "Month and numeric target value",
+        "descriptionTranslations": [
+          {
+            "en": "Month and numeric target value"
+          },
+          {
+            "fa": "ماه و مقدار عددی هدف"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "ListChecks",
+    "schemaType": "business",
+    "allowDataInactive": true,
+    "applications": [
+      {
+        "id": "01KSTMGT000000000000000001",
+        "name": [
+          {
+            "en": "Strategic Management"
+          },
+          {
+            "fa": "مدیریت استراتژیک"
+          },
+          {
+            "ar": "الإدارة الاستراتيجية"
+          },
+          {
+            "es": "Gestión estratégica"
+          },
+          {
+            "fr": "Gestion stratégique"
+          },
+          {
+            "de": "Strategisches Management"
+          },
+          {
+            "it": "Gestione strategica"
+          },
+          {
+            "ru": "Стратегический менеджмент"
+          }
+        ],
+        "icon": "Target"
+      }
+    ],
+    "relatedTenants": [
+      {
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
       }
     ]
   },

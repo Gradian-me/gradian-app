@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Plus, RefreshCw, Settings, Building2, FileText, Zap } from 'lucide-react';
+import { Plus, RefreshCw, Settings, Building2, FileText, Zap, ChevronDown, ChevronRight } from 'lucide-react';
 import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,7 @@ import {
 import { MessageBox } from '@/gradian-ui/layout/message-box';
 import { DynamicFilterPane } from '@/gradian-ui/shared/components';
 import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
+import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { DynamicPagination } from '@/gradian-ui/data-display/components/DynamicPagination';
 import { useSchemaManagerPage } from '../hooks/useSchemaManagerPage';
 import { FormSchema } from '../types';
@@ -32,6 +33,185 @@ import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { clearClientSchemaCache } from '../utils/client-schema-cache';
+import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface AppGroup {
+  id: string;
+  name: string;
+  icon?: string;
+  schemas: FormSchema[];
+}
+
+interface ApplicationGroupedViewProps {
+  schemas: FormSchema[];
+  language: string | null | undefined;
+  viewMode: 'grid' | 'list' | 'table' | 'hierarchy';
+  showStatistics: boolean;
+  onEdit: (schema: FormSchema) => void;
+  onView: (schema: FormSchema) => void;
+  onDelete: (schema: FormSchema) => void;
+  collapsedGroups: Set<string>;
+  onToggleGroup: (id: string) => void;
+  searchQuery?: string;
+}
+
+/** Resolve the display name of an application given the current language. */
+function resolveAppName(
+  name: string | Array<Record<string, string>>,
+  language: string | null | undefined,
+): string {
+  if (typeof name === 'string') return name;
+  if (!Array.isArray(name)) return '';
+  const lang = language || 'en';
+  for (const entry of name) {
+    if (entry && lang in entry) return entry[lang];
+  }
+  // Fallback to English
+  for (const entry of name) {
+    if (entry && 'en' in entry) return entry.en;
+  }
+  return '';
+}
+
+/** Group schemas by their applications. Schemas without an application go into an "Other" bucket. */
+function groupSchemasByApplication(
+  schemas: FormSchema[],
+  language: string | null | undefined,
+): AppGroup[] {
+  const groupMap = new Map<string, AppGroup>();
+
+  for (const schema of schemas) {
+    const apps = schema.applications;
+    if (apps && apps.length > 0) {
+      for (const app of apps) {
+        if (!groupMap.has(app.id)) {
+          groupMap.set(app.id, {
+            id: app.id,
+            name: resolveAppName(app.name, language),
+            icon: app.icon,
+            schemas: [],
+          });
+        }
+        groupMap.get(app.id)!.schemas.push(schema);
+      }
+    } else {
+      const ungroupedId = '__ungrouped__';
+      if (!groupMap.has(ungroupedId)) {
+        groupMap.set(ungroupedId, { id: ungroupedId, name: 'Other', schemas: [] });
+      }
+      groupMap.get(ungroupedId)!.schemas.push(schema);
+    }
+  }
+
+  // Sort: named groups alphabetically, "Other" at the end
+  const groups = Array.from(groupMap.values());
+  groups.sort((a, b) => {
+    if (a.id === '__ungrouped__') return 1;
+    if (b.id === '__ungrouped__') return -1;
+    return a.name.localeCompare(b.name);
+  });
+
+  return groups;
+}
+
+function ApplicationGroupedView({
+  schemas,
+  language,
+  viewMode,
+  showStatistics,
+  onEdit,
+  onView,
+  onDelete,
+  collapsedGroups,
+  onToggleGroup,
+  searchQuery,
+}: ApplicationGroupedViewProps) {
+  const groups = useMemo(
+    () => groupSchemasByApplication(schemas, language),
+    [schemas, language],
+  );
+
+  if (groups.length <= 1 && groups[0]?.id === '__ungrouped__') {
+    // No meaningful grouping — render without headers
+    return renderSchemas(groups[0]?.schemas ?? [], viewMode, showStatistics, onEdit, onView, onDelete, searchQuery);
+  }
+
+  return (
+    <div className="space-y-4">
+      {groups.map((group) => {
+        const isCollapsed = collapsedGroups.has(group.id);
+        return (
+          <div key={group.id} className="rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => onToggleGroup(group.id)}
+              className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 dark:bg-slate-800/60 hover:bg-violet-50 dark:hover:bg-slate-800 transition-colors text-left"
+            >
+              {isCollapsed ? (
+                <ChevronRight className="h-4 w-4 text-gray-400 shrink-0" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
+              )}
+              {group.icon && group.id !== '__ungrouped__' && (
+                <IconRenderer
+                  iconName={group.icon}
+                  className="h-4 w-4 shrink-0 text-violet-600 dark:text-violet-300"
+                />
+              )}
+              <span className="font-semibold text-sm text-gray-800 dark:text-gray-100 flex-1 truncate">
+                {group.name}
+              </span>
+              <Badge
+                variant="secondary"
+                className="shrink-0 bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300"
+              >
+                {group.schemas.length}
+              </Badge>
+            </button>
+
+            {!isCollapsed && (
+              <div className="p-4">
+                {renderSchemas(group.schemas, viewMode, showStatistics, onEdit, onView, onDelete, searchQuery)}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function renderSchemas(
+  schemas: FormSchema[],
+  viewMode: 'grid' | 'list' | 'table' | 'hierarchy',
+  showStatistics: boolean,
+  onEdit: (schema: FormSchema) => void,
+  onView: (schema: FormSchema) => void,
+  onDelete: (schema: FormSchema) => void,
+  searchQuery?: string,
+) {
+  if (viewMode === 'table') {
+    return (
+      <SchemaTableView
+        schemas={schemas}
+        onEdit={onEdit}
+        onView={onView}
+        onDelete={onDelete}
+        isLoading={false}
+        showStatistics={showStatistics}
+        searchQuery={searchQuery}
+      />
+    );
+  }
+  if (viewMode === 'list') {
+    return <SchemaListView schemas={schemas} onEdit={onEdit} onView={onView} onDelete={onDelete} searchQuery={searchQuery} />;
+  }
+  return <SchemaCardGrid schemas={schemas} onEdit={onEdit} onView={onView} onDelete={onDelete} searchQuery={searchQuery} />;
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 
 export function SchemaManagerWrapper() {
   const router = useRouter();
@@ -39,6 +219,17 @@ export function SchemaManagerWrapper() {
   const language = useLanguageStore((s) => s.language);
   const defaultLang = getDefaultLanguage();
   const [isClearingCache, setIsClearingCache] = useState(false);
+
+  // Accordion expand/collapse state for ApplicationGroupedView
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+
+  const handleToggleGroup = (id: string) =>
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+
   const {
     loading,
     refreshing,
@@ -86,6 +277,18 @@ export function SchemaManagerWrapper() {
 
   const handleViewSchema = (schema: FormSchema) => router.push(`/page/${schema.id}`);
   const handleEditSchema = (schema: FormSchema) => router.push(`/builder/schemas/${schema.id}`);
+
+  const currentGroupIds = useMemo(
+    () => groupSchemasByApplication(paginatedSchemas, language).map((g) => g.id),
+    [paginatedSchemas, language],
+  );
+
+  const hasMultipleGroups =
+    currentGroupIds.length > 1 ||
+    (currentGroupIds.length === 1 && currentGroupIds[0] !== '__ungrouped__');
+
+  const handleExpandAll = () => setCollapsedGroups(new Set());
+  const handleCollapseAll = () => setCollapsedGroups(new Set(currentGroupIds));
 
   const handleClearCache = async () => {
     setIsClearingCache(true);
@@ -307,7 +510,7 @@ export function SchemaManagerWrapper() {
                 className="w-full m-0"
               />
             </div>
-            <div className="flex items-center border border-gray-300 dark:border-gray-500 rounded-lg px-3 h-10 shrink-0 whitespace-nowrap">
+            <div className="flex items-center rounded-lg px-3 h-10 shrink-0 whitespace-nowrap">
               <Switch
                 config={{ 
                   name: 'show-statistics', 
@@ -317,14 +520,23 @@ export function SchemaManagerWrapper() {
                 onChange={setShowStatistics}
               />
             </div>
-            <div className="border border-gray-300 dark:border-gray-500 rounded-md h-10 flex items-center shrink-0">
+            {hasMultipleGroups && (
+              <div className="border border-gray-300 dark:border-gray-500 rounded-xl h-10 flex items-center px-1 shrink-0">
+                <ExpandCollapseControls
+                  onExpandAll={handleExpandAll}
+                  onCollapseAll={handleCollapseAll}
+                  expandDisabled={collapsedGroups.size === 0}
+                  collapseDisabled={collapsedGroups.size === currentGroupIds.length}
+                  variant="nobackground"
+                  size="icon"
+                />
+              </div>
+            )}
+            <div className="border border-gray-300 dark:border-gray-500 rounded-xl h-10 flex items-center shrink-0">
               <ViewSwitcher
                 currentView={viewMode}
-                onViewChange={(nextView) => {
-                  if (nextView !== 'kanban') {
-                    setViewMode(nextView);
-                  }
-                }}
+                onViewChange={(v) => { if (v !== 'kanban') setViewMode(v); }}
+                showOnly={['table', 'list', 'grid']}
                 className="h-full"
               />
             </div>
@@ -367,139 +579,40 @@ export function SchemaManagerWrapper() {
             </div>
           )}
 
-          <FormTabsContent value="system" className="mt-4">
-            {loading ? (
-              viewMode === 'table' ? (
-                <div className="w-full">
-                  <SchemaTableView
-                    schemas={[]}
-                    onEdit={handleEditSchema}
-                    onView={handleViewSchema}
-                    onDelete={openDeleteDialog}
-                    isLoading={true}
-                  />
-                </div>
-              ) : (
-                <SchemaCardSkeletonGrid />
-              )
-            ) : paginatedSchemas.length > 0 ? (
-              viewMode === 'table' ? (
-                <SchemaTableView
+          {(['system', 'business', 'action-form'] as const).map((tab) => (
+            <FormTabsContent key={tab} value={tab} className="mt-4">
+              {loading ? (
+                viewMode === 'table' ? (
+                  <div className="w-full">
+                    <SchemaTableView
+                      schemas={[]}
+                      onEdit={handleEditSchema}
+                      onView={handleViewSchema}
+                      onDelete={openDeleteDialog}
+                      isLoading={true}
+                    />
+                  </div>
+                ) : (
+                  <SchemaCardSkeletonGrid />
+                )
+              ) : paginatedSchemas.length > 0 ? (
+                <ApplicationGroupedView
                   schemas={paginatedSchemas}
-                  onEdit={handleEditSchema}
-                  onView={handleViewSchema}
-                  onDelete={openDeleteDialog}
-                  isLoading={false}
+                  language={language}
+                  viewMode={viewMode}
                   showStatistics={showStatistics}
-                />
-              ) : viewMode === 'list' ? (
-                <SchemaListView
-                  schemas={paginatedSchemas}
                   onEdit={handleEditSchema}
                   onView={handleViewSchema}
                   onDelete={openDeleteDialog}
+                  collapsedGroups={collapsedGroups}
+                  onToggleGroup={handleToggleGroup}
+                  searchQuery={searchQuery}
                 />
               ) : (
-                <SchemaCardGrid
-                  schemas={paginatedSchemas}
-                  onEdit={handleEditSchema}
-                  onView={handleViewSchema}
-                  onDelete={openDeleteDialog}
-                />
-              )
-            ) : (
-              emptyState
-            )}
-          </FormTabsContent>
-
-          <FormTabsContent value="business" className="mt-4">
-            {loading ? (
-              viewMode === 'table' ? (
-                <div className="w-full">
-                  <SchemaTableView
-                    schemas={[]}
-                    onEdit={handleEditSchema}
-                    onView={handleViewSchema}
-                    onDelete={openDeleteDialog}
-                    isLoading={true}
-                  />
-                </div>
-              ) : (
-                <SchemaCardSkeletonGrid />
-              )
-            ) : paginatedSchemas.length > 0 ? (
-              viewMode === 'table' ? (
-                <SchemaTableView
-                  schemas={paginatedSchemas}
-                  onEdit={handleEditSchema}
-                  onView={handleViewSchema}
-                  onDelete={openDeleteDialog}
-                  isLoading={false}
-                  showStatistics={showStatistics}
-                />
-              ) : viewMode === 'list' ? (
-                <SchemaListView
-                  schemas={paginatedSchemas}
-                  onEdit={handleEditSchema}
-                  onView={handleViewSchema}
-                  onDelete={openDeleteDialog}
-                />
-              ) : (
-                <SchemaCardGrid
-                  schemas={paginatedSchemas}
-                  onEdit={handleEditSchema}
-                  onView={handleViewSchema}
-                  onDelete={openDeleteDialog}
-                />
-              )
-            ) : (
-              emptyState
-            )}
-          </FormTabsContent>
-          <FormTabsContent value="action-form" className="mt-4">
-            {loading ? (
-              viewMode === 'table' ? (
-                <div className="w-full">
-                  <SchemaTableView
-                    schemas={[]}
-                    onEdit={handleEditSchema}
-                    onView={handleViewSchema}
-                    onDelete={openDeleteDialog}
-                    isLoading={true}
-                  />
-                </div>
-              ) : (
-                <SchemaCardSkeletonGrid />
-              )
-            ) : paginatedSchemas.length > 0 ? (
-              viewMode === 'table' ? (
-                <SchemaTableView
-                  schemas={paginatedSchemas}
-                  onEdit={handleEditSchema}
-                  onView={handleViewSchema}
-                  onDelete={openDeleteDialog}
-                  isLoading={false}
-                  showStatistics={showStatistics}
-                />
-              ) : viewMode === 'list' ? (
-                <SchemaListView
-                  schemas={paginatedSchemas}
-                  onEdit={handleEditSchema}
-                  onView={handleViewSchema}
-                  onDelete={openDeleteDialog}
-                />
-              ) : (
-                <SchemaCardGrid
-                  schemas={paginatedSchemas}
-                  onEdit={handleEditSchema}
-                  onView={handleViewSchema}
-                  onDelete={openDeleteDialog}
-                />
-              )
-            ) : (
-              emptyState
-            )}
-          </FormTabsContent>
+                emptyState
+              )}
+            </FormTabsContent>
+          ))}
         </FormTabs>
       </div>
 
