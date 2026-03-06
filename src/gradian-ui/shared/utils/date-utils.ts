@@ -197,11 +197,12 @@ export function formatDateTimeWithFallback(
 }
 
 /**
- * Gets the current date and time in format: yyyy-MM-dd HH:mm:ss.ms
+ * Gets the current date and time in format: yyyy-MM-dd HH:mm:ss[.ms]
  * Useful for AI prompts and time-related analytics
- * @returns Formatted date/time string (e.g., "2025-01-22 14:30:45.123")
+ * @param includeMilliseconds - When true (default), append milliseconds; when false, format is yyyy-MM-dd HH:mm:ss
+ * @returns Formatted date/time string (e.g., "2025-01-22 14:30:45.123" or "2025-01-22 14:30:45")
  */
-export function getCurrentDateTime(): string {
+export function getCurrentDateTime(includeMilliseconds: boolean = true): string {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -209,7 +210,25 @@ export function getCurrentDateTime(): string {
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = String(now.getSeconds()).padStart(2, '0');
-  const milliseconds = String(now.getMilliseconds()).padStart(3, '0');
-  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
+  const base = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  if (!includeMilliseconds) return base;
+  const ms = String(now.getMilliseconds()).padStart(3, '0');
+  return `${base}.${ms}`;
+}
+
+/**
+ * Current date and time as digits only (no dashes, colons, or spaces).
+ * Suitable for barcode encoding (e.g. EAN) where only numeric content is desired.
+ * @param date - Optional date to format; defaults to now
+ * @returns String like "20250306143025" (yyyyMMddHHmmss)
+ */
+export function getBarcodeTime(date: Date = new Date()): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${year}${month}${day}${hours}${minutes}${seconds}`;
 }
 

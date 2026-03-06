@@ -31,3 +31,4 @@ export * as SharedErrors from './shared/errors';
 export * as IndexedDbManager from './indexdb-manager';
 export * as Communication from './communication';
 export * as FormulaEngine from './formula-engine';
+export * as Printout from './printout';

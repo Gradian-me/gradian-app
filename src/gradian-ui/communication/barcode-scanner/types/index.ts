@@ -128,4 +128,9 @@ export interface BarcodeScannerResultJSONProps {
    * ID of the most recently added/updated barcode — triggers a violet pulse animation.
    */
   newlyAddedId?: string | null;
+  /**
+   * Optional receipt layout: logo, headerTitle, headerSubtitle, headerDescription, footerDescription.
+   * Passed to the print receipt builder for a modern receipt layout.
+   */
+  receiptOptions?: import("@/gradian-ui/printout").ReceiptDocOptions;
 }

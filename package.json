@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.62.001",
+  "version": "1.62.002",
   "private": true,
   "scripts": {
     "dev": "npm run clean:relations && cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack",
@@ -78,6 +78,7 @@
     "framer-motion": "^12.23.26",
     "gsap": "^3.14.2",
     "html2canvas": "^1.4.1",
+    "js-sha256": "^0.11.1",
     "jsonwebtoken": "^9.0.3",
     "jspdf": "^4.1.0",
     "katex": "^0.16.27",
@@ -99,6 +100,7 @@
     "react-qrcode-pretty": "^3.3.1",
     "react-syntax-highlighter": "^16.1.0",
     "react-voice-visualizer": "^2.0.8",
+    "receiptline": "^4.0.0",
     "recharts": "^3.5.1",
     "rehype-katex": "^7.0.1",
     "remark": "^15.0.1",

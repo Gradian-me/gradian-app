@@ -6,13 +6,27 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/gradian-ui/shared/utils";
 import { format as dateFormat } from "date-fns";
+import { getBarcodeTime } from "@/gradian-ui/shared/utils/date-utils";
 import { ButtonMinimal, ConfirmationMessage } from "@/gradian-ui/form-builder/form-elements";
 import { NumberInputAnimated } from "@/gradian-ui/form-builder/form-elements/components/NumberInputAnimated";
 import { SearchInput } from "@/gradian-ui/form-builder/form-elements/components/SearchInput";
+import {
+  PrintoutReceipt,
+  buildDocFromBarcodes,
+  type ReceiptDocOptions,
+} from "@/gradian-ui/printout";
 import { isValidUrl, safeLinkHref } from "../utils/sanitize";
 import type { BarcodeScannerResultJSONProps, ScannedBarcode } from "../types";
 
 const SEARCH_CONFIG = { name: "barcode-search", placeholder: "Search by label or ID…" };
+
+/** Default receipt layout: header, column headers, footer. barcodeValue defaults to current time (12-digit for EAN) in useMemo. */
+const DEFAULT_RECEIPT_OPTIONS: ReceiptDocOptions = {
+  headerTitle: "Label print",
+  headerSubtitle: "Scan results",
+  headerDescription: "Items listed below",
+  listColumnHeaders: ["Item", "Qty"],
+};
 
 /**
  * Splits `text` around case-insensitive matches of `query` and returns
@@ -197,6 +211,7 @@ export const BarcodeScannerResultJSON: React.FC<BarcodeScannerResultJSONProps> =
   hideFooterConfirm = false,
   fillHeight = false,
   newlyAddedId = null,
+  receiptOptions,
 }) => {
   const [confirmId, setConfirmId] = React.useState<string | null>(null);
   const [confirmLabel, setConfirmLabel] = React.useState<string>("");
@@ -244,6 +259,18 @@ export const BarcodeScannerResultJSON: React.FC<BarcodeScannerResultJSONProps> =
     );
   }, [reversed, searchQuery]);
 
+  const receiptDoc = useMemo(
+    () =>
+      buildDocFromBarcodes(
+        barcodes.map((b) => ({ label: b.label ?? "", count: b.count })),
+        {
+          ...DEFAULT_RECEIPT_OPTIONS,
+          ...receiptOptions,
+        }
+      ),
+    [barcodes, receiptOptions]
+  );
+
   return (
     <div
       className={cn(
@@ -275,6 +302,13 @@ export const BarcodeScannerResultJSON: React.FC<BarcodeScannerResultJSONProps> =
                 Mock
               </Button>
             )}
+            <PrintoutReceipt
+              doc={receiptDoc}
+              showTrigger
+              triggerLabel="Print label"
+              triggerVariant="ghost"
+              className="h-9 text-xs gap-1 text-violet-600 hover:text-violet-700 dark:text-violet-400"
+            />
             <Button
               variant="ghost"
               size="sm"
