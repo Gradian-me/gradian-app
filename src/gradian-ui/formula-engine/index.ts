@@ -24,4 +24,4 @@ export {
 } from './utils/formula-visualization';
 export { useFormulaEvaluation, type UseFormulaEvaluationOptions, type FormulaEvaluationResult } from './hooks/useFormulaEvaluation';
 export { FormulaInput, type FormulaInputProps } from './components/FormulaInput';
-
+export { Calculator, type CalculatorProps } from './components/Calculator';

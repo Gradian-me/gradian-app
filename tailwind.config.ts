@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+﻿import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
@@ -110,6 +110,7 @@ const config: Config = {
         'slideInDown': 'slideInDown 0.2s ease-out',
         'flipIn': 'flipIn 0.2s ease-out',
         'wiggle': 'wiggle 0.5s ease-in-out',
+        'scan-line': 'scanLine 2s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -139,6 +140,10 @@ const config: Config = {
         flipIn: {
           '0%': { opacity: '0', transform: 'rotateY(-90deg)' },
           '100%': { opacity: '1', transform: 'rotateY(0)' },
+        },
+        scanLine: {
+          '0%': { top: '0%' },
+          '100%': { top: '100%' },
         },
         wiggle: {
           '0%, 100%': { transform: 'rotate(0deg)' },

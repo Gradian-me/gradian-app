@@ -55,6 +55,7 @@ export interface NumberInputProps extends FormElementProps {
   step?: number;
   precision?: number;
   canCopy?: boolean;
+  enableCalculatorInput?: boolean;
 }
 
 export interface SliderProps extends FormElementProps {
@@ -171,7 +172,24 @@ export interface FileInputProps extends FormElementProps {
 }
 
 export interface FormElementConfig extends FormFieldConfig {
-  component: 'text' | 'email' | 'password' | 'number' | 'select' | 'textarea' | 'json' | 'checkbox' | 'checkbox-list' | 'radio' | 'date' | 'file' | 'picker' | 'toggle' | 'toggle-group' | 'language-selector';
+  component:
+    | 'text'
+    | 'email'
+    | 'password'
+    | 'number'
+    | 'select'
+    | 'textarea'
+    | 'json'
+    | 'checkbox'
+    | 'checkbox-list'
+    | 'radio'
+    | 'date'
+    | 'file'
+    | 'picker'
+    | 'toggle'
+    | 'toggle-group'
+    | 'language-selector'
+    | 'barcode-scanner';
   required?: boolean;
   /**
    * Generic bag of component-specific props that should be forwarded

@@ -169,7 +169,7 @@ export const SwipeButton: React.FC<SwipeButtonProps> = ({
     <div
       ref={containerRef}
       className={cn(
-        'relative h-10 w-[250px] overflow-hidden rounded-lg mx-auto',
+        'relative h-11 w-[250px] overflow-hidden rounded-3xl mx-auto',
         'border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900',
         colors.trackBorder,
         colors.track,

@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.61.015",
+  "version": "1.62.001",
   "private": true,
   "scripts": {
     "dev": "npm run clean:relations && cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack",
@@ -57,6 +57,7 @@
     "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-table": "^8.21.3",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@zxing/library": "^0.21.3",
     "argon2": "^0.44.0",
     "axios": "^1.13.5",
     "class-variance-authority": "^0.7.1",
@@ -110,7 +111,7 @@
     "signature_pad": "^4.2.0",
     "sonner": "^1.6.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-react": "^5.31.0",
+    "swagger-ui-react": "^5.32.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
     "ulid": "^3.0.2",
@@ -137,6 +138,8 @@
     "webpack-obfuscator": "^3.6.0"
   },
   "overrides": {
+    "dompurify": ">=3.3.2",
+    "immutable": ">=4.3.8",
     "js-yaml": "^4.1.1",
     "jws": "^3.2.3",
     "lodash": "^4.17.23",

@@ -4,6 +4,7 @@
 // Number input with type="number" embedded
 
 import React, { forwardRef, useImperativeHandle, useRef, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { NumberInputProps, FormElementRef } from '../types';
 import { cn, validateField, formatNumber } from '../../../shared/utils';
 import { CopyContent } from './CopyContent';
@@ -13,6 +14,9 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage, resolveSchemaFieldPlaceholder } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { Calculator as CalculatorIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calculator } from '@/gradian-ui/formula-engine';
 
 export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
   (
@@ -32,6 +36,7 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
       className,
       touched,
       canCopy = false,
+      enableCalculatorInput = true,
       ...props
     },
     ref
@@ -39,8 +44,10 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
     const inputRef = useRef<HTMLInputElement>(null);
     const [isFocused, setIsFocused] = useState(false);
     const [displayValue, setDisplayValue] = useState<string>('');
+    const [calculatorOpen, setCalculatorOpen] = useState(false);
     const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
     const defaultLang = getDefaultLanguage();
+    const effectiveEnableCalculator = enableCalculatorInput ?? (config as any)?.enableCalculatorInput ?? false;
 
     // Check if thousand separator formatting is enabled (default: true, can be disabled via config)
     const useThousandSeparator = (config as any)?.useThousandSeparator !== false;
@@ -154,14 +161,24 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
       onFocus?.();
     };
 
+    const hasValue = value !== '' && value !== null && value !== undefined && (typeof value !== 'number' || !isNaN(value));
     const inputClasses = cn(
       baseInputClasses,
       error
         ? 'border-red-500 focus-visible:ring-red-300 focus-visible:border-red-500 dark:border-red-500 dark:focus-visible:ring-red-400 dark:focus-visible:border-red-500'
         : '',
-      canCopy && 'pe-10',
+      (canCopy || effectiveEnableCalculator) && (canCopy && effectiveEnableCalculator ? 'pe-20' : 'pe-10'),
       className
     );
+
+    const handleCalculatorApply = (result: number) => {
+      if (hasValue) {
+        const confirmMsg = getT(TRANSLATION_KEYS.MESSAGE_CALCULATOR_REPLACE_VALUE, language, defaultLang);
+        if (!window.confirm(confirmMsg)) return;
+      }
+      onChange?.(result);
+      setCalculatorOpen(false);
+    };
 
     const fieldName = config?.name || 'unknown';
     const fieldLabel = config?.label;
@@ -183,7 +200,7 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
             {fieldLabel}
           </label>
         )}
-        <div className="relative">
+        <div className="relative flex items-center">
         <input
           ref={inputRef}
           id={fieldName}
@@ -204,11 +221,57 @@ export const NumberInput = forwardRef<FormElementRef, NumberInputProps>(
           className={inputClasses}
           {...props}
         />
-          {canCopy && (value !== '' && value !== null && value !== undefined && (typeof value !== 'number' || !isNaN(value))) && (
-            <div className="absolute end-1 top-1/2 -translate-y-1/2">
+          <div className="absolute end-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            {canCopy && hasValue && (
               <CopyContent content={value} />
-            </div>
-          )}
+            )}
+            {effectiveEnableCalculator && (
+              <>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setCalculatorOpen(true)}
+                  disabled={disabled}
+                  className="h-7 w-7 p-0 hover:bg-violet-100 hover:text-violet-600"
+                  title="Open calculator"
+                  aria-label="Open calculator"
+                  tabIndex={-1}
+                >
+                  <CalculatorIcon className="h-4 w-4" />
+                </Button>
+                {calculatorOpen &&
+                  typeof document !== 'undefined' &&
+                  createPortal(
+                    <div
+                      className="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 pointer-events-auto"
+                      style={{ isolation: 'isolate' }}
+                      onClick={() => setCalculatorOpen(false)}
+                      role="presentation"
+                    >
+                      <div
+                        className="rounded-lg border border-gray-700 shadow-2xl overflow-hidden pointer-events-auto"
+                        onClick={(e) => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Calculator"
+                      >
+                        <Calculator
+                          enableCalculatorInput
+                          enableSign={false}
+                          enableParanthesis
+                          enableHistory={false}
+                          initialValue={typeof value === 'number' ? value : value ?? ''}
+                          onApply={handleCalculatorApply}
+                          onCancel={() => setCalculatorOpen(false)}
+                        />
+                      </div>
+                    </div>,
+                    document.body
+                  )}
+              </>
+            )}
+          </div>
         </div>
         {error && (
           <p className={errorTextClasses} role="alert">

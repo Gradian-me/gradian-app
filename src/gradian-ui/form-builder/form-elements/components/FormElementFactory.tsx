@@ -61,6 +61,7 @@ import { VideoViewer } from './VideoViewer';
 import { Slider } from './Slider';
 import { SignaturePad } from './SignaturePad';
 import { SwipeButton } from './SwipeButton';
+import { BarcodeScannerInput } from './BarcodeScannerInput';
 import {
   normalizeChecklistValue,
   checklistToListInputItems,
@@ -210,9 +211,12 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
   
   // Extract loadingTextSwitches from restProps if it exists
   const loadingTextSwitches = (restProps as any)?.loadingTextSwitches;
+
+  // Extract enableCalculatorInput from config or restProps (for number input)
+  const enableCalculatorInput = Boolean((config as any)?.enableCalculatorInput ?? (restProps as any)?.enableCalculatorInput ?? false);
   
-  // Remove canCopy, enableVoiceInput, loadingTextSwitches, and hasAnnotation from restProps (hasAnnotation must not reach DOM)
-  const { canCopy: _, enableVoiceInput: __, loadingTextSwitches: ___, hasAnnotation: ___hasAnnotation, ...restPropsWithoutExtras } = restProps;
+  // Remove canCopy, enableVoiceInput, loadingTextSwitches, enableCalculatorInput, and hasAnnotation from restProps (hasAnnotation must not reach DOM)
+  const { canCopy: _, enableVoiceInput: __, loadingTextSwitches: ___, enableCalculatorInput: ____enableCalculatorInput, hasAnnotation: ___hasAnnotation, ...restPropsWithoutExtras } = restProps;
 
   // Generic per-field extra props bag from config; this lets us avoid
   // touching the factory every time we add a new component-level prop.
@@ -266,16 +270,33 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
         return (
           <NameInput
             config={configForChild}
-          {...commonProps}
-          canCopy={canCopy}
-          isCustomizable={(restProps as any)?.isCustomizable ?? (config as any)?.isCustomizable}
-          customMode={(restProps as any)?.customMode ?? (config as any)?.customMode}
-          defaultCustomMode={(restProps as any)?.defaultCustomMode ?? (config as any)?.defaultCustomMode}
-          onCustomModeChange={(restProps as any)?.onCustomModeChange ?? (config as any)?.onCustomModeChange}
-          customizeDisabled={(restProps as any)?.customizeDisabled ?? (config as any)?.customizeDisabled}
-          helperText={(restProps as any)?.helperText ?? (config as any)?.helperText}
-        />
-      );
+            {...commonProps}
+            canCopy={canCopy}
+            isCustomizable={(restProps as any)?.isCustomizable ?? (config as any)?.isCustomizable}
+            customMode={(restProps as any)?.customMode ?? (config as any)?.customMode}
+            defaultCustomMode={(restProps as any)?.defaultCustomMode ?? (config as any)?.defaultCustomMode}
+            onCustomModeChange={(restProps as any)?.onCustomModeChange ?? (config as any)?.onCustomModeChange}
+            customizeDisabled={(restProps as any)?.customizeDisabled ?? (config as any)?.customizeDisabled}
+            helperText={(restProps as any)?.helperText ?? (config as any)?.helperText}
+          />
+        );
+
+      case 'barcode-scanner':
+      case 'barcodeScanner': {
+        return (
+          <BarcodeScannerInput
+            config={configForChild}
+            value={restProps.value ?? null}
+            onChange={restProps.onChange}
+            onBlur={restProps.onBlur}
+            onFocus={restProps.onFocus}
+            error={restProps.error}
+            disabled={restProps.disabled}
+            required={restProps.required ?? config?.validation?.required ?? false}
+            className={restProps.className}
+          />
+        );
+      }
 
       case 'otp':
       case 'otp-input':
@@ -303,7 +324,7 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
           ...configForChild,
           ...((config as any)?.componentTypeConfig || {}),
         };
-        return <NumberInput config={numberConfig} {...commonProps} canCopy={canCopy} />;
+        return <NumberInput config={numberConfig} {...commonProps} canCopy={canCopy} enableCalculatorInput={enableCalculatorInput} />;
 
       case 'slider': {
         const sliderMin = (config as any)?.min ?? 0;

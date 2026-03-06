@@ -3,6 +3,7 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-xs font-semibold transition-all duration-200 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 active:scale-95",
@@ -44,17 +45,38 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean
+  tooltipText?: string
+  tooltipSide?: "top" | "right" | "bottom" | "left"
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, tooltipText, tooltipSide = "top", ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
-    return (
+    const button = (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size, className }), "gap-2")}
         ref={ref}
         {...props}
       />
+    )
+    if (!tooltipText) return button
+    return (
+      <TooltipProvider delayDuration={300}>
+        <Tooltip>
+          {/*
+           * asChild merges tooltip trigger behaviour onto the <span>.
+           * The span always receives pointer events even when the inner
+           * button has disabled:pointer-events-none, and avoids the
+           * invalid <button><button> nesting error.
+           */}
+          <TooltipTrigger asChild>
+            <span tabIndex={-1} className="inline-flex focus:outline-none">
+              {button}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent side={tooltipSide}>{tooltipText}</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     )
   }
 )

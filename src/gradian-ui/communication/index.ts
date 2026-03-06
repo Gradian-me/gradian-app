@@ -55,6 +55,25 @@ export type {
   CanvasAnnotation,
 } from './annotations';
 
+// Barcode Scanner
+export * as BarcodeScanner from './barcode-scanner';
+export {
+  BarcodeScannerWrapper,
+  BarcodeScannerCamera,
+  BarcodeScannerToolbar,
+  BarcodeScannerResult,
+  BarcodeScannerResultJSON,
+} from './barcode-scanner';
+export type {
+  BarcodeFormat,
+  ScannedBarcode,
+  BarcodeScannerProps,
+  BarcodeScannerCameraProps,
+  BarcodeScannerToolbarProps,
+  BarcodeScannerResultProps,
+  BarcodeScannerResultJSONProps,
+} from './barcode-scanner';
+
 // Future services can be added here:
 // export * as SMS from './sms';
 // export * as PushNotifications from './push-notifications';

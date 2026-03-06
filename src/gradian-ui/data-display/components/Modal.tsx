@@ -51,13 +51,13 @@ export const Modal: React.FC<ModalProps> = ({
   }, [isMaximized, onMaximizeChange]);
 
   const modalClasses = cn(
-    hideDialogHeader 
+    hideDialogHeader
       ? 'border-0 bg-white dark:bg-gray-900 shadow-none overflow-hidden rounded-none h-full w-full' // Full screen, no border, no rounded corners, no max constraints when header is hidden
       : cn(
-          'border-none bg-white dark:bg-gray-900 shadow-xl overflow-hidden rounded-none lg:rounded-2xl h-full w-full',
-          // When not maximized, use default max size (caller className can override)
-          !(enableMaximize && isMaximized) && 'lg:max-h-[90vh] lg:max-w-[90vw]',
-        ),
+        'border-none bg-white dark:bg-gray-900 shadow-xl overflow-hidden rounded-none lg:rounded-2xl h-full w-full',
+        // When not maximized, use default max size (caller className can override)
+        !(enableMaximize && isMaximized) && 'lg:max-h-[90vh] lg:max-w-[90vw]',
+      ),
     'mx-0', // No margin on mobile, margin on desktop
     'flex flex-col', // Add flex column layout
     // When maximized, don't apply caller className for size so our maximized style wins
@@ -76,7 +76,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
+      <DialogContent
         className={modalClasses}
         style={maximizedStyle}
         hideCloseButton={hideCloseButton}
@@ -97,10 +97,10 @@ export const Modal: React.FC<ModalProps> = ({
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 gap-2 flex flex-col">
                 {title && (
-                <DialogTitle className="line-clamp-3 wrap-break-word">
-                  {title}
-                </DialogTitle>
-              )}
+                  <DialogTitle className="line-clamp-3 wrap-break-word">
+                    {title}
+                  </DialogTitle>
+                )}
                 {description && (!enableMaximize || !isMaximized) && (
                   <DialogDescription>{description}</DialogDescription>
                 )}
@@ -148,22 +148,21 @@ export const Modal: React.FC<ModalProps> = ({
             {actions}
           </div>
         )}
-        <div className={cn("flex-1 overflow-y-auto", hideDialogHeader ? "px-1 md:px-2 pb-4 pt-0" : "px-1 md:px-2 pb-4")}>
+        <div className={cn("flex-1 overflow-y-auto", hideDialogHeader ? "px-1 md:px-2 pb-2 pt-0" : "px-1 md:px-2 pb-2")}>
           {children}
         </div>
         {showCloseButton && (
           <div className={cn(
-            "flex px-6 pb-4 pt-2 border-t shrink-0",
-            footerLeftActions ? "justify-between" : "justify-end"
+            "flex px-6 pb-4 pt-2 border-t shrink-0 gap-2 justify-end"
           )}>
+            <Button variant="outline" onClick={onClose}>
+              {closeButtonLabel}
+            </Button>
             {footerLeftActions && (
               <div className="flex items-center gap-2">
                 {footerLeftActions}
               </div>
             )}
-            <Button variant="outline" onClick={onClose}>
-              {closeButtonLabel}
-            </Button>
           </div>
         )}
       </DialogContent>

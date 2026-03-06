@@ -52,6 +52,7 @@ export const TRANSLATION_KEYS = {
   MESSAGE_NO_ITEMS_AVAILABLE: 'MESSAGE_NO_ITEMS_AVAILABLE',
   MESSAGE_NO_OPTIONS_FOUND: 'MESSAGE_NO_OPTIONS_FOUND',
   MESSAGE_NO_ITEMS_FOUND_MATCHING: 'MESSAGE_NO_ITEMS_FOUND_MATCHING',
+  MESSAGE_CALCULATOR_REPLACE_VALUE: 'MESSAGE_CALCULATOR_REPLACE_VALUE',
   ARIA_REFRESH_ITEMS: 'ARIA_REFRESH_ITEMS',
   PLACEHOLDER_SELECT_LANGUAGE: 'PLACEHOLDER_SELECT_LANGUAGE',
   PLACEHOLDER_SEARCH: 'PLACEHOLDER_SEARCH',
@@ -1263,6 +1264,10 @@ export const TRANSLATIONS: TranslationEntry[] = [
   {
     key: TRANSLATION_KEYS.MESSAGE_NO_ITEMS_FOUND_MATCHING,
     translations: [{ en: 'No items found matching "{0}"' }, { fa: 'موردی مطابق با "{0}" یافت نشد' }, { ar: 'لم يتم العثور على عناصر تطابق "{0}"' }, { es: 'No se encontraron elementos que coincidan con "{0}"' }, { fr: 'Aucun élément ne correspond à "{0}"' }, { de: 'Keine Elemente gefunden, die "{0}" entsprechen' }, { it: 'Nessun elemento trovato corrispondente a "{0}"' }, { ru: 'Элементы, соответствующие "{0}", не найдены' }],
+  },
+  {
+    key: TRANSLATION_KEYS.MESSAGE_CALCULATOR_REPLACE_VALUE,
+    translations: [{ en: 'Replace current value?' }, { fa: 'مقدار فعلی جایگزین شود؟' }, { ar: 'استبدال القيمة الحالية؟' }, { es: '¿Reemplazar el valor actual?' }, { fr: 'Remplacer la valeur actuelle ?' }, { de: 'Aktuellen Wert ersetzen?' }, { it: 'Sostituire il valore attuale?' }, { ru: 'Заменить текущее значение?' }],
   },
   {
     key: TRANSLATION_KEYS.ARIA_REFRESH_ITEMS,
