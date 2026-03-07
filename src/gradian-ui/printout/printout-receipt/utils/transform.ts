@@ -16,9 +16,32 @@ export const DEFAULT_PRINTER_CONFIG: Readonly<Partial<PrinterConfig>> = {
   marginRight: 0,
 };
 
+/** Extra horizontal pixels to add per character (receiptline uses fixed charWidth; this loosens spacing). */
+const SVG_LETTER_SPACING_PX = 2;
+
+/**
+ * Post-process SVG: add extra horizontal spacing to each character by increasing
+ * each <tspan x="N"> within every <text> by (characterIndex * extraPx).
+ * receiptline positions characters with fixed charWidth; CSS letter-spacing has no effect.
+ */
+function addSvgLetterSpacing(svg: string, extraPx: number = SVG_LETTER_SPACING_PX): string {
+  if (!svg || extraPx <= 0) return svg;
+  return svg.replace(/<text[^>]*>([\s\S]*?)<\/text>/gi, (textMatch, inner) => {
+    let index = 0;
+    const newInner = inner.replace(/<tspan\s+([^>]*?)x="(\d+)"([^>]*)>/gi, (_m: string, before: string, xStr: string, after: string) => {
+      const x = Number.parseInt(xStr, 10);
+      const newX = x + index * extraPx;
+      index += 1;
+      return `<tspan ${before}x="${newX}"${after}>`;
+    });
+    return textMatch.replace(inner, newInner);
+  });
+}
+
 /**
  * Transforms a ReceiptLine document to an SVG string for display or print.
  * Uses heat-printer-friendly defaults; pass printerConfig to override.
+ * Post-processes the SVG to add letter spacing (receiptline uses fixed character positions).
  *
  * @param doc - ReceiptLine document string
  * @param printer - Optional partial printer config (merged with defaults)
@@ -37,7 +60,8 @@ export function transformDocToSvg(
       ...printer,
     };
     const result = receiptline.transform(doc, config);
-    return typeof result === "string" ? result : "";
+    const svg = typeof result === "string" ? result : "";
+    return svg ? addSvgLetterSpacing(svg) : "";
   } catch {
     return "";
   }

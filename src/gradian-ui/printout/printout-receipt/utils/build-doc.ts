@@ -2,11 +2,47 @@ import type { ReceiptLineDoc } from "../types";
 import { getBarcodeTime, getCurrentDateTime } from "@/gradian-ui/shared/utils/date-utils";
 import { sha256 } from "js-sha256";
 
+// Reshape Persian/Arabic to contextual forms (initial/medial/final/isolated) for correct glyphs when drawn LTR
+const arabicPersianReshaper = require("arabic-persian-reshaper") as {
+  PersianShaper: { convertArabic: (s: string) => string };
+  ArabicShaper: { convertArabic: (s: string) => string };
+};
+
 /**
  * ReceiptLine spec: special characters in text (| column, - rule, _ underline, " emphasis, ` invert, ^ size),
  * escape sequences (\\ \| \{ \} \- \= \~ \_ \" \` \^ \n), and properties ({width:w, image:i, code:c, option:o, align:a}).
  * @see https://www.npmjs.com/package/receiptline OFSC ReceiptLine Specification
  */
+
+/** LRE = Left-to-Right Embedding, PDF = Pop Directional Formatting. Force the run to be drawn LTR so it isn't re-reversed by bidi. */
+const LRE = "\u202A";
+const PDF = "\u202C";
+
+/**
+ * True if the string contains strong RTL characters (Arabic, Hebrew, Persian, etc.).
+ */
+function hasRtlCharacter(str: string): boolean {
+  return /[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/.test(str);
+}
+
+/**
+ * For RTL text: reshape first (logical order → correct contextual glyphs), then reverse
+ * so that when the receipt draws LTR we get correct visual order and correct joining.
+ * Wrap with LRE+PDF so the browser doesn't re-reverse. Works with mixed Persian + Latin.
+ */
+function reverseAndReshapeRtl(text: string): string {
+  if (!text || !hasRtlCharacter(text)) return text;
+  let shaped: string;
+  try {
+    // Reshape in logical (RTL) order so each character gets correct initial/medial/final/isolated form
+    shaped = arabicPersianReshaper.PersianShaper.convertArabic(text);
+  } catch {
+    shaped = text;
+  }
+  // Reverse the reshaped string so LTR drawing produces correct visual order
+  const reversed = [...shaped].reverse().join("");
+  return LRE + reversed + PDF;
+}
 
 /**
  * Escapes ReceiptLine special characters in text so it can be used safely in doc content.
@@ -26,6 +62,14 @@ function escapeReceiptLineText(text: string): string {
     .replace(/`/g, "\\`")
     .replace(/\^/g, "\\^")
     .replace(/\r?\n/g, " ");
+}
+
+/**
+ * Escape for ReceiptLine and reverse+reshape RTL text so the LTR-drawing receipt engine
+ * displays Persian/Arabic correctly (order + contextual glyphs). Latin in mixed text is unchanged.
+ */
+function escapeAndWrapRtl(text: string): string {
+  return reverseAndReshapeRtl(escapeReceiptLineText(text));
 }
 
 /**
@@ -97,13 +141,13 @@ export function buildDocFromBarcodes(
   }
 
   if (options?.headerTitle?.trim()) {
-    lines.push(`^^^${escapeReceiptLineText(options.headerTitle.trim())}`);
+    lines.push(`^^^${escapeAndWrapRtl(options.headerTitle.trim())}`);
   }
   if (options?.headerSubtitle?.trim()) {
-    lines.push(`^^${escapeReceiptLineText(options.headerSubtitle.trim())}`);
+    lines.push(`^^${escapeAndWrapRtl(options.headerSubtitle.trim())}`);
   }
   if (options?.headerDescription?.trim()) {
-    lines.push(escapeReceiptLineText(options.headerDescription.trim()));
+    lines.push(escapeAndWrapRtl(options.headerDescription.trim()));
   }
   if (options?.headerTitle ?? options?.headerSubtitle ?? options?.headerDescription) {
     lines.push("---");
@@ -111,7 +155,7 @@ export function buildDocFromBarcodes(
 
 
   if (options?.listTitle?.trim()) {
-    lines.push(`^^${escapeReceiptLineText(options.listTitle.trim())}`);
+    lines.push(`^^${escapeAndWrapRtl(options.listTitle.trim())}`);
     lines.push("---");
   }
 
@@ -127,13 +171,13 @@ export function buildDocFromBarcodes(
     lines.push("{w:*,7;b:line;a:left}");
     const colHeaders = options?.listColumnHeaders;
     if (colHeaders?.length === 2 && (colHeaders[0]?.trim() || colHeaders[1]?.trim())) {
-      const left = `"${escapeReceiptLineText(colHeaders[0].trim() || "Item")}`;
-      const right = `"${escapeReceiptLineText(colHeaders[1].trim() || "Qty")}`;
+      const left = `"${escapeAndWrapRtl(colHeaders[0].trim() || "Item")}`;
+      const right = `"${escapeAndWrapRtl(colHeaders[1].trim() || "Qty")}`;
       lines.push(`| ${left} | ${right} |`);
       lines.push("---");
     }
     items.forEach((item, index) => {
-      const safeLabel = escapeReceiptLineText(String(item.label).slice(0, 200));
+      const safeLabel = escapeAndWrapRtl(String(item.label).slice(0, 200));
       const num = index + 1;
       const qty = item.count != null && item.count > 1 ? `${item.count}` : "1";
       lines.push(`|${num}. ${safeLabel} | ${qty}|`);
@@ -145,7 +189,7 @@ export function buildDocFromBarcodes(
   lines.push("{w:*;b:none}");
   lines.push("---");
   const footer = options?.footerDescription?.trim() || "powered by Gradian.me";
-  lines.push(escapeReceiptLineText(footer));
+  lines.push(escapeAndWrapRtl(footer));
   const qrVal = options?.qrValue?.trim() || "Gradian.me";
   const barcodeVal = (options?.barcodeValue?.trim()) || getBarcodeTime();
   lines.push(`{c:${escapePropertyValue(qrVal)};o:qrcode,5}`);
@@ -159,7 +203,7 @@ export function buildDocFromBarcodes(
   if (showChecksum) {
     const docSoFar = lines.join("\n");
     const checksum = sha256.hex(docSoFar);
-    lines.push(escapeReceiptLineText(`Signature: ${checksum}`));
+    lines.push(escapeReceiptLineText(`Signature: ${checksum}`)); // Keep LTR: checksum is hex
     lines.push("-");
   }
 

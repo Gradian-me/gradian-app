@@ -2,24 +2,27 @@
 
 import React from "react";
 import { cn } from "@/gradian-ui/shared/utils";
+import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
+import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-utils";
+import { useLanguageStore } from "@/stores/language.store";
 import type { BarcodeScannerCameraProps } from "../types";
 
 export const BarcodeScannerCamera: React.FC<BarcodeScannerCameraProps> = ({
-  videoRef,
+  children,
   isScanning,
   lastScannedFormat,
   cameraError,
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const cameraAllowHint = getT(TRANSLATION_KEYS.BARCODE_SCANNER_CAMERA_ALLOW_HINT, language, defaultLang);
   return (
     <div className="relative w-full items-center justify-center aspect-video max-w-[360px] mx-auto bg-black rounded-2xl overflow-hidden sm:max-w-[420px]">
-      {/* Video feed */}
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        playsInline
-        muted
-        autoPlay
-      />
+      {children && (
+        <div className="absolute inset-0 w-full h-full [&_video]:object-cover [&_video]:w-full [&_video]:h-full">
+          {children}
+        </div>
+      )}
 
       {/* Scanning overlay */}
       <div className="absolute inset-0 pointer-events-none">
@@ -66,7 +69,7 @@ export const BarcodeScannerCamera: React.FC<BarcodeScannerCameraProps> = ({
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/80 px-4 text-center">
           <p className="text-sm font-medium text-amber-200">{cameraError}</p>
           <p className="text-xs text-gray-400">
-            Allow camera access in your browser settings and try again.
+            {cameraAllowHint}
           </p>
         </div>
       )}

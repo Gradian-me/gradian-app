@@ -3,9 +3,17 @@
 import React, {
   useCallback,
   useEffect,
+  useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
+import dynamic from "next/dynamic";
+import { useDevices } from "@yudiel/react-qr-scanner";
+import {
+  prepareZXingModule,
+  ZXING_WASM_VERSION,
+} from "barcode-detector/ponyfill";
 import { DrawerDialog } from "@/gradian-ui/data-display/components/DrawerDialog";
 import { BarcodeScannerCamera } from "./BarcodeScannerCamera";
 import { BarcodeScannerToolbar } from "./BarcodeScannerToolbar";
@@ -18,6 +26,9 @@ import { cn } from "@/gradian-ui/shared/utils";
 import { CodeViewer } from "@/gradian-ui/shared/components/CodeViewer";
 import { CheckCircle2, Plus } from "lucide-react";
 import { sanitizeBarcodeValue, sanitizeFormat } from "../utils/sanitize";
+import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
+import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-utils";
+import { useLanguageStore } from "@/stores/language.store";
 import type {
   BarcodeScannerProps,
   BarcodeFormat,
@@ -26,29 +37,60 @@ import type {
 } from "../types";
 
 // â”€â”€â”€ ZXing format mapping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Maps our friendly names to ZXing BarcodeFormat enum values (numbers).
-const FORMAT_MAP: Record<BarcodeFormat, number> = {
-  Code128: 1,
-  Code39: 2,
-  Code93: 3,
-  EAN: 6,
-  EAN8: 6,
-  EAN13: 7,
-  UPC: 14,
-  UPCA: 14,
-  UPCE: 15,
-  QR: 11,
-  DataMatrix: 5,
-  PDF417: 10,
-  Aztec: 0,
-  ITF: 8,
-  Codabar: 2,
-  RSS14: 12,
-  RSSExpanded: 13,
-  Handheld: -1,
+/** Map our BarcodeFormat to @yudiel/react-qr-scanner format strings. */
+const OUR_FORMAT_TO_LIBRARY: Record<BarcodeFormat, string[]> = {
+  Code128: ["code_128"],
+  Code39: ["code_39"],
+  Code93: ["code_93"],
+  EAN: ["ean_8", "ean_13"],
+  EAN8: ["ean_8"],
+  EAN13: ["ean_13"],
+  UPC: ["upc_a"],
+  UPCA: ["upc_a"],
+  UPCE: ["upc_e"],
+  QR: ["qr_code"],
+  DataMatrix: ["data_matrix"],
+  PDF417: ["pdf417"],
+  Aztec: ["aztec"],
+  ITF: ["itf"],
+  Codabar: ["codabar"],
+  RSS14: ["databar"],
+  RSSExpanded: ["databar_expanded"],
+  Handheld: [],
+};
+
+/** Map library format string to our display name. */
+const LIBRARY_FORMAT_TO_OUR: Record<string, string> = {
+  qr_code: "QR", code_128: "Code128", code_39: "Code39", code_93: "Code93",
+  ean_8: "EAN8", ean_13: "EAN13", upc_a: "UPCA", upc_e: "UPCE",
+  data_matrix: "DataMatrix", pdf417: "PDF417", aztec: "Aztec", itf: "ITF",
+  codabar: "Codabar", databar: "RSS14", databar_expanded: "RSSExpanded",
+  micro_qr_code: "QR", rm_qr_code: "QR", unknown: "Unknown",
 };
 
 const DEFAULT_FORMATS: BarcodeFormat[] = ["Code128", "QR", "DataMatrix", "EAN"];
+
+/** Point ZXing WASM to CSP-allowed CDN (cdn.jsdelivr.net). Default uses fastly.jsdelivr.net which is blocked by CSP. */
+let zxingWasmConfigured = false;
+function ensureZxingWasmConfig(): void {
+  if (zxingWasmConfigured) return;
+  zxingWasmConfigured = true;
+  prepareZXingModule({
+    overrides: {
+      locateFile(path: string, prefix: string): string {
+        if (path.endsWith(".wasm")) {
+          return `https://cdn.jsdelivr.net/npm/zxing-wasm@${ZXING_WASM_VERSION}/dist/reader/zxing_reader.wasm`;
+        }
+        return prefix + path;
+      },
+    },
+  });
+}
+
+const Scanner = dynamic(
+  () => import("@yudiel/react-qr-scanner").then((m) => m.Scanner),
+  { ssr: false }
+);
 
 const ZOOM_STEP = 0.5;
 const MIN_ZOOM = 1;
@@ -67,23 +109,40 @@ function useIsSmallScreen(): boolean {
   return isSmall;
 }
 
-function createBeep(): () => void {
+/** Creates a beep function that uses Web Audio API (no Audio element, works without external sources). */
+function createBeep(audioContextRef: React.MutableRefObject<AudioContext | null>): () => void {
   return () => {
     try {
-      const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(1200, ctx.currentTime);
-      gain.gain.setValueAtTime(0.4, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.18);
-      osc.onended = () => ctx.close();
+      let ctx = audioContextRef.current;
+      if (!ctx) {
+        ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
+        audioContextRef.current = ctx;
+      }
+      const play = () => {
+        if (!audioContextRef.current) return;
+        const c = audioContextRef.current;
+        const osc = c.createOscillator();
+        const gain = c.createGain();
+        osc.connect(gain);
+        gain.connect(c.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(1200, c.currentTime);
+        gain.gain.setValueAtTime(0.4, c.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.18);
+        osc.start(c.currentTime);
+        osc.stop(c.currentTime + 0.18);
+        osc.onended = () => {
+          osc.disconnect();
+          gain.disconnect();
+        };
+      };
+      if (ctx.state === "suspended") {
+        ctx.resume().then(play).catch(() => {});
+      } else {
+        play();
+      }
     } catch {
-      // AudioContext unavailable â€” silently ignore
+      // AudioContext unavailable — silently ignore
     }
   };
 }
@@ -120,13 +179,20 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   initialBarcodes,
   enableMockData = false,
 }) => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const readerRef = useRef<InstanceType<any> | null>(null);
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const defaultTitle = getT(TRANSLATION_KEYS.BARCODE_SCANNER_TITLE, language, defaultLang);
+  const displayTitle = title === "Barcode Scanner" ? defaultTitle : title;
+
   const beepRef = useRef<(() => void) | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
   const lastScanRef = useRef<string>("");
 
-  const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
+  const devices = useDevices();
+  const cameras = useMemo(
+    () => (devices ?? []).filter((d) => d.kind === "videoinput"),
+    [devices]
+  );
   const [selectedCameraId, setSelectedCameraId] = useState<string>("");
   const [isScanning, setIsScanning] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(MIN_ZOOM);
@@ -156,43 +222,52 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   const [lastScannedLabel, setLastScannedLabel] = useState<string | null>(null);
   const [lastScannedFormatForStats, setLastScannedFormatForStats] = useState<string | null>(null);
 
-  // Initialise beep
+  // Configure ZXing WASM URL to use CSP-allowed CDN before any Scanner/BarcodeDetector runs
+  useLayoutEffect(() => {
+    ensureZxingWasmConfig();
+  }, []);
+
+  // Initialise beep (Web Audio API — no Audio element, avoids "no supported sources")
   useEffect(() => {
-    if (enableBeep) beepRef.current = createBeep();
-    return () => { beepRef.current = null; };
+    if (enableBeep) beepRef.current = createBeep(audioContextRef);
+    return () => {
+      beepRef.current = null;
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {});
+        audioContextRef.current = null;
+      }
+    };
   }, [enableBeep]);
 
-  // When drawer opens, ensure we have a camera id to start stream (avoid waiting on enumeration)
-  useEffect(() => {
-    if (!open) return;
-    const t = window.setTimeout(() => {
-      setSelectedCameraId((prev) => (prev || "default"));
-    }, 50);
-    return () => window.clearTimeout(t);
-  }, [open]);
-
-  // Enumerate cameras
   useEffect(() => {
     if (!open) return;
     setCameraError(null);
-    navigator.mediaDevices
-      .enumerateDevices()
-      .then((devices) => {
-        const videoDevices = devices.filter((d) => d.kind === "videoinput");
-        setCameras(videoDevices);
-        if (videoDevices.length > 0) {
-          const back = videoDevices.find((d) =>
-            /back|rear|environment/i.test(d.label)
-          );
-          setSelectedCameraId(back?.deviceId ?? videoDevices[0].deviceId);
-        } else {
-          setSelectedCameraId("default");
-        }
-      })
-      .catch(() => {
-        setSelectedCameraId("default");
-      });
+    const t = window.setTimeout(() => setSelectedCameraId((prev) => prev || "default"), 50);
+    return () => window.clearTimeout(t);
   }, [open]);
+
+  useEffect(() => {
+    if (!open || cameras.length === 0) return;
+    setCameraError(null);
+    const back = cameras.find((d) => /back|rear|environment/i.test(d.label));
+    setSelectedCameraId((prev) => {
+      if (prev && cameras.some((c) => c.deviceId === prev)) return prev;
+      return back?.deviceId ?? cameras[0]?.deviceId ?? "default";
+    });
+  }, [open, cameras]);
+
+  // When no cameras are available after a short delay, show a message instead of mounting Scanner.
+  useEffect(() => {
+    if (!open || scanMode !== "camera" || cameras.length > 0) return;
+    const lang = useLanguageStore.getState().language ?? getDefaultLanguage();
+    const defLang = getDefaultLanguage();
+    const t = window.setTimeout(() => {
+      setCameraError((prev) =>
+        prev ? prev : getT(TRANSLATION_KEYS.BARCODE_SCANNER_CAMERA_NOT_FOUND, lang, defLang)
+      );
+    }, 1200);
+    return () => window.clearTimeout(t);
+  }, [open, scanMode, cameras.length]);
 
   // Seed multi-scan list from initialBarcodes when opening in multi-scan mode
   useEffect(() => {
@@ -204,214 +279,95 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
     }
   }, [open, enableMultipleScan, initialBarcodes]);
 
-  // Apply zoom via track constraints
-  const applyZoom = useCallback(async (level: number) => {
-    if (!streamRef.current) return;
-    const [track] = streamRef.current.getVideoTracks();
-    if (!track) return;
-    try {
-      await track.applyConstraints({ advanced: [{ zoom: level } as any] });
-    } catch {
-      // Zoom unsupported â€” ignore
+  const scannerFormats = useMemo(() => {
+    const set = new Set<string>();
+    for (const f of allowedFormats) {
+      for (const lib of OUR_FORMAT_TO_LIBRARY[f] ?? []) set.add(lib);
     }
+    return set.size > 0 ? Array.from(set) : ["qr_code", "code_128", "ean_13", "data_matrix"];
+  }, [allowedFormats]);
+
+  const markNewlyAdded = useCallback((id: string) => {
+    if (newlyAddedTimerRef.current) clearTimeout(newlyAddedTimerRef.current);
+    setNewlyAddedId(id);
+    newlyAddedTimerRef.current = setTimeout(() => setNewlyAddedId(null), 1200);
   }, []);
 
-  const applyTorch = useCallback(async (active: boolean) => {
-    if (!streamRef.current) return;
-    const [track] = streamRef.current.getVideoTracks();
-    if (!track) return;
-    try {
-      await track.applyConstraints({ advanced: [{ torch: active } as any] });
-    } catch {
-      // Torch unsupported â€” ignore
-    }
-  }, []);
-
-  // Start camera stream
-  const startStream = useCallback(async (deviceId: string) => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
-    }
-    setHasTorch(false);
-    setTorchActive(false);
-    setZoomLevel(MIN_ZOOM);
-    setCameraError(null);
-
-    const isDefault = !deviceId || deviceId === "default";
-    const constraints: MediaStreamConstraints = {
-      video: isDefault
-        ? {
-            facingMode: "environment",
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
+  const handleScan = useCallback(
+    (detectedCodes: { rawValue: string; format?: string }[]) => {
+      if (detectedCodes.length === 0) return;
+      const first = detectedCodes[0];
+      const raw = sanitizeBarcodeValue(first.rawValue);
+      const libFmt = (first as { format?: string }).format ?? "";
+      const fmt = sanitizeFormat(LIBRARY_FORMAT_TO_OUR[libFmt] ?? (libFmt || "Unknown"));
+      if (raw === lastScanRef.current) return;
+      lastScanRef.current = raw;
+      setTimeout(() => { lastScanRef.current = ""; }, 1500);
+      if (enableBeep && beepRef.current) beepRef.current();
+      setLastScannedFormat(fmt);
+      setLastScannedLabel(raw);
+      setLastScannedFormatForStats(fmt);
+      setIsScanning(true);
+      if (enableMultipleScan) {
+        setBarcodes((prev) => {
+          const existing = prev.find((b) => b.label === raw);
+          if (existing) {
+            const updated = prev.map((b) =>
+              b.id === existing.id ? { ...b, count: enableChangeCount ? (b.count ?? 1) + 1 : b.count } : b
+            );
+            window.setTimeout(() => markNewlyAdded(existing.id), 0);
+            return updated;
           }
-        : {
-            deviceId: { exact: deviceId },
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-          },
-      audio: false,
-    };
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      streamRef.current = stream;
-      setCameraError(null);
-
-      const [track] = stream.getVideoTracks();
-      const caps = track.getCapabilities() as any;
-      setHasTorch(Boolean(caps?.torch));
-
-      const video = videoRef.current;
-      if (video) {
-        video.srcObject = stream;
-        try {
-          await video.play();
-        } catch {
-          // Autoplay may be restricted; stream is still attached
-        }
-      }
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Camera access failed";
-      if (
-        message.includes("Permission") ||
-        message.includes("NotAllowed") ||
-        message.includes("denied")
-      ) {
-        setCameraError("Camera access denied. Please allow camera permission.");
-      } else if (
-        message.includes("NotFound") ||
-        message.includes("no camera")
-      ) {
-        setCameraError("No camera found.");
+          const newItem: ScannedBarcode = {
+            id: ulid(),
+            label: raw,
+            format: fmt,
+            createdAt: new Date().toISOString(),
+            count: enableChangeCount ? 1 : undefined,
+          };
+          window.setTimeout(() => markNewlyAdded(newItem.id), 0);
+          return [...prev, newItem];
+        });
       } else {
-        setCameraError("Could not start camera. Please check permissions.");
+        setScannedValue(raw);
+        setScannedFormat(fmt);
+        onScan?.(raw, fmt);
       }
+    },
+    [enableBeep, enableMultipleScan, enableChangeCount, onScan, markNewlyAdded]
+  );
+
+  const handleScanError = useCallback((error: unknown) => {
+    const err = error as { message?: string; name?: string };
+    const message =
+      typeof err?.message === "string" ? err.message : String(error ?? "Camera error");
+    const name = typeof err?.name === "string" ? err.name : "";
+    const lang = useLanguageStore.getState().language ?? getDefaultLanguage();
+    const defLang = getDefaultLanguage();
+    if (message.includes("Permission") || message.includes("NotAllowed") || message.includes("denied")) {
+      setCameraError(getT(TRANSLATION_KEYS.BARCODE_SCANNER_CAMERA_DENIED, lang, defLang));
+    } else if (
+      name === "NotSupportedError" ||
+      message.includes("NotFound") ||
+      message.includes("no camera") ||
+      message.includes("no supported sources")
+    ) {
+      setCameraError(getT(TRANSLATION_KEYS.BARCODE_SCANNER_CAMERA_NOT_FOUND, lang, defLang));
+    } else {
+      setCameraError(getT(TRANSLATION_KEYS.BARCODE_SCANNER_CAMERA_ERROR, lang, defLang));
     }
   }, []);
 
-  // Start ZXing reader
-  const startReader = useCallback(async () => {
-    // Dynamically import so the lib never executes server-side
-    const { BrowserMultiFormatReader, BarcodeFormat: ZXingFormat } = await import(
-      "@zxing/library"
-    );
-
-    if (readerRef.current) {
-      readerRef.current.reset();
-    }
-
-    const hints = new Map();
-    const formatValues: number[] = Array.from(
-      new Set(allowedFormats.map((f) => FORMAT_MAP[f]).filter((v) => v !== undefined))
-    );
-    hints.set(2 /* DecodeHintType.POSSIBLE_FORMATS */, formatValues);
-
-    const reader = new BrowserMultiFormatReader(hints);
-    readerRef.current = reader;
-
-    if (!videoRef.current) return;
-
-    setIsScanning(true);
-
-    reader.decodeFromVideoElementContinuously(
-      videoRef.current,
-      (result: { getText: () => string; getBarcodeFormat?: () => { toString: () => string } }) => {
-        if (!result) return;
-
-        const raw = sanitizeBarcodeValue(result.getText());
-        const fmt = sanitizeFormat(result.getBarcodeFormat?.()?.toString() ?? "Unknown");
-
-        // Debounce: skip duplicate scans within 1.5 s
-        if (raw === lastScanRef.current) return;
-        lastScanRef.current = raw;
-        setTimeout(() => { lastScanRef.current = ""; }, 1500);
-
-        if (enableBeep && beepRef.current) beepRef.current();
-        setLastScannedFormat(fmt);
-        setLastScannedLabel(raw);
-        setLastScannedFormatForStats(fmt);
-
-        if (enableMultipleScan) {
-          setBarcodes((prev) => {
-            const existing = prev.find((b) => b.label === raw);
-            if (existing) {
-              // Increment count on duplicate scan
-              const updated = prev.map((b) =>
-                b.id === existing.id
-                  ? { ...b, count: enableChangeCount ? (b.count ?? 1) + 1 : b.count }
-                  : b
-              );
-              // Schedule the pulse — use timeout outside state updater
-              window.setTimeout(() => markNewlyAdded(existing.id), 0);
-              return updated;
-            }
-            const now = new Date();
-            const newItem: ScannedBarcode = {
-              id: ulid(),
-              label: raw,
-              format: fmt,
-              createdAt: now.toISOString(),
-              count: enableChangeCount ? 1 : undefined,
-            };
-            window.setTimeout(() => markNewlyAdded(newItem.id), 0);
-            return [...prev, newItem];
-          });
-        } else {
-          setScannedValue(raw);
-          setScannedFormat(fmt);
-          onScan?.(raw, fmt);
-          setIsScanning(false);
-          reader.reset();
-          readerRef.current = null;
-        }
-      }
-    );
-  }, [allowedFormats, enableBeep, enableMultipleScan, onScan]);
-
-  // Orchestrate start when open and camera selected (or "default")
-  useEffect(() => {
-    if (!open || !selectedCameraId || scanMode === "handheld") return;
-    // Reset single-scan result when (re)opening
-    if (!enableMultipleScan) setScannedValue(null);
-
-    let cancelled = false;
-    const timer = window.setTimeout(() => {
-      (async () => {
-        await startStream(selectedCameraId);
-        if (!cancelled) await startReader();
-      })();
-    }, 150);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [open, selectedCameraId, scanMode, startStream, startReader]);
-
-  // Stop camera stream when switching to handheld mode
   useEffect(() => {
     if (scanMode === "handheld") {
-      readerRef.current?.reset();
-      readerRef.current = null;
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
       setIsScanning(false);
-      // Auto-focus the handheld input
       const t = window.setTimeout(() => handheldInputRef.current?.focus(), 100);
       return () => window.clearTimeout(t);
     }
   }, [scanMode]);
 
-  // Cleanup on close
   useEffect(() => {
     if (!open) {
-      readerRef.current?.reset();
-      readerRef.current = null;
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
       setIsScanning(false);
       setScannedValue(null);
       setBarcodes([]);
@@ -427,21 +383,9 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
     }
   }, [open]);
 
-  const markNewlyAdded = useCallback((id: string) => {
-    if (newlyAddedTimerRef.current) clearTimeout(newlyAddedTimerRef.current);
-    setNewlyAddedId(id);
-    newlyAddedTimerRef.current = setTimeout(() => setNewlyAddedId(null), 1200);
+  const handleCameraChange = useCallback((id: string) => {
+    setSelectedCameraId(id);
   }, []);
-
-  const handleCameraChange = useCallback(
-    async (id: string) => {
-      setSelectedCameraId(id);
-      readerRef.current?.reset();
-      readerRef.current = null;
-      setIsScanning(false);
-    },
-    []
-  );
 
   const handleScanModeChange = useCallback((mode: ScanMode) => {
     setScanMode(mode);
@@ -483,38 +427,25 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       setScannedFormat("Handheld");
       onScan?.(raw, "Handheld");
     }
-  }, [handheldInput, enableBeep, enableMultipleScan, enableChangeCount, markNewlyAdded, onScan]);
+  }, [handheldInput, setHandheldInput, enableBeep, enableMultipleScan, enableChangeCount, markNewlyAdded, onScan]);
 
   const handleZoomIn = useCallback(() => {
-    setZoomLevel((prev) => {
-      const next = Math.min(prev + ZOOM_STEP, MAX_ZOOM);
-      applyZoom(next);
-      return next;
-    });
-  }, [applyZoom]);
+    setZoomLevel((p) => Math.min(p + ZOOM_STEP, MAX_ZOOM));
+  }, []);
 
   const handleZoomOut = useCallback(() => {
-    setZoomLevel((prev) => {
-      const next = Math.max(prev - ZOOM_STEP, MIN_ZOOM);
-      applyZoom(next);
-      return next;
-    });
-  }, [applyZoom]);
+    setZoomLevel((p) => Math.max(p - ZOOM_STEP, MIN_ZOOM));
+  }, []);
 
   const handleToggleTorch = useCallback(() => {
-    setTorchActive((prev) => {
-      const next = !prev;
-      applyTorch(next);
-      return next;
-    });
-  }, [applyTorch]);
+    setTorchActive((p) => !p);
+  }, []);
 
   const handleReset = useCallback(() => {
     setScannedValue(null);
     setScannedFormat("");
     lastScanRef.current = "";
-    startReader();
-  }, [startReader]);
+  }, []);
 
   const handleConfirmMulti = useCallback(() => {
     onMultiScan?.(barcodes);
@@ -560,6 +491,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   }, []);
 
   const showResult = !enableMultipleScan && scannedValue !== null;
+
   const isSmallScreen = useIsSmallScreen();
   const isDialogLayout = !isSmallScreen;
 
@@ -583,8 +515,22 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       : [];
 
   const hasMultiScanItems = enableMultipleScan && barcodes.length > 0;
+  const confirmLabelKey = hasMultiScanItems ? TRANSLATION_KEYS.BARCODE_SCANNER_CONFIRM_N : TRANSLATION_KEYS.BARCODE_SCANNER_CONFIRM;
+  const confirmLabel = hasMultiScanItems
+    ? getT(confirmLabelKey, language, defaultLang).replace(/\{\{n\}\}/g, String(barcodes.length))
+    : getT(TRANSLATION_KEYS.BARCODE_SCANNER_CONFIRM, language, defaultLang);
 
-  const confirmLabel = hasMultiScanItems ? `Confirm (${barcodes.length})` : "Confirm";
+  const closeScannerTitle = getT(TRANSLATION_KEYS.BARCODE_SCANNER_CLOSE_SCANNER, language, defaultLang);
+  const closeMessageItems = getT(TRANSLATION_KEYS.BARCODE_SCANNER_CLOSE_MESSAGE_ITEMS, language, defaultLang).replace(/\{\{n\}\}/g, String(barcodes.length));
+  const closeMessageEmpty = getT(TRANSLATION_KEYS.BARCODE_SCANNER_CLOSE_MESSAGE_EMPTY, language, defaultLang);
+  const discardCloseLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_DISCARD_CLOSE, language, defaultLang);
+  const pointCameraText = getT(TRANSLATION_KEYS.BARCODE_SCANNER_POINT_CAMERA, language, defaultLang);
+  const addMockResultLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_ADD_MOCK_RESULT, language, defaultLang);
+  const scannedJsonTitle = getT(TRANSLATION_KEYS.BARCODE_SCANNER_SCANNED_JSON_TITLE, language, defaultLang);
+  const handheldTitle = getT(TRANSLATION_KEYS.BARCODE_SCANNER_HANDHELD_TITLE, language, defaultLang);
+  const handheldDescription = getT(TRANSLATION_KEYS.BARCODE_SCANNER_HANDHELD_DESCRIPTION, language, defaultLang);
+  const placeholderScanOrType = getT(TRANSLATION_KEYS.BARCODE_SCANNER_PLACEHOLDER_SCAN_OR_TYPE, language, defaultLang);
+  const addBarcodeAria = getT(TRANSLATION_KEYS.BARCODE_SCANNER_ADD_BARCODE, language, defaultLang);
 
   const confirmButtonNode = (
     <Button
@@ -598,7 +544,6 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
     </Button>
   );
 
-
   const handheldPanel = (
     <div className={cn(
       "flex flex-col items-center justify-center gap-4 px-4",
@@ -611,9 +556,9 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
             <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75V16.5ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z" />
           </svg>
         </div>
-        <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Handheld Scanner</p>
+        <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{handheldTitle}</p>
         <p className="text-xs text-gray-400 dark:text-gray-500 max-w-[200px]">
-          Type or scan with a handheld device.
+          {handheldDescription}
         </p>
       </div>
       <div className="flex w-full max-w-xs gap-2">
@@ -628,19 +573,18 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
               handleHandheldAdd();
             }
           }}
-          placeholder="Scan or type barcode…"
+          placeholder={placeholderScanOrType}
           className="flex-1 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 dark:focus:ring-violet-600 dark:focus:border-violet-600 transition-colors"
           autoComplete="off"
           maxLength={2048}
-          dir="auto"
         />
         <button
           type="button"
           onClick={handleHandheldAdd}
           disabled={!handheldInput.trim()}
           className="h-10 w-10 shrink-0 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1"
-          aria-label="Add barcode"
-          title="Add barcode"
+          aria-label={addBarcodeAria}
+          title={addBarcodeAria}
         >
           <Plus className="w-5 h-5" />
         </button>
@@ -657,11 +601,32 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
         ) : (
           <div className={cn("flex items-center justify-center", isDialogLayout ? "p-2" : "p-2")}>
             <BarcodeScannerCamera
-              videoRef={videoRef}
               isScanning={isScanning}
               lastScannedFormat={lastScannedFormat}
               cameraError={cameraError}
-            />
+            >
+              {open &&
+                scanMode === "camera" &&
+                cameras.length > 0 &&
+                selectedCameraId !== "" &&
+                (selectedCameraId === "default" || cameras.some((c) => c.deviceId === selectedCameraId)) &&
+                (enableMultipleScan || !showResult) && (
+                <Scanner
+                  onScan={handleScan}
+                  onError={handleScanError}
+                  constraints={
+                    selectedCameraId && selectedCameraId !== "default"
+                      ? { deviceId: { exact: selectedCameraId } }
+                      : { facingMode: { ideal: "environment" } }
+                  }
+                  formats={scannerFormats as ("qr_code" | "code_128" | "code_39" | "ean_13" | "ean_8" | "upc_a" | "upc_e" | "codabar" | "itf" | "pdf417" | "aztec" | "data_matrix" | "code_93" | "databar" | "databar_expanded" | "micro_qr_code" | "rm_qr_code")[]}
+                  scanDelay={500}
+                  allowMultiple={enableMultipleScan}
+                  sound={false}
+                  classNames={{ video: "w-full h-full object-cover" }}
+                />
+              )}
+            </BarcodeScannerCamera>
           </div>
         )}
         <div>
@@ -728,7 +693,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
         />
       ) : (
         <div className="flex flex-col items-center justify-center py-8 gap-3 text-gray-400 dark:text-gray-500">
-          <span className="text-sm">Point camera at a barcode to scan</span>
+          <span className="text-sm">{pointCameraText}</span>
           {enableMockData && (
             <Button
               type="button"
@@ -737,7 +702,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
               onClick={handleAddMockSingle}
               className="text-xs"
             >
-              Add mock result
+              {addMockResultLabel}
             </Button>
           )}
         </div>
@@ -751,7 +716,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
     <DrawerDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={title}
+      title={displayTitle}
       size="lg"
       drawerDirection="bottom"
       bodyScrollable={false}
@@ -759,13 +724,9 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       showCloseButton={true}
       enableMaximize={isDialogLayout}
       showConfirmationOnClose={hasUnsavedBarcodes}
-      confirmOnCloseTitle="Close scanner"
-      confirmOnCloseMessage={
-        barcodes.length > 0
-          ? `You have ${barcodes.length} scanned item${barcodes.length > 1 ? 's' : ''}. Closing will discard them unless you confirm first.`
-          : 'Closing will discard your scanned items.'
-      }
-      confirmOnCloseLabel="Discard & close"
+      confirmOnCloseTitle={closeScannerTitle}
+      confirmOnCloseMessage={barcodes.length > 0 ? closeMessageItems : closeMessageEmpty}
+      confirmOnCloseLabel={discardCloseLabel}
       footerLeftActions={isDialogLayout && enableMultipleScan ? confirmButtonNode : undefined}
       headerActions={!isDialogLayout && enableMultipleScan ? confirmButtonNode : undefined}
     >
@@ -792,7 +753,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
         <Dialog open={isJsonDialogOpen} onOpenChange={setIsJsonDialogOpen}>
           <DialogContent className="w-full h-full lg:max-w-[65vw] lg:max-h-[90vh] flex flex-col">
             <DialogHeader>
-              <DialogTitle>Scanned barcodes (JSON)</DialogTitle>
+              <DialogTitle>{scannedJsonTitle}</DialogTitle>
             </DialogHeader>
             <div className="flex-1 min-h-0 overflow-auto">
               <CodeViewer

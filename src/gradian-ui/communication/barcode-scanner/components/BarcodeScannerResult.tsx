@@ -4,6 +4,9 @@ import React, { useMemo } from "react";
 import { CheckCircle2, ExternalLink, Copy, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/gradian-ui/shared/utils";
+import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
+import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-utils";
+import { useLanguageStore } from "@/stores/language.store";
 import { isValidUrl, safeLinkHref } from "../utils/sanitize";
 import type { BarcodeScannerResultProps } from "../types";
 
@@ -12,6 +15,13 @@ export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
   format,
   onReset,
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const openLinkLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_OPEN_LINK, language, defaultLang);
+  const copyLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_COPY, language, defaultLang);
+  const copiedLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_COPIED, language, defaultLang);
+  const scanAgainLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_SCAN_AGAIN, language, defaultLang);
+
   const isUrl = useMemo(() => isValidUrl(value), [value]);
   const safeHref = useMemo(() => (isUrl ? safeLinkHref(value) : null), [value, isUrl]);
   const [copied, setCopied] = React.useState(false);
@@ -62,7 +72,7 @@ export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
           )}
         >
           <ExternalLink className="w-3.5 h-3.5 shrink-0" />
-          Open link in new tab
+          {openLinkLabel}
         </a>
       )}
 
@@ -70,11 +80,11 @@ export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
       <div className="flex gap-2 mt-1">
         <Button variant="outline" size="sm" className="gap-1.5" onClick={handleCopy}>
           <Copy className="w-3.5 h-3.5" />
-          {copied ? "Copied!" : "Copy"}
+          {copied ? copiedLabel : copyLabel}
         </Button>
         <Button variant="outline" size="sm" className="gap-1.5" onClick={onReset}>
           <RotateCcw className="w-3.5 h-3.5" />
-          Scan again
+          {scanAgainLabel}
         </Button>
       </div>
     </div>

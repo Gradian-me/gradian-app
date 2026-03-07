@@ -192,18 +192,18 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+            value: 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()'
           },
           {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
               "base-uri 'self'",
-              "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net",
               "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' blob: https://*.cinnagen.com https://cg-gr-app.cinnagen.com:5001 https://www.gstatic.com https://cdn.jsdelivr.net",
+              "connect-src 'self' blob: https://*.cinnagen.com https://cg-gr-app.cinnagen.com:5001 https://www.gstatic.com https://cdn.jsdelivr.net https://fastly.jsdelivr.net",
               `frame-ancestors ${loginModalFrameAncestors}`,
               "object-src 'none'",
               "media-src 'self' https: blob:",
@@ -241,7 +241,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+            value: 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()'
           },
           // Content Security Policy - adjust based on your needs
           // Note: Mermaid now uses installed package, but we allow CDN as fallback
@@ -250,11 +250,11 @@ const nextConfig: NextConfig = {
             value: [
               "default-src 'self'",
               "base-uri 'self'",
-              "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net", // Allow CDN for Mermaid fallback
+              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net", // Allow CDN for Mermaid; wasm-unsafe-eval for barcode scanner polyfill
               "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
               "img-src 'self' data: blob: https:",
               "font-src 'self' data:",
-              "connect-src 'self' blob: https://*.cinnagen.com https://cg-gr-app.cinnagen.com:5001 https://www.gstatic.com https://cdn.jsdelivr.net", // Allow CDN and required backend connections
+              "connect-src 'self' blob: https://*.cinnagen.com https://cg-gr-app.cinnagen.com:5001 https://www.gstatic.com https://cdn.jsdelivr.net https://fastly.jsdelivr.net", // CDN + barcode WASM
               "frame-ancestors 'self'",
               "object-src 'none'",
               "media-src 'self' https: blob:",

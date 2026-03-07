@@ -122,6 +122,7 @@ export const NumberInputAnimated: React.FC<NumberInputAnimatedProps> = ({
             style={{ isolation: 'isolate' }}
             onClick={() => setCalculatorOpen(false)}
             role="presentation"
+            dir="ltr"
           >
             <div
               className="rounded-lg border border-gray-700 shadow-2xl overflow-hidden pointer-events-auto"

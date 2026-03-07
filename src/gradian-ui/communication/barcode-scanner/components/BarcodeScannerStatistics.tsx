@@ -3,6 +3,9 @@
 import React, { useMemo } from "react";
 import { Package, Hash, ScanLine } from "lucide-react";
 import { cn } from "@/gradian-ui/shared/utils";
+import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
+import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-utils";
+import { useLanguageStore } from "@/stores/language.store";
 import type { ScannedBarcode } from "../types";
 
 // Match MetricCard gradient + border styling for a consistent modern look
@@ -49,22 +52,30 @@ export const BarcodeScannerStatistics: React.FC<BarcodeScannerStatisticsProps> =
   gradient = "indigo",
   className,
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
   const itemsCount = barcodes.length;
+  const labelItems = getT(TRANSLATION_KEYS.BARCODE_SCANNER_ITEMS, language, defaultLang);
+  const labelTotal = getT(TRANSLATION_KEYS.BARCODE_SCANNER_TOTAL, language, defaultLang);
+  const labelScanned = getT(TRANSLATION_KEYS.BARCODE_SCANNER_SCANNED, language, defaultLang);
+  const labelLastScanned = getT(TRANSLATION_KEYS.BARCODE_SCANNER_LAST_SCANNED, language, defaultLang);
   const totalCount = useMemo(() => {
     if (!enableChangeCount) return itemsCount;
     return barcodes.reduce((sum, b) => sum + (b.count ?? 1), 0);
   }, [barcodes, enableChangeCount, itemsCount]);
 
   const lastScannedDisplay = useMemo(() => {
-    if (lastScannedLabel) {
+    const label = lastScannedLabel ?? (barcodes.length > 0 ? barcodes[barcodes.length - 1]?.label ?? null : null);
+    const format = lastScannedFormat ?? (barcodes.length > 0 ? barcodes[barcodes.length - 1]?.format ?? null : null);
+    if (label) {
       const truncated =
-        lastScannedLabel.length > 32
-          ? `${lastScannedLabel.slice(0, 29)}...`
-          : lastScannedLabel;
-      return lastScannedFormat ? `${truncated} (${lastScannedFormat})` : truncated;
+        label.length > 32
+          ? `${label.slice(0, 29)}...`
+          : label;
+      return format ? `${truncated} (${format})` : truncated;
     }
     return "—";
-  }, [lastScannedLabel, lastScannedFormat]);
+  }, [lastScannedLabel, lastScannedFormat, barcodes]);
 
   const gradientClass = GRADIENT_CLASSES[gradient] ?? GRADIENT_CLASSES.indigo;
   const iconBgClass = ICON_BG_CLASSES[gradient] ?? ICON_BG_CLASSES.indigo;
@@ -92,7 +103,7 @@ export const BarcodeScannerStatistics: React.FC<BarcodeScannerStatisticsProps> =
             </div>
             <div>
               <div className={cn("text-xs font-medium uppercase tracking-wide mb-0.5", labelColor)}>
-                Items
+                {labelItems}
               </div>
               <div className={cn("text-2xl font-bold", valueColor)}>{itemsCount}</div>
             </div>
@@ -103,7 +114,7 @@ export const BarcodeScannerStatistics: React.FC<BarcodeScannerStatisticsProps> =
             </div>
             <div>
               <div className={cn("text-xs font-medium uppercase tracking-wide mb-0.5", labelColor)}>
-                {enableChangeCount ? "Total" : "Scanned"}
+                {enableChangeCount ? labelTotal : labelScanned}
               </div>
               <div className={cn("text-2xl font-bold", valueColor)}>{totalCount}</div>
             </div>
@@ -115,7 +126,7 @@ export const BarcodeScannerStatistics: React.FC<BarcodeScannerStatisticsProps> =
               <ScanLine className="h-3.5 w-3.5" />
             </div>
             <div className={cn("text-xs font-medium uppercase tracking-wide", labelColor)}>
-              Last scanned
+              {labelLastScanned}
             </div>
           </div>
           <p className={cn("text-sm font-mono truncate min-h-0", valueColor)} dir="auto">

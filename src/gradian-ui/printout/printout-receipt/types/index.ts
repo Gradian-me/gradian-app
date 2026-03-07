@@ -48,6 +48,8 @@ export interface PrintoutReceiptProps {
   onOpenChange?: (open: boolean) => void;
   /** Fixed width in px for the iframe (e.g. 384 for 48 cpl thermal). */
   iframeWidth?: number;
+  /** Font family for receipt text (e.g. "Inter", "Consolas", "Georgia"). */
+  fontFamily?: string;
   /** When true (default), show the trigger button; when false, only iframe/modal (parent controls trigger). */
   showTrigger?: boolean;
   /** Optional class name for the trigger button container. */

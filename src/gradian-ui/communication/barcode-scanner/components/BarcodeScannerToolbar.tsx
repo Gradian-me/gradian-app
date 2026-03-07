@@ -11,6 +11,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/gradian-ui/shared/utils";
+import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
+import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-utils";
+import { useLanguageStore } from "@/stores/language.store";
 import type { BarcodeScannerToolbarProps, ScanMode } from "../types";
 
 const HANDHELD_VALUE = "__handheld__";
@@ -32,6 +35,18 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
   scanMode,
   onScanModeChange,
 }) => {
+  const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const inputSourceLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_INPUT_SOURCE, language, defaultLang);
+  const handheldDeviceLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_HANDHELD_DEVICE, language, defaultLang);
+  const defaultCameraLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_DEFAULT_CAMERA, language, defaultLang);
+  const cameraNLabel = (n: number) => getT(TRANSLATION_KEYS.BARCODE_SCANNER_CAMERA_N, language, defaultLang).replace(/\{\{n\}\}/g, String(n));
+  const zoomOutAria = getT(TRANSLATION_KEYS.BARCODE_SCANNER_ZOOM_OUT, language, defaultLang);
+  const zoomInAria = getT(TRANSLATION_KEYS.BARCODE_SCANNER_ZOOM_IN, language, defaultLang);
+  const torchOnAria = getT(TRANSLATION_KEYS.BARCODE_SCANNER_TORCH_ON, language, defaultLang);
+  const torchOffAria = getT(TRANSLATION_KEYS.BARCODE_SCANNER_TORCH_OFF, language, defaultLang);
+  const viewJsonAria = getT(TRANSLATION_KEYS.BARCODE_SCANNER_VIEW_JSON, language, defaultLang);
+
   const selectValue = scanMode === "handheld"
     ? HANDHELD_VALUE
     : (selectedCameraId || cameras[0]?.deviceId || "default");
@@ -62,15 +77,15 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
                 ? "bg-violet-50 dark:bg-violet-950/30 border-violet-300 dark:border-violet-700 text-violet-700 dark:text-violet-300"
                 : "bg-white dark:bg-gray-900"
             )}
-            aria-label="Input source"
+            aria-label={inputSourceLabel}
           >
-            <SelectValue placeholder="Input source" />
+            <SelectValue placeholder={inputSourceLabel} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value={HANDHELD_VALUE} className="text-xs font-medium text-violet-700 dark:text-violet-300">
               <span className="flex items-center gap-1.5">
                 <Keyboard className="w-3 h-3" />
-                Handheld Device
+                {handheldDeviceLabel}
               </span>
             </SelectItem>
             {cameras.map((cam, idx) => {
@@ -81,13 +96,13 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
                   value={value}
                   className="text-xs"
                 >
-                  {cam.label || `Camera ${idx + 1}`}
+                  {cam.label || cameraNLabel(idx + 1)}
                 </SelectItem>
               );
             })}
             {cameras.length === 0 && (
               <SelectItem value="default" className="text-xs">
-                Default camera
+                {defaultCameraLabel}
               </SelectItem>
             )}
           </SelectContent>
@@ -103,7 +118,7 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
             className="h-6 w-6"
             onClick={onZoomOut}
             disabled={zoomLevel <= minZoom}
-            aria-label="Zoom out"
+            aria-label={zoomOutAria}
           >
             <Minus className="w-3 h-3" />
           </Button>
@@ -116,7 +131,7 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
             className="h-6 w-6"
             onClick={onZoomIn}
             disabled={zoomLevel >= maxZoom}
-            aria-label="Zoom in"
+            aria-label={zoomInAria}
           >
             <Plus className="w-3 h-3" />
           </Button>
@@ -135,7 +150,7 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
               : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-500"
           )}
           onClick={onToggleTorch}
-          aria-label={torchActive ? "Turn off torch" : "Turn on torch"}
+          aria-label={torchActive ? torchOffAria : torchOnAria}
         >
           {torchActive ? (
             <Flashlight className="w-4 h-4" />
@@ -155,7 +170,7 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
           size="icon"
           className="h-8 w-8 rounded-lg border bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 text-gray-500"
           onClick={onOpenJSON}
-          aria-label="View scan results as JSON"
+          aria-label={viewJsonAria}
         >
           <Braces className="w-4 h-4" />
         </Button>

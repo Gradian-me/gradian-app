@@ -59,7 +59,7 @@ export interface BarcodeScannerProps {
 }
 
 export interface BarcodeScannerCameraProps {
-  videoRef: React.RefObject<HTMLVideoElement | null>;
+  children?: React.ReactNode;
   isScanning: boolean;
   lastScannedFormat?: string;
   cameraError?: string | null;
