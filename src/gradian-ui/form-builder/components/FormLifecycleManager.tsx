@@ -2136,7 +2136,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
                 transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
                 className="space-y-4"
               >
-                {hasWizards && (
+                {hasWizards && activeWizardIndex === 0 && (
                   <FormSystemSection
                     schema={schema}
                     values={state.values}

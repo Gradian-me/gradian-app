@@ -17,7 +17,7 @@ export const BarcodeScannerCamera: React.FC<BarcodeScannerCameraProps> = ({
   const defaultLang = getDefaultLanguage();
   const cameraAllowHint = getT(TRANSLATION_KEYS.BARCODE_SCANNER_CAMERA_ALLOW_HINT, language, defaultLang);
   return (
-    <div className="relative w-full items-center justify-center aspect-square max-w-[200px] md:max-w-[300px] mx-auto bg-black rounded-2xl overflow-hidden">
+    <div className="relative w-full items-center justify-center aspect-square max-w-[200px] md:max-w-[250px] lg:max-w-[300px] mx-auto bg-black rounded-2xl overflow-hidden">
       {children && (
         <div className="absolute inset-0 w-full h-full [&_video]:object-cover [&_video]:w-full [&_video]:h-full">
           {children}
