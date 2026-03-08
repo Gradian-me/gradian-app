@@ -7339,5 +7339,24 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KK25J9N5KQF7FKNJBW9ES1K9",
+    "timestamp": "2026-03-09T00:00:00.000Z",
+    "version": "1.63.002",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "FEATURE: GS1 Datamatrix + Ticket Card | Added new dependencies: bwip-js, country-code-lookup, currency-codes, and html-to-image. Enhanced BarcodeScanner components by integrating GS1Badge for improved barcode display. Added a new TicketCard component to the data-display category. Updated global CSS to prevent box-shadows in print output. Introduced GS1 date formatting utilities in date-utils.ts for better handling of expiry dates. These changes collectively enhance functionality and improve user experience across the application.",
+        "priority": "High",
+        "affectedDomains": [
+          "communication",
+          "data-display",
+          "printout",
+          "shared",
+          "ui"
+        ]
+      }
+    ]
   }
 ]

@@ -1,4 +1,4 @@
-import { formatDistanceToNow, format } from 'date-fns';
+import { formatDistanceToNow, format, startOfDay, isPast, differenceInMonths } from 'date-fns';
 import { enUS } from 'date-fns/locale';
 import { faIR } from 'date-fns/locale/fa-IR';
 import { ar } from 'date-fns/locale/ar';
@@ -194,6 +194,50 @@ export function formatDateTimeWithFallback(
   } catch {
     return fallback;
   }
+}
+
+/**
+ * GS1 Application Identifiers that represent expiry/use-by dates.
+ * When the date is in the past, show "expired" in red in GS1 dialogs.
+ */
+export const GS1_DATE_AI_EXPIRY: readonly string[] = ['17'];
+
+/** Urgency for expiry display: expired (red), soon ≤3 months (amber), ok >3 months (emerald). */
+export type GS1ExpiryUrgency = 'expired' | 'soon' | 'ok';
+
+const EXPIRY_SOON_MONTHS = 3;
+
+/**
+ * Formats a GS1 date (e.g. AI 17 use-by) with a friendly relative part.
+ * @param date - The parsed date (e.g. use-by)
+ * @param localeCode - Optional locale for formatDistanceToNow
+ * @returns dateText, relativeText (e.g. "expired (2 days ago)" or "(expires in 11 months)"), expired, and urgency for styling
+ */
+export function formatGS1DateFriendly(
+  date: Date,
+  localeCode?: string | null
+): {
+  dateText: string;
+  relativeText: string;
+  expired: boolean;
+  urgency: GS1ExpiryUrgency;
+} {
+  const dateOnly = startOfDay(date);
+  const today = startOfDay(new Date());
+  const expired = isPast(dateOnly) && dateOnly.getTime() !== today.getTime();
+  const dateText = format(date, 'yyyy-MM-dd');
+  const locale = getLocale(localeCode);
+  const relative = formatDistanceToNow(date, { addSuffix: true, locale });
+  const relativeText = expired
+    ? `expired (${relative})`
+    : `(expires ${relative})`;
+  const monthsUntil = differenceInMonths(dateOnly, today);
+  const urgency: GS1ExpiryUrgency = expired
+    ? 'expired'
+    : monthsUntil <= EXPIRY_SOON_MONTHS
+      ? 'soon'
+      : 'ok';
+  return { dateText, relativeText, expired, urgency };
 }
 
 /**

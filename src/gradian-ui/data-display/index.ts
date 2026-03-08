@@ -16,6 +16,9 @@ export * from './card';
 export * from './list';
 export * from './kanban';
 
+// Ticket Card
+export * from './ticket-card';
+
 // New Components
 export { EmptyState } from './components/EmptyState';
 export { LoadingState } from './components/LoadingState';

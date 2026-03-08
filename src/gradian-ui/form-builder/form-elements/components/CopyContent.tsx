@@ -90,7 +90,7 @@ export const CopyContent: React.FC<CopyContentProps> = ({
       onClick={handleCopy}
       disabled={disabled}
       className={cn(
-        'h-6 w-6 min-h-6 min-w-6 shrink-0 p-0 rounded-md hover:bg-violet-100 hover:text-violet-600 transition-all duration-200 relative focus:ring-0 focus-visible:ring-0',
+        'h-6 w-6 min-h-6 min-w-6 shrink-0 p-0 rounded-md hover:bg-violet-100 hover:text-violet-600 transition-all duration-200 relative focus:ring-0 focus-visible:ring-0 print:hidden',
         copied && 'text-green-600 hover:text-green-600',
         className
       )}

@@ -14,3 +14,11 @@ export type {
   BarcodeItemForReceipt,
   ReceiptDocOptions,
 } from "./printout-receipt";
+
+export { printElementAsImage } from "./shared/utils";
+export type {
+  PrintElementAsImageOptions,
+  PrintCaptureQuality,
+} from "./shared/utils";
+export { PrintElementButton } from "./shared/components";
+export type { PrintElementButtonProps } from "./shared/components";

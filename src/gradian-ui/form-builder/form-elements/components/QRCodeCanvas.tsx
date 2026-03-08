@@ -54,7 +54,7 @@ export const QRCodeCanvas: React.FC<QRCodeCanvasProps> = ({
   modules,
   image,
   margin = 8,
-  padding = 16,
+  padding = 12,
   variant = DEFAULT_VARIANT,
   divider = false,
   bgColor = '#ffffff',

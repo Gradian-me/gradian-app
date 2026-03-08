@@ -151,6 +151,11 @@ function ulid(): string {
 }
 
 const MOCK_FORMATS = ["Code128", "QR", "DataMatrix", "EAN"] as const;
+
+/** GS1-style mock barcode (DataMatrix) for testing Application Identifiers / ticket. */
+const MOCK_GS1_LABEL =
+  "]C101040123456789011715012910ABC123\\F39329784711\\F310300052539224711\\F42127649716";
+
 function randomMockBarcode(enableChangeCount: boolean): ScannedBarcode {
   const now = new Date();
   const format = MOCK_FORMATS[Math.floor(Math.random() * MOCK_FORMATS.length)];
@@ -159,6 +164,17 @@ function randomMockBarcode(enableChangeCount: boolean): ScannedBarcode {
     id: ulid(),
     label,
     format,
+    createdAt: now.toISOString(),
+    count: enableChangeCount ? Math.floor(Math.random() * 5) + 1 : undefined,
+  };
+}
+
+function mockGS1Barcode(enableChangeCount: boolean): ScannedBarcode {
+  const now = new Date();
+  return {
+    id: ulid(),
+    label: MOCK_GS1_LABEL,
+    format: "DataMatrix",
     createdAt: now.toISOString(),
     count: enableChangeCount ? Math.floor(Math.random() * 5) + 1 : undefined,
   };
@@ -469,7 +485,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
 
   const handleAddMockData = useCallback(() => {
     const items = [
-      randomMockBarcode(enableChangeCount),
+      mockGS1Barcode(enableChangeCount),
       randomMockBarcode(enableChangeCount),
       randomMockBarcode(enableChangeCount),
     ];
@@ -478,7 +494,8 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   }, [enableChangeCount, markNewlyAdded]);
 
   const handleAddMockSingle = useCallback(() => {
-    const b = randomMockBarcode(false);
+    const b =
+      Math.random() < 0.5 ? mockGS1Barcode(false) : randomMockBarcode(false);
     setScannedValue(b.label);
     setScannedFormat(b.format ?? "QR");
     onScan?.(b.label, b.format ?? "QR");

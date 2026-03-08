@@ -1085,3 +1085,12 @@ input.bg-transparent:-webkit-autofill:active {
   border-top-left-radius: 0.375rem !important;
   border-bottom-left-radius: 0.375rem !important;
 }
+
+/* Never show box-shadows in print output */
+@media print {
+  *,
+  *::before,
+  *::after {
+    box-shadow: none !important;
+  }
+}

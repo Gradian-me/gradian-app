@@ -8,6 +8,7 @@ import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
 import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-utils";
 import { useLanguageStore } from "@/stores/language.store";
 import { isValidUrl, safeLinkHref } from "../utils/sanitize";
+import { GS1Badge } from "./GS1Badge";
 import type { BarcodeScannerResultProps } from "../types";
 
 export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
@@ -43,10 +44,13 @@ export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
         <CheckCircle2 className="w-8 h-8 text-emerald-500" />
       </div>
 
-      {/* Format badge */}
-      <span className="text-xs font-semibold tracking-widest uppercase text-emerald-600 dark:text-emerald-400">
-        {format}
-      </span>
+      {/* Format badge + GS1 badge when content is GS1-valid (any format) */}
+      <div className="flex items-center justify-center gap-2 flex-wrap">
+        <span className="text-xs font-semibold tracking-widest uppercase text-emerald-600 dark:text-emerald-400">
+          {format}
+        </span>
+        <GS1Badge barcodeLabel={value} />
+      </div>
 
       {/* Value */}
       <div

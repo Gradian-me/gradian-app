@@ -1107,6 +1107,18 @@
     "directory": "src/gradian-ui/data-display/components/DynamicDetailPageRenderer.tsx"
   },
   {
+    "id": "ticket-card",
+    "label": "TicketCard",
+    "color": "violet",
+    "icon": "Ticket",
+    "category": "data-display",
+    "useInRAG": false,
+    "description": "Composable ticket-style card with header, content, badge, and footer supporting QR, barcode, and DataMatrix.",
+    "usecase": "Receipts, confirmations, GS1 details, and any ticket-style summary with a scannable code.",
+    "directory": "src/gradian-ui/data-display/ticket-card/TicketCardWrapper.tsx",
+    "demoUrl": "/ui/components/ticket-card"
+  },
+  {
     "id": "kpi-indicator",
     "label": "KPIIndicator",
     "color": "rose",

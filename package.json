@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.63.001",
+  "version": "1.63.002",
   "private": true,
   "scripts": {
     "dev": "npm run sync:relation-types && npm run clean:relations && cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack",
@@ -62,9 +62,12 @@
     "arabic-persian-reshaper": "^1.0.1",
     "argon2": "^0.44.0",
     "axios": "^1.13.5",
+    "bwip-js": "^4.8.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
+    "country-code-lookup": "^0.1.3",
+    "currency-codes": "^2.2.0",
     "cytoscape": "^3.33.1",
     "cytoscape-cose-bilkent": "^4.1.0",
     "cytoscape-cxtmenu": "^3.5.0",
@@ -79,6 +82,7 @@
     "flag-icons": "^7.5.0",
     "framer-motion": "^12.23.26",
     "gsap": "^3.14.2",
+    "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
     "js-sha256": "^0.11.1",
     "jsonwebtoken": "^9.0.3",

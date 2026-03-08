@@ -20,6 +20,7 @@ import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-
 import { useLanguageStore } from "@/stores/language.store";
 import { isValidUrl, safeLinkHref } from "../utils/sanitize";
 import { getFormatBadgeClass } from "../utils/format-badge";
+import { GS1Badge } from "./GS1Badge";
 import type { BarcodeScannerResultJSONProps, ScannedBarcode } from "../types";
 
 /** Default receipt layout: header, column headers, footer. Translated in component. */
@@ -116,7 +117,7 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
           {displayIndex}
         </span>
 
-        {/* Format badge + time — can shrink/truncate so number input stays in card */}
+        {/* Format badge + GS1 badge (DataMatrix only) + time — can shrink/truncate so number input stays in card */}
         <div className="flex items-center gap-1 min-w-0 flex-1 overflow-hidden">
           <span className={cn(
             "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold font-mono tracking-wide min-w-0 max-w-24 truncate",
@@ -124,6 +125,9 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
           )}>
             {barcode.format ?? unknownFormatLabel}
           </span>
+          {(barcode.format === "DataMatrix" || barcode.format === "Handheld") && (
+            <GS1Badge barcodeLabel={barcode.label ?? ""} />
+          )}
           {barcode.createdAt && (
             <span className="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums shrink-0">
               {dateFormat(new Date(barcode.createdAt), "HH:mm:ss")}
