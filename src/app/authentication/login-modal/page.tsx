@@ -15,8 +15,8 @@ import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import {
   createLoginSuccessMessage,
-  validateMessageOrigin,
 } from '@/gradian-ui/form-builder/types/embed-messages';
+import { isOriginAllowedForLoginEmbed } from '@/lib/login-embed-origins';
 import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT } from '@/gradian-ui/shared/utils/translation-utils';
@@ -63,17 +63,10 @@ function toStatus(v: unknown): Array<StatusItem> | undefined {
   return undefined;
 }
 
-const LOGIN_EMBED_ALLOWED_ORIGINS =
-  typeof process.env.NEXT_PUBLIC_LOGIN_EMBED_ALLOWED_ORIGINS === 'string'
-    ? process.env.NEXT_PUBLIC_LOGIN_EMBED_ALLOWED_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
-    : [];
-
 function isReturnOriginAllowed(origin: string | null | undefined): boolean {
   if (!origin) return false;
   if (typeof window !== 'undefined' && origin === window.location.origin) return true;
-  const event = { origin } as MessageEvent;
-  if (LOGIN_EMBED_ALLOWED_ORIGINS.length === 0) return false;
-  return validateMessageOrigin(event, LOGIN_EMBED_ALLOWED_ORIGINS);
+  return isOriginAllowedForLoginEmbed(origin);
 }
 
 function LoginModalContent() {

@@ -139,77 +139,18 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Security headers for production
+  // Security headers for production. Login-modal uses middleware for wildcard subdomain (NEXT_PUBLIC_DEFAULT_DOMAIN).
   async headers() {
-    let loginEmbedOrigins: string[] = typeof process.env.NEXT_PUBLIC_LOGIN_EMBED_ALLOWED_ORIGINS === 'string'
-      ? process.env.NEXT_PUBLIC_LOGIN_EMBED_ALLOWED_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
-      : [];
-    // Fallback: allow same-app embedding when env not set (e.g. app1.cinnagen.com embedding its own login-modal)
-    if (loginEmbedOrigins.length === 0 && typeof process.env.NEXT_PUBLIC_APP_URL === 'string') {
-      try {
-        const u = new URL(process.env.NEXT_PUBLIC_APP_URL.trim());
-        const origin = u.origin;
-        loginEmbedOrigins = [origin];
-        if (u.protocol === 'https:') loginEmbedOrigins.push(u.origin.replace('https:', 'http:'));
-        else if (u.protocol === 'http:') loginEmbedOrigins.push(u.origin.replace('http:', 'https:'));
-      } catch {
-        // ignore invalid URL
-      }
-    }
-    // Always allow localhost for dev (when not in production or when explicitly desired)
-    if (process.env.NODE_ENV !== 'production' || process.env.NEXT_PUBLIC_LOGIN_EMBED_ALLOWED_ORIGINS?.includes('localhost')) {
-      const localhostOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000'];
-      for (const o of localhostOrigins) {
-        if (!loginEmbedOrigins.includes(o)) loginEmbedOrigins.push(o);
-      }
-    }
-    const loginModalFrameAncestors = ['\'self\'', ...loginEmbedOrigins].join(' ');
-
     return [
-      // Login modal: allow iframe embedding from allowed origins (must be first to take precedence)
+      // Login-modal: no X-Frame-Options/CSP/Permissions-Policy here; middleware sets them per-request from Referer
       {
         source: '/authentication/login-modal',
         headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on'
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block'
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()'
-          },
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "base-uri 'self'",
-              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net",
-              "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-              "img-src 'self' data: blob: https:",
-              "font-src 'self' data:",
-              "connect-src 'self' blob: https://*.cinnagen.com https://cg-gr-app.cinnagen.com:5001 https://www.gstatic.com https://cdn.jsdelivr.net https://fastly.jsdelivr.net",
-              `frame-ancestors ${loginModalFrameAncestors}`,
-              "object-src 'none'",
-              "media-src 'self' https: blob:",
-              "worker-src 'self' blob:",
-            ].join('; ')
-          }
+          { key: 'X-DNS-Prefetch-Control', value: 'on' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         ],
       },
       {

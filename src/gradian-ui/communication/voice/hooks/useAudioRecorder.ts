@@ -6,6 +6,8 @@ export interface UseAudioRecorderReturn {
   isRecording: boolean;
   recordedBlob: Blob | null;
   audioUrl: string | null;
+  /** Active microphone stream while recording; pass to VoicePoweredOrb for wave visualization */
+  mediaStream: MediaStream | null;
   startRecording: () => Promise<void>;
   stopRecording: () => void;
   clearRecording: () => void;
@@ -16,6 +18,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   const [isRecording, setIsRecording] = useState(false);
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -49,6 +52,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       });
 
       streamRef.current = stream;
+      setMediaStream(stream);
 
       const mediaRecorder = new MediaRecorder(stream, {
         mimeType: MediaRecorder.isTypeSupported('audio/webm') 
@@ -74,6 +78,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
         const url = URL.createObjectURL(blob);
         setAudioUrl(url);
 
+        setMediaStream(null);
         // Tracks are already stopped in stopRecording, but ensure cleanup here too
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => {
@@ -136,6 +141,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
       
       setError(errorMessage);
       setIsRecording(false);
+      setMediaStream(null);
       // Clean up any partial stream on error
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
@@ -145,6 +151,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
   }, []);
 
   const stopAllTracks = useCallback(() => {
+    setMediaStream(null);
     // Stop all tracks in the stream immediately
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => {
@@ -196,6 +203,7 @@ export const useAudioRecorder = (): UseAudioRecorderReturn => {
     isRecording,
     recordedBlob,
     audioUrl,
+    mediaStream,
     startRecording,
     stopRecording,
     clearRecording,

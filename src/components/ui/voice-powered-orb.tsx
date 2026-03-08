@@ -10,6 +10,8 @@ export interface VoicePoweredOrbProps {
   className?: string;
   hue?: number;
   enableVoiceControl?: boolean;
+  /** When provided (e.g. recorder's stream), orb uses this for wave visualization instead of its own mic */
+  externalStream?: MediaStream | null;
   voiceSensitivity?: number;
   maxRotationSpeed?: number;
   maxHoverIntensity?: number;
@@ -20,6 +22,7 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
   className,
   hue = 0,
   enableVoiceControl = true,
+  externalStream = null,
   voiceSensitivity = 1.5,
   maxRotationSpeed = 1.2,
   maxHoverIntensity = 0.8,
@@ -30,9 +33,12 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
   const analyserRef = useRef<AnalyserNode | null>(null);
   const microphoneRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const dataArrayRef = useRef<Uint8Array | null>(null);
+  const timeDomainDataRef = useRef<Uint8Array | null>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const isMountedRef = useRef(true);
+  /** When true, we must not stop stream tracks in stopMicrophone (stream is owned by parent) */
+  const externalStreamRef = useRef(false);
 
   const vert = /* glsl */ `
     precision highp float;
@@ -180,8 +186,8 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
       float c = cos(angle);
       uv = vec2(c * uv.x - s * uv.y, s * uv.x + c * uv.y);
 
-      uv.x += hover * hoverIntensity * 0.1 * sin(uv.y * 10.0 + iTime);
-      uv.y += hover * hoverIntensity * 0.1 * sin(uv.x * 10.0 + iTime);
+      uv.x += hover * hoverIntensity * 0.28 * sin(uv.y * 10.0 + iTime);
+      uv.y += hover * hoverIntensity * 0.28 * sin(uv.x * 10.0 + iTime);
 
       return draw(uv);
     }
@@ -193,36 +199,36 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
     }
   `;
 
-  // Voice analysis function
+  // Voice analysis: use time-domain for volume so the orb waves with speech
   const analyzeAudio = () => {
-    if (!analyserRef.current || !dataArrayRef.current) return 0;
+    if (!analyserRef.current || !timeDomainDataRef.current) return 0;
 
-    // Type assertion to satisfy TypeScript's strict type checking
-    analyserRef.current.getByteFrequencyData(dataArrayRef.current as any);
-
-    // Calculate RMS (Root Mean Square) for better voice detection
+    const analyser = analyserRef.current;
+    const timeData = timeDomainDataRef.current;
+    analyser.getByteTimeDomainData(timeData as Uint8Array<ArrayBuffer>);
+    const data = timeData;
     let sum = 0;
-    for (let i = 0; i < dataArrayRef.current.length; i++) {
-      const value = dataArrayRef.current[i] / 255;
-      sum += value * value;
+    for (let i = 0; i < data.length; i++) {
+      const normalized = (data[i] - 128) / 128;
+      sum += normalized * normalized;
     }
-    const rms = Math.sqrt(sum / dataArrayRef.current.length);
-
-    // Apply sensitivity and boost the signal
-    const level = Math.min(rms * voiceSensitivity * 3.0, 1);
+    const rms = Math.sqrt(sum / data.length);
+    const level = Math.min(rms * voiceSensitivity * 4.0, 1);
     return level;
   };
 
-  // Stop microphone and cleanup
+  // Stop microphone and cleanup (do not stop tracks when stream is external)
   const stopMicrophone = () => {
     try {
-      // Stop all tracks in the media stream
-      if (mediaStreamRef.current) {
+      const isExternal = externalStreamRef.current;
+      // Stop tracks only when we own the stream (internal getUserMedia)
+      if (mediaStreamRef.current && !isExternal) {
         mediaStreamRef.current.getTracks().forEach(track => {
           track.stop();
         });
-        mediaStreamRef.current = null;
       }
+      mediaStreamRef.current = null;
+      externalStreamRef.current = false;
 
       // Disconnect and cleanup audio nodes
       if (microphoneRef.current) {
@@ -242,6 +248,7 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
       }
 
       dataArrayRef.current = null;
+      timeDomainDataRef.current = null;
       console.log('Microphone stopped and cleaned up');
     } catch (error) {
       console.warn('Error stopping microphone:', error);
@@ -285,6 +292,7 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
       microphoneRef.current.connect(analyserRef.current);
 
       dataArrayRef.current = new Uint8Array(analyserRef.current.frequencyBinCount);
+      timeDomainDataRef.current = new Uint8Array(analyserRef.current.fftSize);
 
       console.log('Microphone initialized successfully');
       return true;
@@ -389,20 +397,12 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
       let currentRot = 0;
       let voiceLevel = 0;
       const baseRotationSpeed = 0.3;
-      let isMicrophoneInitialized = false;
 
-      // Initialize or stop microphone based on voice control setting
-      if (enableVoiceControl) {
-        initMicrophone().then((success) => {
-          // Only update if component is still mounted
-          if (isMountedRef.current) {
-            isMicrophoneInitialized = success;
-          }
-        });
-      } else {
-        // Stop microphone when voice control is disabled
+      // Initialize or stop microphone when not using external stream
+      if (!externalStream && enableVoiceControl) {
+        initMicrophone();
+      } else if (!externalStream) {
         stopMicrophone();
-        isMicrophoneInitialized = false;
       }
 
       const update = (t: number) => {
@@ -420,28 +420,23 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
         program.uniforms.iTime.value = t * 0.001;
         program.uniforms.hue.value = hue;
 
-        // Handle voice input
-        if (enableVoiceControl && isMicrophoneInitialized) {
+        // Handle voice input (analyser may be from internal mic or externalStream)
+        const hasAudioSource = analyserRef.current && timeDomainDataRef.current;
+        if (hasAudioSource) {
           voiceLevel = analyzeAudio();
 
-          // Notify parent component about voice detection (only if mounted)
           if (onVoiceDetected && isMountedRef.current) {
             onVoiceDetected(voiceLevel > 0.1);
           }
 
-          // Map voice level to rotation speed with more visible effect
           const voiceRotationSpeed = baseRotationSpeed + (voiceLevel * maxRotationSpeed * 2.0);
-
-          // Always rotate when there's voice input, even at low levels
           if (voiceLevel > 0.05) {
             currentRot += dt * voiceRotationSpeed;
           }
 
-          // Use voice level to drive hover effects for visual feedback
           program.uniforms.hover.value = Math.min(voiceLevel * 2.0, 1.0);
-          program.uniforms.hoverIntensity.value = Math.min(voiceLevel * maxHoverIntensity * 0.8, maxHoverIntensity);
+          program.uniforms.hoverIntensity.value = Math.min(voiceLevel * maxHoverIntensity * 1.2, maxHoverIntensity);
         } else {
-          // Keep effects at 0 when not using voice control
           program.uniforms.hover.value = 0;
           program.uniforms.hoverIntensity.value = 0;
           if (onVoiceDetected && isMountedRef.current) {
@@ -509,20 +504,56 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
     frag
   ]);
 
-  // Handle microphone state changes separately
+  // Attach to external stream (e.g. recorder) for wave visualization during recording
+  useEffect(() => {
+    if (!externalStream || !externalStream.active) {
+      const hadExternal = externalStreamRef.current;
+      if (hadExternal) stopMicrophone();
+      return;
+    }
+    const audioTracks = externalStream.getAudioTracks();
+    if (audioTracks.length === 0) return;
+
+    stopMicrophone();
+    try {
+      const ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      if (ctx.state === "suspended") ctx.resume();
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 512;
+      analyser.smoothingTimeConstant = 0.3;
+      analyser.minDecibels = -90;
+      analyser.maxDecibels = -10;
+      const source = ctx.createMediaStreamSource(externalStream);
+      source.connect(analyser);
+
+      audioContextRef.current = ctx;
+      analyserRef.current = analyser;
+      microphoneRef.current = source;
+      mediaStreamRef.current = externalStream;
+      externalStreamRef.current = true;
+      dataArrayRef.current = new Uint8Array(analyser.frequencyBinCount);
+      timeDomainDataRef.current = new Uint8Array(analyser.fftSize);
+    } catch (e) {
+      console.warn("VoicePoweredOrb: failed to attach to external stream", e);
+      externalStreamRef.current = false;
+    }
+
+    return () => {
+      if (externalStreamRef.current) stopMicrophone();
+    };
+  }, [externalStream]);
+
+  // Handle microphone state when not using external stream
   useEffect(() => {
     isMountedRef.current = true;
+    if (externalStream) return;
 
     const handleMicrophoneState = async () => {
       if (enableVoiceControl) {
         const success = await initMicrophone();
-        // Only proceed if component is still mounted
         if (!isMountedRef.current) return;
-        // Update the microphone state in the WebGL context if needed
       } else {
-        if (isMountedRef.current) {
-          stopMicrophone();
-        }
+        if (isMountedRef.current) stopMicrophone();
       }
     };
 
@@ -530,10 +561,9 @@ export const VoicePoweredOrb: FC<VoicePoweredOrbProps> = ({
 
     return () => {
       isMountedRef.current = false;
-      // Stop microphone on unmount to ensure cleanup
-      stopMicrophone();
+      if (!externalStreamRef.current) stopMicrophone();
     };
-  }, [enableVoiceControl]);
+  }, [enableVoiceControl, externalStream]);
 
   return (
     <div

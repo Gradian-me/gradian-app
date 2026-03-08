@@ -1,6 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { proxy } from './proxy';
 
+/** Base host for login embed wildcard (e.g. cinnagen.com). Any subdomain is allowed. */
+const LOGIN_EMBED_BASE_HOST = process.env.NEXT_PUBLIC_DEFAULT_DOMAIN?.trim() ?? '';
+
+function isSubdomainOfBaseHost(hostname: string): boolean {
+  if (!LOGIN_EMBED_BASE_HOST) return false;
+  return hostname === LOGIN_EMBED_BASE_HOST || hostname.endsWith('.' + LOGIN_EMBED_BASE_HOST);
+}
+
+/** If Referer is present and its origin is allowed (subdomain of DEFAULT_DOMAIN or localhost in dev), return that origin. */
+function getRefererOriginIfAllowed(request: NextRequest): string | null {
+  const referer = request.headers.get('referer');
+  if (!referer) return null;
+  try {
+    const u = new URL(referer);
+    const hostname = u.hostname.toLowerCase();
+    if (isSubdomainOfBaseHost(hostname)) return u.origin;
+    if (process.env.NODE_ENV !== 'production' && (hostname === 'localhost' || hostname === '127.0.0.1')) return u.origin;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 /** Permissions-Policy: allow camera/microphone for same origin (barcode scanner, etc.). Set in middleware so it is not stripped by reverse proxies. */
 const PERMISSIONS_POLICY = 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()';
 
@@ -19,9 +42,37 @@ const CONTENT_SECURITY_POLICY = [
   "worker-src 'self' blob:",
 ].join('; ');
 
+const LOGIN_MODAL_CSP_BASE = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net",
+  "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  "connect-src 'self' blob: https://*.cinnagen.com https://cg-gr-app.cinnagen.com:5001 https://www.gstatic.com https://cdn.jsdelivr.net https://fastly.jsdelivr.net",
+  "object-src 'none'",
+  "media-src 'self' https: blob:",
+  "worker-src 'self' blob:",
+];
+
 function withSecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set('Permissions-Policy', PERMISSIONS_POLICY);
   response.headers.set('Content-Security-Policy', CONTENT_SECURITY_POLICY);
+  return response;
+}
+
+function withLoginModalHeaders(response: NextResponse, refererOrigin: string | null): NextResponse {
+  const frameAncestors = refererOrigin ? `'self' ${refererOrigin}` : "'self'";
+  const csp = [...LOGIN_MODAL_CSP_BASE, `frame-ancestors ${frameAncestors}`].join('; ');
+  response.headers.set('Content-Security-Policy', csp);
+  const permPolicy = refererOrigin
+    ? `camera=(self "${refererOrigin}"), microphone=(self "${refererOrigin}"), geolocation=(self), interest-cohort=()`
+    : 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()';
+  response.headers.set('Permissions-Policy', permPolicy);
+  response.headers.set('X-DNS-Prefetch-Control', 'on');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   return response;
 }
 
@@ -44,6 +95,12 @@ export default async function middleware(request: NextRequest) {
   }
   
   const response = await proxy(request);
+
+  if (pathname === '/authentication/login-modal') {
+    const refererOrigin = getRefererOriginIfAllowed(request);
+    return withLoginModalHeaders(response, refererOrigin);
+  }
+
   return withSecurityHeaders(response);
 }
 

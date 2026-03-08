@@ -73,6 +73,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
   const {
     isRecording,
     recordedBlob,
+    mediaStream,
     startRecording,
     stopRecording,
     clearRecording,
@@ -477,6 +478,7 @@ export const VoiceInputDialog: React.FC<VoiceInputDialogProps> = ({
             <div className="w-full h-96 relative rounded-xl overflow-hidden">
               <VoicePoweredOrb
                 enableVoiceControl={false}
+                externalStream={isRecording ? mediaStream : null}
                 className="rounded-xl overflow-hidden"
               />
               {loadingTextSwitches && (isRecording || isTranscribing) && (

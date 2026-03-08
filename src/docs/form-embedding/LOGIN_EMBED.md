@@ -4,8 +4,27 @@ Third-party sites can open the Gradian login page in a **popup** or **iframe**. 
 
 ## Requirements
 
-- The third-party origin must be listed in the app allowlist: set `NEXT_PUBLIC_LOGIN_EMBED_ALLOWED_ORIGINS` (comma-separated origins, e.g. `https://partner.com,https://app.partner.com`).
+- The third-party origin must be listed in the app allowlist (see **Allowlist** below).
 - The login-modal URL must be opened with a `returnOrigin` query parameter set to the third-party page origin (e.g. `https://partner.com`).
+
+---
+
+## Allowlist (embed + camera/microphone)
+
+**Wildcard:** Any subdomain of `NEXT_PUBLIC_DEFAULT_DOMAIN` can embed the login modal and use camera/microphone. No list of subdomains is required.
+
+| Env var | Description |
+|--------|-------------|
+| `NEXT_PUBLIC_DEFAULT_DOMAIN` | Base hostname (e.g. `cinnagen.com`). Any origin whose hostname is this or a subdomain (e.g. `app1.cinnagen.com`, `app2.cinnagen.com`) is allowed. |
+
+**Setup:**
+
+```bash
+# Any *.cinnagen.com (and cinnagen.com) can embed the login modal and use camera/voice
+NEXT_PUBLIC_DEFAULT_DOMAIN=cinnagen.com
+```
+
+The app uses the request `Referer` to allow the embedding origin and sets CSP `frame-ancestors` and Permissions-Policy per request. Localhost is allowed in non-production.
 
 ---
 
@@ -123,7 +142,7 @@ Iframe embed example:
 
 ## Security
 
-- **Allowlist**: Only origins in `NEXT_PUBLIC_LOGIN_EMBED_ALLOWED_ORIGINS` can use the embed flow; others are not sent the success message / reload.
+- **Allowlist**: Only origins in the resolved allowlist (explicit origins + subdomain-expanded origins) can embed the login modal and use camera/microphone; others are not sent the success message / reload.
 - **postMessage**: The login-success payload contains no secrets or PII (only `type` and `timestamp`). The parent must always validate `event.origin` against the Gradian app origin.
 - **Cookies**: In a third-party iframe, some browsers may block or limit cookies. The **popup** flow is more reliable for auth; use iframe when you need in-page UX and accept that cookies may require same-site or allowed third-party configuration.
 
