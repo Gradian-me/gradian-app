@@ -959,7 +959,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
               </Button>
             </div>
           ) : (
-            /* Show regular input if no icon/color */
+            /* Show regular input if no icon/color — same roundness (rounded-xl) as chosen-items container */
             <div className="relative flex-1">
               <Input
                 id={fieldName}
@@ -981,7 +981,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
                 onBlur={onBlur}
                 disabled={disabled}
                 className={cn(
-                  'cursor-pointer text-xs',
+                  'cursor-pointer text-xs rounded-xl',
                   error && inputErrorBorderClasses
                 )}
               />

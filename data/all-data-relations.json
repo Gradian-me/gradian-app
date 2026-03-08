@@ -1963,7 +1963,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "detected-by",
     "createdAt": "2026-01-02T21:04:46.719Z",
-    "updatedAt": "2026-01-02T21:10:48.316Z"
+    "updatedAt": "2026-03-08T15:56:04.006Z"
   },
   {
     "id": "01KE08DX60BRQPHQY1NQ795Y4J",
@@ -1974,7 +1974,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "affected-processes",
     "createdAt": "2026-01-02T21:04:46.784Z",
-    "updatedAt": "2026-01-02T21:10:48.330Z"
+    "updatedAt": "2026-03-08T15:56:04.014Z"
   },
   {
     "id": "01KE08DXNGTY863MWPYXF3WE8C",
@@ -1985,7 +1985,7 @@
     "relationTypeId": "HAS_FIELD_VALUE",
     "fieldId": "deviation-categories",
     "createdAt": "2026-01-02T21:04:47.279Z",
-    "updatedAt": "2026-01-02T21:10:48.719Z"
+    "updatedAt": "2026-03-08T15:56:04.187Z"
   },
   {
     "id": "01KE4BXSPSKP464XAMA1H9PSJ0",
@@ -6181,5 +6181,126 @@
     "fieldId": "lims-external-request-requested-tests",
     "createdAt": "2026-03-04T09:35:08.897Z",
     "updatedAt": "2026-03-04T09:43:54.950Z"
+  },
+  {
+    "id": "01KK72KBJJ2G900X7AK6FNBW8K",
+    "sourceSchema": "deviation-management",
+    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+    "targetSchema": "external_nodes",
+    "targetId": "high",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-product-quality",
+    "createdAt": "2026-03-08T15:56:04.050Z",
+    "updatedAt": "2026-03-08T15:56:04.050Z"
+  },
+  {
+    "id": "01KK72KBKTXZDPJN3MPV6YET13",
+    "sourceSchema": "deviation-management",
+    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+    "targetSchema": "external_nodes",
+    "targetId": "low",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-patient-safety",
+    "createdAt": "2026-03-08T15:56:04.090Z",
+    "updatedAt": "2026-03-08T15:56:04.090Z"
+  },
+  {
+    "id": "01KK72KBMRME3ZSAP1WFV2MENR",
+    "sourceSchema": "deviation-management",
+    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+    "targetSchema": "external_nodes",
+    "targetId": "critical",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-data-integrity",
+    "createdAt": "2026-03-08T15:56:04.120Z",
+    "updatedAt": "2026-03-08T15:56:04.120Z"
+  },
+  {
+    "id": "01KK72KBPCA5B05HTNQWZ105JM",
+    "sourceSchema": "deviation-management",
+    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+    "targetSchema": "external_nodes",
+    "targetId": "high",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "impact-regulatory-compliance",
+    "createdAt": "2026-03-08T15:56:04.171Z",
+    "updatedAt": "2026-03-08T15:56:04.171Z"
+  },
+  {
+    "id": "01KK72KBQTFPEH27G7S8T9NCGB",
+    "sourceSchema": "deviation-management",
+    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+    "targetSchema": "external_nodes",
+    "targetId": "unplanned",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "deviation-type",
+    "createdAt": "2026-03-08T15:56:04.218Z",
+    "updatedAt": "2026-03-08T15:56:04.218Z"
+  },
+  {
+    "id": "01KK72KBR74Q4PDRF58ND1JP0G",
+    "sourceSchema": "deviation-management",
+    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+    "targetSchema": "change-classifications",
+    "targetId": "Data Integrity / Documentation",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "deviation-category",
+    "createdAt": "2026-03-08T15:56:04.231Z",
+    "updatedAt": "2026-03-08T15:56:04.231Z"
+  },
+  {
+    "id": "01KK72KBS9BMACT45GPPXGARGY",
+    "sourceSchema": "deviation-management",
+    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+    "targetSchema": "external_nodes",
+    "targetId": "critical",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "deviation-criticality",
+    "createdAt": "2026-03-08T15:56:04.265Z",
+    "updatedAt": "2026-03-08T15:56:04.265Z"
+  },
+  {
+    "id": "01KK72KBTBTSKN3HWQQJZK0DVE",
+    "sourceSchema": "deviation-management",
+    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+    "targetSchema": "external_nodes",
+    "targetId": "repeat",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "recurrence-indicator",
+    "createdAt": "2026-03-08T15:56:04.299Z",
+    "updatedAt": "2026-03-08T15:56:04.299Z"
+  },
+  {
+    "id": "01KK72KBWCZZC7Q48YDCV5TTQZ",
+    "sourceSchema": "deviation-management",
+    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+    "targetSchema": "external_nodes",
+    "targetId": "5-why",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "root-cause-analysis-method",
+    "createdAt": "2026-03-08T15:56:04.364Z",
+    "updatedAt": "2026-03-08T15:56:04.364Z"
+  },
+  {
+    "id": "01KK72KBY05NXCHMY08B1BCPEN",
+    "sourceSchema": "deviation-management",
+    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+    "targetSchema": "external_nodes",
+    "targetId": "effective",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "effectiveness-result",
+    "createdAt": "2026-03-08T15:56:04.416Z",
+    "updatedAt": "2026-03-08T15:56:04.416Z"
+  },
+  {
+    "id": "01KK72KBYEG6S298JFFANBCBF3",
+    "sourceSchema": "deviation-management",
+    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
+    "targetSchema": "change-management-records",
+    "targetId": "01KCDG346XD1GBAKQEADRABBHB",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "linked-change-controls",
+    "createdAt": "2026-03-08T15:56:04.430Z",
+    "updatedAt": "2026-03-08T15:56:04.430Z"
   }
 ]

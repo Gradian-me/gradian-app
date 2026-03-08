@@ -22513,61 +22513,57 @@
     },
     {
       "id": "high",
-      "label": "High",
-      "icon": "ArrowUp",
-      "color": "orange",
-      "sourceUrl": "field-options:deviation-management:impact-product-quality"
+      "label": "high",
+      "sourceUrl": "field-options:deviation-management:impact-product-quality",
+      "businessId": "high"
     },
     {
       "id": "low",
-      "label": "Low",
-      "icon": "ArrowDown",
-      "color": "green",
-      "sourceUrl": "field-options:deviation-management:impact-patient-safety"
+      "label": "low",
+      "sourceUrl": "field-options:deviation-management:impact-patient-safety",
+      "businessId": "low"
     },
     {
       "id": "critical",
-      "label": "Critical",
-      "sourceUrl": "field-options:deviation-management:impact-data-integrity"
+      "label": "critical",
+      "sourceUrl": "field-options:deviation-management:impact-data-integrity",
+      "businessId": "critical"
     },
     {
       "id": "high",
-      "label": "High",
-      "icon": "ArrowUp",
-      "color": "orange",
-      "sourceUrl": "field-options:deviation-management:impact-regulatory-compliance"
+      "label": "high",
+      "sourceUrl": "field-options:deviation-management:impact-regulatory-compliance",
+      "businessId": "high"
     },
     {
       "id": "unplanned",
-      "label": "Unplanned",
-      "color": "orange",
-      "sourceUrl": "field-options:deviation-management:deviation-type"
+      "label": "unplanned",
+      "sourceUrl": "field-options:deviation-management:deviation-type",
+      "businessId": "unplanned"
     },
     {
       "id": "critical",
-      "label": "Critical",
-      "sourceUrl": "field-options:deviation-management:deviation-criticality"
+      "label": "critical",
+      "sourceUrl": "field-options:deviation-management:deviation-criticality",
+      "businessId": "critical"
     },
     {
       "id": "repeat",
-      "label": "Repeat",
-      "icon": "Repeat",
-      "color": "purple",
-      "sourceUrl": "field-options:deviation-management:recurrence-indicator"
+      "label": "repeat",
+      "sourceUrl": "field-options:deviation-management:recurrence-indicator",
+      "businessId": "repeat"
     },
     {
       "id": "5-why",
-      "label": "5-Why",
-      "icon": "Brain",
-      "color": "blue",
-      "sourceUrl": "field-options:deviation-management:root-cause-analysis-method"
+      "label": "5-why",
+      "sourceUrl": "field-options:deviation-management:root-cause-analysis-method",
+      "businessId": "5-why"
     },
     {
       "id": "effective",
-      "label": "Effective",
-      "icon": "CheckCircle",
-      "color": "green",
-      "sourceUrl": "field-options:deviation-management:effectiveness-result"
+      "label": "effective",
+      "sourceUrl": "field-options:deviation-management:effectiveness-result",
+      "businessId": "effective"
     },
     {
       "id": "in-use",
@@ -23088,7 +23084,7 @@
       ],
       "relatedPreviousDeviations": [],
       "createdAt": "2025-06-18T09:35:00.000Z",
-      "updatedAt": "2026-01-02T21:10:50.539Z",
+      "updatedAt": "2026-03-08T15:56:04.523Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "affectedProcesses": [

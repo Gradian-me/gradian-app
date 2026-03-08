@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronsUp } from 'lucide-react';
-import { FormSection, FormField } from '../types/form-schema';
+import { FormSection, FormField, FormWizard } from '../types/form-schema';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
@@ -29,6 +29,7 @@ import {
 
 interface SectionsTabProps {
   sections: FormSection[];
+  wizards?: FormWizard[];
   getFieldsForSection: (sectionId: string) => FormField[];
   expandedSection: string | null;
   onToggleSection: (sectionId: string) => void;
@@ -47,6 +48,7 @@ interface SectionsTabProps {
 
 export function SectionsTab({
   sections,
+  wizards = [],
   getFieldsForSection,
   expandedSection,
   onToggleSection,
@@ -187,6 +189,7 @@ export function SectionsTab({
                         onUpdate={(updates) => onUpdateSection(section.id, updates)}
                         fields={fields}
                         sections={safeSections}
+                        wizards={wizards}
                         onAddField={(sectionId) => onAddField(sectionId || section.id)}
                         onFieldUpdate={onFieldUpdate}
                         onFieldDelete={onFieldDelete}

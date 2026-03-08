@@ -9,6 +9,7 @@ import {
   FormErrors,
   FormSchema,
   FormState,
+  FormWizard,
   FormWrapperProps
 } from '@/gradian-ui/schema-manager/types/form-schema';
 import { FormContext } from '@/gradian-ui/schema-manager/context/FormContext';
@@ -38,6 +39,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { DynamicQuickActions } from '@/gradian-ui/data-display/components/DynamicQuickActions';
 import { DiscussionsDialog } from '@/gradian-ui/communication';
 import { getDiscussionCount } from '@/gradian-ui/data-display/utils';
+import { WizardStepper } from './WizardStepper';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const useFormContext = () => {
   const context = useContext(FormContext);
@@ -476,10 +479,12 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           quickActions: Array.isArray(dpm.quickActions) ? dpm.quickActions : [],
         }
       : { sections: [] as any[], componentRenderers: [] as any[], tableRenderers: [] as any[], quickActions: [] as any[] };
+    const wizards = schema.wizards != null ? (Array.isArray(schema.wizards) ? schema.wizards : []) : undefined;
     return {
       ...schema,
       sections,
       fields,
+      ...(wizards !== undefined ? { wizards } : {}),
       detailPageMetadata,
     } as FormSchema;
   }, [schema]);
@@ -526,6 +531,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     }
     return initial;
   });
+
+  // Wizard (stepper) state: when schema has wizards, track active step
+  const [activeWizardIndex, setActiveWizardIndex] = React.useState(0);
 
   // Deep comparison to avoid unnecessary resets
   const prevInitialValuesRef = React.useRef<string>(JSON.stringify(initialValues));
@@ -609,6 +617,40 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     });
   }, [sectionIds, forceExpandedSections, safeSchema?.sections]);
 
+  // When schema has wizards, build effective list (sorted) and assign sections to wizards. Sections without wizardId go to first wizard.
+  const effectiveWizards = useMemo((): FormWizard[] => {
+    const list = safeSchema.wizards && safeSchema.wizards.length > 0
+      ? [...safeSchema.wizards].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      : [{ id: '__default__', title: [{ en: 'Form' }], order: 0 }] as FormWizard[];
+    return list;
+  }, [safeSchema.wizards]);
+
+  const sectionsByWizardId = useMemo(() => {
+    const firstWizardId = effectiveWizards[0]?.id;
+    const map = new Map<string, typeof safeSchema.sections>();
+    safeSchema.sections.forEach(section => {
+      const wizardId = section.wizardId && effectiveWizards.some(w => w.id === section.wizardId) ? section.wizardId : firstWizardId;
+      const list = map.get(wizardId) ?? [];
+      list.push(section);
+      map.set(wizardId, list);
+    });
+    return map;
+  }, [safeSchema.sections, effectiveWizards]);
+
+  const currentWizardSections = useMemo(() => {
+    const wizardId = effectiveWizards[activeWizardIndex]?.id;
+    return wizardId ? (sectionsByWizardId.get(wizardId) ?? []) : [];
+  }, [effectiveWizards, activeWizardIndex, sectionsByWizardId]);
+
+  const hasWizards = effectiveWizards.length > 1;
+
+  // Reset wizard step when schema changes or step is out of range
+  useEffect(() => {
+    if (activeWizardIndex >= effectiveWizards.length) {
+      setActiveWizardIndex(0);
+    }
+  }, [effectiveWizards.length, activeWizardIndex]);
+
   const setValue = useCallback((fieldName: string, value: any) => {
     loggingCustom(LogType.FORM_DATA, 'info', `Setting field "${fieldName}" to: ${JSON.stringify(value)}`);
     dispatch({ type: 'SET_VALUE', fieldName, value });
@@ -635,6 +677,73 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     dispatch({ type: 'VALIDATE_FIELD', fieldName, schema: safeSchema });
     return !state.errors[fieldName];
   }, [safeSchema, state.errors]);
+
+  // Validate only sections in the given list (for wizard "Next" step validation)
+  const validateSectionsSubset = useCallback((sectionIds: Set<string>): { isValid: boolean; newErrors: FormErrors } => {
+    let isValid = true;
+    const newErrors: FormErrors = {};
+    safeSchema.sections.filter(s => sectionIds.has(s.id)).forEach(section => {
+      if (section.isRepeatingSection && section.repeatingConfig && !section.repeatingConfig.targetSchema) {
+        const items = state.values[section.id] || [];
+        const { maxItems } = section.repeatingConfig;
+        if (maxItems !== undefined && items.length > maxItems) {
+          newErrors[section.id] = `Maximum ${maxItems} item(s) allowed`;
+          isValid = false;
+        }
+        const sectionFields = safeSchema.fields.filter(f => f.sectionId === section.id);
+        items.forEach((item: any, itemIndex: number) => {
+          sectionFields.forEach(field => {
+            const isRequired = field.validation?.required ?? false;
+            if (isRequired || field.validation) {
+              const result = validateFieldUtil(item[field.name], { ...field.validation, required: field.validation?.required ?? false });
+              if (!result.isValid) {
+                newErrors[`${section.id}[${itemIndex}].${field.name}`] = result.error || 'Invalid value';
+                isValid = false;
+              }
+            }
+          });
+        });
+      } else {
+        safeSchema.fields.filter(f => f.sectionId === section.id).forEach(field => {
+          const isRequired = field.validation?.required ?? false;
+          if (isRequired || field.validation) {
+            const result = validateFieldUtil(state.values[field.name], { ...field.validation, required: field.validation?.required ?? false });
+            if (!result.isValid) {
+              newErrors[field.name] = result.error || 'Invalid value';
+              isValid = false;
+            }
+          }
+        });
+      }
+    });
+    return { isValid, newErrors };
+  }, [safeSchema, state.values]);
+
+  // Which wizards have at least one validation error (for red border on stepper)
+  const wizardHasError = useMemo((): Record<string, boolean> => {
+    const out: Record<string, boolean> = {};
+    const sectionToWizard = new Map<string, string>();
+    effectiveWizards.forEach(w => {
+      (sectionsByWizardId.get(w.id) ?? []).forEach(s => sectionToWizard.set(s.id, w.id));
+    });
+    Object.keys(state.errors).forEach(key => {
+      if (!state.errors[key]) return;
+      let sectionId: string | null = null;
+      if (safeSchema.sections.some(s => s.id === key)) sectionId = key;
+      else if (key.includes('[') && key.includes('].')) {
+        const match = key.match(/^(.+)\[\d+\]\./);
+        if (match) sectionId = match[1];
+      } else {
+        const field = safeSchema.fields.find(f => f.name === key);
+        if (field) sectionId = field.sectionId;
+      }
+      if (sectionId) {
+        const wid = sectionToWizard.get(sectionId);
+        if (wid) out[wid] = true;
+      }
+    });
+    return out;
+  }, [state.errors, effectiveWizards, sectionsByWizardId, safeSchema.sections, safeSchema.fields]);
 
   const validateForm = useCallback(async (): Promise<{ isValid: boolean; isIncomplete: boolean }> => {
     // STEP 1: Validate main form first (required fields, maxItems, field validations)
@@ -1577,8 +1686,26 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   const isInsideForm = typeof window !== 'undefined' &&
     document.getElementById('form-dialog-form')?.closest('form');
 
-  const renderSections = () => {
-    return safeSchema.sections.map((section) => {
+  const handleWizardNext = useCallback(() => {
+    const sectionIds = new Set(currentWizardSections.map(s => s.id));
+    const { isValid, newErrors } = validateSectionsSubset(sectionIds);
+    if (!isValid) {
+      Object.entries(newErrors).forEach(([fieldName, error]) => {
+        dispatch({ type: 'SET_ERROR', fieldName, error });
+        dispatch({ type: 'SET_TOUCHED', fieldName, touched: true });
+      });
+      return;
+    }
+    setActiveWizardIndex(prev => Math.min(prev + 1, effectiveWizards.length - 1));
+  }, [currentWizardSections, validateSectionsSubset, effectiveWizards.length]);
+
+  const handleWizardPrevious = useCallback(() => {
+    setActiveWizardIndex(prev => Math.max(0, prev - 1));
+  }, []);
+
+  const renderSections = (sectionsToRender?: typeof safeSchema.sections) => {
+    const list = sectionsToRender ?? safeSchema.sections;
+    return list.map((section) => {
       const isRelationBased = section.isRepeatingSection && section.repeatingConfig?.targetSchema;
       const pending = isRelationBased ? pendingRelations[section.id] : undefined;
       return (
@@ -1967,7 +2094,89 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             />
           )}
 
+          {/* Wizard block: stepper + content + nav (horizontally centered when wizards present) */}
+          {hasWizards ? (
+            <div className="flex flex-col items-center w-full py-6">
+              <div className="mb-6 w-full flex justify-center">
+                <WizardStepper
+                  wizards={effectiveWizards}
+                  activeIndex={activeWizardIndex}
+                  onSelect={setActiveWizardIndex}
+                  wizardHasError={wizardHasError}
+                  language={language}
+                  defaultLang={defaultLang}
+                  disabled={disabled}
+                />
+              </div>
+
           {/* Collapse/Expand All Buttons */}
+          {(safeSchema.sections.length > 0) && schema?.isCollapsibleSections !== false && !hideCollapseExpandButtons && (
+            <TooltipProvider>
+              <div className="flex justify-end mb-4 w-full max-w-3xl mx-auto">
+                <ExpandCollapseControls
+                  onExpandAll={expandAll}
+                  onCollapseAll={collapseAll}
+                  expandDisabled={allExpanded || disabled}
+                  collapseDisabled={allCollapsed || disabled}
+                  variant="outline"
+                  size="sm"
+                  showLabels={true}
+                />
+              </div>
+            </TooltipProvider>
+          )}
+
+          <div className="space-y-4 w-full max-w-3xl mx-auto">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={activeWizardIndex}
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -24 }}
+                transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                className="space-y-4"
+              >
+                {hasWizards && (
+                  <FormSystemSection
+                    schema={schema}
+                    values={state.values}
+                    errors={state.errors}
+                    touched={state.touched}
+                    onChange={setValue}
+                    onBlur={(fieldName: string) => setTouched(fieldName, true)}
+                    disabled={disabled}
+                  />
+                )}
+                {renderSections(hasWizards ? currentWizardSections : undefined)}
+              </motion.div>
+            </AnimatePresence>
+            {hasWizards && (
+              <div className="flex items-center justify-between gap-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleWizardPrevious}
+                  disabled={activeWizardIndex === 0 || disabled}
+                  className="h-14 w-14 shrink-0 p-0 flex items-center justify-center rounded-lg border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-300 dark:hover:bg-violet-900/30 focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:outline-offset-2 focus:ring-0"
+                >
+                  <span className="text-xs font-medium truncate max-w-full px-1">{getT(TRANSLATION_KEYS.WIZARD_PREVIOUS, language, defaultLang)}</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="default"
+                  onClick={handleWizardNext}
+                  disabled={activeWizardIndex >= effectiveWizards.length - 1 || disabled}
+                  className="h-14 w-14 shrink-0 p-0 flex items-center justify-center rounded-lg bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-600 dark:hover:bg-violet-700 focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:outline-offset-2 focus:ring-0"
+                >
+                  <span className="text-xs font-medium truncate max-w-full px-1">{getT(TRANSLATION_KEYS.WIZARD_NEXT, language, defaultLang)}</span>
+                </Button>
+              </div>
+            )}
+          </div>
+            </div>
+          ) : (
+          <>
+          {/* Collapse/Expand All Buttons (no wizards) */}
           {(safeSchema.sections.length > 0) && schema?.isCollapsibleSections !== false && !hideCollapseExpandButtons && (
             <TooltipProvider>
               <div className="flex justify-end mb-4">
@@ -1994,8 +2203,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               onBlur={(fieldName: string) => setTouched(fieldName, true)}
               disabled={disabled}
             />
-            {renderSections()}
           </div>
+          </>
+          )}
         </>
       )}
 

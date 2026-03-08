@@ -54,6 +54,7 @@ export function SectionEditor({
   onFieldDelete,
   onFieldMove,
   sections,
+  wizards,
   config,
   currentSchemaId,
   onClose,
@@ -120,6 +121,8 @@ export function SectionEditor({
   const sectionDescDeleteRelationOnly = getT(TRANSLATION_KEYS.SECTION_DESC_DELETE_RELATION_ONLY, language, defaultLang);
   const sectionDescDeleteItemAndRelation = getT(TRANSLATION_KEYS.SECTION_DESC_DELETE_ITEM_AND_RELATION, language, defaultLang);
   const sectionLabelAddType = getT(TRANSLATION_KEYS.SECTION_LABEL_ADD_TYPE, language, defaultLang);
+  const sectionLabelWizard = getT(TRANSLATION_KEYS.SECTION_LABEL_WIZARD, language, defaultLang);
+  const sectionOptionWizardNone = getT(TRANSLATION_KEYS.SECTION_OPTION_WIZARD_NONE, language, defaultLang);
   const sectionOptionAddOnly = getT(TRANSLATION_KEYS.SECTION_OPTION_ADD_ONLY, language, defaultLang);
   const sectionOptionCanSelectFromData = getT(TRANSLATION_KEYS.SECTION_OPTION_CAN_SELECT_FROM_DATA, language, defaultLang);
   const sectionOptionMustSelectFromData = getT(TRANSLATION_KEYS.SECTION_OPTION_MUST_SELECT_FROM_DATA, language, defaultLang);
@@ -367,6 +370,21 @@ export function SectionEditor({
               />
             </div>
           </div>
+
+          {wizards && wizards.length > 0 && (
+            <Select
+              config={{ name: 'section-wizard', label: sectionLabelWizard }}
+              value={tempSection.wizardId ?? ''}
+              onValueChange={(value) => setTempSection({ ...tempSection, wizardId: value || undefined })}
+              options={[
+                { value: '', label: sectionOptionWizardNone },
+                ...wizards.map((w) => ({
+                  value: w.id,
+                  label: resolveFromTranslationsArray(w.title, language, defaultLang) || w.id,
+                })),
+              ]}
+            />
+          )}
           
           <div className="space-y-3 pb-2 border-b border-gray-100">
             <Switch

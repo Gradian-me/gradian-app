@@ -144,6 +144,19 @@ export interface FormSection {
   };
   initialState?: 'expanded' | 'collapsed';
   showNotApplicable?: boolean; // If true, shows N.A switch in section header (only for sections that are NOT repeating sections with minItems > 1)
+  /** When schema has wizards, sections with this id are shown in that wizard. Sections without wizardId go in the first wizard. */
+  wizardId?: string;
+}
+
+/** Wizard (stepper step) for multi-step forms. Title/description are translation arrays (same format as TextInput with allowTranslation). */
+export interface FormWizard {
+  id: string;
+  /** Translation array e.g. [{ en: "Identification" }, { fa: "..." }] — same format as TextInput allowTranslation value */
+  title: Array<Record<string, string>>;
+  /** Optional; same translation-array format */
+  description?: Array<Record<string, string>>;
+  icon?: string; // Lucide icon name for IconBox
+  order?: number;
 }
 
 // Card-related types
@@ -549,6 +562,8 @@ export interface FormSchema {
   };
   fields: FormField[]; // All fields at schema level, each with a sectionId
   sections: FormSection[]; // Sections no longer contain fields
+  /** Optional wizard (stepper) steps; when present, sections are grouped by wizardId and rendered as wizard tabs. */
+  wizards?: FormWizard[];
   fieldsCount?: number;
   sectionsCount?: number;
   cardMetadata?: CardSection[];

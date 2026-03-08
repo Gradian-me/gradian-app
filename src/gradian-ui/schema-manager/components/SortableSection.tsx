@@ -8,7 +8,7 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { ButtonMinimal, Badge } from '@/gradian-ui/form-builder/form-elements';
 import { Button } from '@/components/ui/button';
 import { GripVertical, Trash2, Edit, Pencil } from 'lucide-react';
-import { FormSection, FormSchema } from '../types/form-schema';
+import { FormSection, FormSchema, FormWizard } from '../types/form-schema';
 import { SectionEditor } from './SectionEditor';
 import { SchemaBuilderDialog } from './SchemaBuilderDialog';
 import { config } from '@/lib/config';
@@ -29,6 +29,7 @@ export interface SortableSectionProps {
   onUpdate: (updates: Partial<FormSection>) => void;
   fields: any[];
   sections: FormSection[];
+  wizards?: FormWizard[];
   onAddField: (sectionId?: string) => void; // Optional sectionId - will use current section if not provided
   onFieldUpdate: (fieldId: string, updates: any) => void;
   onFieldDelete: (fieldId: string) => void;
@@ -48,6 +49,7 @@ export function SortableSection({
   onUpdate,
   fields,
   sections,
+  wizards = [],
   onAddField,
   onFieldUpdate,
   onFieldDelete,
@@ -252,6 +254,7 @@ export function SortableSection({
           onFieldDelete={onFieldDelete}
           onFieldMove={onFieldMove}
           sections={sections}
+          wizards={wizards}
           config={config}
           currentSchemaId={currentSchemaId}
           onClose={() => setShowDialog(false)}

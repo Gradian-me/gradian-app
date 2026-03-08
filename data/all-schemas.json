@@ -17551,6 +17551,7 @@
     "sections": [
       {
         "id": "deviation-identification",
+        "wizardId": "wizard-identification",
         "title": "1. Deviation Identification",
         "titleTranslations": [
           {
@@ -17610,6 +17611,7 @@
       },
       {
         "id": "deviation-details",
+        "wizardId": "wizard-details-impact",
         "title": "2. Deviation Details (Facts Only)",
         "titleTranslations": [
           {
@@ -17669,6 +17671,7 @@
       },
       {
         "id": "impact-scope-assessment",
+        "wizardId": "wizard-details-impact",
         "title": "3. Impact & Scope Assessment",
         "titleTranslations": [
           {
@@ -17728,6 +17731,7 @@
       },
       {
         "id": "immediate-actions-containment",
+        "wizardId": "wizard-immediate-classification",
         "title": "4. Immediate Actions / Containment",
         "titleTranslations": [
           {
@@ -17787,6 +17791,7 @@
       },
       {
         "id": "deviation-classification",
+        "wizardId": "wizard-immediate-classification",
         "title": "5. Deviation Classification",
         "titleTranslations": [
           {
@@ -17846,6 +17851,7 @@
       },
       {
         "id": "investigation-root-cause",
+        "wizardId": "wizard-investigation-capa",
         "title": "6. Investigation & Root Cause Analysis",
         "titleTranslations": [
           {
@@ -17905,6 +17911,7 @@
       },
       {
         "id": "capa",
+        "wizardId": "wizard-investigation-capa",
         "title": "7. Corrective and Preventive Actions (CAPA)",
         "titleTranslations": [
           {
@@ -17972,6 +17979,7 @@
       },
       {
         "id": "capa-effectiveness-check",
+        "wizardId": "wizard-investigation-capa",
         "title": "8. CAPA Effectiveness Check",
         "titleTranslations": [
           {
@@ -18031,6 +18039,7 @@
       },
       {
         "id": "qa-review-closure",
+        "wizardId": "wizard-review-linkages",
         "title": "9. QA Review & Closure",
         "titleTranslations": [
           {
@@ -18090,6 +18099,7 @@
       },
       {
         "id": "related-records-linkages",
+        "wizardId": "wizard-review-linkages",
         "title": "10. Related Records & Linkages",
         "titleTranslations": [
           {
@@ -18146,6 +18156,163 @@
         ],
         "initialState": "expanded",
         "columns": 2
+      }
+    ],
+    "wizards": [
+      {
+        "id": "wizard-identification",
+        "title": [
+          {
+            "en": "Identification"
+          },
+          {
+            "fa": "شناسایی"
+          },
+          {
+            "ar": "التحديد"
+          },
+          {
+            "es": "Identificación"
+          },
+          {
+            "fr": "Identification"
+          },
+          {
+            "de": "Identifizierung"
+          },
+          {
+            "it": "Identificazione"
+          },
+          {
+            "ru": "Идентификация"
+          }
+        ],
+        "icon": "Hash",
+        "order": 0
+      },
+      {
+        "id": "wizard-details-impact",
+        "title": [
+          {
+            "en": "Details & Impact"
+          },
+          {
+            "fa": "جزئیات و تأثیر"
+          },
+          {
+            "ar": "التفاصيل والتأثير"
+          },
+          {
+            "es": "Detalles e impacto"
+          },
+          {
+            "fr": "Détails et impact"
+          },
+          {
+            "de": "Details und Auswirkung"
+          },
+          {
+            "it": "Dettagli e impatto"
+          },
+          {
+            "ru": "Детали и воздействие"
+          }
+        ],
+        "icon": "FileText",
+        "order": 1
+      },
+      {
+        "id": "wizard-immediate-classification",
+        "title": [
+          {
+            "en": "Immediate Actions & Classification"
+          },
+          {
+            "fa": "اقدامات فوری و طبقه‌بندی"
+          },
+          {
+            "ar": "الإجراءات الفورية والتصنيف"
+          },
+          {
+            "es": "Acciones inmediatas y clasificación"
+          },
+          {
+            "fr": "Actions immédiates et classification"
+          },
+          {
+            "de": "Sofortmaßnahmen und Klassifizierung"
+          },
+          {
+            "it": "Azioni immediate e classificazione"
+          },
+          {
+            "ru": "Немедленные действия и классификация"
+          }
+        ],
+        "icon": "Zap",
+        "order": 2
+      },
+      {
+        "id": "wizard-investigation-capa",
+        "title": [
+          {
+            "en": "Investigation & CAPA"
+          },
+          {
+            "fa": "بررسی و CAPA"
+          },
+          {
+            "ar": "التحقيق وCAPA"
+          },
+          {
+            "es": "Investigación y CAPA"
+          },
+          {
+            "fr": "Enquête et CAPA"
+          },
+          {
+            "de": "Untersuchung und CAPA"
+          },
+          {
+            "it": "Indagine e CAPA"
+          },
+          {
+            "ru": "Расследование и CAPA"
+          }
+        ],
+        "icon": "Search",
+        "order": 3
+      },
+      {
+        "id": "wizard-review-linkages",
+        "title": [
+          {
+            "en": "Review & Linkages"
+          },
+          {
+            "fa": "بررسی و ارتباطات"
+          },
+          {
+            "ar": "المراجعة والروابط"
+          },
+          {
+            "es": "Revisión y enlaces"
+          },
+          {
+            "fr": "Revue et liaisons"
+          },
+          {
+            "de": "Überprüfung und Verknüpfungen"
+          },
+          {
+            "it": "Revisione e collegamenti"
+          },
+          {
+            "ru": "Проверка и связи"
+          }
+        ],
+        "icon": "CheckCircle",
+        "order": 4
       }
     ],
     "detailPageMetadata": {
@@ -18339,7 +18506,32 @@
     "applications": [
       {
         "id": "01KBFCM00000000000000000003",
-        "name": "Deviation Management",
+        "name": [
+          {
+            "en": "Deviation Management"
+          },
+          {
+            "fa": "مدیریت انحرافات"
+          },
+          {
+            "ar": "إدارة الانحرافات"
+          },
+          {
+            "es": "Gestión de desviaciones"
+          },
+          {
+            "fr": "Gestion des déviations"
+          },
+          {
+            "de": "Abweichungsmanagement"
+          },
+          {
+            "it": "Gestione delle deviazioni"
+          },
+          {
+            "ru": "Управление отклонениями"
+          }
+        ],
         "icon": "AlertTriangle"
       }
     ],
@@ -18373,6 +18565,16 @@
       },
       {
         "ru": "Система управления отклонениями по GMP для учёта и управления отклонениями от процедур и спецификаций"
+      }
+    ],
+    "permissions": [
+      "view",
+      "edit"
+    ],
+    "statusGroup": [
+      {
+        "id": "01KBHD90EMZKAT502KNVVDQZC7",
+        "label": "Progress Status"
       }
     ]
   },

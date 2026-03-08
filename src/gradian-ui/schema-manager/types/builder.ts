@@ -1,7 +1,7 @@
 // Schema Builder Types
 // Types for the schema builder UI components
 
-import { FormSchema, FormField, FormSection } from './form-schema';
+import { FormSchema, FormField, FormSection, FormWizard } from './form-schema';
 
 export interface SchemaBuilderConfig {
   apiBaseUrl?: string;
@@ -42,6 +42,7 @@ export interface SectionEditorProps {
   onFieldDelete: (fieldId: string) => void;
   onFieldMove?: (fieldId: string, direction: 'up' | 'down') => void;
   sections: FormSection[];
+  wizards?: FormWizard[]; // When present, section can be assigned to a wizard (wizardId)
   config?: SchemaBuilderConfig;
   currentSchemaId?: string; // Current schema ID to filter out from target schema list
 }

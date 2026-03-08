@@ -242,6 +242,8 @@ export const asFormBuilderSchema = (schema: ExtendedFormSchema): FormBuilderForm
         : s))
     : [];
   const cardMetadata = Array.isArray(schema.cardMetadata) ? schema.cardMetadata : [];
+  // When schema has wizards, ensure it is always an array (do not add default so schemas without wizards stay flat)
+  const wizards = schema.wizards == null ? undefined : (Array.isArray(schema.wizards) ? schema.wizards : []);
   
   // Always provide detailPageMetadata as an object with arrays (never null/undefined) so consumers never hit .length on null
   const detailPageMetadata = schema.detailPageMetadata != null
@@ -270,6 +272,7 @@ export const asFormBuilderSchema = (schema: ExtendedFormSchema): FormBuilderForm
     description: schema.description,
     fields,
     sections,
+    ...(wizards !== undefined ? { wizards } : {}),
     cardMetadata,
     detailPageMetadata,
     statusGroup,

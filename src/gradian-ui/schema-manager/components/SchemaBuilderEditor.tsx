@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Settings, Layers, Layout, FileText } from 'lucide-react';
-import { FormSchema, FormField, FormSection } from '../types/form-schema';
+import { Settings, Layers, Layout, FileText, Sparkles } from 'lucide-react';
+import { FormSchema, FormField, FormSection, FormWizard } from '../types/form-schema';
 import { GeneralInfoTab } from './GeneralInfoTab';
+import { WizardsTab } from './WizardsTab';
 import { SectionsTab } from './SectionsTab';
 import { CardMetadataTab } from './CardMetadataTab';
 import { DetailPageMetadataTab } from './DetailPageMetadataTab';
@@ -441,13 +442,20 @@ export function SchemaBuilderEditor({
         />
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-slate-800 dark:bg-slate-900/40 select-none">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 h-auto gap-2 rounded-xl border border-gray-200 bg-gray-50 p-1 dark:border-slate-800 dark:bg-slate-900/40 select-none">
             <TabsTrigger
               value="general"
               className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
             >
               <Settings className="h-4 w-4 me-1 sm:me-2" />
               <span className="truncate">{getT(TRANSLATION_KEYS.SCHEMA_TAB_GENERAL, language, defaultLang)}</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="wizards"
+              className="text-xs sm:text-sm rounded-lg py-2 px-3 text-gray-600 transition-colors data-[state=active]:bg-white data-[state=active]:text-violet-600 data-[state=active]:shadow-sm dark:text-slate-300 dark:data-[state=active]:bg-slate-800 dark:data-[state=active]:text-white"
+            >
+              <Sparkles className="h-4 w-4 me-1 sm:me-2" />
+              <span className="truncate">{getT(TRANSLATION_KEYS.SCHEMA_TAB_WIZARDS, language, defaultLang)}</span>
             </TabsTrigger>
             <TabsTrigger
               value="sections"
@@ -482,9 +490,17 @@ export function SchemaBuilderEditor({
             />
           </TabsContent>
 
+          <TabsContent value="wizards" className="space-y-4">
+            <WizardsTab
+              wizards={schema.wizards ?? []}
+              onUpdate={(wizards) => updateSchema({ wizards })}
+            />
+          </TabsContent>
+
           <TabsContent value="sections" className="space-y-4">
             <SectionsTab
               sections={schema.sections || []}
+              wizards={schema.wizards ?? []}
               getFieldsForSection={getFieldsForSection}
               expandedSection={expandedSection}
               onToggleSection={toggleSection}

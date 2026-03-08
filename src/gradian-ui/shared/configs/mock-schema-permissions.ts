@@ -4,9 +4,11 @@
  * page access (view permission) and action buttons respect this list.
  *
  * To add more schemas or change permissions, edit the record below.
+ * After changing this file: clear the schema cache (e.g. call POST /api/schemas/clear-cache
+ * or use the schema manager "Clear cache" action) and refresh the page so the Edit button appears.
  */
 export const MOCK_SCHEMA_PERMISSIONS: Record<string, string[]> = {
-  'deviation-management': ['view'],
+  'deviation-management': ['view', 'edit'],
 };
 
 export function getMockPermissionsForSchema(schemaId: string): string[] | undefined {
