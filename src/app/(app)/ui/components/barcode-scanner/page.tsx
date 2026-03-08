@@ -98,11 +98,11 @@ export default function BarcodeScannerPage() {
             <ul className="text-xs space-y-1">
               {multiValues.map((item) => (
                 <li key={item.id} className="flex items-center justify-between gap-2">
-                  <span className="font-mono break-all" dir="auto">
+                  <span className="font-mono break-all min-w-0 flex-1" dir="auto">
                     {item.label}
                   </span>
                   {item.count != null && (
-                    <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                    <span className="shrink-0 whitespace-nowrap text-[11px] text-gray-500 dark:text-gray-400">
                       × {item.count}
                     </span>
                   )}

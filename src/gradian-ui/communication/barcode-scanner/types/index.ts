@@ -63,6 +63,8 @@ export interface BarcodeScannerCameraProps {
   isScanning: boolean;
   lastScannedFormat?: string;
   cameraError?: string | null;
+  /** When true (e.g. drawer mode), constrains camera to max-w-[200px]. */
+  compact?: boolean;
 }
 
 export interface BarcodeScannerToolbarProps {

@@ -182,7 +182,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()'
+            value: 'camera=*, microphone=*, geolocation=*, interest-cohort=()'
           },
           // Content Security Policy - adjust based on your needs
           // Note: Mermaid now uses installed package, but we allow CDN as fallback

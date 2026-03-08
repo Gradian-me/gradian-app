@@ -105,7 +105,7 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
       isNew && "animate-barcode-pulse ring-1 ring-violet-300 dark:ring-violet-700"
     )}>
       {/* Top row: index + format badge + time + count editor + actions */}
-      <div className="flex items-center gap-2 px-3 py-2">
+      <div className="flex items-center gap-1 px-3 py-2 min-w-0">
         {/* Index bubble */}
         <span className={cn(
           "shrink-0 flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold",
@@ -116,57 +116,55 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
           {displayIndex}
         </span>
 
-        {/* Format badge */}
-        <span className={cn(
-          "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold font-mono tracking-wide",
-          getFormatBadgeClass(barcode.format)
-        )}>
-          {barcode.format ?? unknownFormatLabel}
-        </span>
-
-        {/* Timestamp */}
-        {barcode.createdAt && (
-          <span className="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums">
-            {dateFormat(new Date(barcode.createdAt), "HH:mm:ss")}
+        {/* Format badge + time — can shrink/truncate so number input stays in card */}
+        <div className="flex items-center gap-1 min-w-0 flex-1 overflow-hidden">
+          <span className={cn(
+            "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold font-mono tracking-wide min-w-0 max-w-24 truncate",
+            getFormatBadgeClass(barcode.format)
+          )}>
+            {barcode.format ?? unknownFormatLabel}
           </span>
-        )}
-
-        <div className="flex-1" />
-
-        {/* Actions — always visible on mobile, hover on desktop */}
-        <div className="flex items-center gap-0.5 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 relative"
-            onClick={handleCopy}
-            aria-label={copyValueAria}
-          >
-            <Copy className="w-3.5 h-3.5" />
-            {copied && (
-              <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-medium text-emerald-500 whitespace-nowrap pointer-events-none">
-                {copiedLabel}
-              </span>
-            )}
-          </Button>
-          <ButtonMinimal
-            icon={Trash2}
-            title={deleteScanTitle}
-            color="red"
-            size="lg"
-            onClick={onRemove}
-          />
+          {barcode.createdAt && (
+            <span className="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums shrink-0">
+              {dateFormat(new Date(barcode.createdAt), "HH:mm:ss")}
+            </span>
+          )}
         </div>
 
-        {/* Count editor — inline in the row */}
-        {enableChangeCount && (
-          <NumberInputAnimated
-            value={barcode.count ?? 1}
-            min={1}
-            max={200}
-            onChange={(next) => onChangeCount?.(next)}
-          />
-        )}
+        {/* Actions + count editor — kept in card with shrink-0 */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-0.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 relative"
+              onClick={handleCopy}
+              aria-label={copyValueAria}
+            >
+              <Copy className="w-3.5 h-3.5" />
+              {copied && (
+                <span className="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-medium text-emerald-500 whitespace-nowrap pointer-events-none">
+                  {copiedLabel}
+                </span>
+              )}
+            </Button>
+            <ButtonMinimal
+              icon={Trash2}
+              title={deleteScanTitle}
+              color="red"
+              size="lg"
+              onClick={onRemove}
+            />
+          </div>
+          {enableChangeCount && (
+            <NumberInputAnimated
+              value={barcode.count ?? 1}
+              min={1}
+              max={200}
+              onChange={(next) => onChangeCount?.(next)}
+            />
+          )}
+        </div>
       </div>
 
       {/* Value row */}

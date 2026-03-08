@@ -61,6 +61,11 @@ export interface DrawerDialogProps {
    */
   drawerHeight?: string;
   /**
+   * When true, bottom drawer uses 95dvh height with no top margin.
+   * Ignored for side drawer.
+   */
+  drawerFullHeight?: boolean;
+  /**
    * When true (default), the drawer body wraps children in a scrollable container.
    * When false, scrolling must be handled by children (useful when only an inner
    * list should scroll, not the whole drawer).
@@ -132,6 +137,7 @@ export const DrawerDialog: React.FC<DrawerDialogProps> = ({
   drawerClassName,
   drawerDirection = 'side',
   drawerHeight,
+  drawerFullHeight = false,
   bodyScrollable = true,
   headerActions,
   footerLeftActions,
@@ -211,23 +217,26 @@ export const DrawerDialog: React.FC<DrawerDialogProps> = ({
   const showSideHandle = !isBottom && handlerPosition === 'side';
   const vaulDirection = isBottom ? 'bottom' : (isRTLLanguage ? 'left' : 'right');
   const bottomMaxHeight =
-    drawerHeight ?? (isSmallScreen ? '95vh' : '85vh');
+    drawerHeight ?? (drawerFullHeight ? '95dvh' : (isSmallScreen ? '95vh' : '85vh'));
+  const bottomDrawerFull = isBottom && drawerFullHeight;
 
   return (
     <>
     <Drawer open={open} onOpenChange={handleCloseRequest} direction={vaulDirection}>
       <DrawerContent
         className={cn(
-          'flex flex-col p-0 [&>button]:z-20 z-100! **:data-drawer-handle:hidden',
+          'flex flex-col p-0 [&>button]:z-20 z-126 **:data-drawer-handle:hidden',
           isBottom
-            ? 'inset-x-0 bottom-0 top-auto mt-24 w-full max-w-full rounded-t-2xl'
+            ? bottomDrawerFull
+              ? 'inset-x-0 bottom-0 top-auto mt-0 w-full max-w-full rounded-t-2xl'
+              : 'inset-x-0 bottom-0 top-auto mt-24 w-full max-w-full rounded-t-2xl'
             : cn(
                 'inset-y-0 mt-0 h-full w-full max-w-full sm:w-160 sm:max-w-[100vw]',
                 isRTLLanguage ? 'left-0 right-auto' : 'right-0 left-auto',
               ),
           drawerClassName,
         )}
-        style={isBottom ? { maxHeight: bottomMaxHeight } : undefined}
+        style={isBottom ? { maxHeight: bottomMaxHeight, height: bottomDrawerFull ? '95dvh' : undefined } : undefined}
       >
         {showSideHandle ? (
           <div

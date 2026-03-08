@@ -52,10 +52,10 @@ const DrawerContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <DrawerPortal>
     <DrawerOverlay />
-    <VaulDrawer.Content
+      <VaulDrawer.Content
       ref={ref}
       className={cn(
-        "fixed inset-x-0 bottom-0 z-[125] mt-24 flex h-auto flex-col rounded-t-[10px] border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+        "fixed inset-x-0 bottom-0 z-[126] mt-24 flex h-auto flex-col rounded-t-[10px] border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900 outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
         className
       )}
       {...props}

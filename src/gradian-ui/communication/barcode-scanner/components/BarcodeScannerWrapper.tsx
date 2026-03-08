@@ -602,15 +602,16 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   const cameraAndToolbarBlock = (
     <>
       {/* Camera / handheld + toolbar — vertically centered in dialog layout */}
-      <div className={isDialogLayout ? "flex-1 min-h-0 flex flex-col items-stretch justify-around" : undefined}>
+      <div className={cn("flex min-h-0 flex-col items-stretch justify-around", isDialogLayout && "flex-1")}>
         {scanMode === "handheld" ? (
           handheldPanel
         ) : (
-          <div className={cn("flex items-center justify-center", isDialogLayout ? "p-2" : "p-2")}>
+          <div className="flex flex-1 min-h-0 items-center justify-center p-1">
             <BarcodeScannerCamera
               isScanning={isScanning}
               lastScannedFormat={lastScannedFormat}
               cameraError={cameraError}
+              compact={!isDialogLayout}
             >
               {open &&
                 scanMode === "camera" &&
@@ -737,6 +738,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       title={displayTitle}
       size="lg"
       drawerDirection="bottom"
+      drawerFullHeight={true}
       bodyScrollable={false}
       hideCloseButton={enableMultipleScan}
       showCloseButton={true}

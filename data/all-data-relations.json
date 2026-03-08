@@ -6238,17 +6238,6 @@
     "updatedAt": "2026-03-08T15:56:04.218Z"
   },
   {
-    "id": "01KK72KBR74Q4PDRF58ND1JP0G",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "change-classifications",
-    "targetId": "Data Integrity / Documentation",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "deviation-category",
-    "createdAt": "2026-03-08T15:56:04.231Z",
-    "updatedAt": "2026-03-08T15:56:04.231Z"
-  },
-  {
     "id": "01KK72KBS9BMACT45GPPXGARGY",
     "sourceSchema": "deviation-management",
     "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
@@ -6291,16 +6280,5 @@
     "fieldId": "effectiveness-result",
     "createdAt": "2026-03-08T15:56:04.416Z",
     "updatedAt": "2026-03-08T15:56:04.416Z"
-  },
-  {
-    "id": "01KK72KBYEG6S298JFFANBCBF3",
-    "sourceSchema": "deviation-management",
-    "sourceId": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
-    "targetSchema": "change-management-records",
-    "targetId": "01KCDG346XD1GBAKQEADRABBHB",
-    "relationTypeId": "HAS_FIELD_VALUE",
-    "fieldId": "linked-change-controls",
-    "createdAt": "2026-03-08T15:56:04.430Z",
-    "updatedAt": "2026-03-08T15:56:04.430Z"
   }
 ]
