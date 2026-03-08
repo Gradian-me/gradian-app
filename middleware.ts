@@ -1,5 +1,29 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { proxy } from './proxy';
+
+/** Permissions-Policy: allow camera/microphone for same origin (barcode scanner, etc.). Set in middleware so it is not stripped by reverse proxies. */
+const PERMISSIONS_POLICY = 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()';
+
+/** CSP including connect-src for ZXing WASM (cdn.jsdelivr.net). Set in middleware so production/proxy cannot strip it and block barcode scanner. */
+const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net",
+  "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data:",
+  "connect-src 'self' blob: https://*.cinnagen.com https://cg-gr-app.cinnagen.com:5001 https://www.gstatic.com https://cdn.jsdelivr.net https://fastly.jsdelivr.net",
+  "frame-ancestors 'self'",
+  "object-src 'none'",
+  "media-src 'self' https: blob:",
+  "worker-src 'self' blob:",
+].join('; ');
+
+function withSecurityHeaders(response: NextResponse): NextResponse {
+  response.headers.set('Permissions-Policy', PERMISSIONS_POLICY);
+  response.headers.set('Content-Security-Policy', CONTENT_SECURITY_POLICY);
+  return response;
+}
 
 // Next.js middleware must be exported as default with name 'middleware'
 export default async function middleware(request: NextRequest) {
@@ -19,7 +43,8 @@ export default async function middleware(request: NextRequest) {
     console.error('[MIDDLEWARE] Cookie names:', cookieNames.join(', '));
   }
   
-  return proxy(request);
+  const response = await proxy(request);
+  return withSecurityHeaders(response);
 }
 
 // Middleware config - must be defined directly, not re-exported

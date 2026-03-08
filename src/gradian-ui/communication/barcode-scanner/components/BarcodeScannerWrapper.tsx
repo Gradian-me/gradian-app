@@ -10,10 +10,7 @@ import React, {
 } from "react";
 import dynamic from "next/dynamic";
 import { useDevices, boundingBox } from "@yudiel/react-qr-scanner";
-import {
-  prepareZXingModule,
-  ZXING_WASM_VERSION,
-} from "barcode-detector/ponyfill";
+import { prepareZXingModule } from "barcode-detector/ponyfill";
 import { DrawerDialog } from "@/gradian-ui/data-display/components/DrawerDialog";
 import { BarcodeScannerCamera } from "./BarcodeScannerCamera";
 import { BarcodeScannerToolbar } from "./BarcodeScannerToolbar";
@@ -70,7 +67,9 @@ const LIBRARY_FORMAT_TO_OUR: Record<string, string> = {
 
 const DEFAULT_FORMATS: BarcodeFormat[] = ["Code128", "QR", "DataMatrix", "EAN"];
 
-/** Point ZXing WASM to CSP-allowed CDN (cdn.jsdelivr.net). Default uses fastly.jsdelivr.net which is blocked by CSP. */
+/** Point ZXing WASM to local copy in public/zxing-wasm (avoids CDN and CSP connect-src). */
+const ZXING_READER_WASM_URL = "/zxing-wasm/zxing_reader.wasm";
+
 let zxingWasmConfigured = false;
 function ensureZxingWasmConfig(): void {
   if (zxingWasmConfigured) return;
@@ -79,7 +78,7 @@ function ensureZxingWasmConfig(): void {
     overrides: {
       locateFile(path: string, prefix: string): string {
         if (path.endsWith(".wasm")) {
-          return `https://cdn.jsdelivr.net/npm/zxing-wasm@${ZXING_WASM_VERSION}/dist/reader/zxing_reader.wasm`;
+          return ZXING_READER_WASM_URL;
         }
         return prefix + path;
       },

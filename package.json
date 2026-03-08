@@ -1,6 +1,6 @@
 {
   "name": "gradian-app",
-  "version": "1.62.004",
+  "version": "1.62.005",
   "private": true,
   "scripts": {
     "dev": "npm run clean:relations && cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack",
@@ -20,7 +20,9 @@
     "build:cdn:login": "webpack --config scripts/webpack-cdn/webpack.cdn.login.config.js",
     "build:cdn:all": "npm run build:cdn && npm run build:cdn:modal && npm run build:cdn:table && npm run build:cdn:login",
     "audit": "npm audit --registry=https://registry.npmjs.org/",
-    "audit:fix": "npm audit fix --registry=https://registry.npmjs.org/"
+    "audit:fix": "npm audit fix --registry=https://registry.npmjs.org/",
+    "copy:zxing-wasm": "node scripts/copy-zxing-wasm.js",
+    "postinstall": "node scripts/copy-zxing-wasm.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
