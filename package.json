@@ -1,10 +1,11 @@
 {
   "name": "gradian-app",
-  "version": "1.62.008",
+  "version": "1.62.009",
   "private": true,
   "scripts": {
-    "dev": "npm run clean:relations && cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack",
+    "dev": "npm run sync:relation-types && npm run clean:relations && cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack",
     "start:dev": "cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack",
+    "sync:relation-types": "node scripts/sync-relation-types.js",
     "clean:relations": "node scripts/clean-relations.js",
     "build": "next build --webpack",
     "build:release": "npm run clean:relations && OBFUSCATE=true next build --webpack",

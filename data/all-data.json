@@ -235,6 +235,106 @@
       "id": "HAS_QUOTATION_ITEM",
       "createdAt": "2026-01-05T07:55:07.927Z",
       "updatedAt": "2026-01-05T07:55:07.927Z"
+    },
+    {
+      "id": "HAS_ACCESS_POLICY",
+      "label": "Has Access Policy",
+      "color": "blue",
+      "icon": "Nodes",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2026-03-08T14:29:53.748Z",
+      "updatedAt": "2026-03-08T14:29:53.748Z"
+    },
+    {
+      "id": "HAS_ADDRESS",
+      "label": "Has Address",
+      "color": "blue",
+      "icon": "Nodes",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2026-03-08T14:29:53.748Z",
+      "updatedAt": "2026-03-08T14:29:53.748Z"
+    },
+    {
+      "id": "HAS_APP_PERMISSION",
+      "label": "Has App Permission",
+      "color": "blue",
+      "icon": "Nodes",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2026-03-08T14:29:53.748Z",
+      "updatedAt": "2026-03-08T14:29:53.748Z"
+    },
+    {
+      "id": "HAS_FOLLOW_UP_TASK",
+      "label": "Has Follow Up Task",
+      "color": "blue",
+      "icon": "Nodes",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2026-03-08T14:29:53.748Z",
+      "updatedAt": "2026-03-08T14:29:53.748Z"
+    },
+    {
+      "id": "HAS_INVITATION",
+      "label": "Has Invitation",
+      "color": "blue",
+      "icon": "Nodes",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2026-03-08T14:29:53.748Z",
+      "updatedAt": "2026-03-08T14:29:53.748Z"
+    },
+    {
+      "id": "HAS_ITEM",
+      "label": "Has Item",
+      "color": "blue",
+      "icon": "Nodes",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2026-03-08T14:29:53.748Z",
+      "updatedAt": "2026-03-08T14:29:53.748Z"
+    },
+    {
+      "id": "HAS_LIMS_EXTERNAL_FRACTION_TEST",
+      "label": "Has Lims External Fraction Test",
+      "color": "blue",
+      "icon": "Nodes",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2026-03-08T14:29:53.748Z",
+      "updatedAt": "2026-03-08T14:29:53.748Z"
+    },
+    {
+      "id": "HAS_QUALITY_ASSURANCE_ANALYSIS",
+      "label": "Has Quality Assurance Analysis",
+      "color": "blue",
+      "icon": "Nodes",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2026-03-08T14:29:53.748Z",
+      "updatedAt": "2026-03-08T14:29:53.748Z"
+    },
+    {
+      "id": "HAS_QUOTATION",
+      "label": "Has Quotation",
+      "color": "blue",
+      "icon": "Nodes",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2026-03-08T14:29:53.748Z",
+      "updatedAt": "2026-03-08T14:29:53.748Z"
+    },
+    {
+      "id": "HAS_SCHEMA",
+      "label": "Has Schema",
+      "color": "blue",
+      "icon": "Nodes",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "createdAt": "2026-03-08T14:29:53.748Z",
+      "updatedAt": "2026-03-08T14:29:53.748Z"
     }
   ],
   "user-roles": [
