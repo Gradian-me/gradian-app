@@ -9,7 +9,7 @@ const path = require("path");
 
 const root = path.resolve(__dirname, "..");
 const src = path.join(root, "node_modules", "zxing-wasm", "dist", "reader", "zxing_reader.wasm");
-const destDir = path.join(root, "public", "zxing-wasm");
+const destDir = path.join(root, "public", "cdn");
 const dest = path.join(destDir, "zxing_reader.wasm");
 
 if (!fs.existsSync(src)) {
@@ -22,7 +22,7 @@ try {
     fs.mkdirSync(destDir, { recursive: true });
   }
   fs.copyFileSync(src, dest);
-  console.log("[copy-zxing-wasm] Copied zxing_reader.wasm to public/zxing-wasm/");
+  console.log("[copy-zxing-wasm] Copied zxing_reader.wasm to public/cdn/");
 } catch (err) {
   console.error("[copy-zxing-wasm] Failed:", err.message);
   process.exit(1);

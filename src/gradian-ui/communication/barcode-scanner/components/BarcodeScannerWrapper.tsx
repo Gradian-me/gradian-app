@@ -68,7 +68,7 @@ const LIBRARY_FORMAT_TO_OUR: Record<string, string> = {
 const DEFAULT_FORMATS: BarcodeFormat[] = ["Code128", "QR", "DataMatrix", "EAN"];
 
 /** Point ZXing WASM to local copy in public/zxing-wasm (avoids CDN and CSP connect-src). */
-const ZXING_READER_WASM_URL = "/zxing-wasm/zxing_reader.wasm";
+const ZXING_READER_WASM_URL = "/cdn/zxing_reader.wasm";
 
 let zxingWasmConfigured = false;
 function ensureZxingWasmConfig(): void {

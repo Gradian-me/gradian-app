@@ -42,9 +42,6 @@
     # Copy package files and npm config
     COPY package.json package-lock.json* .npmrc* ./
     
-    # Copy script required by postinstall (must exist before npm ci)
-    COPY scripts/copy-zxing-wasm.js ./scripts/
-    
     # Same npm registry + retry config
     RUN npm config set registry https://reg.cinnagen.com/repository/npm-group/ && \
         npm config set fetch-retries 5 && \
