@@ -199,47 +199,41 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   }, [normalizedValue]);
 
   // Enrich normalized selection with icon/color/label from selectedItem/fetchedItems (only for display, not as dependency)
+  // Always ensure label is a string (API may return translation arrays -> avoid [object Object] in UI)
   const normalizedSelection = useMemo(() => {
+    const lang = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
+    const dLang = getDefaultLanguage();
     const normalized = baseNormalizedSelection;
-    
-    // Enrich all items that need enrichment (label equals ID, or missing icon/color)
+
+    const ensureStringLabel = (raw: unknown, fallbackId: string): string =>
+      typeof raw === 'string' && raw.trim() !== '' ? raw : (resolveDisplayLabel(raw, lang, dLang) || fallbackId);
+
     return normalized.map((opt) => {
       const optId = String(opt.id);
-      const labelNeedsEnrichment = !opt.label || String(opt.label) === optId;
+      const labelNeedsEnrichment = !opt.label || String(opt.label) === optId || typeof opt.label !== 'string';
       const needsEnrichment = labelNeedsEnrichment || !opt.icon || !opt.color;
-      
-      if (!needsEnrichment) {
-        return opt;
-      }
-      
-      // Try to get enriched data from fetchedItems map first, then selectedItem
+
+      let displayLabel = ensureStringLabel(opt.label, optId);
       let fetchedItem = fetchedItems.get(optId);
       if (!fetchedItem && selectedItem && String(selectedItem.id) === optId) {
         fetchedItem = selectedItem;
       }
-      
-      if (!fetchedItem) {
-        // If no fetched item available, return as-is (will be fetched by useEffect)
-        return opt;
+      if (fetchedItem && labelNeedsEnrichment) {
+        const raw =
+          targetSchema && fetchedItem
+            ? getValueByRole(targetSchema, fetchedItem, 'title') || fetchedItem.name || fetchedItem.title || fetchedItem.label || optId
+            : fetchedItem.label || fetchedItem.name || fetchedItem.title || optId;
+        displayLabel = ensureStringLabel(raw, optId);
       }
-      
-      // Get label from fetchedItem (prefer role-based lookup for targetSchema, then name/title/label)
-      let enrichedLabel = opt.label;
-      if (labelNeedsEnrichment) {
-        if (targetSchema && fetchedItem) {
-          // For targetSchema, use role-based lookup to get title (proper display value)
-          enrichedLabel = getValueByRole(targetSchema, fetchedItem, 'title') || fetchedItem.name || fetchedItem.title || fetchedItem.label || optId;
-        } else {
-          // For sourceUrl or other cases, use name/title/label from fetchedItem
-          enrichedLabel = fetchedItem.label || fetchedItem.name || fetchedItem.title || optId;
-        }
+
+      if (!needsEnrichment && typeof opt.label === 'string') {
+        return { ...opt, label: displayLabel };
       }
-      
       return {
         ...opt,
-        label: enrichedLabel,
-        icon: opt.icon || fetchedItem.icon,
-        color: opt.color || fetchedItem.color,
+        label: displayLabel,
+        icon: opt.icon || fetchedItem?.icon,
+        color: opt.color || fetchedItem?.color,
       };
     });
   }, [baseNormalizedSelection, selectedItem, fetchedItems, targetSchema]);
@@ -655,22 +649,24 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       }
     }
 
+    const lang = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
+    const dLang = getDefaultLanguage();
+    const toStr = (v: unknown) => (v == null || v === 'undefined' ? '' : typeof v === 'string' ? v : resolveDisplayLabel(v, lang, dLang));
+
     // For sourceUrl, use normalized selection directly
     if (sourceUrl) {
       const fallbackOption = normalizedSelection[0];
       if (fallbackOption) {
-        const label = fallbackOption.label;
+        const label = toStr(fallbackOption.label);
         const id = fallbackOption.id;
-        // Ensure we never return undefined - convert to empty string
         if (label && label !== 'undefined') return label;
         if (id && id !== 'undefined') return id;
         return '';
       }
       if (selectedItem) {
-        const name = selectedItem.name;
-        const title = selectedItem.title;
+        const name = toStr(selectedItem.name);
+        const title = toStr(selectedItem.title);
         const itemId = selectedItem.id;
-        // Ensure we never return undefined - convert to empty string
         if (name && name !== 'undefined') return name;
         if (title && title !== 'undefined') return title;
         if (itemId && itemId !== 'undefined') return String(itemId);
@@ -682,9 +678,8 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     if (!selectedItem || !targetSchema) {
       const fallbackOption = normalizedSelection[0];
       if (fallbackOption) {
-        const label = fallbackOption.label;
+        const label = toStr(fallbackOption.label);
         const id = fallbackOption.id;
-        // Ensure we never return undefined - convert to empty string
         if (label && label !== 'undefined') return label;
         if (id && id !== 'undefined') return id;
         return '';
@@ -693,10 +688,9 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     }
 
     // Try to get title field from schema (uses role-based concatenation)
-    const title = getValueByRole(targetSchema, selectedItem, 'title') || selectedItem.name || selectedItem.title || '';
+    const rawTitle = getValueByRole(targetSchema, selectedItem, 'title') || selectedItem.name || selectedItem.title || '';
+    const title = toStr(rawTitle);
     const subtitle = getSingleValueByRole(targetSchema, selectedItem, 'subtitle') || selectedItem.email || '';
-    
-    // Ensure we always return a string, never undefined
     if (!title) return '';
     return subtitle ? `${title} (${subtitle})` : title;
   };
@@ -730,7 +724,10 @@ export const PickerInput: React.FC<PickerInputProps> = ({
           <div className="flex flex-wrap gap-2 flex-1">
             {normalizedSelection.map((option) => {
               const optionId = String(option.id || '');
-              const optionLabel = option.label || optionId;
+              const optionLabel =
+                typeof option.label === 'string'
+                  ? option.label
+                  : (resolveDisplayLabel(option.label, language, defaultLang) || optionId);
               const optionIcon = option.icon;
               const optionColor = option.color;
               
@@ -844,7 +841,10 @@ export const PickerInput: React.FC<PickerInputProps> = ({
               <div className="flex-1">
                 {normalizedSelection.map((option) => {
                   const optionId = String(option.id || '');
-                  const optionLabel = option.label || optionId;
+                  const optionLabel =
+                    typeof option.label === 'string'
+                      ? option.label
+                      : (resolveDisplayLabel(option.label, language, defaultLang) || optionId);
                   const optionIcon = option.icon;
                   const optionColor = option.color;
                   

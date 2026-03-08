@@ -5,6 +5,7 @@
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { FormField } from '@/gradian-ui/schema-manager/types/form-schema';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 
 export interface SystemSectionFieldConfig {
   field: Partial<FormField>;
@@ -281,7 +282,6 @@ export const getSystemSectionFields = (
           label: t(TRANSLATION_KEYS.LABEL_STATUS, 'Status'),
           sectionId: 'system-section',
           component: 'picker',
-          placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_STATUS, 'Select status'),
           description: t(TRANSLATION_KEYS.DESCRIPTION_STATUS_FROM_GROUP, 'Status for this record from the configured status group.'),
           targetSchema: 'status-items',
           referenceSchema: 'status-groups',
@@ -320,7 +320,6 @@ export const getSystemSectionFields = (
         label: 'Entity Type',
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: 'Select entity type',
         description: 'Entity type for this record from the configured entity type group.',
         targetSchema: 'entity-type-items',
         referenceSchema: 'entity-type-groups',
@@ -355,7 +354,6 @@ export const getSystemSectionFields = (
           label: t(TRANSLATION_KEYS.LABEL_ENTITY_TYPE, 'Entity Type'),
           sectionId: 'system-section',
           component: 'picker',
-          placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_ENTITY_TYPE, 'Select entity type'),
           description: t(TRANSLATION_KEYS.DESCRIPTION_ENTITY_TYPE_FROM_GROUP, 'Entity type for this record from the configured entity type group.'),
           targetSchema: 'entity-type-items',
           referenceSchema: 'entity-type-groups',
@@ -395,7 +393,6 @@ export const getSystemSectionFields = (
         label: t(TRANSLATION_KEYS.LABEL_PARENT_HIERARCHICAL, 'Parent (hierarchical)'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_PARENT_OPTIONAL, 'Select parent (optional)'),
         targetSchema: schema.id,
         description: t(TRANSLATION_KEYS.DESCRIPTION_PARENT_HIERARCHICAL, 'Choose a parent {entity} for hierarchical view', { entity: getEntityName(schema) }),
         validation: {
@@ -410,7 +407,6 @@ export const getSystemSectionFields = (
         label: t(TRANSLATION_KEYS.LABEL_PARENT_HIERARCHICAL, 'Parent (hierarchical)'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_SELECT_PARENT_OPTIONAL, 'Select parent (optional)'),
         targetSchema: sch.id,
         description: t(TRANSLATION_KEYS.DESCRIPTION_PARENT_HIERARCHICAL, 'Choose a parent {entity} for hierarchical view', { entity: getEntityName(sch) }),
         validation: {
@@ -440,7 +436,6 @@ export const getSystemSectionFields = (
         label: t(TRANSLATION_KEYS.LABEL_RELATED_COMPANIES, 'Related Companies'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_RELATED_COMPANIES_OPTIONAL, 'Select related companies (optional)'),
         targetSchema: 'companies',
         description: schema.isNotCompanyBased === true
           ? t(TRANSLATION_KEYS.DESCRIPTION_RELATED_COMPANIES_OPTIONAL, 'Choose one or more companies related to this record (optional).')
@@ -460,7 +455,6 @@ export const getSystemSectionFields = (
         label: 'Related Companies',
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: 'Select related companies (optional)',
         targetSchema: 'companies',
         description: sch.isNotCompanyBased === true
           ? 'Choose one or more companies related to this record (optional).'
@@ -472,7 +466,13 @@ export const getSystemSectionFields = (
           allowMultiselect: true,
         },
       }),
-      getValue: (vals) => vals?.relatedCompanies || [],
+      getValue: (vals) => {
+        const raw = vals?.relatedCompanies || [];
+        if (!Array.isArray(raw) || raw.length === 0) return raw;
+        // Normalize so label/name translation arrays become strings (avoid [object Object] in UI).
+        // Uses current language from useLanguageStore inside normalizeOptionArray → resolveDisplayLabel.
+        return normalizeOptionArray(raw);
+      },
       onChange: (value, onChange) => onChange('relatedCompanies', value),
       group: 'multi-select',
       order: 30,
@@ -487,7 +487,6 @@ export const getSystemSectionFields = (
         label: t(TRANSLATION_KEYS.LABEL_RELATED_TENANTS, 'Related Tenants'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_RELATED_TENANTS_OPTIONAL, 'Select related tenants (optional)'),
         targetSchema: 'tenants',
         description: t(TRANSLATION_KEYS.DESCRIPTION_RELATED_TENANTS_OPTIONAL, 'Choose one or more tenants related to this record (optional).'),
         validation: {
@@ -505,7 +504,6 @@ export const getSystemSectionFields = (
         label: t(TRANSLATION_KEYS.LABEL_RELATED_TENANTS, 'Related Tenants'),
         sectionId: 'system-section',
         component: 'picker',
-        placeholder: t(TRANSLATION_KEYS.PLACEHOLDER_RELATED_TENANTS_OPTIONAL, 'Select related tenants (optional)'),
         targetSchema: 'tenants',
         description: t(TRANSLATION_KEYS.DESCRIPTION_RELATED_TENANTS_OPTIONAL, 'Choose one or more tenants related to this record (optional).'),
         validation: {
@@ -515,7 +513,11 @@ export const getSystemSectionFields = (
           allowMultiselect: true,
         },
       }),
-      getValue: (vals) => vals?.relatedTenants || [],
+      getValue: (vals) => {
+        const raw = vals?.relatedTenants || [];
+        if (!Array.isArray(raw) || raw.length === 0) return raw;
+        return normalizeOptionArray(raw);
+      },
       onChange: (value, onChange) => onChange('relatedTenants', value),
       group: 'multi-select',
       order: 31,

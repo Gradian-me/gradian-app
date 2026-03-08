@@ -81,6 +81,11 @@ export const getValueByRole = (schema: FormSchema, data: any, role: string): str
       if (isTranslationArray(rawValue)) {
         return resolveFromTranslationsArray(rawValue, lang, defaultLang);
       }
+      // API localized format: [{ en: "X", fa: "Y" }] or { en: "X", fa: "Y" } (single object with multiple keys)
+      if (rawValue !== undefined && rawValue !== null && typeof rawValue === 'object') {
+        const resolved = resolveDisplayLabel(rawValue, lang, defaultLang);
+        if (resolved && resolved.trim() !== '') return resolved;
+      }
 
       const valueArray = Array.isArray(rawValue)
         ? rawValue
@@ -157,7 +162,12 @@ export const getSingleValueByRole = (schema: FormSchema, data: any, role: string
   if (isTranslationArray(rawValue)) {
     return resolveFromTranslationsArray(rawValue, lang, defaultLang) || defaultValue;
   }
-  
+  // API localized format: [{ en: "X", fa: "Y" }] or { en: "X", fa: "Y" }
+  if (typeof rawValue === 'object' && rawValue !== null) {
+    const resolved = resolveDisplayLabel(rawValue, lang, defaultLang);
+    if (resolved && resolved.trim() !== '') return resolved;
+  }
+
   const valueArray = Array.isArray(rawValue)
     ? rawValue
     : [rawValue];

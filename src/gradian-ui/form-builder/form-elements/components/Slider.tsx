@@ -47,6 +47,7 @@ export const Slider = forwardRef<FormElementRef, SliderProps>(
 
     const sliderValue = Array.isArray(value) ? value[0] : (typeof value === 'number' ? value : min);
     const clampedValue = Math.max(min, Math.min(max, sliderValue));
+    const percent = max > min ? ((clampedValue - min) / (max - min)) * 100 : 0;
 
     if (!config) {
       loggingCustom(LogType.CLIENT_LOG, 'error', 'Slider: config is required');
@@ -56,7 +57,7 @@ export const Slider = forwardRef<FormElementRef, SliderProps>(
     return (
       <div className="w-full">
         {fieldLabel && (
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3">
             <label
               htmlFor={fieldName}
               dir="auto"
@@ -64,26 +65,33 @@ export const Slider = forwardRef<FormElementRef, SliderProps>(
             >
               {fieldLabel}
             </label>
-            <span className="text-sm font-semibold text-violet-600 dark:text-violet-200 bg-violet-50 dark:bg-violet-500/20 px-2.5 py-1 rounded-md min-w-[2.5rem] text-center">
-              {clampedValue}
-            </span>
           </div>
         )}
-        <UISlider
-          id={fieldName}
-          name={fieldName}
-          value={[clampedValue]}
-          onValueChange={handleValueChange}
-          min={min}
-          max={max}
-          step={step}
-          disabled={disabled}
-          className={cn(
-            error && 'slider-error',
-            className
-          )}
-          {...props}
-        />
+        <div className="relative pt-8 pb-1">
+          {/* Value pill above thumb */}
+          <span
+            className="absolute text-xs font-semibold text-violet-700 dark:text-violet-200 bg-violet-100 dark:bg-violet-500/30 border border-violet-200 dark:border-violet-500/50 px-2 py-0.5 rounded-md min-w-8 text-center shadow-sm pointer-events-none whitespace-nowrap -translate-x-1/2 transition-[left] duration-75"
+            style={{ left: `${percent+1}%`, top: 0 }}
+            aria-hidden
+          >
+            {clampedValue}
+          </span>
+          <UISlider
+            id={fieldName}
+            name={fieldName}
+            value={[clampedValue]}
+            onValueChange={handleValueChange}
+            min={min}
+            max={max}
+            step={step}
+            disabled={disabled}
+            className={cn(
+              error && 'slider-error',
+              className
+            )}
+            {...props}
+          />
+        </div>
         {error && (
           <p className={errorTextClasses} role="alert">
             {error}

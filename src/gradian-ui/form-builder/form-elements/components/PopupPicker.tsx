@@ -1393,9 +1393,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           item.label || item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
         : item.label || item.name || item.title || item.id || `Item ${index + 1}`;
       const displayName =
-        typeof rawDisplayName === 'string'
-          ? resolveDisplayLabel(rawDisplayName, langFallback, dLangFallback)
-          : resolveLocalizedField(rawDisplayName as Parameters<typeof resolveLocalizedField>[0], langFallback, dLangFallback) || String(item.id ?? `Item ${index + 1}`);
+        resolveDisplayLabel(rawDisplayName, langFallback, dLangFallback) || String(item.id ?? `Item ${index + 1}`);
       const iconName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'icon', effectiveSourceColumnRoles) || item.icon
         : item.icon || item.name || item.title;
@@ -1825,9 +1823,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           item.label || item.name || item.title || item.singular_name || item.id || `Item ${index + 1}`
         : item.label || item.name || item.title || item.id || `Item ${index + 1}`;
       const displayName =
-        typeof rawDisplayName === 'string'
-          ? resolveDisplayLabel(rawDisplayName, langFallback, dLangFallback)
-          : resolveLocalizedField(rawDisplayName as Parameters<typeof resolveLocalizedField>[0], langFallback, dLangFallback) || String(item.id ?? `Item ${index + 1}`);
+        resolveDisplayLabel(rawDisplayName, langFallback, dLangFallback) || String(item.id ?? `Item ${index + 1}`);
       const iconName = effectiveSourceColumnRoles
         ? getValueByRoleFromSourceColumns(item, 'icon', effectiveSourceColumnRoles) || item.icon
         : item.icon || item.name || item.title;

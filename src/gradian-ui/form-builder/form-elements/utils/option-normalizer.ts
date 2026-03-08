@@ -1,7 +1,7 @@
 import { resolveDisplayLabel, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
 
-/** Current UI language when available (e.g. client); otherwise default. */
+/** Current UI language for resolving translation arrays (e.g. [{ en: "X", fa: "Y" }]). Reacts to language change when caller re-renders after store update. */
 function getLabelLanguage(): string {
   try {
     const lang = useLanguageStore.getState?.()?.getLanguage?.();
@@ -81,7 +81,7 @@ export const normalizeOptionEntry = (input: OptionValueInput): NormalizedOption 
       (input as any).label ?? (input as any).name ?? (input as any).title ?? undefined;
     const lang = getLabelLanguage();
     const defaultLang = getDefaultLanguage();
-    let label =
+    let label: string | undefined =
       rawLabel !== undefined && rawLabel !== null
         ? resolveDisplayLabel(rawLabel, lang, defaultLang)
         : undefined;
@@ -91,12 +91,17 @@ export const normalizeOptionEntry = (input: OptionValueInput): NormalizedOption 
       const last = resolveDisplayLabel((input as any).lastName, lang, defaultLang).trim();
       if (first || last) label = [first, last].filter(Boolean).join(' ');
     }
+    // Ensure label is always a string (API may return translation arrays; avoid [object Object] in UI)
+    const finalLabel =
+      (typeof label === 'string' && label.trim() !== ''
+        ? label
+        : resolveDisplayLabel(rawLabel ?? label, lang, defaultLang)) || id;
 
     return {
       ...(input ?? {}),
       id,
       value,
-      label,
+      label: finalLabel,
     };
   }
 

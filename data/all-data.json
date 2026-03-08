@@ -3654,8 +3654,8 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "genora_schema_sync",
       "createdAt": "2025-11-30T16:48:01.239Z",
-      "updatedAt": "2026-03-03T19:15:59.555Z",
-      "lastSynced": "2026-03-03T19:15:59.555Z",
+      "updatedAt": "2026-03-08T11:47:37.730Z",
+      "lastSynced": "2026-03-08T11:47:37.730Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "category": [
@@ -3667,7 +3667,7 @@
         }
       ],
       "isTenantBased": true,
-      "lastSyncMessage": "Processed 39 schemas: 39 succeeded, 0 failed (0 created, 39 updated)"
+      "lastSyncMessage": "Processed 44 schemas: 44 succeeded, 0 failed (5 created, 39 updated)"
     },
     {
       "title": "Schema Related Schemas Sync Production",
@@ -3695,7 +3695,7 @@
       "sourceRoute": [],
       "id": "schema_related_schemas_sync_prod",
       "createdAt": "2025-12-06T09:54:51.218Z",
-      "updatedAt": "2026-03-03T18:37:56.169Z",
+      "updatedAt": "2026-03-08T11:47:41.895Z",
       "isTenantBased": true,
       "category": [
         {
@@ -3705,8 +3705,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-03-03T18:37:56.169Z",
-      "lastSyncMessage": "Generated relations for 39 out of 39 schemas",
+      "lastSynced": "2026-03-08T11:47:41.895Z",
+      "lastSyncMessage": "Generated relations for 44 out of 44 schemas",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -3756,7 +3756,7 @@
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "graph_data_sync_prod",
       "createdAt": "2025-12-06T09:56:02.933Z",
-      "updatedAt": "2026-03-03T19:15:31.834Z",
+      "updatedAt": "2026-03-08T11:47:58.357Z",
       "category": [
         {
           "id": "production-integration",
@@ -3765,8 +3765,8 @@
           "color": "emerald"
         }
       ],
-      "lastSynced": "2026-03-03T19:15:31.834Z",
-      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 0, nodes updated: 351, edges created: 233, nodes failed: 0, edges failed: 0.",
+      "lastSynced": "2026-03-08T11:47:58.357Z",
+      "lastSyncMessage": "Graph processed successfully (transactional - all or nothing). Nodes created: 40, nodes updated: 352, edges created: 287, nodes failed: 0, edges failed: 0.",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -8306,8 +8306,38 @@
           ]
         }
       ],
+      "title": "Project Types",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KCDZPROJECTGROUP00000000001",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "entity-type-items-section": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
+        }
+      ],
       "title": "Process Types",
-      "incomplete": true,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
       "id": "01KCPROCESSTYPES00000000001",
       "createdAt": "2025-12-15T00:00:00.000Z",
@@ -8337,7 +8367,6 @@
         }
       ],
       "title": "User Type",
-      "incomplete": true,
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "id": "01KCXDJ8JBXRP84PW59Y5ADR5A",
       "createdAt": "2025-12-20T08:21:07.292Z",
@@ -8517,6 +8546,72 @@
       "color": "red",
       "incomplete": false,
       "id": "01KCDZTASK010URGENT0000000010",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Drug Development",
+      "icon": "FlaskConical",
+      "color": "blue",
+      "incomplete": false,
+      "id": "01KCDZPROJ001DRUGDEV00000000001",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Process Optimization",
+      "icon": "Settings",
+      "color": "slate",
+      "incomplete": false,
+      "id": "01KCDZPROJ002PROCOPT00000000002",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Regulatory Affairs",
+      "icon": "FileCheck",
+      "color": "amber",
+      "incomplete": false,
+      "id": "01KCDZPROJ003REGAFFAIRS000000003",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Export",
+      "icon": "Ship",
+      "color": "emerald",
+      "incomplete": false,
+      "id": "01KCDZPROJ004EXPORT000000000004",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Technology & Infrastructure",
+      "icon": "Server",
+      "color": "purple",
+      "incomplete": false,
+      "id": "01KCDZPROJ005TECHINFRA000000005",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Construction",
+      "icon": "HardHat",
+      "color": "orange",
+      "incomplete": false,
+      "id": "01KCDZPROJ006CONSTRUC0000000006",
       "createdAt": "2025-12-14T08:30:00.000Z",
       "updatedAt": "2025-12-14T08:30:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -23006,6 +23101,39 @@
       "id": "01KGVEN60BD590CB72NRY8343H",
       "createdAt": "2026-02-07T07:04:29.970Z",
       "updatedAt": "2026-02-07T07:11:26.983Z"
+    }
+  ],
+  "project-portfolio": [
+    {
+      "progress": 51,
+      "status": [
+        {
+          "id": "01KBHGVA9789N2GWB9XKT6RQ06",
+          "label": "In Progress",
+          "icon": "LucideClock8",
+          "color": "amber"
+        }
+      ],
+      "entityType": [
+        {
+          "id": "01KCDZPROJ001DRUGDEV00000000001",
+          "label": "Drug Development",
+          "icon": "FlaskConical",
+          "color": "blue"
+        }
+      ],
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": "CinnaGen"
+        }
+      ],
+      "title": "Daratumumab",
+      "incomplete": false,
+      "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "id": "01KK6MBAD7NXYHRC7BGXP16Y81",
+      "createdAt": "2026-03-08T11:47:00.650Z",
+      "updatedAt": "2026-03-08T11:47:00.650Z"
     }
   ],
   "notes": [

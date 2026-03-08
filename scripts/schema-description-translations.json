@@ -159,6 +159,16 @@
     "it": "Raggruppa elementi tipo entità in gruppi riutilizzabili, opzionalmente per azienda",
     "ru": "Группировка элементов типа сущности в переиспользуемые группы, опционально по компаниям"
   },
+  "project-portfolio": {
+    "en": "Track projects with title, progress, planned dates and description",
+    "fa": "ردیابی پروژه‌ها با عنوان، پیشرفت، تاریخ‌های برنامه‌ریزی شده و توضیحات",
+    "ar": "تتبع المشاريع بالعنوان والتقدم والتواريخ المخططة والوصف",
+    "es": "Seguir proyectos con título, progreso, fechas planificadas y descripción",
+    "fr": "Suivre les projets avec titre, progression, dates prévues et description",
+    "de": "Projekte mit Titel, Fortschritt, geplanten Daten und Beschreibung verfolgen",
+    "it": "Tracciare progetti con titolo, progresso, date pianificate e descrizione",
+    "ru": "Отслеживание проектов с названием, прогрессом, запланированными датами и описанием"
+  },
   "status-groups": {
     "en": "Group status items into reusable status groups, optionally scoped to companies",
     "fa": "گروه‌بندی آیتم‌های وضعیت در گروه‌های وضعیت قابل استفاده مجدد، اختیاری محدود به شرکت‌ها",

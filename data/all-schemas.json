@@ -35559,6 +35559,44 @@
       {
         "ru": "Предложение по проекту: определение, параметры оценки и оценка CEO"
       }
+    ],
+    "applications": [
+      {
+        "id": "01KGVJXCKW8X0GHS7EPFVK9KTX",
+        "name": [
+          {
+            "en": "Project Management"
+          },
+          {
+            "fa": "مدیریت پروژه"
+          },
+          {
+            "ar": "إدارة المشاريع"
+          },
+          {
+            "es": "Gestión de proyectos"
+          },
+          {
+            "fr": "Gestion de projet"
+          },
+          {
+            "de": "Projektmanagement"
+          },
+          {
+            "it": "Gestione progetti"
+          },
+          {
+            "ru": "Управление проектами"
+          }
+        ],
+        "icon": "ActivitySquare"
+      }
+    ],
+    "relatedTenants": [
+      {
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
+      }
     ]
   },
   {
@@ -40511,5 +40549,304 @@
         "label": "LIMS External Request Status"
       }
     ]
+  },
+  {
+    "id": "project-portfolio",
+    "description": "Track projects with title, progress, planned dates and description",
+    "singular_name": "Project",
+    "plural_name": "Project Portfolio",
+    "singular_name_translations": [
+      {
+        "en": "Project"
+      },
+      {
+        "fa": "پروژه"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "Project Portfolio"
+      },
+      {
+        "fa": "سبد پروژه‌ها"
+      }
+    ],
+    "customButtons": [
+      {
+        "id": "go-to-schemas",
+        "label": [
+          {
+            "en": "Back to Schemas"
+          },
+          {
+            "fa": "بازگشت به طرح‌ها"
+          }
+        ],
+        "icon": "ArrowLeft",
+        "variant": "outline",
+        "action": "goToUrl",
+        "targetUrl": "/builder/schemas"
+      }
+    ],
+    "cardMetadata": [],
+    "fields": [
+      {
+        "id": "project-portfolio-title",
+        "name": "title",
+        "label": "Project Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "role": "title",
+        "translations": [
+          {
+            "en": "Project Title"
+          },
+          {
+            "fa": "عنوان پروژه"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1,
+        "caption": "Enter project title",
+        "captionTranslations": [
+          {
+            "en": "Enter project title"
+          },
+          {
+            "fa": "عنوان پروژه را وارد کنید"
+          }
+        ]
+      },
+      {
+        "id": "project-portfolio-progress",
+        "name": "progress",
+        "label": "Progress",
+        "sectionId": "basic-information",
+        "component": "slider",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "defaultValue": 0,
+        "translations": [
+          {
+            "en": "Progress"
+          },
+          {
+            "fa": "پیشرفت"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 2,
+        "caption": "Set progress (0–100%)",
+        "captionTranslations": [
+          {
+            "en": "Set progress (0–100%)"
+          },
+          {
+            "fa": "درصد پیشرفت (۰–۱۰۰) را تنظیم کنید"
+          }
+        ]
+      },
+      {
+        "id": "project-portfolio-planned-start-date",
+        "name": "plannedStartDate",
+        "label": "Planned Start Date",
+        "sectionId": "basic-information",
+        "component": "date",
+        "translations": [
+          {
+            "en": "Planned Start Date"
+          },
+          {
+            "fa": "تاریخ شروع برنامه‌ریزی شده"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 3,
+        "caption": "Select planned start date",
+        "captionTranslations": [
+          {
+            "en": "Select planned start date"
+          },
+          {
+            "fa": "تاریخ شروع برنامه‌ریزی شده را انتخاب کنید"
+          }
+        ]
+      },
+      {
+        "id": "project-portfolio-planned-end-date",
+        "name": "plannedEndDate",
+        "label": "Planned End Date",
+        "sectionId": "basic-information",
+        "component": "date",
+        "translations": [
+          {
+            "en": "Planned End Date"
+          },
+          {
+            "fa": "تاریخ پایان برنامه‌ریزی شده"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 1,
+        "order": 4,
+        "caption": "Select planned end date",
+        "captionTranslations": [
+          {
+            "en": "Select planned end date"
+          },
+          {
+            "fa": "تاریخ پایان برنامه‌ریزی شده را انتخاب کنید"
+          }
+        ]
+      },
+      {
+        "id": "project-portfolio-description",
+        "name": "description",
+        "label": "Project Description",
+        "sectionId": "basic-information",
+        "component": "textarea",
+        "role": "description",
+        "translations": [
+          {
+            "en": "Project Description"
+          },
+          {
+            "fa": "توضیحات پروژه"
+          }
+        ],
+        "validation": {
+          "required": false
+        },
+        "colSpan": 2,
+        "order": 5,
+        "caption": "Enter project description",
+        "captionTranslations": [
+          {
+            "en": "Enter project description"
+          },
+          {
+            "fa": "توضیحات پروژه را وارد کنید"
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "titleTranslations": [
+          {
+            "en": "Basic Information"
+          },
+          {
+            "fa": "اطلاعات پایه"
+          }
+        ],
+        "description": "Project title, progress, dates and description",
+        "descriptionTranslations": [
+          {
+            "en": "Project title, progress, dates and description"
+          },
+          {
+            "fa": "عنوان پروژه، پیشرفت، تاریخ‌ها و توضیحات"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "project-overview",
+          "title": "Project Overview",
+          "description": "Project details",
+          "colSpan": 2,
+          "fieldIds": [
+            "project-portfolio-title",
+            "project-portfolio-progress",
+            "project-portfolio-planned-start-date",
+            "project-portfolio-planned-end-date",
+            "project-portfolio-description"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "FolderKanban",
+    "schemaType": "business",
+    "description_translations": [
+      {
+        "en": "Track projects with title, progress, planned dates and description"
+      },
+      {
+        "fa": "ردیابی پروژه‌ها با عنوان، پیشرفت، تاریخ‌های برنامه‌ریزی شده و توضیحات"
+      }
+    ],
+    "applications": [
+      {
+        "id": "01KGVJXCKW8X0GHS7EPFVK9KTX",
+        "name": [
+          {
+            "en": "Project Management"
+          },
+          {
+            "fa": "مدیریت پروژه"
+          },
+          {
+            "ar": "إدارة المشاريع"
+          },
+          {
+            "es": "Gestión de proyectos"
+          },
+          {
+            "fr": "Gestion de projet"
+          },
+          {
+            "de": "Projektmanagement"
+          },
+          {
+            "it": "Gestione progetti"
+          },
+          {
+            "ru": "Управление проектами"
+          }
+        ],
+        "icon": "ActivitySquare"
+      }
+    ],
+    "relatedTenants": [
+      {
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
+      }
+    ],
+    "entityTypeGroup": [
+      {
+        "id": "01KCDZPROJECTGROUP00000000001",
+        "label": "Project Types"
+      }
+    ],
+    "statusGroup": [
+      {
+        "id": "01KBHD90EMZKAT502KNVVDQZC7",
+        "label": "Progress Status"
+      }
+    ],
+    "canSelectMultiCompanies": true,
+    "isNotCompanyBased": true
   }
 ]
