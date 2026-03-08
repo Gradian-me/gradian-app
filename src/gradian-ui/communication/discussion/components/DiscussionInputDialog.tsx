@@ -116,8 +116,8 @@ export const DiscussionInputDialog: React.FC<DiscussionInputDialogProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
-        className={cn('max-w-4xl w-[95vw] z-[110]', className)}
-        overlayClassName="z-[105] bg-black/70 dark:bg-black/80 backdrop-blur-sm"
+        className={cn('max-w-4xl w-[95vw] z-[136]', className)}
+        overlayClassName="z-[135] bg-black/70 dark:bg-black/80 backdrop-blur-sm"
         hideCloseButton={isSubmitting}
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}

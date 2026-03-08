@@ -73,7 +73,7 @@ export const DiscussionsDialog: React.FC<DiscussionsDialogProps> = ({
     <>
       <Dialog open={isOpen} onOpenChange={onOpenChange}>
         <DialogContent
-          className={cn('max-w-5xl w-[95vw] max-h-[90vh] flex flex-col z-[100]', className)}
+          className={cn('max-w-5xl w-[95vw] max-h-[90vh] flex flex-col', className)}
           onClick={(e) => e.stopPropagation()}
           onMouseDown={(e) => e.stopPropagation()}
         >
