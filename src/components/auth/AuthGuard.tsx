@@ -94,15 +94,24 @@ function triggerForceLogout(reason: string) {
 
 export function AuthGuard({ children }: AuthGuardProps) {
   const pathname = usePathname();
-  // Fallback when router pathname is not yet available (e.g. during hydration) so we don't block login page
-  const [pathnameFallback, setPathnameFallback] = useState<string>('');
+  // Fallback when router pathname is not yet available (e.g. during hydration or after client redirect).
+  // Reading window.location.pathname during render (client-only) ensures the login page is recognized
+  // immediately on first paint after redirect, avoiding 404 flash or blank content.
+  const [pathnameFallback, setPathnameFallback] = useState<string>(() =>
+    typeof window !== 'undefined' ? window.location.pathname : ''
+  );
 
   useEffect(() => {
     if (pathname) return;
     if (typeof window !== 'undefined') setPathnameFallback(window.location.pathname);
   }, [pathname]);
 
-  const effectivePathname = (pathname && pathname.length > 0) ? pathname : pathnameFallback;
+  const effectivePathname =
+    pathname && pathname.length > 0
+      ? pathname
+      : typeof window !== 'undefined'
+        ? window.location.pathname || pathnameFallback
+        : pathnameFallback;
 
   // Determine if current path requires authentication
   const requiresAuth = useMemo(() => {

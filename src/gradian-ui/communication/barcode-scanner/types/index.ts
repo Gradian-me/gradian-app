@@ -89,6 +89,14 @@ export interface BarcodeScannerToolbarProps {
   scanMode: ScanMode;
   /** Called when the user changes scan mode. */
   onScanModeChange: (mode: ScanMode) => void;
+  /** When true, zoom controls are hidden (e.g. when Scanner uses built-in zoom). */
+  hideZoom?: boolean;
+  /** When true, shows a Beep switch (only relevant when scanner has beep enabled). */
+  showBeepSwitch?: boolean;
+  /** Beep on/off (default true). */
+  beepOn?: boolean;
+  /** Called when user toggles the beep. */
+  onBeepChange?: (on: boolean) => void;
 }
 
 export interface BarcodeScannerResultProps {

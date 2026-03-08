@@ -14,6 +14,8 @@ export interface ComponentMeta {
   description?: string;
   usecase?: string;
   directory: string; // relative path in repo
+  /** Optional URL to a dedicated demo page (e.g. /ui/components/popup-picker) */
+  demoUrl?: string;
   configSchema?: ComponentConfigSchema; // Configuration schema for this component
 }
 

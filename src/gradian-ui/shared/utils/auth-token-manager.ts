@@ -644,9 +644,7 @@ class AuthTokenManager {
 
     const currentPath = window.location.pathname + window.location.search;
     const loginUrl = `/authentication/login?returnUrl=${encodeURIComponent(currentPath)}`;
-    
-    // Use window.location for full page navigation (handles hard refresh, initial load)
-    window.location.href = loginUrl;
+    window.location.replace(loginUrl);
   }
 }
 

@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ALL_COMPONENTS } from '@/gradian-ui/shared/components/component-registry';
-import { IconBox, resolveIconBoxColor } from '@/gradian-ui/form-builder/form-elements';
+import { IconBox } from '@/gradian-ui/form-builder/form-elements';
+import { resolveIconBoxColor } from '@/gradian-ui/form-builder/form-elements/utils/icon-box-color';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
 
@@ -14,8 +15,8 @@ function getComponentById(id: string) {
 }
 
 function getSampleForComponent(componentId: string): { title: string; language: string; code: string }[] {
-  // Basic showcase samples per component; extend as needed
-  if (componentId === 'popup-picker') {
+  // Picker (PopupPicker) samples; live demo is at /ui/components/popup-picker
+  if (componentId === 'picker' || componentId === 'popup-picker') {
     const mapping = `const columnMap = {
   item: { id: 'id', title: 'title', subtitle: 'completed' },
   request: { page: 'page', limit: 'limit', search: 'q', includeIds: 'includeIds', excludeIds: 'excludeIds' },
@@ -63,7 +64,7 @@ export default async function ComponentDetailPage({ params }: PageProps) {
   return (
     <div className="container mx-auto px-4 py-6 space-y-8">
       <header className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-3">
+        <div className="flex items-start gap-3 h-full">
           {meta.icon ? (
             <IconBox
               name={meta.icon}

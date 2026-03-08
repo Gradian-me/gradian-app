@@ -1,120 +1,52 @@
 'use client';
-import React, { useMemo, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { CodeViewer } from '@/gradian-ui/shared/components/CodeViewer';
-import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/PopupPicker';
-import Link from 'next/link';
-import { ColumnMapConfig } from '@/gradian-ui/shared/utils/column-mapper';
+
+import React, { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { cn } from '@/gradian-ui/shared/utils';
 import { ALL_COMPONENTS, ComponentMeta } from '@/gradian-ui/shared/components/component-registry';
-import { IconBox, resolveIconBoxColor } from '@/gradian-ui/form-builder/form-elements';
-
-export interface AllComponentsProps {
-  /** Pass from server to avoid hydration mismatch (registry loads only on server). */
-  initialComponents?: ComponentMeta[];
-}
+import type { ComponentConfigField } from '@/gradian-ui/shared/components/component-registry';
+import { IconBox, resolveIconBoxColor, Button } from '@/gradian-ui/form-builder/form-elements';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { SearchInput } from '@/gradian-ui/form-builder/form-elements/components/SearchInput';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { Badge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
 import { Select } from '@/gradian-ui/form-builder/form-elements/components/Select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { FileText, Info } from 'lucide-react';
+
+export interface AllComponentsProps {
+  /** Pass from server to avoid hydration mismatch (registry loads only on server). */
+  initialComponents?: ComponentMeta[];
+}
 
 export const AllComponents: React.FC<AllComponentsProps> = ({ initialComponents }) => {
-  const [isTodosPickerOpen, setTodosPickerOpen] = useState(false);
-  const [isStaticPickerOpen, setStaticPickerOpen] = useState(false);
-  const [lastSelection, setLastSelection] = useState<any[]>([]);
-
+  const router = useRouter();
   const components = initialComponents ?? ALL_COMPONENTS;
 
-  const columnMap: ColumnMapConfig = useMemo(() => ({
-    item: {
-      id: 'id',
-      title: 'title',
-      subtitle: 'completed',
-      // icon/color left unmapped; defaults will be used
-    },
-    request: {
-      page: 'page',
-      limit: 'limit',
-      search: 'q',
-      includeIds: 'includeIds',
-      excludeIds: 'excludeIds',
-    },
-    response: {
-      data: '', // payload is an array; extractor handles it
-      meta: {
-        // no meta in this API; derived hasMore will be based on pageSize vs total
-      },
-    },
-  }), []);
-
-  const todosPickerConfigCode = `const columnMap = {
-  item: {
-    id: 'id',
-    title: 'title',
-    subtitle: 'completed',
-  },
-  request: {
-    page: 'page',
-    limit: 'limit',
-    search: 'q',
-  },
-  response: {
-    data: '', // array payload
-  },
-} as const;`;
-
-  const todosPickerUsageCode = `<PopupPicker
-  isOpen={isTodosPickerOpen}
-  onClose={() => setTodosPickerOpen(false)}
-  sourceUrl="https://jsonplaceholder.typicode.com/todos"
-  columnMap={columnMap}
-  allowMultiselect
-  pageSize={200} // prevent false pagination for this API
-  onSelect={(normalized, raw) => {
-    setLastSelection(raw);
-  }}
-/>`;
-
-  const staticSampleData = [
-    {
-      userId: 1,
-      id: 1,
-      title: 'delectus aut autem',
-      completed: false,
-    },
-    {
-      userId: 1,
-      id: 2,
-      title: 'quis ut nam facilis et officia qui',
-      completed: false,
-    },
-  ];
-
-  const staticPickerUsageCode = `<PopupPicker
-  isOpen={isStaticPickerOpen}
-  onClose={() => setStaticPickerOpen(false)}
-  staticItems={[${JSON.stringify(staticSampleData[0], null, 2)}, ${JSON.stringify(staticSampleData[1], null, 2)}]}
-  allowMultiselect
-  onSelect={(normalized, raw) => {
-    setLastSelection(raw);
-  }}
-/>`;
-
-  // Catalog search
   const [catalogQuery, setCatalogQuery] = useState('');
+  const [hasDemoOnly, setHasDemoOnly] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const categories = useMemo(() => {
     const set = new Set<string>();
-    components.forEach(c => set.add(c.category));
+    components.forEach((c) => set.add(c.category));
     return ['all', ...Array.from(set)];
   }, [components]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const filteredComponents = useMemo(() => {
     const q = catalogQuery.trim().toLowerCase();
-    const base = selectedCategory === 'all'
-      ? components
-      : components.filter(c => c.category === selectedCategory);
+    let base =
+      selectedCategory === 'all' ? components : components.filter((c) => c.category === selectedCategory);
+    if (hasDemoOnly) base = base.filter((c) => !!c.demoUrl);
     if (!q) return base;
     return base.filter((c) => {
       return (
@@ -126,7 +58,7 @@ export const AllComponents: React.FC<AllComponentsProps> = ({ initialComponents 
         (c.directory && c.directory.toLowerCase().includes(q))
       );
     });
-  }, [catalogQuery, selectedCategory, components]);
+  }, [catalogQuery, selectedCategory, hasDemoOnly, components]);
 
   const groupedByCategory = useMemo(() => {
     const map = new Map<string, ComponentMeta[]>();
@@ -137,35 +69,46 @@ export const AllComponents: React.FC<AllComponentsProps> = ({ initialComponents 
     return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
   }, [filteredComponents]);
 
-  const categoryOptions = useMemo(() => {
-    return categories.map(cat => ({ id: cat, label: cat.replace('-', ' ').toUpperCase() }));
-  }, [categories]);
+  const categoryOptions = useMemo(
+    () => categories.map((cat) => ({ id: cat, label: cat.replace(/-/g, ' ').toUpperCase() })),
+    [categories]
+  );
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogComponent, setDialogComponent] = useState<ComponentMeta | null>(null);
+  const openDetailsDialog = (comp: ComponentMeta) => {
+    setDialogComponent(comp);
+    setDialogOpen(true);
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-10">
       <header className="space-y-2">
-        <h1 className="text-2xl font-semibold">All Components</h1>
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">All Components</h1>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Central wiki for our form-elements, data-display, and analytics components with live samples and documentation.
+          Central wiki for form-elements, data-display, and analytics components with live samples and
+          documentation.
         </p>
       </header>
 
-      {/* Catalog */}
       <section className="space-y-4">
-        <h2 className="text-lg font-semibold">Catalog</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Catalog</h2>
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Overview of exported components in <code>@gradian-ui</code>.
+          Overview of exported components in <code className="rounded bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-xs">@gradian-ui</code>.
         </p>
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
           <div className="flex-1 min-w-0 w-full sm:w-auto">
             <SearchInput
-              config={{ name: 'components-search', placeholder: 'Search components, categories, and descriptions...' } as any}
+              config={{
+                name: 'components-search',
+                placeholder: 'Search components, categories, and descriptions...',
+              } as any}
               value={catalogQuery}
               onChange={setCatalogQuery}
               onClear={() => setCatalogQuery('')}
             />
           </div>
-          <div className="flex-shrink-0 w-full sm:w-48">
+          <div className="shrink-0 w-full sm:w-48">
             <Select
               config={{ name: 'component-category', label: '', allowMultiselect: false } as any}
               options={categoryOptions}
@@ -174,70 +117,113 @@ export const AllComponents: React.FC<AllComponentsProps> = ({ initialComponents 
               placeholder="Select category"
             />
           </div>
+          {mounted && (
+            <div className="flex items-center gap-2 shrink-0">
+              <Switch
+                id="has-demo"
+                checked={hasDemoOnly}
+                onCheckedChange={setHasDemoOnly}
+              />
+              <Label htmlFor="has-demo" className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap">
+                Has Demo
+              </Label>
+            </div>
+          )}
         </div>
-        <div className="text-xs text-gray-500 dark:text-gray-400">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
           {filteredComponents.length} result{filteredComponents.length === 1 ? '' : 's'}
-        </div>
-        <Accordion type="multiple" className="space-y-2" defaultValue={groupedByCategory.map(([cat]) => cat)}>
+        </p>
+
+        <Accordion
+          type="multiple"
+          className="space-y-6"
+          defaultValue={groupedByCategory.map(([cat]) => cat)}
+        >
           {groupedByCategory.map(([category, comps]) => (
-            <AccordionItem key={category} value={category} className="border border-gray-200 dark:border-gray-800 rounded-lg px-2">
-              <AccordionTrigger className="px-1 py-2 text-sm font-medium text-gray-700 dark:text-gray-200">
+            <AccordionItem
+              key={category}
+              value={category}
+              className={cn(
+                'rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 shadow-sm overflow-hidden',
+                'data-[state=open]:border-gray-300 dark:data-[state=open]:border-gray-700/60'
+              )}
+            >
+              <AccordionTrigger className="px-4 py-3 hover:no-underline data-[state=open]:border-b bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-2">
-                  <span>{renderHighlightedText(category.toUpperCase(), catalogQuery)}</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                    {renderHighlightedText(category.toUpperCase(), catalogQuery)}
+                  </span>
                   <span className="text-xs text-gray-500 dark:text-gray-400">({comps.length})</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="pb-3">
-                <div className="p-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <AccordionContent className="px-4 pb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4">
                   {comps.map((comp) => (
-                  <div key={comp.id} className="rounded-xl border p-3 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
-                      <div className="flex items-start gap-3">
+                    <div
+                      key={comp.id}
+                      className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-100 dark:bg-gray-800 shadow-sm p-4"
+                    >
+                      <div className="flex items-start gap-3 h-full">
                         {comp.icon ? (
-                          <IconBox
-                            name={comp.icon}
-                            variant="filled"
-                            size="md"
-                            color={resolveIconBoxColor(comp.color || 'gray')}
-                            className={!comp.color ? '!bg-gray-800' : undefined}
-                          />
+                          <div className="shrink-0">
+                            <IconBox
+                              name={comp.icon}
+                              variant="filled"
+                              size="md"
+                              color={resolveIconBoxColor(comp.color || 'gray')}
+                              className={!comp.color ? 'bg-gray-800 dark:bg-gray-700' : undefined}
+                            />
+                          </div>
                         ) : null}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="min-w-0">
-                              <h3 className="text-sm font-semibold truncate">
-                                {renderHighlightedText(comp.label, catalogQuery)}
-                              </h3>
-                            </div>
+                        <div className="flex-1 min-w-0 h-full justify-between flex flex-col">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                              {renderHighlightedText(comp.label, catalogQuery)}
+                            </h3>
                             <Badge
                               variant="outline"
                               size="sm"
-                              className="px-1.5 py-0.5 text-[10px] leading-none font-mono bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700"
+                              className="shrink-0 px-1.5 py-0 text-[10px] font-mono bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700"
                             >
                               {renderHighlightedText(comp.id, catalogQuery)}
                             </Badge>
                           </div>
                           {comp.description && (
-                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1.5 line-clamp-2">
                               {renderHighlightedText(comp.description, catalogQuery)}
                             </p>
                           )}
                           {comp.usecase && (
-                            <p className="text-[11px] text-gray-500 mt-1">
+                            <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1">
                               <span className="font-medium">Use case:</span>{' '}
                               {renderHighlightedText(comp.usecase, catalogQuery)}
                             </p>
                           )}
-                          <div className="mt-2">
-                            <code className="text-[11px] bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded block overflow-x-auto">
-                              {renderHighlightedText(comp.directory, catalogQuery)}
-                            </code>
+                          <code className="mt-2 text-[11px] bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded block overflow-x-auto text-gray-700 dark:text-gray-300">
+                            {renderHighlightedText(comp.directory, catalogQuery)}
+                          </code>
+                          <div className="mt-3 flex flex-wrap items-center gap-2">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="gap-1.5"
+                              onClick={() => openDetailsDialog(comp)}
+                            >
+                              <Info className="h-3.5 w-3.5" />
+                              Details
+                            </Button>
+                            {comp.demoUrl ? (
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                className="gap-1.5"
+                                onClick={() => router.push(comp.demoUrl!)}
+                              >
+                                <FileText className="h-3.5 w-3.5" />
+                                Details & samples
+                              </Button>
+                            ) : null}
                           </div>
-                        <div className="mt-3">
-                          <Link href={`/ui/components/${comp.id}`} className="text-xs inline-flex items-center gap-1 px-2 py-1 rounded border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition">
-                            <IconRenderer iconName="ExternalLink" className="h-3.5 w-3.5" />
-                            View details & samples
-                          </Link>
-                        </div>
                         </div>
                       </div>
                     </div>
@@ -249,84 +235,125 @@ export const AllComponents: React.FC<AllComponentsProps> = ({ initialComponents 
         </Accordion>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">PopupPicker - Remote (Todos)</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Demonstrates using PopupPicker with a public API and column mapping.
-        </p>
-        <div className="flex gap-2">
-          <Button type="button" onClick={() => setTodosPickerOpen(true)}>
-            Open Todos Picker
-          </Button>
-          <Button type="button" variant="outline" onClick={() => setLastSelection([])}>
-            Clear Last Selection
-          </Button>
-        </div>
-        <div className="grid gap-3">
-          <CodeViewer title="Mapping Config" programmingLanguage="ts" code={todosPickerConfigCode} />
-          <CodeViewer title="Usage" programmingLanguage="tsx" code={todosPickerUsageCode} />
-        </div>
-        <PopupPicker
-          isOpen={isTodosPickerOpen}
-          onClose={() => setTodosPickerOpen(false)}
-          sourceUrl="https://jsonplaceholder.typicode.com/todos"
-          columnMap={columnMap}
-          allowMultiselect
-          pageSize={200}
-          onSelect={async (_normalized, raw) => {
-            setLastSelection(raw);
-          }}
-          title="Select Todos"
-          description="Data via jsonplaceholder"
-        />
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-lg font-semibold">PopupPicker - Static Items</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Demonstrates PopupPicker using static items (no network).
-        </p>
-        <div className="flex gap-2">
-          <Button type="button" onClick={() => setStaticPickerOpen(true)}>
-            Open Static Picker
-          </Button>
-          <Button type="button" variant="outline" onClick={() => setLastSelection([])}>
-            Clear Last Selection
-          </Button>
-        </div>
-        <div className="grid gap-3">
-          <CodeViewer title="Static Usage" programmingLanguage="tsx" code={staticPickerUsageCode} />
-        </div>
-        <PopupPicker
-          isOpen={isStaticPickerOpen}
-          onClose={() => setStaticPickerOpen(false)}
-          staticItems={staticSampleData}
-          allowMultiselect
-          onSelect={async (_normalized, raw) => {
-            setLastSelection(raw);
-          }}
-          title="Select Items"
-          description="Using sample static items"
-        />
-      </section>
-
-      <section className="space-y-3">
-        <h3 className="text-base font-semibold">Last Selection (Raw)</h3>
-        <div className={cn('rounded-lg border p-3 text-xs overflow-auto', lastSelection.length ? 'border-gray-200 dark:border-gray-800' : 'border-dashed')}>
-          {lastSelection.length ? <pre className="m-0 whitespace-pre-wrap">{JSON.stringify(lastSelection, null, 2)}</pre> : <span className="text-gray-500">No selection yet.</span>}
-        </div>
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-lg font-semibold">More Components</h2>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Extend this page with your components from <code>@form-elements</code>, <code>@data-display</code>, and <code>@analytics</code> as needed.
-        </p>
-      </section>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
+          {dialogComponent ? (
+            <>
+              <DialogHeader>
+                <div className="flex items-start gap-3 h-full">
+                  {dialogComponent.icon ? (
+                    <IconBox
+                      name={dialogComponent.icon}
+                      variant="filled"
+                      size="lg"
+                      color={resolveIconBoxColor(dialogComponent.color || 'gray')}
+                      className={!dialogComponent.color ? 'bg-gray-800 dark:bg-gray-700' : undefined}
+                    />
+                  ) : null}
+                  <div className="min-w-0">
+                    <DialogTitle>{dialogComponent.label}</DialogTitle>
+                    <DialogDescription>
+                      <span className="uppercase text-gray-500 dark:text-gray-400">{dialogComponent.category}</span>
+                      <span className="mx-2">·</span>
+                      <code className="text-xs bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+                        {dialogComponent.id}
+                      </code>
+                      {dialogComponent.demoUrl ? (
+                        <>
+                          <span className="mx-2">·</span>
+                          <a
+                            href={dialogComponent.demoUrl}
+                            className="text-violet-600 dark:text-violet-400 hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Demo
+                          </a>
+                        </>
+                      ) : null}
+                    </DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
+              <div className="overflow-y-auto flex-1 space-y-4 pr-2 -me-2">
+                {dialogComponent.description ? (
+                  <section>
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                      Description
+                    </h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">{dialogComponent.description}</p>
+                  </section>
+                ) : null}
+                {dialogComponent.usecase ? (
+                  <section>
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                      Use case
+                    </h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">{dialogComponent.usecase}</p>
+                  </section>
+                ) : null}
+                <section>
+                  <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
+                    Source
+                  </h4>
+                  <code className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1.5 rounded block overflow-x-auto text-gray-700 dark:text-gray-300">
+                    {dialogComponent.directory}
+                  </code>
+                </section>
+                {dialogComponent.configSchema?.fields?.length ? (
+                  <section>
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">
+                      Config schema
+                    </h4>
+                    <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-gray-50 dark:bg-gray-800/80 text-left">
+                            <th className="px-3 py-2 font-medium text-gray-700 dark:text-gray-200">Field</th>
+                            <th className="px-3 py-2 font-medium text-gray-700 dark:text-gray-200">Type</th>
+                            <th className="px-3 py-2 font-medium text-gray-700 dark:text-gray-200">Description</th>
+                            <th className="px-3 py-2 font-medium text-gray-700 dark:text-gray-200">Default</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {(dialogComponent.configSchema.fields as ComponentConfigField[]).map((field, idx) => (
+                            <tr
+                              key={field.name}
+                              className={cn(
+                                'border-t border-gray-200 dark:border-gray-700',
+                                idx % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50/50 dark:bg-gray-800/30'
+                              )}
+                            >
+                              <td className="px-3 py-2 font-mono text-xs text-gray-800 dark:text-gray-200">
+                                {field.name}
+                              </td>
+                              <td className="px-3 py-2 text-gray-600 dark:text-gray-400">{field.type}</td>
+                              <td className="px-3 py-2 text-gray-600 dark:text-gray-400 max-w-[200px]">
+                                {field.description ?? '—'}
+                              </td>
+                              <td className="px-3 py-2 text-gray-600 dark:text-gray-400">
+                                {field.options?.length
+                                  ? `One of: ${field.options.map((o) => String(o.value)).join(', ')}`
+                                  : field.defaultValue !== undefined
+                                    ? String(field.defaultValue)
+                                    : '—'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Number, min, max, step and select options are available in the schema.
+                    </p>
+                  </section>
+                ) : null}
+              </div>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
 AllComponents.displayName = 'AllComponents';
-
-

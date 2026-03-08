@@ -1,8 +1,9 @@
 "use client";
 
 import React from "react";
-import { Camera, Minus, Plus, Flashlight, FlashlightOff, Braces, Keyboard } from "lucide-react";
+import { Camera, Minus, Plus, Flashlight, FlashlightOff, Braces, Keyboard, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -34,6 +35,10 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
   onOpenJSON,
   scanMode,
   onScanModeChange,
+  hideZoom = false,
+  showBeepSwitch = false,
+  beepOn = true,
+  onBeepChange,
 }) => {
   const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
   const defaultLang = getDefaultLanguage();
@@ -46,6 +51,7 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
   const torchOnAria = getT(TRANSLATION_KEYS.BARCODE_SCANNER_TORCH_ON, language, defaultLang);
   const torchOffAria = getT(TRANSLATION_KEYS.BARCODE_SCANNER_TORCH_OFF, language, defaultLang);
   const viewJsonAria = getT(TRANSLATION_KEYS.BARCODE_SCANNER_VIEW_JSON, language, defaultLang);
+  const beepLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_BEEP, language, defaultLang);
 
   const selectValue = scanMode === "handheld"
     ? HANDHELD_VALUE
@@ -109,8 +115,8 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
         </Select>
       </div>
 
-      {/* Zoom controls — hidden in handheld mode */}
-      {scanMode === "camera" && (
+      {/* Zoom controls — hidden in handheld mode or when Scanner has built-in zoom */}
+      {scanMode === "camera" && !hideZoom && (
         <div className="flex items-center gap-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg px-1 py-0.5">
           <Button
             variant="ghost"
@@ -135,6 +141,15 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
           >
             <Plus className="w-3 h-3" />
           </Button>
+        </div>
+      )}
+
+      {/* Beep switch — only when scanner has beep enabled */}
+      {showBeepSwitch && onBeepChange && (
+        <div className="flex items-center gap-2">
+          <Volume2 className="w-3.5 h-3.5 text-gray-500 shrink-0" aria-hidden />
+          <span className="text-xs font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{beepLabel}</span>
+          <Switch checked={beepOn} onCheckedChange={onBeepChange} aria-label={beepLabel} />
         </div>
       )}
 

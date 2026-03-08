@@ -176,7 +176,7 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className={cn(sizeClasses[size], variantStyles[variant], className)}>
+      <DialogContent className={cn(sizeClasses[size], variantStyles[variant], showSwipe && 'max-w-sm', className)}>
         <DialogHeader>
           <DialogTitle>
             {title}

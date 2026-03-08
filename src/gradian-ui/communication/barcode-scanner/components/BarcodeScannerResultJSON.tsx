@@ -19,6 +19,7 @@ import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
 import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-utils";
 import { useLanguageStore } from "@/stores/language.store";
 import { isValidUrl, safeLinkHref } from "../utils/sanitize";
+import { getFormatBadgeClass } from "../utils/format-badge";
 import type { BarcodeScannerResultJSONProps, ScannedBarcode } from "../types";
 
 /** Default receipt layout: header, column headers, footer. Translated in component. */
@@ -43,19 +44,6 @@ function highlightMatch(text: string, query: string): React.ReactNode {
       part
     )
   );
-}
-
-const FORMAT_COLORS: Record<string, string> = {
-  QR: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 border-violet-200 dark:border-violet-800",
-  Code128: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border-blue-200 dark:border-blue-800",
-  Code39: "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 border-sky-200 dark:border-sky-800",
-  DataMatrix: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800",
-  EAN: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800",
-  Handheld: "bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-900/40 dark:text-fuchsia-300 border-fuchsia-200 dark:border-fuchsia-800",
-};
-
-function formatBadgeClass(fmt: string | undefined): string {
-  return FORMAT_COLORS[fmt ?? ""] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 border-gray-200 dark:border-gray-700";
 }
 
 type BarcodeCardProps = {
@@ -131,7 +119,7 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
         {/* Format badge */}
         <span className={cn(
           "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold font-mono tracking-wide",
-          formatBadgeClass(barcode.format)
+          getFormatBadgeClass(barcode.format)
         )}>
           {barcode.format ?? unknownFormatLabel}
         </span>

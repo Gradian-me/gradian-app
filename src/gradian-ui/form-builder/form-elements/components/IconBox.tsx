@@ -4,31 +4,10 @@ import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/gradian-ui/shared/utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import type { IconBoxColor } from '../utils/icon-box-color';
 
-/** Supported color names for IconBox (matches status/badge colors) */
-export type IconBoxColor =
-  | 'violet'
-  | 'emerald'
-  | 'indigo'
-  | 'blue'
-  | 'green'
-  | 'red'
-  | 'orange'
-  | 'amber'
-  | 'yellow'
-  | 'pink'
-  | 'purple'
-  | 'teal'
-  | 'cyan'
-  | 'stone'
-  | 'neutral'
-  | 'gray'
-  | 'slate'
-  | 'rose'
-  | 'fuchsia'
-  | 'lime'
-  | 'sky'
-  | 'zinc';
+export type { IconBoxColor } from '../utils/icon-box-color';
+export { resolveIconBoxColor } from '../utils/icon-box-color';
 
 /** Flat variant: rounded-lg, no border, light bg (for integrations, etc.) */
 const flatColorVariants: Record<IconBoxColor, string> = {
@@ -191,27 +170,6 @@ export interface IconBoxProps
   /** Optional className for the icon SVG. Default: h-4 w-4 */
   iconClassName?: string;
   children?: React.ReactNode;
-}
-
-/** Resolve color string to IconBoxColor (handles badge/status color names) */
-export function resolveIconBoxColor(color?: string): IconBoxColor {
-  if (!color || typeof color !== 'string') return 'violet';
-  const c = color.toLowerCase();
-  const aliasMap: Record<string, IconBoxColor> = {
-    muted: 'gray',
-    destructive: 'red',
-    success: 'green',
-    warning: 'amber',
-    danger: 'red',
-    info: 'blue',
-  };
-  if (aliasMap[c]) return aliasMap[c];
-  const valid: IconBoxColor[] = [
-    'violet', 'emerald', 'indigo', 'blue', 'green', 'red', 'orange', 'amber',
-    'yellow', 'pink', 'purple', 'teal', 'cyan', 'stone', 'neutral', 'gray',
-    'slate', 'rose', 'fuchsia', 'lime', 'sky', 'zinc',
-  ];
-  return valid.includes(c as IconBoxColor) ? (c as IconBoxColor) : 'violet';
 }
 
 /** Check if value looks like a hex color */

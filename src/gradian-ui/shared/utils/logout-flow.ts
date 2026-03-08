@@ -250,8 +250,9 @@ function redirectToLogin(currentPath?: string): void {
   
   loggingCustom(LogType.CLIENT_LOG, 'log', `[LOGOUT_FLOW] Redirecting to login: ${loginUrl}`);
   
-  // Use window.location for full page navigation (handles hard refresh, initial load)
-  window.location.href = loginUrl;
+  // Use replace so the current history entry is replaced; avoids back-button and ensures
+  // the next load is a clean document request (can prevent 404 on first load after redirect).
+  window.location.replace(loginUrl);
 }
 
 /**

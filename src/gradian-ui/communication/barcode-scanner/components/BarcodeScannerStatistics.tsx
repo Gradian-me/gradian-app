@@ -6,6 +6,7 @@ import { cn } from "@/gradian-ui/shared/utils";
 import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
 import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-utils";
 import { useLanguageStore } from "@/stores/language.store";
+import { getFormatBadgeClass } from "../utils/format-badge";
 import type { ScannedBarcode } from "../types";
 
 // Match MetricCard gradient + border styling for a consistent modern look
@@ -72,9 +73,9 @@ export const BarcodeScannerStatistics: React.FC<BarcodeScannerStatisticsProps> =
         label.length > 32
           ? `${label.slice(0, 29)}...`
           : label;
-      return format ? `${truncated} (${format})` : truncated;
+      return { label: truncated, format: format ?? null };
     }
-    return "—";
+    return { label: null, format: null };
   }, [lastScannedLabel, lastScannedFormat, barcodes]);
 
   const gradientClass = GRADIENT_CLASSES[gradient] ?? GRADIENT_CLASSES.indigo;
@@ -129,9 +130,21 @@ export const BarcodeScannerStatistics: React.FC<BarcodeScannerStatisticsProps> =
               {labelLastScanned}
             </div>
           </div>
-          <p className={cn("text-sm font-mono truncate min-h-0", valueColor)} dir="auto">
-            {lastScannedDisplay}
-          </p>
+          <div className="flex flex-wrap items-center gap-2 min-h-0">
+            <span className={cn("text-sm font-mono truncate", valueColor)} dir="auto">
+              {lastScannedDisplay.label ?? "—"}
+            </span>
+            {lastScannedDisplay.format && (
+              <span
+                className={cn(
+                  "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold font-mono tracking-wide shrink-0",
+                  getFormatBadgeClass(lastScannedDisplay.format)
+                )}
+              >
+                {lastScannedDisplay.format}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react";
 import dynamic from "next/dynamic";
-import { useDevices } from "@yudiel/react-qr-scanner";
+import { useDevices, boundingBox } from "@yudiel/react-qr-scanner";
 import {
   prepareZXingModule,
   ZXING_WASM_VERSION,
@@ -214,6 +214,9 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   const [handheldInput, setHandheldInput] = useState("");
   const handheldInputRef = useRef<HTMLInputElement>(null);
 
+  // Beep on/off (toolbar switch; default true)
+  const [beepOn, setBeepOn] = useState(true);
+
   // ID of the most-recently added/updated barcode (for pulse animation)
   const [newlyAddedId, setNewlyAddedId] = useState<string | null>(null);
   const newlyAddedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -303,7 +306,8 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       if (raw === lastScanRef.current) return;
       lastScanRef.current = raw;
       setTimeout(() => { lastScanRef.current = ""; }, 1500);
-      if (enableBeep && beepRef.current) beepRef.current();
+      // Use Web Audio beep when enabled and toolbar switch is on
+      if (enableBeep && beepOn && beepRef.current) beepRef.current();
       setLastScannedFormat(fmt);
       setLastScannedLabel(raw);
       setLastScannedFormatForStats(fmt);
@@ -312,8 +316,9 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
         setBarcodes((prev) => {
           const existing = prev.find((b) => b.label === raw);
           if (existing) {
+            // Camera mode: do not auto-increment count on duplicate; user changes count manually.
             const updated = prev.map((b) =>
-              b.id === existing.id ? { ...b, count: enableChangeCount ? (b.count ?? 1) + 1 : b.count } : b
+              b.id === existing.id ? { ...b } : b
             );
             window.setTimeout(() => markNewlyAdded(existing.id), 0);
             return updated;
@@ -329,12 +334,15 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
           return [...prev, newItem];
         });
       } else {
-        setScannedValue(raw);
-        setScannedFormat(fmt);
-        onScan?.(raw, fmt);
+        // Defer so Scanner can finish and clean up before we unmount it (avoids "no supported sources" error)
+        window.setTimeout(() => {
+          setScannedValue(raw);
+          setScannedFormat(fmt);
+          onScan?.(raw, fmt);
+        }, 0);
       }
     },
-    [enableBeep, enableMultipleScan, enableChangeCount, onScan, markNewlyAdded]
+    [enableBeep, beepOn, enableMultipleScan, enableChangeCount, onScan, markNewlyAdded]
   );
 
   const handleScanError = useCallback((error: unknown) => {
@@ -395,7 +403,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
     const raw = sanitizeBarcodeValue(handheldInput);
     if (!raw) return;
     setHandheldInput("");
-    if (enableBeep && beepRef.current) beepRef.current();
+    if (enableBeep && beepOn && beepRef.current) beepRef.current();
     setLastScannedLabel(raw);
     setLastScannedFormatForStats("Handheld");
 
@@ -427,7 +435,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       setScannedFormat("Handheld");
       onScan?.(raw, "Handheld");
     }
-  }, [handheldInput, setHandheldInput, enableBeep, enableMultipleScan, enableChangeCount, markNewlyAdded, onScan]);
+  }, [handheldInput, setHandheldInput, enableBeep, beepOn, enableMultipleScan, enableChangeCount, markNewlyAdded, onScan]);
 
   const handleZoomIn = useCallback(() => {
     setZoomLevel((p) => Math.min(p + ZOOM_STEP, MAX_ZOOM));
@@ -574,7 +582,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
             }
           }}
           placeholder={placeholderScanOrType}
-          className="flex-1 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 dark:focus:ring-violet-600 dark:focus:border-violet-600 transition-colors"
+          className="flex-1 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 dark:focus:ring-violet-600 dark:focus:border-violet-600 transition-colors"
           autoComplete="off"
           maxLength={2048}
         />
@@ -623,6 +631,13 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
                   scanDelay={500}
                   allowMultiple={enableMultipleScan}
                   sound={false}
+                  components={{
+                    finder: true,
+                    torch: true,
+                    zoom: true,
+                    onOff: true,
+                    tracker: boundingBox,
+                  }}
                   classNames={{ video: "w-full h-full object-cover" }}
                 />
               )}
@@ -646,6 +661,10 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
             onOpenJSON={() => setIsJsonDialogOpen(true)}
             scanMode={scanMode}
             onScanModeChange={handleScanModeChange}
+            hideZoom
+            showBeepSwitch={true}
+            beepOn={beepOn}
+            onBeepChange={setBeepOn}
           />
         </div>
       </div>
@@ -751,7 +770,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
 
       {enableJSONResult && (
         <Dialog open={isJsonDialogOpen} onOpenChange={setIsJsonDialogOpen}>
-          <DialogContent className="w-full h-full lg:max-w-[65vw] lg:max-h-[90vh] flex flex-col">
+          <DialogContent className="w-full h-full lg:max-w-[65vw] lg:max-h-[90vh] flex flex-col" aria-describedby={undefined}>
             <DialogHeader>
               <DialogTitle>{scannedJsonTitle}</DialogTitle>
             </DialogHeader>

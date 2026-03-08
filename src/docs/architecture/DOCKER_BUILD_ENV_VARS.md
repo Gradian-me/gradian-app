@@ -161,3 +161,16 @@ docker build \
 
 4. **Best Practice**: If you frequently change `NEXT_PUBLIC_*` variables, consider adding them as `ARG` in the Dockerfile for explicit control.
 
+## Troubleshooting: "NEXT_PUBLIC_ENCRYPTION_KEY is not defined" in the browser
+
+If you see this error in the **browser console** even though the variable is set in GitLab CI/CD and in `docker-compose.yml`:
+
+- **Cause**: `NEXT_PUBLIC_*` values are **inlined into the client JS bundle at image build time**. Setting them only in `docker-compose` `environment:` does **not** change the bundle; the bundle was already built with whatever value was available during `docker build`.
+
+- **Fix**:
+  1. **Pass the value at build time**: The job that runs `docker build` must pass:
+     `--build-arg NEXT_PUBLIC_ENCRYPTION_KEY=$NEXT_PUBLIC_ENCRYPTION_KEY`
+     (and similarly for `NEXT_PUBLIC_SKIP_KEY` if used).
+  2. **GitLab CI**: Ensure `NEXT_PUBLIC_ENCRYPTION_KEY` is defined in CI/CD Variables and is **available in the build job** (not only deploy). If your build uses `devops/ci-templates`, confirm that the build template passes build args from the env list; otherwise extend the build job to pass them.
+  3. **After changing the variable**: Re-run the **build** pipeline so a new image is built with the correct value. Redeploying the same image without rebuilding will not fix the error.
+

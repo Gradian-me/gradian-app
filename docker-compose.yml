@@ -25,6 +25,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
       - NEXTAUTH_URL=${NEXTAUTH_URL}
+      # NEXT_PUBLIC_* must be passed as Docker build-args during image build to appear in the client bundle; runtime env here does not change the bundle.
       - NEXT_PUBLIC_CLIENT_ID=${NEXT_PUBLIC_CLIENT_ID}
       - NEXT_PUBLIC_ENCRYPTION_KEY=${NEXT_PUBLIC_ENCRYPTION_KEY}
       - NEXT_PUBLIC_SCHEMA_API_BASE=${NEXT_PUBLIC_SCHEMA_API_BASE}

@@ -8,7 +8,8 @@
     "useInRAG": true,
     "description": "Searchable modal to select record(s) from another schema. Field must include targetSchema (id from Available Schemas). Optional metadata.allowMultiselect.",
     "usecase": "Reference fields, relational data, selecting from other schemas (e.g. Order→Customer, Order Item→Product).",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/PopupPicker.tsx"
+    "directory": "src/gradian-ui/form-builder/form-elements/components/PopupPicker.tsx",
+    "demoUrl": "/ui/components/popup-picker"
   },
   {
     "id": "search-input",
@@ -390,6 +391,7 @@
     "description": "Multiline text input optimized for markdown content with syntax highlighting support.",
     "usecase": "Markdown content, documentation, formatted text, system prompts, code documentation.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/MarkdownInput.tsx",
+    "demoUrl": "/ui/components/markdown",
     "configSchema": {
       "fields": [
         {
@@ -702,6 +704,7 @@
     "description": "Canvas-based signature capture with optional lock, undo/redo, color, eraser, and PNG export.",
     "usecase": "Consent forms, agreements, approvals, and any form requiring a drawn signature.",
     "directory": "src/gradian-ui/form-builder/form-elements/components/SignaturePad.tsx",
+    "demoUrl": "/ui/components/signature-pad",
     "configSchema": {
       "fields": [
         {
@@ -755,6 +758,18 @@
         }
       ]
     }
+  },
+  {
+    "id": "barcode-scanner",
+    "label": "Barcode Scanner",
+    "color": "teal",
+    "icon": "ScanBarcode",
+    "category": "form-elements",
+    "useInRAG": false,
+    "description": "Camera-based barcode and QR scanner with single and multi-scan modes, JSON export, and quantity editing.",
+    "usecase": "Inventory, checkout, asset tracking, form input for codes.",
+    "directory": "src/gradian-ui/communication/barcode-scanner/components/BarcodeScannerWrapper.tsx",
+    "demoUrl": "/ui/components/barcode-scanner"
   },
   {
     "id": "swipe-button",
@@ -1244,7 +1259,8 @@
     "useInRAG": false,
     "description": "Video display component for URLs or embedded content.",
     "usecase": "Display video attachments, embedded players, media previews.",
-    "directory": "src/gradian-ui/form-builder/form-elements/components/VideoViewer.tsx"
+    "directory": "src/gradian-ui/form-builder/form-elements/components/VideoViewer.tsx",
+    "demoUrl": "/ui/components/video"
   },
   {
     "id": "formula",
