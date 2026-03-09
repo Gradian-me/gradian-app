@@ -53,7 +53,7 @@ const nextConfig: NextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       "immutable-real": path.join(process.cwd(), "node_modules", "immutable"),
-      immutable: path.join(process.cwd(), "src/lib/immutable-shim.cjs"),
+      immutable: path.join(process.cwd(), "src/lib/immutable-shim.js"),
     };
 
     // Enable webpack caching for faster builds
