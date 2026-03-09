@@ -15,10 +15,10 @@
         npm config set fetch-retry-maxtimeout 120000 && \
         npm config set fetch-timeout 300000
     
-    # Install production dependencies – no cache mount
-    RUN npm ci --only=production \
-        && npm cache clean --force \
-        && rm -rf /tmp/* /var/tmp/* /root/.npm /root/.node-gyp
+    # Install production dependencies – with cache mount
+    RUN --mount=type=cache,target=/root/.npm \
+        npm ci --only=production \
+        && rm -rf /tmp/* /var/tmp/* /root/.node-gyp
     
     
     # ---------------------------
@@ -49,16 +49,16 @@
         npm config set fetch-retry-maxtimeout 120000 && \
         npm config set fetch-timeout 300000
     
-    # Install all dependencies (dev + prod) – no cache mount
-    RUN npm ci --legacy-peer-deps --include=optional --no-audit \
-        && npm cache clean --force
+    # Install all dependencies (dev + prod) – with cache mount
+    RUN --mount=type=cache,target=/root/.npm \
+        npm ci --legacy-peer-deps --include=optional --no-audit
     
     # Copy full source code
     COPY . .
     
-    # Build the application – no cache mount for .next
-    RUN npm run build \
-        && npm cache clean --force \
+    # Build the application – with cache mount for .next
+    RUN --mount=type=cache,target=/app/.next/cache \
+        npm run build \
         && rm -rf /tmp/* /var/tmp/* /root/.npm /root/.node-gyp \
         && find /app/node_modules -type f -name "*.md"       -delete 2>/dev/null || true \
         && find /app/node_modules -type f -name "*.txt"      -delete 2>/dev/null || true \
