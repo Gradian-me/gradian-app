@@ -145,6 +145,12 @@ export function getAvailableLanguageCodes(): string[] {
   if (raw === undefined || raw === null || typeof raw !== 'string') return [];
   const trimmed = raw.trim();
   if (trimmed === '') return [];
+
+  // Special keyword: "all" means expose all supported locales (no filtering)
+  if (trimmed.toLowerCase() === 'all') {
+    return [];
+  }
+
   const normalized = trimmed.replace(/^\[|\]$/g, ''); // strip leading/trailing brackets
   return normalized
     .split(',')

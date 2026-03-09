@@ -20,15 +20,34 @@ export interface GS1ParseResult {
 
 const FNC_CHAR = String.fromCharCode(29);
 
-/** Literal \F (backslash-F) is treated as FNC1 group separator. */
-const FNC1_ESCAPE = "\\F";
+/**
+ * Literal aliases that should be treated as the FNC1 / GS (group separator).
+ * - "\\F"  : common escape from some scanners / test tools
+ * - "<GS>" : textual placeholder for the GS control character
+ * NOTE: the actual ASCII 29 character is already handled via `FNC_CHAR`.
+ */
+const FNC1_ALIASES: readonly string[] = ["\\F", "<GS>"];
 
 /**
- * Normalizes barcode input: replaces literal \F with FNC1 (ASCII 29) so
- * pasted strings like 01...10ABC123\F3932... are parsed correctly.
+ * Normalizes barcode input:
+ * - Replaces literal aliases (e.g. "\F", "<GS>") with FNC1 (ASCII 29)
+ *   so pasted strings like `01...10ABC123\F3932...` or `01...10ABC123<GS>3932...`
+ *   are parsed correctly.
+ * - Leaves existing ASCII 29 characters unchanged.
  */
 function normalizeFNC1(barcode: string): string {
-  return barcode.split(FNC1_ESCAPE).join(FNC_CHAR);
+  if (typeof barcode !== "string" || barcode.length === 0) {
+    return barcode;
+  }
+
+  let normalized = barcode;
+  for (const alias of FNC1_ALIASES) {
+    if (normalized.includes(alias)) {
+      normalized = normalized.split(alias).join(FNC_CHAR);
+    }
+  }
+
+  return normalized;
 }
 
 /**

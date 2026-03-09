@@ -253,11 +253,46 @@ const normalizeDataListResponse = (payload: unknown, context: NormalizeContext) 
   return normalized;
 };
 
+import { SENSITIVE_DETAIL_FIELDS } from '@/gradian-ui/shared/configs/auth-config';
+
+const sanitizeDetailData = (data: unknown, context: NormalizeContext): unknown => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return data;
+  }
+
+  // Derive schemaId from path: /api/data/[schema-id]/[id]
+  const pathWithoutQuery = getPathWithoutQuery(context.targetPathWithQuery);
+  const segments = pathWithoutQuery.split('/'); // ["", "api", "data", schemaId, id]
+  const schemaId = segments.length >= 4 ? segments[3] : undefined;
+  if (!schemaId) {
+    return data;
+  }
+
+  const sensitiveFields = SENSITIVE_DETAIL_FIELDS[schemaId];
+  if (!sensitiveFields || sensitiveFields.size === 0) {
+    return data;
+  }
+
+  const record = data as Record<string, unknown>;
+  const sanitized: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(record)) {
+    if (!sensitiveFields.has(key)) {
+      sanitized[key] = value;
+    }
+  }
+
+  return sanitized;
+};
+
 const normalizeDataDetailResponse = (payload: unknown, context: NormalizeContext) => {
   if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
     const payloadRecord = payload as Record<string, unknown>;
     if ('success' in payloadRecord && 'data' in payloadRecord) {
-      return payload;
+      return {
+        ...payloadRecord,
+        data: sanitizeDetailData(payloadRecord.data, context),
+      };
     }
   }
 
@@ -286,9 +321,12 @@ const normalizeDataDetailResponse = (payload: unknown, context: NormalizeContext
       ? (payload as Record<string, unknown>).error
       : undefined;
 
+  const rawDetail = objectCandidate ?? payload;
+  const sanitizedDetail = sanitizeDetailData(rawDetail, context);
+
   const normalized: Record<string, unknown> = {
     success,
-    data: objectCandidate ?? payload,
+    data: sanitizedDetail,
   };
 
   if (message) {

@@ -21,6 +21,11 @@ export interface AuthConfig {
   };
 }
 
+// Fields that must never be exposed in detail responses per schema
+export const SENSITIVE_DETAIL_FIELDS: Record<string, Set<string>> = {
+  users: new Set(['password']),
+};
+
 // Default authentication configuration
 const defaultAuthConfig: AuthConfig = {
   JWT_SECRET: 'your-default-secret-key-change-in-production',

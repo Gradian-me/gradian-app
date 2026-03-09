@@ -22852,11 +22852,7 @@
       "id": "01HZHNQPNQRGJR9CCX4KXNVNZVN",
       "deviationNumber": "DEV-2025-0147",
       "deviationDetectionDateTime": "2025-06-18T09:35",
-      "detectedBy": [
-        {
-          "id": "01KCPC8YBMRYB3X846103R11MH"
-        }
-      ],
+      "detectedBy": [],
       "deviationTitle": "Non-contemporaneous recording of environmental monitoring results",
       "deviationDescription": "During routine QA review of environmental monitoring (EM) records for Grade B cleanroom (Room B-204), it was observed that EM results for settle plates and active air sampling dated 2025-06-15 were recorded in the official logbook on 2025-06-17. The entries were not recorded at the time the activity was performed.",
       "expectedCondition": "According to SOP QC-EM-012, all environmental monitoring results must be recorded contemporaneously at the time of sampling or immediately after completion of the activity, with date and time documented.",
@@ -22880,56 +22876,20 @@
           "label": "Active Air Sampler ID: AAS-017"
         }
       ],
-      "impactProductQuality": [
-        {
-          "id": "high"
-        }
-      ],
-      "impactPatientSafety": [
-        {
-          "id": "low"
-        }
-      ],
-      "impactDataIntegrity": [
-        {
-          "id": "critical"
-        }
-      ],
-      "impactRegulatoryCompliance": [
-        {
-          "id": "high"
-        }
-      ],
+      "impactProductQuality": [],
+      "impactPatientSafety": [],
+      "impactDataIntegrity": [],
+      "impactRegulatoryCompliance": [],
       "quarantineHoldApplied": true,
       "productionStopped": false,
       "qaInitialDecision": "Full deviation investigation required; batch disposition decision deferred until completion.",
-      "deviationType": [
-        {
-          "id": "unplanned"
-        }
-      ],
-      "deviationCategory": [
-        {
-          "id": "Data Integrity / Documentation"
-        }
-      ],
-      "deviationCriticality": [
-        {
-          "id": "critical"
-        }
-      ],
-      "recurrenceIndicator": [
-        {
-          "id": "repeat"
-        }
-      ],
+      "deviationType": [],
+      "deviationCategory": [],
+      "deviationCriticality": [],
+      "recurrenceIndicator": [],
       "investigationRequired": true,
       "investigationLead": [],
-      "rootCauseAnalysisMethod": [
-        {
-          "id": "5-why"
-        }
-      ],
+      "rootCauseAnalysisMethod": [],
       "identifiedRootCauses": [
         {
           "id": "item-1767387960454-rootcause",
@@ -23068,35 +23028,19 @@
         }
       ],
       "effectivenessReviewDate": "2025-12-15",
-      "effectivenessResult": [
-        {
-          "id": "effective"
-        }
-      ],
+      "effectivenessResult": [],
       "additionalActionsRequired": false,
       "qaFinalReview": "Investigation, CAPA, and effectiveness verification reviewed and found adequate. Data integrity risk addressed systemically. Approved – Head of Quality Assurance",
       "deviationClosureDate": "2025-12-20",
       "justificationForClosure": "Root cause adequately identified, CAPA implemented and verified effective, and no recurrence observed during monitoring period.",
-      "linkedChangeControls": [
-        {
-          "id": "01KCDG346XD1GBAKQEADRABBHB"
-        }
-      ],
+      "linkedChangeControls": [],
       "relatedPreviousDeviations": [],
       "createdAt": "2025-06-18T09:35:00.000Z",
-      "updatedAt": "2026-03-08T15:56:04.523Z",
+      "updatedAt": "2026-03-09T08:52:21.358Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "affectedProcesses": [
-        {
-          "id": "01JGFJJZ00CYR47QV0E9C1029P"
-        }
-      ],
-      "deviationCategories": [
-        {
-          "id": "01KD0683FRE85PCAZPR42MX8GE"
-        }
-      ],
+      "affectedProcesses": [],
+      "deviationCategories": [],
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "actionType": [],
@@ -23106,7 +23050,13 @@
           "id": "item-1767387960450-wqbtdu7j1",
           "label": "Batch BX-250615-01 was placed on QA hold pending investigation outcome."
         }
-      ]
+      ],
+      "status": {
+        "id": "01KBHGVA9789N2GWB9XKT6RQ06",
+        "label": "In Progress",
+        "color": "amber",
+        "icon": "LucideClock8"
+      }
     }
   ],
   "lean-management": [

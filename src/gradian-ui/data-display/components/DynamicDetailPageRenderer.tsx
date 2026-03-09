@@ -569,7 +569,9 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
             sourceSchema?: string;
             targetSchema?: string;
           }>
-        >(`/api/data/all-relations?schema=${schema.id}&id=${data.id}&direction=both`);
+        >(
+          `/api/data/all-relations?schema=${schema.id}&id=${data.id}&direction=both&includeFieldRelations=true`
+        );
 
         if (!relationsResponse.success || !Array.isArray(relationsResponse.data)) {
           setRelatedSchemas([]);
@@ -1838,8 +1840,14 @@ export const DynamicDetailPageRenderer: React.FC<DynamicDetailPageRendererProps>
 
         {/* Auto Table Renderers - Show relations to uncovered target schemas */}
         {relatedSchemas.length > 0 && (
-          <>
-            <EndLine label="Relations" />
+        <>
+            <EndLine
+              label={getT(
+                TRANSLATION_KEYS.DETAIL_RELATIONS_TITLE,
+                language ?? defaultLang,
+                defaultLang
+              )}
+            />
             <div className="space-y-6 mt-6 w-full min-w-0">
             {relatedSchemas.map((targetSchema, index) => (
               <DynamicRepeatingTableViewer

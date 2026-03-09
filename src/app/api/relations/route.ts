@@ -63,6 +63,8 @@ export async function GET(request: NextRequest) {
     const fieldId = searchParams.get('fieldId');
     const includeInactive = searchParams.get('includeInactive') === 'true';
     const resolveTargets = searchParams.get('resolveTargets') === 'true';
+    const includeFieldRelations =
+      searchParams.get('includeFieldRelations') === 'true';
 
     let relations: DataRelation[];
 
@@ -109,7 +111,8 @@ export async function GET(request: NextRequest) {
 
     // Exclude HAS_FIELD_VALUE relations from generic fetches unless explicitly requested
     // The relations section in detail pages should not show field-value relations
-    if (!relationTypeId) {
+    // unless relationTypeId is specified or includeFieldRelations=true is set
+    if (!relationTypeId && !includeFieldRelations) {
       relations = relations.filter((r) => r.relationTypeId !== 'HAS_FIELD_VALUE');
     }
 

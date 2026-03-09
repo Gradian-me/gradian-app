@@ -25,6 +25,10 @@ import { useLanguageStore } from '@/stores/language.store';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { RefreshCw } from 'lucide-react';
+import {
+  getSchemaTranslatedPluralName,
+  getSectionTranslatedTitle,
+} from '@/gradian-ui/schema-manager/utils/schema-utils';
 
 /**
  * Column width configuration for different field types
@@ -207,8 +211,43 @@ export const DynamicRepeatingTableViewer: React.FC<DynamicRepeatingTableViewerPr
   const shouldShowCards = isSmallScreen;
 
   const colSpan = config.colSpan || 1;
-  const titleRaw = config.title || (isRelationBased ? targetSchemaData?.plural_name || 'Related Items' : section?.title);
-  const title = typeof titleRaw === 'string' ? titleRaw : resolveDisplayLabel(titleRaw, language, defaultLang) || 'Table';
+
+  // Localized title: prefer explicit config.title, otherwise derive from schema/section
+  const title: string = useMemo(() => {
+    // 1) Explicit title from config (can be string or translation object/array)
+    if (config.title) {
+      if (typeof config.title === 'string') {
+        return config.title;
+      }
+      const resolved = resolveDisplayLabel(config.title as any, language, defaultLang);
+      if (resolved) return resolved;
+    }
+
+    // 2) Relation-based: use target schema plural name with proper translations
+    if (isRelationBased) {
+      const s = (targetSchemaData as FormSchema | undefined) || schema;
+      return (
+        getSchemaTranslatedPluralName(
+          s,
+          language ?? defaultLang,
+          s.plural_name || s.singular_name || 'Related Items'
+        ) || 'Related Items'
+      );
+    }
+
+    // 3) Non-relation: use section title with section translation helper
+    if (section) {
+      return getSectionTranslatedTitle(
+        section,
+        language ?? defaultLang,
+        typeof section.title === 'string' ? section.title : section.id
+      );
+    }
+
+    // 4) Fallback
+    return 'Table';
+  }, [config.title, isRelationBased, targetSchemaData, schema, section, language, defaultLang]);
+
   const description = config.description || (isRelationBased ? undefined : section?.description);
 
   const relationDirections = relationInfo.directions;

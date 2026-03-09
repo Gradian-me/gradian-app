@@ -2203,6 +2203,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               onBlur={(fieldName: string) => setTouched(fieldName, true)}
               disabled={disabled}
             />
+            {/* When no wizards are defined, render all sections directly below the system section */}
+            {renderSections()}
           </div>
           </>
           )}

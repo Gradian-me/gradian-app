@@ -9,6 +9,8 @@ import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-
 import { useLanguageStore } from "@/stores/language.store";
 import { isValidUrl, safeLinkHref } from "../utils/sanitize";
 import { GS1Badge } from "./GS1Badge";
+import { BarcodeCanvas } from "@/gradian-ui/form-builder/form-elements";
+import { isGS1Valid } from "../utils/gs1-utils";
 import type { BarcodeScannerResultProps } from "../types";
 
 export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
@@ -26,6 +28,7 @@ export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
   const isUrl = useMemo(() => isValidUrl(value), [value]);
   const safeHref = useMemo(() => (isUrl ? safeLinkHref(value) : null), [value, isUrl]);
   const [copied, setCopied] = React.useState(false);
+  const isGS1 = useMemo(() => isGS1Valid(value), [value]);
 
   const handleCopy = async () => {
     try {
@@ -91,6 +94,16 @@ export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
           {scanAgainLabel}
         </Button>
       </div>
+
+      {/* GS1 DataMatrix rendering under the actions (single-scan mode) */}
+      {isGS1 && (
+        <div className="mt-4 flex flex-col items-center gap-2">
+          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+            GS1 DataMatrix
+          </span>
+          <BarcodeCanvas value={value} type="datamatrix" />
+        </div>
+      )}
     </div>
   );
 };

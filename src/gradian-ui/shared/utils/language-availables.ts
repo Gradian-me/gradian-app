@@ -24,9 +24,10 @@ const ALL_SUPPORTED_LOCALES: SupportedLocale[] = [
   { code: 'en', label: 'English', isRTL: false, locale: 'en-US', flag: 'gb', calendar: 'gregorian' },
   { code: 'fa', label: 'فارسی', isRTL: true, locale: 'fa-IR', flag: 'ir', calendar: 'jalali', calendarLocale: 'fa-IR' },
   { code: 'ar', label: 'العربية', isRTL: true, locale: 'ar', flag: 'sa', calendar: 'gregorian' },
-  { code: 'es', label: 'Español', isRTL: false, locale: 'es', flag: 'es', calendar: 'gregorian' },
-  { code: 'fr', label: 'Français', isRTL: false, locale: 'fr', flag: 'fr', calendar: 'gregorian' },
+  { code: 'tr', label: 'Türkçe', isRTL: false, locale: 'tr', flag: 'tr', calendar: 'gregorian' },
   { code: 'de', label: 'Deutsch', isRTL: false, locale: 'de', flag: 'de', calendar: 'gregorian' },
+  { code: 'fr', label: 'Français', isRTL: false, locale: 'fr', flag: 'fr', calendar: 'gregorian' },
+  { code: 'es', label: 'Español', isRTL: false, locale: 'es', flag: 'es', calendar: 'gregorian' },
   { code: 'it', label: 'Italiano', isRTL: false, locale: 'it', flag: 'it', calendar: 'gregorian' },
   { code: 'ru', label: 'Русский', isRTL: false, locale: 'ru', flag: 'ru', calendar: 'gregorian' },
 ];

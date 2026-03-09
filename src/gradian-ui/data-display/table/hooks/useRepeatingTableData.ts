@@ -170,7 +170,7 @@ export function useRepeatingTableData(
             targetId: string;
             relationTypeId: string;
           }>>(
-            `/api/relations?sourceSchema=${referenceSchema}&sourceId=${referenceEntityId}&targetSchema=${targetSchemaId}&relationTypeId=${referenceRelationTypeId}&includeInactive=true`,
+            `/api/relations?sourceSchema=${referenceSchema}&sourceId=${referenceEntityId}&targetSchema=${targetSchemaId}&relationTypeId=${referenceRelationTypeId}`,
             {
               params: companyIdsParam,
             }
@@ -189,39 +189,9 @@ export function useRepeatingTableData(
         }
       }
 
-      // Fetch relation metadata (ids) for delete/edit actions
-      const relationsMetaResponse = await apiRequest<Array<{
-        id: string;
-        sourceSchema: string;
-        sourceId: string;
-        targetSchema: string;
-        targetId: string;
-        relationTypeId: string;
-      }>>(
-        `/api/relations?sourceSchema=${effectiveSourceSchemaId}&sourceId=${effectiveSourceId}&targetSchema=${targetSchemaId}${
-          relationTypeId ? `&relationTypeId=${relationTypeId}` : ''
-        }&includeInactive=true`,
-        {
-          params: companyIdsParam,
-        }
-      );
-
-      const relationIdByTargetId = new Map<string, string>();
-      if (relationsMetaResponse.success && Array.isArray(relationsMetaResponse.data)) {
-        relationsMetaResponse.data.forEach((rel) => {
-          if (rel.targetId) {
-            const targetIdStr = String(rel.targetId);
-            // Apply reference filtering if enabled
-            if (referenceFilteredTargetIds === null || referenceFilteredTargetIds.has(targetIdStr)) {
-              relationIdByTargetId.set(targetIdStr, rel.id);
-            }
-          }
-        });
-      }
-
       // Remove cache-busting timestamp to allow browser/API caching
       // Only add timestamp when explicitly refreshing (handled by refresh callback)
-      const allRelationsUrl = `/api/data/all-relations?schema=${effectiveSourceSchemaId}&id=${effectiveSourceId}&direction=both&otherSchema=${targetSchemaId}${relationTypeId ? `&relationTypeId=${relationTypeId}` : ''}`;
+      const allRelationsUrl = `/api/data/all-relations?schema=${effectiveSourceSchemaId}&id=${effectiveSourceId}&direction=both&otherSchema=${targetSchemaId}${relationTypeId ? `&relationTypeId=${relationTypeId}` : ''}&includeFieldRelations=true`;
 
       const allRelationsResponse = await apiRequest<Array<{
         schema: string;
@@ -254,8 +224,9 @@ export function useRepeatingTableData(
           directionsSet.add(group.direction);
           const annotatedData = filteredData.map((item) => ({
             ...item,
+            // __relationType and __relationId are now provided by /api/data/all-relations
+            // We still ensure __relationType is set from the group for robustness.
             __relationType: group.relation_type,
-            __relationId: relationIdByTargetId.get(String(item?.id)) || null,
           }));
           entities.push(...annotatedData);
         }

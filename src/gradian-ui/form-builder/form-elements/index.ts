@@ -62,5 +62,6 @@ export * from './components/ImageViewer';
 export * from './components/VideoViewer';
 export * from './components/NumberInputAnimated';
 export * from './components/BarcodeScannerInput';
+export * from './components/BarcodeCanvas';
 export * from './hooks/useOptionsFromUrl';
 export * from './hooks/useOptionsFromSchemaOrUrl';

@@ -138,7 +138,7 @@ export function GS1Badge({ barcodeLabel, className }: GS1BadgeProps) {
         <DialogContent
           overlayClassName="!z-[9998]"
           className={cn(
-            "w-full h-full rounded-none lg:rounded-2xl lg:max-w-2xl lg:max-h-[85vh] overflow-x-visible overflow-y-auto flex flex-col p-2 gap-0 bg-white dark:bg-gray-800",
+            "w-full h-full lg:h-fit rounded-none lg:rounded-2xl lg:max-w-2xl lg:max-h-[85vh] overflow-x-visible overflow-y-auto flex flex-col p-2 gap-0 bg-white dark:bg-gray-800",
             "!z-[9999] pt-10"
           )}
           aria-describedby="gs1-dialog-description"

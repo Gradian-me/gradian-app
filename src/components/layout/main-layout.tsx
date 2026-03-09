@@ -463,7 +463,7 @@ function MainLayoutContent(initialProps: MainLayoutProps) {
             initial={{ opacity: 0, x: 5 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.1, ease: 'easeOut' }}
-            className="text-sm direction-auto text-start text-violet-600 dark:text-violet-400 mt-0.5 hidden lg:block truncate min-w-0 leading-relaxed"
+            className="text-sm direction-auto text-start text-violet-600 dark:text-violet-400 mt-0.5 truncate min-w-0 leading-relaxed"
           >
             {subtitle}
           </motion.div>

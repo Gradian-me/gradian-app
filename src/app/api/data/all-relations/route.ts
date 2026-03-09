@@ -46,12 +46,14 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    
+
     const schema = searchParams.get('schema');
     const id = searchParams.get('id');
     const direction = searchParams.get('direction') as 'source' | 'target' | 'both' | null;
     const otherSchema = searchParams.get('otherSchema');
     const relationTypeId = searchParams.get('relationTypeId');
+    const includeFieldRelations =
+      searchParams.get('includeFieldRelations') === 'true';
 
     // Validate required parameters
     if (!schema || !id) {
@@ -110,7 +112,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Exclude HAS_FIELD_VALUE unless explicitly requested via relationTypeId
-    if (!relationTypeId) {
+    // or includeFieldRelations=true flag
+    if (!relationTypeId && !includeFieldRelations) {
       filteredRelations = filteredRelations.filter(r => r.relationTypeId !== 'HAS_FIELD_VALUE');
     }
 
@@ -118,12 +121,16 @@ export async function GET(request: NextRequest) {
     const allData = readAllData();
 
     // Group relations by schema, direction, and relation type
-    const groupedMap = new Map<string, {
-      schema: string;
-      direction: 'source' | 'target';
-      relation_type: string;
-      entityIds: Set<string>;
-    }>();
+    const groupedMap = new Map<
+      string,
+      {
+        schema: string;
+        direction: 'source' | 'target';
+        relation_type: string;
+        entityIds: Set<string>;
+        relationIdByEntityId: Map<string, string>;
+      }
+    >();
 
     for (const relation of filteredRelations) {
       // Determine which entity ID and schema to fetch based on direction
@@ -157,16 +164,25 @@ export async function GET(request: NextRequest) {
           direction: relationDirection,
           relation_type: relation.relationTypeId,
           entityIds: new Set(),
+          relationIdByEntityId: new Map<string, string>(),
         });
       }
 
-      groupedMap.get(groupKey)!.entityIds.add(entityIdToFetch);
+      const group = groupedMap.get(groupKey)!;
+      group.entityIds.add(entityIdToFetch);
+
+      // Store the first relationId we see for each entityId in this group.
+      // This allows clients to access a stable __relationId without
+      // needing a separate /api/relations call.
+      if (!group.relationIdByEntityId.has(entityIdToFetch)) {
+        group.relationIdByEntityId.set(entityIdToFetch, relation.id);
+      }
     }
 
     // Fetch entities from all-data.json and group them
     const result: GroupedRelationData[] = [];
 
-    for (const [groupKey, groupInfo] of groupedMap.entries()) {
+    for (const [, groupInfo] of groupedMap.entries()) {
       const entities: any[] = [];
       
       // Get schema data
@@ -176,17 +192,28 @@ export async function GET(request: NextRequest) {
       for (const entityId of groupInfo.entityIds) {
         const entity = schemaData.find((e: any) => e.id === entityId);
         if (entity) {
+          const relationIdForEntity =
+            groupInfo.relationIdByEntityId.get(entityId) || null;
+
           // Enrich picker fields with id, label, icon, color from relations
           try {
             const enrichedEntity = await enrichEntityPickerFieldsFromRelations({
               schemaId: groupInfo.schema,
               entity: entity,
             });
-            entities.push(enrichedEntity);
+            entities.push({
+              ...enrichedEntity,
+              __relationId: relationIdForEntity,
+              __relationType: groupInfo.relation_type,
+            });
           } catch (error) {
             // If enrichment fails, use original entity
             console.warn(`Failed to enrich entity ${entityId} in schema ${groupInfo.schema}:`, error);
-            entities.push(entity);
+            entities.push({
+              ...entity,
+              __relationId: relationIdForEntity,
+              __relationType: groupInfo.relation_type,
+            });
           }
         }
       }
