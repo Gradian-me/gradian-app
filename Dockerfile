@@ -57,6 +57,8 @@
     COPY . .
     
     # Build the application – with cache mount for .next
+    # Note: Node 25+ may log "Warning: --localstorage-file was provided without a valid path" during
+    # page data collection; this is harmless and does not affect the build or runtime.
     RUN --mount=type=cache,target=/app/.next/cache \
         npm run build \
         && rm -rf /tmp/* /var/tmp/* /root/.npm /root/.node-gyp \

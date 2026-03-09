@@ -4,7 +4,11 @@ import React, { useCallback, useState } from "react";
 import dynamic from "next/dynamic";
 import { QrCode, Loader2 } from "lucide-react";
 import { cn } from "@/gradian-ui/shared/utils";
-import { PrintElementButton, DownloadElementButton, captureElementAsDataUrl } from "@/gradian-ui/printout";
+import {
+  PrintElementButton,
+  DownloadElementButton,
+  captureElementAsDataUrl,
+} from "@/gradian-ui/printout";
 import { Button } from "@/components/ui/button";
 
 const QRCodeDialog = dynamic(
@@ -20,6 +24,8 @@ export type TicketCardOrientation = "portrait" | "landscape";
 /** CSS mask cutout: notch radius and vertical position (e.g. "50%" or "120px"). */
 const NOTCH_RADIUS_PX = 16;
 const NOTCH_Y_DEFAULT = "50%";
+/** Rough upper bound for data URL length that typical QR codes can handle. */
+const MAX_QR_DATA_URL_LENGTH = 4500;
 
 export interface TicketCardWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
   /** When true, punch left/right circular notches via CSS mask for ticket strip effect. Disable in modals if it clashes. */
@@ -87,6 +93,7 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
       const el = internalRef.current;
       if (!el || qrLoading) return;
       setQrLoading(true);
+      setQrValue("");
       try {
         const dataUrl = await captureElementAsDataUrl(el, {
           exportType: "canvas",
@@ -96,10 +103,20 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
             console.error("[TicketCardWrapper] QR capture failed:", err);
           },
         });
+        if (!dataUrl || typeof dataUrl !== "string") {
+          return;
+        }
+        if (dataUrl.length > MAX_QR_DATA_URL_LENGTH) {
+          console.warn(
+            "[TicketCardWrapper] QR payload too large for QR code; length=",
+            dataUrl.length
+          );
+          return;
+        }
         setQrValue(dataUrl);
         setQrDialogOpen(true);
-      } catch {
-        // Error already reported via onError; ensure loading ends
+      } catch (err) {
+        console.error("[TicketCardWrapper] QR capture error:", err);
       } finally {
         setQrLoading(false);
       }

@@ -48,6 +48,14 @@ const nextConfig: NextConfig = {
     ],
   },
   webpack: (config, { dev, isServer }) => {
+    // Fix swagger-ui-react: immutable has no default export; alias to a shim that re-exports namespace as default
+    config.resolve = config.resolve ?? {};
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "immutable-real": path.join(process.cwd(), "node_modules", "immutable"),
+      immutable: path.join(process.cwd(), "src/lib/immutable-shim.cjs"),
+    };
+
     // Enable webpack caching for faster builds
     // Cache is stored in .next/cache/webpack
     config.cache = {
@@ -139,72 +147,11 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Security headers for production. Login-modal uses middleware for wildcard subdomain (NEXT_PUBLIC_DEFAULT_DOMAIN).
+  // Security headers: set only in middleware to avoid duplicates (next.config + proxy/nginx
+  // were causing duplicate Permissions-Policy, Referrer-Policy, Strict-Transport-Security,
+  // X-Content-Type-Options, X-Frame-Options and camera/mic denial in production).
   async headers() {
-    return [
-      // Login-modal: no X-Frame-Options/CSP/Permissions-Policy here; middleware sets them per-request from Referer
-      {
-        source: '/authentication/login-modal',
-        headers: [
-          { key: 'X-DNS-Prefetch-Control', value: 'on' },
-          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-XSS-Protection', value: '1; mode=block' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-        ],
-      },
-      {
-        source: '/:path*',
-        headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on'
-          },
-          {
-            key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload'
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff'
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block'
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
-          },
-          {
-            key: 'Permissions-Policy',
-            value: 'camera=*, microphone=*, geolocation=*, interest-cohort=()'
-          },
-          // Content Security Policy - adjust based on your needs
-          // Note: Mermaid now uses installed package, but we allow CDN as fallback
-          {
-            key: 'Content-Security-Policy',
-            value: [
-              "default-src 'self'",
-              "base-uri 'self'",
-              "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://cdn.jsdelivr.net", // Allow CDN for Mermaid; wasm-unsafe-eval for barcode scanner polyfill
-              "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
-              "img-src 'self' data: blob: https:",
-              "font-src 'self' data:",
-              "connect-src 'self' blob: https://*.cinnagen.com https://cg-gr-app.cinnagen.com:5001 https://www.gstatic.com https://cdn.jsdelivr.net https://fastly.jsdelivr.net", // CDN + barcode WASM
-              "frame-ancestors 'self'",
-              "object-src 'none'",
-              "media-src 'self' https: blob:",
-              "worker-src 'self' blob:",
-            ].join('; ')
-          }
-        ],
-      },
-    ];
+    return [];
   },
 };
 

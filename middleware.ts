@@ -55,9 +55,22 @@ const LOGIN_MODAL_CSP_BASE = [
   "worker-src 'self' blob:",
 ];
 
+/** Shared security header values so next.config does not duplicate (single source in middleware). */
+const SECURITY_HEADERS: [string, string][] = [
+  ['X-DNS-Prefetch-Control', 'on'],
+  ['Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload'],
+  ['X-Frame-Options', 'SAMEORIGIN'],
+  ['X-Content-Type-Options', 'nosniff'],
+  ['X-XSS-Protection', '1; mode=block'],
+  ['Referrer-Policy', 'strict-origin-when-cross-origin'],
+];
+
 function withSecurityHeaders(response: NextResponse): NextResponse {
   response.headers.set('Permissions-Policy', PERMISSIONS_POLICY);
   response.headers.set('Content-Security-Policy', CONTENT_SECURITY_POLICY);
+  for (const [key, value] of SECURITY_HEADERS) {
+    response.headers.set(key, value);
+  }
   return response;
 }
 
@@ -69,10 +82,9 @@ function withLoginModalHeaders(response: NextResponse, refererOrigin: string | n
     ? `camera=(self "${refererOrigin}"), microphone=(self "${refererOrigin}"), geolocation=(self), interest-cohort=()`
     : 'camera=(self), microphone=(self), geolocation=(self), interest-cohort=()';
   response.headers.set('Permissions-Policy', permPolicy);
-  response.headers.set('X-DNS-Prefetch-Control', 'on');
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('X-XSS-Protection', '1; mode=block');
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  for (const [key, value] of SECURITY_HEADERS) {
+    response.headers.set(key, value);
+  }
   return response;
 }
 
