@@ -10,6 +10,7 @@ import {
   captureElementAsDataUrl,
 } from "@/gradian-ui/printout";
 import { Button } from "@/components/ui/button";
+import { ensurePngDataUrl } from "@/gradian-ui/shared/utils/image-utils";
 
 const QRCodeDialog = dynamic(
   () =>
@@ -113,7 +114,8 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
           );
           return;
         }
-        setQrValue(dataUrl);
+        const pngDataUrl = ensurePngDataUrl(dataUrl);
+        setQrValue(pngDataUrl);
         setQrDialogOpen(true);
       } catch (err) {
         console.error("[TicketCardWrapper] QR capture error:", err);

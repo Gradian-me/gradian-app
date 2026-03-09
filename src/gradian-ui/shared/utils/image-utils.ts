@@ -31,6 +31,17 @@ export interface ResizeImageResult {
 }
 
 /**
+ * Ensure a value is a PNG data URL.
+ * - If the string already starts with "data:", it is returned unchanged.
+ * - Otherwise, it is treated as a raw base64 payload and wrapped with the PNG data URL prefix.
+ */
+export function ensurePngDataUrl(value: string): string {
+  if (!value) return '';
+  if (value.startsWith('data:')) return value;
+  return `data:image/png;base64,${value}`;
+}
+
+/**
  * Load an image from a File and return dimensions (width, height).
  * Resolves when the image has loaded; rejects on error.
  */
