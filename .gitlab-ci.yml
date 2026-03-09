@@ -49,6 +49,12 @@ variables:
   ENV_VARIABLES_LIST_PATH: "ci/env-variables.list"
   COMPOSE_FILE: "docker-compose.yml"
 
+
+  ENABLE_SECURITY_AUDIT: "false"
+  ENABLE_OWASP: "false"
+  ENABLE_SEMGREP: "false"
+  ENABLE_TRIVY: "true"
+
 # If the pipeline build job does not pass NEXT_PUBLIC_ENCRYPTION_KEY as a Docker build-arg,
 # extend the build job (from templates/build/build.yml) to pass it, or ask devops to add it.
 # See src/docs/architecture/DOCKER_BUILD_ENV_VARS.md (Troubleshooting).
