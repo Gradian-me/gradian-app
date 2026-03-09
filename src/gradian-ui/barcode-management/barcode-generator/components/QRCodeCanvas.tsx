@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { QrcodeCanvas, useQrcodeDownload } from 'react-qrcode-pretty';
-import { cn } from '../../../shared/utils';
+import { cn } from '@/gradian-ui/shared/utils';
 
 // Default values with proper types
 const DEFAULT_COLOR = {

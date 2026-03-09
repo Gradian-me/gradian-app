@@ -23,3 +23,4 @@ const DEFAULT_BADGE_CLASS =
 export function getFormatBadgeClass(format: string | undefined): string {
   return FORMAT_BADGE_COLORS[format ?? ""] ?? DEFAULT_BADGE_CLASS;
 }
+

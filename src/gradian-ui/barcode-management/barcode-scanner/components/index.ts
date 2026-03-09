@@ -4,3 +4,4 @@ export { BarcodeScannerToolbar } from "./BarcodeScannerToolbar";
 export { BarcodeScannerResult } from "./BarcodeScannerResult";
 export { BarcodeScannerResultJSON } from "./BarcodeScannerResultJSON";
 export { BarcodeScannerStatistics } from "./BarcodeScannerStatistics";
+

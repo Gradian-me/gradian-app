@@ -8,8 +8,8 @@ import React, {
 import { ScanBarcode } from 'lucide-react';
 import { ulid } from 'ulid';
 import { Button } from '@/components/ui/button';
-import { BarcodeScannerWrapper } from '@/gradian-ui/communication';
-import type { ScannedBarcode as BarcodeValue, BarcodeFormat } from '@/gradian-ui/communication';
+import { BarcodeScannerWrapper } from '@/gradian-ui/barcode-management';
+import type { ScannedBarcode as BarcodeValue, BarcodeFormat } from '@/gradian-ui/barcode-management';
 import { cn, validateField } from '../../../shared/utils';
 import { getLabelClasses, errorTextClasses, baseInputClasses } from '../utils/field-styles';
 import type { FormElementProps, FormElementRef } from '../types';

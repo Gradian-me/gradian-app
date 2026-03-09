@@ -63,3 +63,4 @@ export const BarcodeScannerCamera: React.FC<BarcodeScannerCameraProps> = ({
 };
 
 BarcodeScannerCamera.displayName = "BarcodeScannerCamera";
+

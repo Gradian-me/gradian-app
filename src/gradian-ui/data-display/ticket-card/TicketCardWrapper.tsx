@@ -14,9 +14,11 @@ import { ensurePngDataUrl } from "@/gradian-ui/shared/utils/image-utils";
 
 const QRCodeDialog = dynamic(
   () =>
-    import("@/gradian-ui/layout/components/QRCodeDialog").then((mod) => ({
-      default: mod.QRCodeDialog,
-    })),
+    import("@/gradian-ui/barcode-management/barcode-generator/components/QRCodeDialog").then(
+      (mod) => ({
+        default: mod.QRCodeDialog,
+      })
+    ),
   { ssr: false }
 );
 

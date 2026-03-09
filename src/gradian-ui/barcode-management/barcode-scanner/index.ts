@@ -1,4 +1,4 @@
-﻿export {
+export {
   BarcodeScannerWrapper,
   BarcodeScannerCamera,
   BarcodeScannerToolbar,
@@ -15,3 +15,4 @@ export type {
   BarcodeScannerResultProps,
   BarcodeScannerResultJSONProps,
 } from "./types";
+

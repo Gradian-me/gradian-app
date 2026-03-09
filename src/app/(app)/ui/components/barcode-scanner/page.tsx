@@ -5,11 +5,11 @@ import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsConte
 import { Button } from '@/components/ui/button';
 import {
   BarcodeScannerWrapper,
-} from '@/gradian-ui/communication';
+} from '@/gradian-ui/barcode-management';
 import type {
   ScannedBarcode,
   BarcodeFormat,
-} from '@/gradian-ui/communication';
+} from '@/gradian-ui/barcode-management';
 import { BarcodeScannerInput } from '@/gradian-ui/form-builder/form-elements';
 
 export default function BarcodeScannerPage() {

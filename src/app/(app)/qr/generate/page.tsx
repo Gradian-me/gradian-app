@@ -10,7 +10,10 @@ import { QrCode } from 'lucide-react';
 
 // Dynamically import QRCodeDialog to avoid SSR issues with HTMLCanvasElement
 const QRCodeDialog = dynamic(
-  () => import('@/gradian-ui/layout/components/QRCodeDialog').then(mod => ({ default: mod.QRCodeDialog })),
+  () =>
+    import('@/gradian-ui/barcode-management/barcode-generator/components/QRCodeDialog').then(
+      (mod) => ({ default: mod.QRCodeDialog })
+    ),
   { ssr: false }
 );
 

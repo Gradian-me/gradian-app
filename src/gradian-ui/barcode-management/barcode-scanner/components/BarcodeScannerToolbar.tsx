@@ -195,3 +195,4 @@ export const BarcodeScannerToolbar: React.FC<BarcodeScannerToolbarProps> = ({
 };
 
 BarcodeScannerToolbar.displayName = "BarcodeScannerToolbar";
+

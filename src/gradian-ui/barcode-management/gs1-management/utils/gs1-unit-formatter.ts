@@ -43,3 +43,4 @@ export function formatGS1Unit(unit: string, ai: string): string {
 
   return trimmed;
 }
+

@@ -20,7 +20,7 @@ import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-
 import { useLanguageStore } from "@/stores/language.store";
 import { isValidUrl, safeLinkHref } from "../utils/sanitize";
 import { getFormatBadgeClass } from "../utils/format-badge";
-import { GS1Badge } from "./GS1Badge";
+import { GS1Badge } from "@/gradian-ui/barcode-management/gs1-management";
 import type { BarcodeScannerResultJSONProps, ScannedBarcode } from "../types";
 
 /** Default receipt layout: header, column headers, footer. Translated in component. */
@@ -105,7 +105,7 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
       "transition-all duration-200",
       isNew && "animate-barcode-pulse ring-1 ring-violet-300 dark:ring-violet-700"
     )}>
-      {/* Top row: index + format badge + time + count editor + actions */}
+      {/* Top row: index + format badge + GS1 badge (DataMatrix only) + time + count editor + actions */}
       <div className="flex items-center gap-1 px-3 py-2 min-w-0">
         {/* Index bubble */}
         <span className={cn(
@@ -481,3 +481,4 @@ export const BarcodeScannerResultJSON: React.FC<BarcodeScannerResultJSONProps> =
 };
 
 BarcodeScannerResultJSON.displayName = "BarcodeScannerResultJSON";
+

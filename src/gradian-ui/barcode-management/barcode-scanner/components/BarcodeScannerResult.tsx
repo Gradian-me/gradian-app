@@ -8,9 +8,9 @@ import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
 import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-utils";
 import { useLanguageStore } from "@/stores/language.store";
 import { isValidUrl, safeLinkHref } from "../utils/sanitize";
-import { GS1Badge } from "./GS1Badge";
-import { BarcodeCanvas } from "@/gradian-ui/form-builder/form-elements";
-import { isGS1Valid } from "../utils/gs1-utils";
+import { GS1Badge } from "@/gradian-ui/barcode-management/gs1-management";
+import { BarcodeCanvas } from "@/gradian-ui/barcode-management/barcode-generator";
+import { isGS1Valid } from "@/gradian-ui/barcode-management/gs1-management";
 import type { BarcodeScannerResultProps } from "../types";
 
 export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
@@ -101,7 +101,9 @@ export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
           <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
             GS1 DataMatrix
           </span>
-          <BarcodeCanvas value={value} type="datamatrix" />
+          <div className="bg-white rounded-xl p-2 flex items-center justify-center shadow-md">
+            <BarcodeCanvas value={value} type="datamatrix" />
+          </div>
         </div>
       )}
     </div>
@@ -109,3 +111,4 @@ export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
 };
 
 BarcodeScannerResult.displayName = "BarcodeScannerResult";
+

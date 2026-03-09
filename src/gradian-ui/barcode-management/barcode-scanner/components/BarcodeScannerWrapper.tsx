@@ -33,7 +33,7 @@ import type {
   ScanMode,
 } from "../types";
 
-// â”€â”€â”€ ZXing format mapping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ——— ZXing format mapping ————————————————————————————————————————————————
 /** Map our BarcodeFormat to @yudiel/react-qr-scanner format strings. */
 const OUR_FORMAT_TO_LIBRARY: Record<BarcodeFormat, string[]> = {
   Code128: ["code_128"],
@@ -573,7 +573,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       "flex flex-col items-center justify-center gap-4 px-4",
       isDialogLayout ? "flex-1 py-6" : "py-6"
     )}>
-      <div className="flex flex-col items-center gap-1 text-center">
+      <div className="flex flex-col items-center gap-1 textcenter">
         <div className="w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center mb-1">
           <svg className="w-6 h-6 text-violet-600 dark:text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
@@ -808,3 +808,4 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
 };
 
 BarcodeScannerWrapper.displayName = "BarcodeScannerWrapper";
+

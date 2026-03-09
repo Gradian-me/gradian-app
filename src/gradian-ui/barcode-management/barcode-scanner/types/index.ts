@@ -144,3 +144,4 @@ export interface BarcodeScannerResultJSONProps {
    */
   receiptOptions?: import("@/gradian-ui/printout").ReceiptDocOptions;
 }
+

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { cn } from "../../../shared/utils";
+import { cn } from "@/gradian-ui/shared/utils";
 
 export type BarcodeCanvasType = "barcode" | "datamatrix";
 
@@ -33,14 +33,20 @@ export const BarcodeCanvas: React.FC<BarcodeCanvasProps> = ({ value, type, class
     if (!isDatamatrix || !value || typeof window === "undefined") return;
     let cancelled = false;
 
+    // Normalise GS1 group separator: replace textual aliases with actual ASCII 29 (GS)
+    const GS = "\x1D";
+    const normalizedText = value
+      .replace(/\\F/g, GS)
+      .replace(/<GS>/g, GS);
+
     const run = async () => {
       try {
         const bwipjs = await import("bwip-js/browser");
         if (cancelled) return;
-        const bcid = value.includes("(") ? "gs1datamatrix" : "datamatrix";
+        const bcid = normalizedText.includes("(") ? "gs1datamatrix" : "datamatrix";
         const svg = bwipjs.toSVG({
           bcid,
-          text: value,
+          text: normalizedText,
           scale: 2,
           height: 15,
           width: 15,

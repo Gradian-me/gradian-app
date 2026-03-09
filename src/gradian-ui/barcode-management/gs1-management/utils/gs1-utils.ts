@@ -21,10 +21,12 @@ export interface GS1ParseResult {
 const FNC_CHAR = String.fromCharCode(29);
 
 /**
- * Literal aliases that should be treated as the FNC1 / GS (group separator).
- * - "\\F"  : common escape from some scanners / test tools
- * - "<GS>" : textual placeholder for the GS control character
- * NOTE: the actual ASCII 29 character is already handled via `FNC_CHAR`.
+ * Literal aliases that should be treated as the FNC1 / GS (group separator) when *parsing* input.
+ * These are common escape forms produced by scanners or test tools; they are all normalised to
+ * the real ASCII 29 GS character internally.
+ *
+ * NOTE: this only affects how we parse inbound strings; the generator still emits the real GS
+ * character (0x1D) when rendering DataMatrix.
  */
 const FNC1_ALIASES: readonly string[] = ["\\F", "<GS>"];
 
@@ -909,3 +911,4 @@ export function isGS1Valid(barcode: string): boolean {
     return false;
   }
 }
+
