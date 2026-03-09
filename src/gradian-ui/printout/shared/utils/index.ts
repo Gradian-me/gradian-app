@@ -1,6 +1,9 @@
 // Shared utils across printout features.
-export { printElementAsImage } from "./print-element-as-image";
+export { printElementAsImage, downloadElementAsImage, captureElementAsDataUrl } from "./print-element-as-image";
 export type {
   PrintElementAsImageOptions,
+  DownloadElementAsImageOptions,
+  CaptureElementAsDataUrlOptions,
   PrintCaptureQuality,
+  PrintExportType,
 } from "./print-element-as-image";

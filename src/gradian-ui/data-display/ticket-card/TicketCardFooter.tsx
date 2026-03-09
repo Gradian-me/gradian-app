@@ -36,7 +36,7 @@ const DashedLine = () => (
 const BARCODE_CONTAINER_CLASS =
   "flex justify-center items-center bg-white p-2 rounded-xl mx-auto";
 
-/** Client-only barcode/DataMatrix via bwip-js to avoid SSR. */
+/** Client-only barcode/DataMatrix via bwip-js to avoid SSR. DataMatrix uses toSVG for square output; barcode uses toCanvas. */
 function BwipBarcode({
   value,
   type,
@@ -47,9 +47,46 @@ function BwipBarcode({
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
 }) {
   const [error, setError] = useState<string | null>(null);
+  const [svgDataUrl, setSvgDataUrl] = useState<string | null>(null);
 
+  const isDatamatrix = type === "datamatrix";
+
+  // DataMatrix: use toSVG so the symbol is natively square (no canvas aspect-ratio issues).
   useEffect(() => {
-    if (!value || !canvasRef.current || typeof window === "undefined") return;
+    if (!isDatamatrix || !value || typeof window === "undefined") return;
+    let cancelled = false;
+
+    const run = async () => {
+      try {
+        const bwipjs = await import("bwip-js/browser");
+        if (cancelled) return;
+        const bcid = value.includes("(") ? "gs1datamatrix" : "datamatrix";
+        const svg = bwipjs.toSVG({
+          bcid,
+          text: value,
+          scale: 2,
+          height: 10,
+          includetext: false,
+          backgroundcolor: "FFFFFF"
+        });
+        if (cancelled) return;
+        const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        setSvgDataUrl(dataUrl);
+        setError(null);
+      } catch (e) {
+        if (!cancelled) setError((e as Error).message);
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [value, isDatamatrix]);
+
+  // Barcode: use toCanvas as before.
+  useEffect(() => {
+    if (isDatamatrix || !value || !canvasRef.current || typeof window === "undefined") return;
     let cancelled = false;
 
     const draw = async () => {
@@ -57,38 +94,14 @@ function BwipBarcode({
         const bwipjs = await import("bwip-js/browser");
         const canvas = canvasRef.current;
         if (!canvas || cancelled) return;
-        const isDatamatrix = type === "datamatrix";
-        // Use gs1datamatrix (square by default) for GS1-style data; otherwise datamatrix with format square
-        const bcid =
-          type === "datamatrix"
-            ? value.includes("(")
-              ? "gs1datamatrix"
-              : "datamatrix"
-            : "code128";
         bwipjs.toCanvas(canvas, {
-          bcid,
+          bcid: "code128",
           text: value,
-          scale: isDatamatrix ? 2 : 2,
+          scale: 2,
           height: 10,
-          includetext: false,
+          includetext: true,
           backgroundcolor: "FFFFFF",
-          ...(bcid === "datamatrix" ? { format: "square" as const } : {}),
         });
-        if (isDatamatrix && canvas.width !== canvas.height) {
-          const side = Math.max(canvas.width, canvas.height);
-          const squareCanvas = document.createElement("canvas");
-          squareCanvas.width = side;
-          squareCanvas.height = side;
-          const ctx = squareCanvas.getContext("2d");
-          if (ctx) {
-            ctx.fillStyle = "#FFFFFF";
-            ctx.fillRect(0, 0, side, side);
-            ctx.drawImage(canvas, (side - canvas.width) / 2, (side - canvas.height) / 2);
-            canvas.width = side;
-            canvas.height = side;
-            canvas.getContext("2d")?.drawImage(squareCanvas, 0, 0);
-          }
-        }
         setError(null);
       } catch (e) {
         if (!cancelled) setError((e as Error).message);
@@ -99,7 +112,7 @@ function BwipBarcode({
     return () => {
       cancelled = true;
     };
-  }, [value, type, canvasRef]);
+  }, [value, isDatamatrix, canvasRef]);
 
   if (error) {
     return (
@@ -111,32 +124,33 @@ function BwipBarcode({
     );
   }
 
-  const isDatamatrix = type === "datamatrix";
-  const canvas = (
-    <canvas
-      ref={canvasRef}
-      className={cn(
-        "h-auto",
-        isDatamatrix
-          ? "w-full h-full max-w-[80px] max-h-[80px] object-contain object-center"
-          : "max-w-full"
-      )}
-      aria-label={`${type} barcode for ${value}`}
-      style={
-        isDatamatrix
-          ? { width: "100%", height: "100%", objectFit: "contain" as const }
-          : { maxHeight: 60 }
-      }
-    />
-  );
   if (isDatamatrix) {
     return (
       <div className="w-[80px] h-[80px] flex items-center justify-center shrink-0" aria-hidden>
-        {canvas}
+        {svgDataUrl ? (
+          <img
+            src={svgDataUrl}
+            alt=""
+            role="img"
+            aria-label={`DataMatrix barcode for ${value}`}
+            className="w-full h-full max-w-[80px] max-h-[80px] object-contain object-center"
+            style={{ width: "100%", height: "100%", objectFit: "contain" }}
+          />
+        ) : (
+          <div className="w-full h-full bg-white dark:bg-gray-800 rounded animate-pulse" />
+        )}
       </div>
     );
   }
-  return canvas;
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="h-auto max-w-full"
+      aria-label={`barcode for ${value}`}
+      style={{ maxHeight: 60 }}
+    />
+  );
 }
 
 export function TicketCardFooter({

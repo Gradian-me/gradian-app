@@ -1,15 +1,30 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useState } from "react";
+import dynamic from "next/dynamic";
+import { QrCode, Loader2 } from "lucide-react";
 import { cn } from "@/gradian-ui/shared/utils";
-import { PrintElementButton } from "@/gradian-ui/printout";
+import { PrintElementButton, DownloadElementButton, captureElementAsDataUrl } from "@/gradian-ui/printout";
+import { Button } from "@/components/ui/button";
+
+const QRCodeDialog = dynamic(
+  () =>
+    import("@/gradian-ui/layout/components/QRCodeDialog").then((mod) => ({
+      default: mod.QRCodeDialog,
+    })),
+  { ssr: false }
+);
 
 export type TicketCardOrientation = "portrait" | "landscape";
 
+/** CSS mask cutout: notch radius and vertical position (e.g. "50%" or "120px"). */
+const NOTCH_RADIUS_PX = 16;
+const NOTCH_Y_DEFAULT = "50%";
+
 export interface TicketCardWrapperProps extends React.HTMLAttributes<HTMLDivElement> {
-  /** When true, show left/right circular cut-outs for ticket strip effect. Disable in modals if it clashes. */
+  /** When true, punch left/right circular notches via CSS mask for ticket strip effect. Disable in modals if it clashes. */
   showCutouts?: boolean;
-  /** Tailwind class for the cut-out circles so they match the background behind the ticket (e.g. "bg-white dark:bg-gray-800"). */
+  /** Tailwind class for the cut-out circles so they match the background behind the ticket (e.g. "bg-white dark:bg-gray-800"). Unused when using mask cutouts; kept for API compatibility. */
   cutoutClassName?: string;
   /** When true, show a print button (top right) that captures the ticket as PNG and opens the print dialog. Button is hidden when printing. */
   showPrintButton?: boolean;
@@ -22,6 +37,25 @@ function setRef<T>(ref: React.Ref<T> | null | undefined, value: T | null) {
   else if (ref) (ref as React.MutableRefObject<T | null>).current = value;
 }
 
+/**
+ * Inline mask style that punches two circles out of the card edges.
+ * Layers: [left circle, right circle, full fill]; composite excludes circles from full so mask is visible everywhere except the notches.
+ */
+function getCutoutMaskStyle(): React.CSSProperties {
+  const notch = `${NOTCH_RADIUS_PX}px`;
+  const ny = NOTCH_Y_DEFAULT;
+  const leftRadial = `radial-gradient(circle ${notch} at 0 ${ny}, black 99%, transparent 100%)`;
+  const rightRadial = `radial-gradient(circle ${notch} at 100% ${ny}, black 99%, transparent 100%)`;
+  const full = "linear-gradient(black, black)";
+  const maskImage = `${leftRadial}, ${rightRadial}, ${full}`;
+  return {
+    WebkitMaskImage: maskImage,
+    WebkitMaskComposite: "destination-out, destination-out",
+    maskImage,
+    maskComposite: "exclude, exclude",
+  } as React.CSSProperties;
+}
+
 const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProps>(
   (
     {
@@ -31,11 +65,16 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
       showPrintButton = true,
       orientation = "portrait",
       children,
+      style,
       ...props
     },
     ref
   ) => {
     const internalRef = React.useRef<HTMLDivElement>(null);
+    const [qrDialogOpen, setQrDialogOpen] = useState(false);
+    const [qrValue, setQrValue] = useState<string>("");
+    const [qrLoading, setQrLoading] = useState(false);
+
     const setRefs = React.useCallback(
       (el: HTMLDivElement | null) => {
         (internalRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
@@ -43,6 +82,31 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
       },
       [ref]
     );
+
+    const handleQrClick = useCallback(async () => {
+      const el = internalRef.current;
+      if (!el || qrLoading) return;
+      setQrLoading(true);
+      try {
+        const dataUrl = await captureElementAsDataUrl(el, {
+          exportType: "canvas",
+          quality: "draft",
+          maxDimension: 100,
+          onError: (err) => {
+            console.error("[TicketCardWrapper] QR capture failed:", err);
+          },
+        });
+        setQrValue(dataUrl);
+        setQrDialogOpen(true);
+      } catch {
+        // Error already reported via onError; ensure loading ends
+      } finally {
+        setQrLoading(false);
+      }
+    }, [qrLoading]);
+
+    const maskStyle = showCutouts ? getCutoutMaskStyle() : undefined;
+    const combinedStyle = style ?? maskStyle ? { ...style, ...maskStyle } : undefined;
     return (
       <div
         ref={setRefs}
@@ -54,15 +118,43 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
           "animate-in fade-in-0 zoom-in-95 duration-300",
           className
         )}
+        style={combinedStyle}
         data-orientation={orientation}
+        data-cutouts={showCutouts ? "mask" : "none"}
         {...props}
       >
         {showPrintButton && (
-          <div className="absolute top-2 right-2 z-10">
-            <PrintElementButton
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+            <Button
+              type="button"
+              variant="secondary"
+              size="icon"
+              onClick={handleQrClick}
+              disabled={qrLoading}
+              className="print:hidden h-8 w-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 hover:bg-gray-100 dark:hover:bg-gray-700"
+              title="Show as QR code (scan to open image offline)"
+              aria-label={qrLoading ? "Loading QR code…" : "Show ticket as QR code"}
+            >
+              {qrLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+              ) : (
+                <QrCode className="h-4 w-4" aria-hidden />
+              )}
+            </Button>
+            <DownloadElementButton
               elementRef={internalRef}
+              exportType="canvas"
               size="icon"
               variant="secondary"
+              disabled={qrLoading}
+              className="h-8 w-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 hover:bg-gray-100 dark:hover:bg-gray-700"
+            />
+            <PrintElementButton
+              elementRef={internalRef}
+              exportType="canvas"
+              size="icon"
+              variant="secondary"
+              disabled={qrLoading}
               className="h-8 w-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 hover:bg-gray-100 dark:hover:bg-gray-700"
             />
           </div>
@@ -70,15 +162,31 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
         {showCutouts && (
           <>
             <div
-              className={cn("print:hidden absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full", cutoutClassName)}
+              className="pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full border border-gray-200 dark:border-gray-700 bg-transparent"
               aria-hidden
+              style={{
+                width: NOTCH_RADIUS_PX * 2,
+                height: NOTCH_RADIUS_PX * 2,
+                left: -NOTCH_RADIUS_PX,
+              }}
             />
             <div
-              className={cn("print:hidden absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full", cutoutClassName)}
+              className="pointer-events-none absolute top-1/2 -translate-y-1/2 rounded-full border border-gray-200 dark:border-gray-700 bg-transparent"
               aria-hidden
+              style={{
+                width: NOTCH_RADIUS_PX * 2,
+                height: NOTCH_RADIUS_PX * 2,
+                right: -NOTCH_RADIUS_PX,
+              }}
             />
           </>
         )}
+        <QRCodeDialog
+          value={qrValue}
+          isOpen={qrDialogOpen}
+          onOpenChange={setQrDialogOpen}
+          showGoToUrl={false}
+        />
         {children}
       </div>
     );

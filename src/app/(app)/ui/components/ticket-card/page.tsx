@@ -20,6 +20,8 @@ export default function TicketCardPage() {
     icon: 'Ticket',
   });
 
+  // Fixed date for "Date & Time" so server and client render the same (avoids hydration mismatch).
+  const demoDate = new Date('2026-03-09T08:40:00');
   const paymentItems = [
     { label: 'Ticket ID', value: 'TKT-8F2A-91' },
     {
@@ -35,7 +37,7 @@ export default function TicketCardPage() {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
-      }).format(new Date()).replace(',', ' •'),
+      }).format(demoDate).replace(',', ' •'),
     },
     { label: 'Card', value: '•••• 4242' },
   ];

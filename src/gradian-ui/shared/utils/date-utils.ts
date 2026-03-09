@@ -108,6 +108,15 @@ export function formatDateTime(date: Date | string, localeCode?: string | null):
 }
 
 /**
+ * Returns a filename-safe timestamp for "now" (or the given date), e.g. "2026-03-09_14-30-00".
+ * Use for export filenames like Gradian_Label_Export_{timestamp}.png.
+ */
+export function getExportTimestamp(date?: Date | string): string {
+  const d = date ? (typeof date === 'string' ? new Date(date) : date) : new Date();
+  return format(d, 'yyyy-MM-dd_HH-mm-ss');
+}
+
+/**
  * Formats a date for display (e.g., "December 10, 2024")
  */
 export function formatDate(date: Date | string, localeCode?: string | null): string {

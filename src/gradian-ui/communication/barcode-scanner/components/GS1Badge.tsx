@@ -88,7 +88,14 @@ export function GS1Badge({ barcodeLabel, className }: GS1BadgeProps) {
       const valueDisplay = expiryFriendly ? (
         <span className="block">
           {expiryFriendly.dateText}
-          <span className={cn("block text-xs mt-0.5", urgencyClass)}>
+          <span
+            className={cn(
+              "block text-xs mt-0.5 min-w-0 overflow-hidden text-ellipsis",
+              urgencyClass
+            )}
+            style={{ whiteSpace: "nowrap" }}
+            title={expiryFriendly.relativeText}
+          >
             {expiryFriendly.relativeText}
           </span>
         </span>
@@ -129,7 +136,11 @@ export function GS1Badge({ barcodeLabel, className }: GS1BadgeProps) {
       </button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          className="w-full h-full lg:max-w-2xl lg:max-h-[85vh] overflow-x-visible overflow-y-auto flex flex-col p-2 gap-0 bg-white dark:bg-gray-800"
+          overlayClassName="!z-[9998]"
+          className={cn(
+            "w-full h-full rounded-none lg:rounded-2xl lg:max-w-2xl lg:max-h-[85vh] overflow-x-visible overflow-y-auto flex flex-col p-2 gap-0 bg-white dark:bg-gray-800",
+            "!z-[9999] pt-10"
+          )}
           aria-describedby="gs1-dialog-description"
         >
           <DialogTitle className="sr-only">GS1 Application Identifiers</DialogTitle>

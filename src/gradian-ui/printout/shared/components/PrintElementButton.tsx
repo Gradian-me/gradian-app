@@ -5,17 +5,24 @@ import type { RefObject } from "react";
 import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/gradian-ui/shared/utils";
-import { printElementAsImage } from "../utils/print-element-as-image";
+import { printElementAsImage, type PrintExportType } from "../utils/print-element-as-image";
 
 export interface PrintElementButtonProps {
   /** Ref to the element to capture and print (e.g. ticket card root). */
   elementRef: RefObject<HTMLElement | null>;
+  /**
+   * Export method for print: "png" (default) or "canvas" (toCanvas then PNG; use for ticket/card).
+   * @default "png"
+   */
+  exportType?: PrintExportType;
   /** Optional class for the button. */
   className?: string;
   /** Optional label (default: "Print"). */
   label?: string;
   /** Called when print fails. */
   onError?: (error: Error) => void;
+  /** When true, button is disabled (e.g. while another action like QR capture is in progress). */
+  disabled?: boolean;
   /** Button variant/size - passed to Button. */
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
   size?: "default" | "sm" | "lg" | "icon";
@@ -27,9 +34,11 @@ export interface PrintElementButtonProps {
  */
 export function PrintElementButton({
   elementRef,
+  exportType = "png",
   className,
   label = "Print",
   onError,
+  disabled: disabledProp = false,
   variant = "outline",
   size = "sm",
 }: PrintElementButtonProps) {
@@ -42,6 +51,7 @@ export function PrintElementButton({
     try {
       await printElementAsImage(el, {
         quality: "normal",
+        exportType,
         onError: (err) => {
           onError?.(err);
         },
@@ -49,7 +59,7 @@ export function PrintElementButton({
     } finally {
       setPrinting(false);
     }
-  }, [elementRef, onError]);
+  }, [elementRef, exportType, onError]);
 
   return (
     <Button
@@ -57,7 +67,7 @@ export function PrintElementButton({
       variant={variant}
       size={size}
       onClick={handlePrint}
-      disabled={printing}
+      disabled={printing || disabledProp}
       className={cn("print:hidden", className)}
       title={label}
       aria-label={label}

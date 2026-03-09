@@ -15,10 +15,13 @@ export type {
   ReceiptDocOptions,
 } from "./printout-receipt";
 
-export { printElementAsImage } from "./shared/utils";
+export { printElementAsImage, downloadElementAsImage, captureElementAsDataUrl } from "./shared/utils";
 export type {
   PrintElementAsImageOptions,
+  DownloadElementAsImageOptions,
+  CaptureElementAsDataUrlOptions,
   PrintCaptureQuality,
+  PrintExportType,
 } from "./shared/utils";
-export { PrintElementButton } from "./shared/components";
-export type { PrintElementButtonProps } from "./shared/components";
+export { PrintElementButton, DownloadElementButton } from "./shared/components";
+export type { PrintElementButtonProps, DownloadElementButtonProps } from "./shared/components";
