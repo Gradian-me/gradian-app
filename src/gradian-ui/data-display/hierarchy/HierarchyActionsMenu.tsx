@@ -167,7 +167,12 @@ export const HierarchyActionsMenu: React.FC<HierarchyActionsMenuProps> = ({
   const squircleSizeOverride = '!h-8 !min-h-8 !w-8 !min-w-8';
   const squircleSizeOverrideBig = '!h-10 !min-h-10 !w-10 !min-w-10';
   const sizeClass = showBig ? squircleSizeOverrideBig : squircleSizeOverride;
-  const baseButtonClass = sizeClass;
+  const baseButtonClass = cn(
+    sizeClass,
+    'text-gray-500 dark:text-gray-300 hover:squircle-violet-50 hover:squircle-border-violet-200',
+    'dark:hover:squircle-violet-500/15 dark:hover:squircle-border-violet-500/40',
+    'hover:!text-violet-700 dark:hover:!text-violet-200'
+  );
   const destructiveButtonClass = cn(sizeClass, 'hover:squircle-red-50 hover:squircle-border-red-200 dark:hover:squircle-red-500/15 dark:hover:squircle-border-red-500/40 hover:!text-red-600 dark:hover:!text-red-400');
 
   const wrapProps = stopPropagation

@@ -8,9 +8,9 @@ import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
 import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-utils";
 import { useLanguageStore } from "@/stores/language.store";
 import { isValidUrl, safeLinkHref } from "../utils/sanitize";
-import { GS1Badge } from "@/gradian-ui/barcode-management/gs1-management";
+import { GS1Badge, isGS1Valid } from "@/gradian-ui/barcode-management/gs1-management";
+import { renderGs1ValueForDisplay } from "@/gradian-ui/data-display/ticket-card/TicketCardFooter";
 import { BarcodeCanvas } from "@/gradian-ui/barcode-management/barcode-generator";
-import { isGS1Valid } from "@/gradian-ui/barcode-management/gs1-management";
 import type { BarcodeScannerResultProps } from "../types";
 
 export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
@@ -29,6 +29,7 @@ export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
   const safeHref = useMemo(() => (isUrl ? safeLinkHref(value) : null), [value, isUrl]);
   const [copied, setCopied] = React.useState(false);
   const isGS1 = useMemo(() => isGS1Valid(value), [value]);
+  const gs1Display = useMemo(() => renderGs1ValueForDisplay(value), [value]);
 
   const handleCopy = async () => {
     try {
@@ -64,7 +65,7 @@ export const BarcodeScannerResult: React.FC<BarcodeScannerResultProps> = ({
         )}
         dir="auto"
       >
-        {value}
+        {gs1Display ?? value}
       </div>
 
       {/* URL link */}

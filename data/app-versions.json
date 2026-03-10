@@ -7358,5 +7358,23 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KK25J9N5KQF7FKNJBW9ES1LA",
+    "timestamp": "2026-03-10T00:00:00.000Z",
+    "version": "1.64.001",
+    "changes": [
+      {
+        "changeType": "refactor",
+        "description": "UPDATE: Refactored AI agent definitions in ai-agents.json to replace category fields with entityType objects for improved structure and consistency. Added new entity types in all-data.json for Builders & Development, Content Generator, Analysis & Research, Human Resources, Business & Process, Pharmaceutical & Life Sciences, General, Assistants, and Utilities. Enhanced API routes to support tenant filtering for AI agents and improved logging for lookup operations, ensuring better data handling and security. These changes collectively enhance the organization and functionality of the AI agent management system.",
+        "priority": "High",
+        "affectedDomains": [
+          "ai-builder",
+          "api",
+          "data",
+          "logging"
+        ]
+      }
+    ]
   }
 ]

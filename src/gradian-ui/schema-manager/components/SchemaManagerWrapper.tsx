@@ -521,7 +521,7 @@ export function SchemaManagerWrapper() {
               />
             </div>
             {hasMultipleGroups && (
-              <div className="border border-gray-300 dark:border-gray-500 rounded-xl h-10 flex items-center px-1 shrink-0">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl h-10 shadow-sm flex items-center px-1 shrink-0">
                 <ExpandCollapseControls
                   onExpandAll={handleExpandAll}
                   onCollapseAll={handleCollapseAll}
@@ -532,7 +532,7 @@ export function SchemaManagerWrapper() {
                 />
               </div>
             )}
-            <div className="border border-gray-300 dark:border-gray-500 rounded-xl h-10 flex items-center shrink-0">
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-xl h-10 shadow-sm flex items-center shrink-0">
               <ViewSwitcher
                 currentView={viewMode}
                 onViewChange={(v) => { if (v !== 'kanban') setViewMode(v); }}

@@ -127,6 +127,7 @@ export async function GET(request: NextRequest) {
     const agentIdsParam = searchParams.get('agentIds');
     const summary = searchParams.get('summary') === 'true';
     const nocache = searchParams.get('nocache') === 'true' || searchParams.get('refresh') === 'true';
+    const tenantId = searchParams.get('tenantId') || searchParams.get('tenant');
 
     // Load agents (bypass cache if nocache parameter is present)
     const agents = await loadAiAgents(!nocache);
@@ -137,6 +138,22 @@ export async function GET(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // When listing agents (no specific id/ids requested), optionally filter by tenant
+    const filterAgentsByTenant = (allAgents: any[]): any[] => {
+      if (!tenantId) {
+        return allAgents;
+      }
+      // Only include agents that either have no tenant restriction
+      // or explicitly include the requested tenant ID.
+      return allAgents.filter((agent: any) => {
+        if (!Array.isArray(agent.tenantIds) || agent.tenantIds.length === 0) {
+          // No tenant restriction configured on this agent
+          return false;
+        }
+        return agent.tenantIds.map((id: any) => String(id)).includes(tenantId);
+      });
+    };
 
     // If multiple agent IDs requested, return only those agents in the order they appear in the original array
     if (agentIdsParam) {
@@ -225,9 +242,10 @@ export async function GET(request: NextRequest) {
       });
     }
 
-      // If summary mode, return only essential fields for all agents (preserve order)
+    // If summary mode, return only essential fields for all agents (preserve order)
     if (summary) {
-      const summaryAgents = getSummaryAgents(agents);
+      const filteredAgents = filterAgentsByTenant(agents);
+      const summaryAgents = getSummaryAgents(filteredAgents);
       // getSummaryAgents uses map() which preserves array order
 
       return NextResponse.json({
@@ -246,13 +264,14 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Return all agents in the exact order they appear in the JSON file (preserve array index order)
+    // Return all (optionally tenant-filtered) agents in the exact order they appear in the JSON file (preserve array index order)
     // Agents are already in the correct order from the file, but we explicitly ensure no reordering
+    const filteredAgents = filterAgentsByTenant(agents);
     return NextResponse.json({
       success: true,
-      data: agents, // Already in correct order from JSON array
+      data: filteredAgents, // Already in correct order from JSON array
       meta: {
-        totalCount: agents.length,
+        totalCount: filteredAgents.length,
       },
     }, {
       headers: {

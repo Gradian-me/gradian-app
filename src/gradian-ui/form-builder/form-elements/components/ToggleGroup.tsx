@@ -19,6 +19,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { useLanguageStore } from '@/stores/language.store';
 import { getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function getOptionDisplayLabel(raw: unknown, lang: string | undefined, defaultLang: string): string {
   if (raw == null) return '';
@@ -433,7 +434,14 @@ const ToggleGroupComponent = forwardRef<FormElementRef, ToggleGroupProps>(
           </div>
         )}
         {isLoadingOptions ? (
-          <div className="text-xs text-gray-500 py-2">Loading options...</div>
+          <div className="py-2 flex flex-wrap gap-2">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <Skeleton
+                key={index}
+                className="h-7 w-20 rounded-full bg-gray-200 dark:bg-gray-700"
+              />
+            ))}
+          </div>
         ) : optionsError ? (
           <div className="text-xs text-red-600 py-2">{optionsError}</div>
         ) : (

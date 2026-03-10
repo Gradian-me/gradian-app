@@ -21,6 +21,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { useLanguageStore } from '@/stores/language.store';
 import { getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function getOptionDisplayLabel(raw: unknown, lang: string | undefined, defaultLang: string): string {
   if (raw == null) return '';
@@ -88,7 +89,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
     const referenceSchema = config?.referenceSchema;
     const referenceRelationTypeId = config?.referenceRelationTypeId;
     const referenceEntityId = config?.referenceEntityId;
-    
+
     // Extract targetSchema with defensive checks for production
     // Try multiple possible property names and handle empty strings
     // Process through dynamic context replacer to support templates like {{formData.resourceType}}
@@ -99,32 +100,32 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
       const configTargetSchemaDash = (config as any)?.['target-schema'];
       const configName = (config as any)?.name;
       const configId = (config as any)?.id;
-      
+
       const ts = configTargetSchema || configTargetSchemaUnderscore || configTargetSchemaDash;
-      
+
       if (!ts || String(ts).trim() === '') {
         return null;
       }
-      
+
       const rawTargetSchema = String(ts).trim();
-      
+
       // Process through dynamic context replacer to resolve templates like {{formData.resourceType}}
       const resolvedTargetSchema = replaceDynamicContext(rawTargetSchema, dynamicContext);
-      
+
       // Check if the result still contains unresolved templates (still has {{ and }})
       // If so, return null to prevent invalid schema fetches
       if (typeof resolvedTargetSchema === 'string' && resolvedTargetSchema.includes('{{') && resolvedTargetSchema.includes('}}')) {
         return null;
       }
-      
+
       // Return null for empty string, otherwise return the resolved value
       const result = typeof resolvedTargetSchema === 'string' && resolvedTargetSchema.trim() !== '' ? resolvedTargetSchema.trim() : null;
-      
+
       // Log in production to help debug issues
       if (process.env.NODE_ENV === 'production' && !result && (config as any)?.component === 'checkbox-list' && (configTargetSchema || configTargetSchemaUnderscore || configTargetSchemaDash)) {
         loggingCustom(LogType.CLIENT_LOG, 'warn', `[CheckboxList] targetSchema is null/empty for field: ${configName || configId}, targetSchema value: ${JSON.stringify(ts)}, resolved: ${JSON.stringify(resolvedTargetSchema)}, config keys: ${Object.keys(config || {}).join(', ')}`);
       }
-      
+
       return result;
     }, [config, dynamicContext]);
 
@@ -204,7 +205,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
     // Handle value - support both array of IDs and array of option objects
     // For backward compatibility, extract IDs if value contains objects
     const currentValueIds = extractIds(value);
-    
+
     const selectAllCheckboxRef = useRef<HTMLButtonElement>(null);
     const language = useLanguageStore((s) => s.language);
     const defaultLang = getDefaultLanguage();
@@ -212,13 +213,13 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
     // Get options from config if not provided directly, or use URL options
     const checkboxOptions: CheckboxListProps['options'] = effectiveSourceUrl
       ? urlOptions.map(opt => ({
-          id: opt.id,
-          label: (getOptionDisplayLabel(opt.label ?? opt.id, language ?? undefined, defaultLang) || opt.id) ?? '',
-          value: opt.value ?? opt.id,
-          disabled: opt.disabled,
-          icon: opt.icon,
-          color: opt.color,
-        }))
+        id: opt.id,
+        label: (getOptionDisplayLabel(opt.label ?? opt.id, language ?? undefined, defaultLang) || opt.id) ?? '',
+        value: opt.value ?? opt.id,
+        disabled: opt.disabled,
+        icon: opt.icon,
+        color: opt.color,
+      }))
       : options.length > 0
         ? options
         : ((config.options as CheckboxListProps['options']) ?? []);
@@ -258,7 +259,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
     // Get selectable options (not disabled)
     const selectableOptions = normalizedOptions.filter(opt => !opt.disabled);
     const selectableOptionIds = selectableOptions.map(opt => opt.id);
-    
+
     // Helper to convert IDs to option objects for saving
     const convertIdsToOptionObjects = React.useCallback((ids: string[]): NormalizedOption[] => {
       return ids.map((id: string) => {
@@ -276,7 +277,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
         return { id, label: id };
       });
     }, [normalizedOptions]);
-    
+
     // Calculate select all state using IDs
     const selectedSelectableCount = selectableOptionIds.filter(id => currentValueIds.includes(id)).length;
     const isAllSelected = selectableOptions.length > 0 && selectedSelectableCount === selectableOptions.length;
@@ -397,48 +398,7 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
             </Label>
           </div>
         )}
-        {isLoadingOptions ? (
-          <div className="text-sm text-gray-500 py-2">Loading options...</div>
-        ) : optionsError ? (
-          <div className="text-xs text-red-600 py-2">{optionsError}</div>
-        ) : (
-          <div className={cn(
-            "grid gap-2",
-            "grid-cols-1 md:grid-cols-2"
-          )}>
-            {normalizedOptions.map((option) => {
-            const isChecked = currentValueIds.includes(option.id);
-            const optionId = `${fieldName}-${option.id}`;
 
-            return (
-              <div key={option.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={optionId}
-                  name={fieldName}
-                  checked={isChecked}
-                  onCheckedChange={(checked) => handleCheckedChange(option, checked as boolean)}
-                  onBlur={onBlur}
-                  onFocus={onFocus}
-                  disabled={disabled || option.disabled}
-                  className={cn(
-                    error && "border-red-500 focus-visible:ring-red-500"
-                  )}
-                />
-                <Label
-                  htmlFor={optionId}
-                  className={cn(
-                    'text-sm font-normal cursor-pointer',
-                    error ? 'text-red-700' : 'text-gray-700',
-                    (disabled || option.disabled) && 'opacity-50 cursor-not-allowed'
-                  )}
-                >
-                  {getOptionDisplayLabel(option.label ?? option.id, language ?? undefined, defaultLang)}
-                </Label>
-              </div>
-            );
-          })}
-          </div>
-        )}
         {error && (
           <p className="text-sm text-red-600" role="alert">
             {error}
@@ -446,6 +406,56 @@ export const CheckboxList = forwardRef<FormElementRef, CheckboxListProps>(
         )}
         {config.description && (
           <p className="text-xs text-gray-500">{config.description}</p>
+        )}
+        
+        {isLoadingOptions ? (
+          <div className="py-2 space-y-2">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <Skeleton className="h-4 w-4 rounded" />
+                <Skeleton className="h-3 w-32" />
+              </div>
+            ))}
+          </div>
+        ) : optionsError ? (
+          <div className="text-xs text-red-600 py-2">{optionsError}</div>
+        ) : (
+          <div className={cn(
+            "grid gap-2 mt-2",
+            "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+          )}>
+            {normalizedOptions.map((option) => {
+              const isChecked = currentValueIds.includes(option.id);
+              const optionId = `${fieldName}-${option.id}`;
+
+              return (
+                <div key={option.id} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={optionId}
+                    name={fieldName}
+                    checked={isChecked}
+                    onCheckedChange={(checked) => handleCheckedChange(option, checked as boolean)}
+                    onBlur={onBlur}
+                    onFocus={onFocus}
+                    disabled={disabled || option.disabled}
+                    className={cn(
+                      error && "border-red-500 focus-visible:ring-red-500"
+                    )}
+                  />
+                  <Label
+                    htmlFor={optionId}
+                    className={cn(
+                      'text-sm font-normal cursor-pointer m-0!',
+                      error ? 'text-red-700' : 'text-gray-700',
+                      (disabled || option.disabled) && 'opacity-50 cursor-not-allowed'
+                    )}
+                  >
+                    {getOptionDisplayLabel(option.label ?? option.id, language ?? undefined, defaultLang)}
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     );

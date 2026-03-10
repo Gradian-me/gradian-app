@@ -51,7 +51,7 @@ const AiAgentCardComponent = memo(({ agent, index, onEdit, onView, onDelete }: A
       }}
     >
       <Card
-        className="group relative flex h-full flex-col overflow-hidden border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300/80 hover:shadow-lg border-blue-100/80 bg-gradient-to-br from-blue-50/90 via-white to-cyan-50/80 dark:border-slate-700/80 dark:bg-gradient-to-br dark:from-slate-900/85 dark:via-slate-900/80 dark:to-zinc-900/80"
+        className="group relative flex h-full flex-col overflow-hidden rounded-xl border shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300/80 hover:shadow-lg border-violet-100/80 bg-linear-to-br from-violet-50/90 via-white to-indigo-50/80 dark:border-slate-700/80 dark:bg-linear-to-br dark:from-slate-900/85 dark:via-slate-900/80 dark:to-zinc-900/80"
       >
         <div
           className="pointer-events-none absolute inset-0 opacity-20 dark:opacity-10"
@@ -62,13 +62,13 @@ const AiAgentCardComponent = memo(({ agent, index, onEdit, onView, onDelete }: A
           }}
         />
         <CardHeader className="relative z-10 pb-3 pt-4 px-4">
-          <div className="flex items-start justify-between">
+          <div className="flex items-start">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1.5">
                 {agent.icon && (
-                  <IconRenderer 
-                    iconName={agent.icon} 
-                    className="h-5 w-5 shrink-0 text-blue-600 dark:text-blue-300" 
+                  <IconRenderer
+                    iconName={agent.icon}
+                    className="h-5 w-5 shrink-0 text-violet-600 dark:text-violet-300"
                   />
                 )}
                 <CardTitle className="text-base font-semibold truncate text-gray-900 dark:text-gray-100">
@@ -80,35 +80,6 @@ const AiAgentCardComponent = memo(({ agent, index, onEdit, onView, onDelete }: A
                   {agent.description}
                 </p>
               )}
-            </div>
-            <div className="flex gap-0.5 ms-2 shrink-0">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onView(agent)}
-                className="h-7 w-7 rounded-full text-gray-500 hover:text-blue-700 hover:bg-blue-50/80 dark:text-gray-400 dark:hover:text-blue-200 dark:hover:bg-blue-500/10"
-                title="View Agent"
-              >
-                <Sparkles className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onEdit(agent)}
-                className="h-7 w-7 rounded-full text-gray-500 hover:text-blue-700 hover:bg-blue-50/80 dark:text-gray-400 dark:hover:text-blue-200 dark:hover:bg-blue-500/10"
-                title="Edit Agent"
-              >
-                <PencilRuler className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onDelete(agent)}
-                className="h-7 w-7 rounded-full text-red-600 hover:text-red-700 hover:bg-red-50/80"
-                title="Delete Agent"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </Button>
             </div>
           </div>
         </CardHeader>
@@ -124,28 +95,58 @@ const AiAgentCardComponent = memo(({ agent, index, onEdit, onView, onDelete }: A
               {preloadRoutesCount > 0 && (
                 <div className="flex items-center gap-1.5">
                   <Sparkles className="h-3.5 w-3.5" />
-                  <span>{preloadRoutesCount} Routes</span>
+                  <span>
+                    {preloadRoutesCount}{' '}
+                    {preloadRoutesCount === 1 ? 'RAG' : 'RAGs'}
+                  </span>
                 </div>
               )}
             </div>
           </CardContent>
         )}
-        {(agent.model || agent.requiredOutputFormat) && (
-          <CardContent className="relative z-10 pt-0 px-4 pb-4 mt-auto">
-            <div className="flex items-center justify-end gap-2">
+        <CardContent className="relative z-10 pt-0 px-4 pb-4 mt-auto">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
               {agent.model && (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] px-1.5 py-0.5 bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300"
+                >
                   {agent.model}
                 </Badge>
               )}
-              {agent.requiredOutputFormat && (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300">
-                  {agent.requiredOutputFormat}
-                </Badge>
-              )}
             </div>
-          </CardContent>
-        )}
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onView(agent)}
+                className="h-7 w-7 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:text-violet-200 dark:hover:bg-violet-500/10"
+                title="View Agent"
+              >
+                <Sparkles className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onEdit(agent)}
+                className="h-7 w-7 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:text-violet-200 dark:hover:bg-violet-500/10"
+                title="Edit Agent"
+              >
+                <PencilRuler className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onDelete(agent)}
+                className="h-7 w-7 rounded-full text-red-600 hover:text-red-700 hover:bg-red-50/80"
+                title="Delete Agent"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
       </Card>
     </motion.div>
   );
@@ -184,7 +185,7 @@ export function AiAgentCardSkeletonGrid({ count = 6 }: AiAgentCardSkeletonGridPr
             ease: 'easeOut',
           }}
         >
-          <div className="h-32 rounded-xl border border-blue-100/70 bg-gradient-to-br from-blue-50/70 via-white to-cyan-50/70 shadow-sm dark:border-slate-700/80 dark:bg-gradient-to-br dark:from-slate-900/85 dark:via-slate-900/80 dark:to-zinc-900/80 animate-pulse" />
+          <div className="h-32 rounded-xl border border-violet-100/70 bg-linear-to-br from-violet-50/70 via-white to-indigo-50/70 shadow-sm dark:border-slate-700/80 dark:bg-linear-to-br dark:from-slate-900/85 dark:via-slate-900/80 dark:to-zinc-900/80 animate-pulse" />
         </motion.div>
       ))}
     </div>

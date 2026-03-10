@@ -57,6 +57,11 @@ export interface UseOptionsFromUrlResult {
   refetch: () => Promise<void>;
 }
 
+// Simple in-memory cache to avoid duplicate network requests for the same URL.
+// Caches the raw API response per fully-resolved URL, so each hook instance can
+// still apply its own columnMap/transform on top of the shared payload.
+const optionsResponseCache = new Map<string, Promise<any>>();
+
 /**
  * Hook to fetch options from a URL and normalize them
  * 
@@ -118,10 +123,18 @@ export function useOptionsFromUrl({
           }
         });
         
-        // Add 'id' as the last parameter if it exists
+        // Add 'id' as the last parameter if it exists.
+        // If an array is provided, join into a single comma-separated value so the
+        // backend can resolve all ids in one pass: id=ID1,ID2,ID3
         if (idValue !== undefined && idValue !== null) {
           if (Array.isArray(idValue)) {
-            (idValue as string[]).forEach((v: string) => params.append('id', v));
+            const csv = (idValue as string[])
+              .map((v: string) => v.trim())
+              .filter((v: string) => v.length > 0)
+              .join(',');
+            if (csv) {
+              params.append('id', csv);
+            }
           } else if (typeof idValue === 'string') {
             params.append('id', idValue);
           }
@@ -131,7 +144,14 @@ export function useOptionsFromUrl({
         url = `${sourceUrl}${separator}${params.toString()}`;
       }
 
-      const response = await apiRequest<any>(url, { disableCache: true });
+      // Use per-URL cache so multiple hooks with the same URL share one request.
+      let responsePromise = optionsResponseCache.get(url);
+      if (!responsePromise) {
+        responsePromise = apiRequest<any>(url, { disableCache: true });
+        optionsResponseCache.set(url, responsePromise);
+      }
+
+      const response = await responsePromise;
 
       if (response.success && (response.data || columnMap)) {
         // Extract items using column mapping if provided

@@ -3,10 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Plus, RefreshCw, Bot } from 'lucide-react';
+import { Plus, RefreshCw, Bot, ChevronDown, ChevronRight } from 'lucide-react';
 import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { AiAgentCardGrid, AiAgentCardSkeletonGrid } from './AiAgentCardGrid';
 import { AiAgentListView } from './AiAgentListView';
@@ -22,19 +23,25 @@ import {
 } from '@/gradian-ui/form-builder/form-elements';
 import { MessageBox } from '@/gradian-ui/layout/message-box';
 import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
+import { HierarchyExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { useAiAgentManagerPage } from '../../hooks/useAiAgentManagerPage';
 import { AiAgent } from '../../types';
 import { AiPromptHistory } from '@/domains/ai-prompts';
+import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 
 export function AiAgentManagerWrapper() {
   const router = useRouter();
   const BackIcon = useBackIcon();
   const [activeTab, setActiveTab] = useState('agents');
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
   const {
     loading,
     refreshing,
     searchQuery,
     setSearchQuery,
+    selectedEntityTypeId,
+    setSelectedEntityTypeId,
+    availableEntityTypes,
     viewMode,
     setViewMode,
     filteredAgents,
@@ -62,6 +69,61 @@ export function AiAgentManagerWrapper() {
     }
     return result;
   };
+  const entityTypeMetaById = useMemo(
+    () =>
+      new Map(
+        availableEntityTypes.map((t: any) => [
+          t.id,
+          { id: t.id, label: t.label, icon: t.icon, color: t.color },
+        ]),
+      ),
+    [availableEntityTypes],
+  );
+
+  // Group agents by entity type label (fallback to "Other")
+  const groupedAgents = useMemo(() => {
+    const groups = new Map<
+      string,
+      { id: string; label: string; icon?: string; color?: string; agents: AiAgent[] }
+    >();
+    filteredAgents.forEach((agent) => {
+      const typeId = agent.entityType?.id;
+      const meta = typeId ? entityTypeMetaById.get(typeId) : undefined;
+      const label = meta?.label || agent.entityType?.label || 'Other';
+      const id = meta?.id || typeId || `__${label.replace(/\s+/g, '_').toLowerCase()}__`;
+      if (!groups.has(id)) {
+        groups.set(id, {
+          id,
+          label,
+          icon: meta?.icon,
+          color: meta?.color,
+          agents: [],
+        });
+      }
+      groups.get(id)!.agents.push(agent);
+    });
+    return Array.from(groups.values()).sort((a, b) => a.label.localeCompare(b.label));
+  }, [filteredAgents, entityTypeMetaById]);
+
+  const currentGroupIds = useMemo(
+    () => groupedAgents.map((g) => g.id),
+    [groupedAgents],
+  );
+
+  const hasMultipleGroups =
+    currentGroupIds.length > 1 ||
+    (currentGroupIds.length === 1 && currentGroupIds[0] !== '__other__');
+
+  const handleToggleGroup = (id: string) =>
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+
+  const handleExpandAllGroups = () => setCollapsedGroups(new Set());
+  const handleCollapseAllGroups = () => setCollapsedGroups(new Set(currentGroupIds));
+
 
   const handleViewChange = (view: 'grid' | 'list' | 'table' | 'hierarchy' | 'kanban') => {
     // Only accept valid view modes, ignore hierarchy
@@ -151,22 +213,61 @@ export function AiAgentManagerWrapper() {
           </FormTabsList>
 
           <FormTabsContent value="agents" className="space-y-4 mt-4">
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center flex-wrap">
               <div className="flex-1">
                 <SearchInput
                   config={{ name: 'search', placeholder: 'Search AI agents...' }}
                   value={searchQuery}
                   onChange={setSearchQuery}
                   onClear={() => setSearchQuery('')}
-                  className="[&_input]:h-10"
+                  className="h-10"
                 />
               </div>
-              <div className="border border-gray-300 dark:border-gray-500 rounded-md h-10 flex items-center shrink-0">
+              <div className="w-full sm:w-56">
+                <Select
+                  value={selectedEntityTypeId}
+                  onValueChange={(value) => setSelectedEntityTypeId(value as typeof selectedEntityTypeId)}
+                >
+                  <SelectTrigger className="h-10 w-full">
+                    <SelectValue placeholder="Filter by type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All types</SelectItem>
+                    {availableEntityTypes.map((type: any) => (
+                      <SelectItem key={type.id} value={type.id}>
+                        <div className="flex items-center gap-2">
+                          {type.icon && (
+                            <IconRenderer
+                              iconName={type.icon}
+                              className="h-4 w-4"
+                            />
+                          )}
+                          <span>{type.label}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {hasMultipleGroups && (
+                <div className="bg-gray-50 dark:bg-gray-700 rounded-xl h-9 shadow-sm sm:h-10 flex items-center px-1 shrink-0">
+                  <HierarchyExpandCollapseControls
+                    onExpandAll={handleExpandAllGroups}
+                    onCollapseAll={handleCollapseAllGroups}
+                    expandDisabled={collapsedGroups.size === 0}
+                    collapseDisabled={collapsedGroups.size === currentGroupIds.length}
+                    variant="nobackground"
+                    size="icon"
+                  />
+                </div>
+              )}
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-xl h-9 shadow-sm sm:h-10 flex items-center shrink-0">
                 <ViewSwitcher
                   currentView={viewMode}
                   onViewChange={handleViewChange}
                   className="h-full"
                   showHierarchy={false}
+                  showOnly={['grid', 'list', 'table']}
                 />
               </div>
               <Button
@@ -197,29 +298,74 @@ export function AiAgentManagerWrapper() {
                   <AiAgentCardSkeletonGrid />
                 )
               ) : filteredAgents.length > 0 ? (
-                viewMode === 'table' ? (
-                  <AiAgentTableView
-                    agents={filteredAgents}
-                    onEdit={handleEditAgent}
-                    onView={handleViewAgent}
-                    onDelete={openDeleteDialog}
-                    isLoading={false}
-                  />
-                ) : viewMode === 'list' ? (
-                  <AiAgentListView
-                    agents={filteredAgents}
-                    onEdit={handleEditAgent}
-                    onView={handleViewAgent}
-                    onDelete={openDeleteDialog}
-                  />
-                ) : (
-                  <AiAgentCardGrid
-                    agents={filteredAgents}
-                    onEdit={handleEditAgent}
-                    onView={handleViewAgent}
-                    onDelete={openDeleteDialog}
-                  />
-                )
+                <div className="space-y-4">
+                  {groupedAgents.map((group) => {
+                    const isCollapsed = collapsedGroups.has(group.id);
+                    return (
+                      <div
+                        key={group.id}
+                        className="rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900/60 shadow-sm"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => handleToggleGroup(group.id)}
+                          className="w-full flex items-center gap-3 px-4 py-3 bg-slate-100 dark:bg-slate-800/60 hover:bg-violet-50 dark:hover:bg-slate-800 transition-colors text-left"
+                        >
+                          {isCollapsed ? (
+                            <ChevronRight className="h-4 w-4 text-gray-400 shrink-0" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 text-gray-400 shrink-0" />
+                          )}
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            {group.icon && (
+                              <IconRenderer
+                                iconName={group.icon}
+                                className="h-4 w-4"
+                                style={group.color ? { color: group.color } : undefined}
+                              />
+                            )}
+                            <span className="font-semibold text-sm text-gray-800 dark:text-gray-100 truncate">
+                              {group.label}
+                            </span>
+                          </div>
+                          <Badge
+                            variant="secondary"
+                            className="shrink-0 bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300"
+                          >
+                            {group.agents.length}
+                          </Badge>
+                        </button>
+                        {!isCollapsed && (
+                          <div className="p-4">
+                            {viewMode === 'table' ? (
+                              <AiAgentTableView
+                                agents={group.agents}
+                                onEdit={handleEditAgent}
+                                onView={handleViewAgent}
+                                onDelete={openDeleteDialog}
+                                isLoading={false}
+                              />
+                            ) : viewMode === 'list' ? (
+                              <AiAgentListView
+                                agents={group.agents}
+                                onEdit={handleEditAgent}
+                                onView={handleViewAgent}
+                                onDelete={openDeleteDialog}
+                              />
+                            ) : (
+                              <AiAgentCardGrid
+                                agents={group.agents}
+                                onEdit={handleEditAgent}
+                                onView={handleViewAgent}
+                                onDelete={openDeleteDialog}
+                              />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               ) : (
                 emptyState
               )}

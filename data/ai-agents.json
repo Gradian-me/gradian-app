@@ -3,7 +3,10 @@
     "id": "app-builder",
     "label": "App Builder",
     "icon": "Sparkles",
-    "category": "Builders & Development",
+    "entityType": {
+      "id": "01KAITYPE001BUILDERSDEV000001",
+      "label": "Builders & Development"
+    },
     "description": "Creates and modifies JSON database schemas for dynamic form builders. Use for: creating data models, form schemas, database structures, entity definitions, CRUD operations setup. Outputs JSON schema objects with fields, sections, relationships, and industry best practices. NOT for: code generation, process documentation, or data analysis.",
     "agentType": "chat",
     "requiredOutputFormat": "json",
@@ -92,7 +95,10 @@
     "id": "ai-agent-builder",
     "label": "AI Agent Builder",
     "icon": "Bot",
-    "category": "Builders & Development",
+    "entityType": {
+      "id": "01KAITYPE001BUILDERSDEV000001",
+      "label": "Builders & Development"
+    },
     "description": "Creates and configures new AI agent definitions in JSON format. Use for: building custom AI agents, configuring agent prompts, setting up agent capabilities, defining agent workflows. Outputs complete AI agent JSON configurations with system prompts, render components, and agent settings. NOT for: creating schemas, analyzing data, or generating content.",
     "agentType": "chat",
     "requiredOutputFormat": "json",
@@ -194,7 +200,10 @@
     "id": "professional-writing",
     "agentType": "chat",
     "label": "Professional Writing",
-    "category": "Content Generator",
+    "entityType": {
+      "id": "01KAITYPE002CONTENTGEN0000002",
+      "label": "Content Generator"
+    },
     "icon": "PenTool",
     "description": "Text processing and writing enhancement agent. Use for: text improvement, grammar correction, style adaptation (professional/casual), translation between languages, text summarization (1-2 paragraphs), text expansion, solution advisor recommendations. Outputs enhanced text in string format. NOT for: code review, data analysis, image generation, or schema creation.",
     "loadingTextSwitches": [
@@ -240,6 +249,11 @@
             "id": "summarizer",
             "label": "Summarizer",
             "description": "Deeply analyze the text to understand meaning, context, relationships, and key details. Synthesize and completely rephrase all content into one or two flowing narrative paragraphs that capture the essence, main ideas, and critical information. Output MUST be plain text only - NO headings, sections, bullet points, markdown, or structured formatting. Create continuous, natural-flowing prose that reads as if written from scratch based on comprehensive understanding, not a condensed or reorganized version of the original."
+          },
+          {
+            "id": "email-writer",
+            "label": "Email Writer",
+            "description": "Analyze the text and rewrite it as a complete, professional email. Automatically infer the appropriate greeting and closing, and structure the message with clear paragraphs, context, and calls to action. Maintain the original intent and key details while improving clarity, tone, and professionalism. Always include a suitable opening (e.g., “Dear [Name],” or “Hi [Name],”) and a courteous sign‑off with regards."
           }
         ],
         "validation": {
@@ -284,7 +298,6 @@
     "id": "search",
     "label": "Search Agent",
     "icon": "Search",
-    "category": "Analysis & Research",
     "description": "Performs web searches using configured search tools (parallel_ai-search, parallel_ai-search, parallel_ai-search-pro) and returns structured search results with titles, snippets, URLs, and dates. Use for: finding information, researching topics, gathering data from the web. Outputs structured search results in JSON format.",
     "agentType": "search",
     "requiredOutputFormat": "search-card",
@@ -324,7 +337,6 @@
     "agentType": "chat",
     "label": "Performance Manager",
     "icon": "Target",
-    "category": "Human Resources",
     "description": "HR performance management agent that generates employee KPI performance improvement plans. Use for: creating employee KPIs, performance reviews, employee development plans, HR performance metrics, role-based KPI generation. Outputs structured table format with KPIs, weights, formulas, and improvement notes. NOT for: process documentation, business process analysis, or general HR tasks.",
     "requiredOutputFormat": "table",
     "model": "gemini-2.5-flash",
@@ -498,7 +510,6 @@
     "agentType": "chat",
     "label": "HR Feedback Specialist",
     "icon": "MessageSquare",
-    "category": "Human Resources",
     "description": "HR feedback specialist agent that generates comprehensive employee performance feedback reports. Use for: creating employee feedback reports, performance reviews, constructive feedback, employee development feedback, HR performance assessments. Outputs structured feedback reports with clear expectations, strengths, gaps, ownership requirements, and improvement plans. NOT for: KPI generation, process documentation, or business process analysis.",
     "requiredOutputFormat": "string",
     "model": "gemini-3-flash-preview",
@@ -655,7 +666,6 @@
     "agentType": "chat",
     "label": "Process Analyst",
     "icon": "Workflow",
-    "category": "Business & Process",
     "description": "Business process documentation and analysis agent for GMP/ISO 9001 compliant process documentation. Use for: creating process documentation, process analysis, workflow documentation, process flow diagrams (Mermaid), process KPIs, RACI matrices, process risk assessment, GMP/ISO compliant procedures. Outputs comprehensive markdown process documents. NOT for: employee performance management, code review, or data analysis.",
     "requiredOutputFormat": "string",
     "model": "gemini-3-flash-preview",
@@ -830,7 +840,10 @@
     "id": "image-generator",
     "agentType": "image-generation",
     "label": "Image Generator",
-    "category": "Content Generator",
+    "entityType": {
+      "id": "01KAITYPE002CONTENTGEN0000002",
+      "label": "Content Generator"
+    },
     "icon": "Image",
     "description": "AI image generation agent that creates images from text prompts. Use for: generating images, creating visual content, image creation from descriptions, sketch generation, infographic creation, creative image design. Supports multiple image types: sketch, standard, infographic, 3D model, creative, iconic, editorial, comic-book. Outputs image files (PNG/URL format). NOT for: video generation, text processing, or data analysis.",
     "requiredOutputFormat": "image",
@@ -1203,7 +1216,10 @@
     "agentType": "chat",
     "label": "Graph Generator",
     "icon": "Network",
-    "category": "Content Generator",
+    "entityType": {
+      "id": "01KAITYPE002CONTENTGEN0000002",
+      "label": "Content Generator"
+    },
     "description": "Advanced graph generation agent that analyzes user prompts, compares with industry best practices, and creates comprehensive graph visualizations. Use for: root cause analysis (6M model), decision trees, relationship mapping, cause-and-effect analysis, entity relationship diagrams, organizational structures, dependency graphs, workflow diagrams, process flows, decision builder graphs. Analyzes industry context and applies best practices. Outputs graph data with nodes and edges that can be visualized. NOT for: image generation, video generation, or text processing.",
     "requiredOutputFormat": "graph",
     "model": "gpt-5-mini",
@@ -1244,7 +1260,10 @@
     "agentType": "video-generation",
     "label": "Video Generator",
     "icon": "Video",
-    "category": "Content Generator",
+    "entityType": {
+      "id": "01KAITYPE002CONTENTGEN0000002",
+      "label": "Content Generator"
+    },
     "description": "AI video generation agent that creates videos from text prompts. Use for: generating videos, creating video content, video creation from descriptions, video production. Supports reference images and custom durations (1-10 seconds). Outputs video files. NOT for: image generation, text processing, or data analysis.",
     "requiredOutputFormat": "video",
     "model": "veo-3.1-fast-generate-preview",
@@ -1341,7 +1360,10 @@
     "agentType": "chat",
     "label": "General Assistant",
     "icon": "Brain",
-    "category": "Assisstants",
+    "entityType": {
+      "id": "01KAITYPE008ASSISTANTS00008",
+      "label": "Assistants"
+    },
     "stream": true,
     "description": "Business intelligence and data analysis agent that analyzes preloaded system data comprehensively. Use for: analyzing existing schemas/data, business intelligence, system analysis, data relationship analysis, organizational insights, strategic recommendations, risk assessment of system data. Outputs comprehensive markdown analysis reports. NOT for: analyzing user-provided raw data, code review, or process documentation.",
     "requiredOutputFormat": "string",
@@ -1378,7 +1400,10 @@
     "agentType": "chat",
     "label": "Quality Assurance Analyst",
     "icon": "ShieldCheck",
-    "category": "Pharmaceutical & Life Sciences",
+    "entityType": {
+      "id": "01KAITYPE006PHARMLIFE000006",
+      "label": "Pharmaceutical & Life Sciences"
+    },
     "description": "Quality assurance deviation analysis agent using 6M root cause analysis model. Use for: analyzing quality deviations, change investigations, non-conformance analysis, CAPA generation, pharmaceutical quality issues, regulatory compliance assessment (GMP/GAMP/ISO/WHO), root cause analysis with 6M model. Outputs comprehensive deviation analysis reports with regulatory references. NOT for: process documentation, employee performance, or general data analysis.",
     "requiredOutputFormat": "string",
     "model": "gemini-3-flash-preview",
@@ -1416,11 +1441,13 @@
     }
   },
   {
-    "id": "code-review-agent",
     "agentType": "chat",
     "label": "Code Review Agent",
     "icon": "Code",
-    "category": "Analysis & Research",
+    "entityType": {
+      "id": "01KAITYPE003ANALYSISRES000003",
+      "label": "Analysis & Research"
+    },
     "description": "Code review and security analysis agent for programming code. Use for: code review, security vulnerability detection, code quality analysis, code refactoring recommendations, secure code rewriting, static code analysis, identifying code risks and anti-patterns. Outputs detailed code review reports with secure rewrites. NOT for: text processing, data analysis, or schema creation.",
     "requiredOutputFormat": "string",
     "model": "gemini-3-flash-preview",
@@ -1454,14 +1481,24 @@
       "icon": "CheckSquare",
       "route": "/api/code-review"
     },
-    "systemPrompt": "You are a Senior Code Reviewer, Security Auditor, and Language Specialist.\n\n## Your Core Responsibilities\n\n1. **Detect Programming Language**: Analyze the provided code and determine the programming language automatically.\n2. **Deep Static Analysis**: Perform in-depth analysis and identify logical flaws, security vulnerabilities, injection risks, race conditions, memory leaks, undefined behaviors, bad complexity, broken abstractions, poor error handling, and missing validation.\n3. **Impact Calculation**: Calculate the impact of each identified issue, emphasizing potential failures in a production environment.\n4. **Recommendations**: Offer specific, actionable recommendations, including alternative patterns for flawed approaches, and ensure rewritten code is secure, idiomatic, and optimized.\n\n## Review Output Structure Requirements\n\nWhen provided with code, your output MUST include: \n\n### A. Language Detection\n- State the detected programming language and explain the signals used for detection.\n\n### B. High-Level Assessment\n- Inferred purpose of the code.\n- Overall risks associated with the code.\n- Overall quality rating on an A-F scale.\n\n### C. Detailed Code Review\nFor each issue identified, provide:\n- **Issue Name**\n- **Severity**: Critical / High / Medium / Low\n- **Danger**: Why it is dangerous?\n- **Location**: Where exactly it appears?\n- **Impact**: Real-world impact of this issue.\n- **Solution**: How to fix it?\n\nEvaluate the following:\n- Security vulnerabilities\n- Performance bottlenecks\n- Logic errors\n- Anti-patterns\n- Code smells\n- Missing validation\n- Maintainability issues\n\n### D. Architectural & Design Pitfalls\nIdentify deeper systemic mistakes including but not limited to:\n- Wrong abstractions\n- Overcoupling\n- Misuse of resources\n- Concurrency risks\n- Violation of language paradigms\n\n### E. Secure, Clean Rewrite\nProvide a rewritten version of the code that is secure, idiomatic, maintainable, testable, free of vulnerabilities, and optimized for performance, adhering strictly to the same programming language.\n\n### F. Explanation of Improvements\nDetail why each change was made and how it reduces risk.\n\n## Hard Rules\n- NEVER invent functionality not present in the original code.\n- NEVER alter the algorithmic intent.\n- If some aspects are unclear, ask the user for clarification before rewriting.\n- If the code is incomplete, request the missing parts.\n- Call out dangerous patterns aggressively.\n- Propose a better architecture if the entire design is flawed.\n\n### In Case of No Provided Code\n- If no code is provided, simply respond: 'Provide the code you want reviewed. I will analyze its risks and give you a secure, clean rewrite.'"
+    "systemPrompt": "You are a Senior Code Reviewer, Security Auditor, and Language Specialist.\n\n## Your Core Responsibilities\n\n1. **Detect Programming Language**: Analyze the provided code and determine the programming language automatically.\n2. **Deep Static Analysis**: Perform in-depth analysis and identify logical flaws, security vulnerabilities, injection risks, race conditions, memory leaks, undefined behaviors, bad complexity, broken abstractions, poor error handling, and missing validation.\n3. **Impact Calculation**: Calculate the impact of each identified issue, emphasizing potential failures in a production environment.\n4. **Recommendations**: Offer specific, actionable recommendations, including alternative patterns for flawed approaches, and ensure rewritten code is secure, idiomatic, and optimized.\n\n## Review Output Structure Requirements\n\nWhen provided with code, your output MUST include: \n\n### A. Language Detection\n- State the detected programming language and explain the signals used for detection.\n\n### B. High-Level Assessment\n- Inferred purpose of the code.\n- Overall risks associated with the code.\n- Overall quality rating on an A-F scale.\n\n### C. Detailed Code Review\nFor each issue identified, provide:\n- **Issue Name**\n- **Severity**: Critical / High / Medium / Low\n- **Danger**: Why it is dangerous?\n- **Location**: Where exactly it appears?\n- **Impact**: Real-world impact of this issue.\n- **Solution**: How to fix it?\n\nEvaluate the following:\n- Security vulnerabilities\n- Performance bottlenecks\n- Logic errors\n- Anti-patterns\n- Code smells\n- Missing validation\n- Maintainability issues\n\n### D. Architectural & Design Pitfalls\nIdentify deeper systemic mistakes including but not limited to:\n- Wrong abstractions\n- Overcoupling\n- Misuse of resources\n- Concurrency risks\n- Violation of language paradigms\n\n### E. Secure, Clean Rewrite\nProvide a rewritten version of the code that is secure, idiomatic, maintainable, testable, free of vulnerabilities, and optimized for performance, adhering strictly to the same programming language.\n\n### F. Explanation of Improvements\nDetail why each change was made and how it reduces risk.\n\n## Hard Rules\n- NEVER invent functionality not present in the original code.\n- NEVER alter the algorithmic intent.\n- If some aspects are unclear, ask the user for clarification before rewriting.\n- If the code is incomplete, request the missing parts.\n- Call out dangerous patterns aggressively.\n- Propose a better architecture if the entire design is flawed.\n\n### In Case of No Provided Code\n- If no code is provided, simply respond: 'Provide the code you want reviewed. I will analyze its risks and give you a secure, clean rewrite.'",
+    "relatedTenants": [
+      {
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
+      }
+    ],
+    "id": "code-review-agent"
   },
   {
     "id": "voice-transcription",
     "agentType": "voice-transcription",
     "label": "Voice Transcription",
     "icon": "Mic",
-    "category": "General",
+    "entityType": {
+      "id": "01KAITYPE007GENERAL00000007",
+      "label": "General"
+    },
     "description": "Voice transcription agent that converts audio recordings to text. Use for: transcribing audio files, speech-to-text conversion, voice recording transcription, audio transcription. Outputs transcribed text in string format. NOT for: text processing, translation, or content generation.",
     "requiredOutputFormat": "string",
     "model": "whisper-1",
@@ -1478,7 +1515,10 @@
     "id": "presentation-slide-creator",
     "label": "Presentation Slide Creator",
     "icon": "FileText",
-    "category": "Content Generator",
+    "entityType": {
+      "id": "01KAITYPE002CONTENTGEN0000002",
+      "label": "Content Generator"
+    },
     "description": "Presentation slide generation agent that creates structured slide content. Use for: creating presentation slides, generating slide content, presentation creation, slide deck generation. Outputs markdown-formatted slide content with titles, descriptions, and bullet points. NOT for: process documentation, data analysis, or code generation.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -1588,7 +1628,10 @@
     "agentType": "chat",
     "label": "Data Analysis Expert",
     "icon": "BarChart",
-    "category": "Analysis & Research",
+    "entityType": {
+      "id": "01KAITYPE003ANALYSISRES000003",
+      "label": "Analysis & Research"
+    },
     "description": "Raw data analysis agent for user-provided data in any format (tables, JSON, CSV, text). Use for: analyzing raw data provided by user, numerical data analysis, statistical analysis, data pattern recognition, identifying data strengths/weaknesses, data risk assessment, generating data analysis reports with actionable checklists. Outputs comprehensive markdown data analysis reports. NOT for: analyzing system/preloaded data (use general-assistant), code review, or process documentation.",
     "requiredOutputFormat": "string",
     "model": "gemini-3-flash-preview",
@@ -1625,7 +1668,10 @@
     "id": "oox-analyzer-quality-control",
     "label": "OOX Analyzer for Quality Control",
     "icon": "ClipboardList",
-    "category": "Pharmaceutical & Life Sciences",
+    "entityType": {
+      "id": "01KAITYPE006PHARMLIFE000006",
+      "label": "Pharmaceutical & Life Sciences"
+    },
     "description": "Pharmaceutical OOX (OOS/OOT/OOE) incident analysis agent for quality control. Use for: analyzing OOS/OOT/OOE incidents, pharmaceutical quality control incidents, quality deviation analysis in pharma, FMEA risk assessment, pharmaceutical compliance reporting. Outputs comprehensive OOX analysis reports with 6M root cause analysis. NOT for: general deviation analysis (use quality-assurance-analyst), process documentation, or employee performance.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -1709,7 +1755,10 @@
     "agentType": "chat",
     "label": "Business Process Generator",
     "icon": "GitBranch",
-    "category": "Business & Process",
+    "entityType": {
+      "id": "01KAITYPE005BUSPROCESS000005",
+      "label": "Business & Process"
+    },
     "description": "BPMN 2.0 XML generator that converts business process descriptions into executable BPMN workflow definitions. Use for: creating BPMN 2.0 XML files, workflow engine process definitions, executable business process models, Camunda/Flowable process creation, BPMN diagram generation. Outputs valid BPMN 2.0 XML that can be imported into workflow engines. NOT for: process documentation (use process-analyst), process analysis, or general process descriptions.",
     "requiredOutputFormat": "string",
     "model": "gemini-3-flash-preview",
@@ -1768,7 +1817,10 @@
     "id": "production-plan-analyst-pharma",
     "label": "Pharma Production Plan Analyst",
     "icon": "BarChart3",
-    "category": "Pharmaceutical & Life Sciences",
+    "entityType": {
+      "id": "01KAITYPE006PHARMLIFE000006",
+      "label": "Pharmaceutical & Life Sciences"
+    },
     "description": "Specialized pharmaceutical production plan and supply-risk analyst. Use for: analyzing monthly or weekly production plans vs actuals, inventory coverage, deliveries to distributors, and previous-month trends. Identifies SKUs with high, medium, and low supply risk and provides expert recommendations tailored to pharma manufacturing and distribution realities. NOT for: general financial forecasting, marketing mix analysis, or non-pharma production environments.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -1815,7 +1867,10 @@
     "id": "change-management-analyst-pharma-biotech",
     "label": "Change Management Analyst",
     "icon": "ClipboardList",
-    "category": "Pharmaceutical & Life Sciences",
+    "entityType": {
+      "id": "01KAITYPE006PHARMLIFE000006",
+      "label": "Pharmaceutical & Life Sciences"
+    },
     "description": "A Senior Change Management Analyst specializing in pharmaceutical and biotech manufacturing, ensuring compliance with GMP and WHO guidelines.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -1961,7 +2016,10 @@
     "id": "routing-plan-analyzer",
     "label": "Routing Plan Analyzer",
     "icon": "MapPin",
-    "category": "Business & Process",
+    "entityType": {
+      "id": "01KAITYPE005BUSPROCESS000005",
+      "label": "Business & Process"
+    },
     "description": "Analyzes Points of Interest (POIs) for optimal routing, considering demand, risk, and visit constraints.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -2002,7 +2060,10 @@
     "id": "project-excellence-analysis-agent",
     "label": "Project Excellence Analysis Agent",
     "icon": "ClipboardCheck",
-    "category": "Business & Process",
+    "entityType": {
+      "id": "01KAITYPE005BUSPROCESS000005",
+      "label": "Business & Process"
+    },
     "description": "Conducts a comprehensive analysis of project excellence by summarizing task data, identifying strengths and risks, and creating a flowchart representation of tasks.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -2090,7 +2151,10 @@
     "id": "pharmaceutical-rd-analyst",
     "label": "Pharmaceutical R&D Analyst",
     "icon": "FlaskConical",
-    "category": "Pharmaceutical & Life Sciences",
+    "entityType": {
+      "id": "01KAITYPE006PHARMLIFE000006",
+      "label": "Pharmaceutical & Life Sciences"
+    },
     "description": "Senior Pharmaceutical R&D Analyst and Manufacturing Investigator specializing in pharmaceutical/biotech manufacturing problem-solving, scale-up, process robustness, glycosylation, and deviation/root-cause investigations using 6M (Ishikawa). Use for: manufacturing issue diagnosis, root cause analysis, process scale-up challenges, deviation investigations, quality investigations, process robustness assessment. Outputs comprehensive problem-driven analysis reports in markdown format. NOT for: academic reviews, literature dumps, general process documentation.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -2146,7 +2210,10 @@
     "id": "board-level-sales-analyst",
     "label": "Board-Level Sales Analyst",
     "icon": "TrendingUp",
-    "category": "Business & Process",
+    "entityType": {
+      "id": "01KAITYPE005BUSPROCESS000005",
+      "label": "Business & Process"
+    },
     "description": "Board-level sales performance analyst that audits sales data and provides executive summaries with actionable insights. Analyzes sales data including year, customer, product, sales quantity, and sales amount. Delivers critical findings, risk assessments, and forced actions for leadership decision-making.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -2189,7 +2256,10 @@
     "id": "faq-generator",
     "label": "FAQ Generator",
     "icon": "HelpCircle",
-    "category": "Content Generator",
+    "entityType": {
+      "id": "01KAITYPE002CONTENTGEN0000002",
+      "label": "Content Generator"
+    },
     "description": "Transforms unstructured user prompts into clear, actionable FAQ documents following best practices for technical documentation, customer support, and product enablement. Generates structured FAQs with summaries, key questions and answers, process flows, resolution checklists, and important notes.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -2224,7 +2294,10 @@
     "id": "user-experience-analyst",
     "label": "User Experience Analyst",
     "icon": "Users",
-    "category": "Analysis & Research",
+    "entityType": {
+      "id": "01KAITYPE003ANALYSISRES000003",
+      "label": "Analysis & Research"
+    },
     "description": "User Experience Strategy, Analysis, and Execution Agent that transforms user context, qualitative insights, and system behavior into clear UX decisions, prioritized initiatives, and execution-ready plans. Use for: UX analysis, user journey mapping, experience design, usability analysis, customer experience optimization, UX strategy, user research synthesis. Outputs comprehensive UX analysis reports with journey diagrams, state diagrams, mindmaps, timelines, and actionable execution plans. NOT for: visual design mockups, code implementation, or general business analysis.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -2266,7 +2339,10 @@
     "id": "meeting-assistant",
     "label": "Meeting Assistant",
     "icon": "Users",
-    "category": "Assisstants",
+    "entityType": {
+      "id": "01KAITYPE008ASSISTANTS00008",
+      "label": "Assistants"
+    },
     "description": "Analyzes meeting transcripts to extract decisions, action items, and insights. Use for: processing meeting recordings, extracting decisions and action items, identifying risks and open questions, generating meeting summaries. Outputs structured markdown with decisions, action plans, and decision flowcharts. NOT for: scheduling meetings, creating agendas, or generating meeting invitations.",
     "agentType": "chat",
     "model": "gemini-3-flash-preview",
@@ -2355,7 +2431,10 @@
     "id": "form-filler",
     "label": "Form Filler",
     "icon": "Sparkles",
-    "category": "Builders & Development",
+    "entityType": {
+      "id": "01KAITYPE001BUILDERSDEV000001",
+      "label": "Builders & Development"
+    },
     "description": "AI-powered form filling agent that generates and populates form data based on natural language descriptions. Use for: filling forms with AI-generated data, auto-completing form fields, generating form data from descriptions. Outputs JSON form data matching the schema structure. NOT for: schema creation, data analysis, or content generation.",
     "agentType": "chat",
     "requiredOutputFormat": "json",
@@ -2403,7 +2482,10 @@
     "id": "lean-analyst",
     "label": "Lean Analyst",
     "icon": "Activity",
-    "category": "Business & Process",
+    "entityType": {
+      "id": "01KAITYPE005BUSPROCESS000005",
+      "label": "Business & Process"
+    },
     "description": "Analyzes processes and issues to identify waste types using Lean thinking (8 Wastes - DOWNTIME). Use for: process waste analysis, lean improvement analysis, waste identification, process optimization recommendations. Outputs comprehensive waste analysis with solutions, RACI matrix, and Mermaid flow diagrams. NOT for: general process documentation, code review, or data analysis.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -2446,7 +2528,10 @@
     "agentType": "chat",
     "label": "HR Interview Assistant",
     "icon": "Users",
-    "category": "Human Resources",
+    "entityType": {
+      "id": "01KAITYPE004HUMANRES0000004",
+      "label": "Human Resources"
+    },
     "description": "HR interview assistant that generates comprehensive interview questions based on job post title and complexity levels. Use for: creating interview question sets, preparing for candidate interviews, generating role-specific questions, creating assessment questions by difficulty level. Outputs markdown-formatted questions organized by complexity with hints. NOT for: performance reviews, employee feedback, or general HR tasks.",
     "requiredOutputFormat": "string",
     "model": "gemini-3-flash-preview",
@@ -2586,7 +2671,10 @@
     "id": "title-generator",
     "label": "Title Generator",
     "icon": "Heading",
-    "category": "Utilities",
+    "entityType": {
+      "id": "01KAITYPE009UTILITIES000009",
+      "label": "Utilities"
+    },
     "description": "Generates a very short, meaningful chat title from user text.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -2598,7 +2686,10 @@
     "id": "cost-intelligence",
     "label": "Cost Intelligence",
     "icon": "Calculator",
-    "category": "Analysis & Research",
+    "entityType": {
+      "id": "01KAITYPE003ANALYSISRES000003",
+      "label": "Analysis & Research"
+    },
     "description": "Cost analysis agent for user-provided data (CSV, tables, JSON) and cost questions. Use for: analyzing pasted cost data, pharma manufacturing cost/BOM/overhead/FX/ledger/cost-center questions, scenario-style reasoning. Can be used standalone (paste data + ask) or with dashboard context. Outputs markdown insights. NOT for: non-cost data analysis (use data-analysis-expert).",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -2633,7 +2724,10 @@
     "id": "strategic-sourcing-advisor",
     "label": "Strategic Sourcing & Risk Advisor",
     "icon": "ShoppingCart",
-    "category": "Business & Process",
+    "entityType": {
+      "id": "01KAITYPE005BUSPROCESS000005",
+      "label": "Business & Process"
+    },
     "description": "Analyzes purchase items to provide sourcing strategies, operational risk assessments, and supplier discovery paths including trade shows.",
     "agentType": "chat",
     "requiredOutputFormat": "string",
@@ -2746,7 +2840,10 @@
     "id": "hr-job-description-analyst",
     "label": "Job Description Analyst",
     "icon": "FileSearch",
-    "category": "Human Resources",
+    "entityType": {
+      "id": "01KAITYPE004HUMANRES0000004",
+      "label": "Human Resources"
+    },
     "description": "Analyzes and generates professional, high-impact job descriptions based on organizational structure, seniority, and industry standards.",
     "agentType": "chat",
     "requiredOutputFormat": "string",

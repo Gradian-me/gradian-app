@@ -3,12 +3,30 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { proxyDataRequest } from '@/app/api/data/utils';
 import {
   fetchLookupDefinition,
   fetchLookupRaw,
   sanitizeLookupRows,
 } from '../../utils/lookup-fetch';
+
+/** Mask Bearer token for logs: "Bearer ***...last4" or "Bearer ***" if short. */
+function maskToken(auth: string | null): string {
+  if (!auth || typeof auth !== 'string') return '(none)';
+  const t = auth.trim();
+  if (!t.toLowerCase().startsWith('bearer ')) return '***';
+  const token = t.slice(7).trim();
+  return token.length <= 4 ? 'Bearer ***' : `Bearer ***...${token.slice(-4)}`;
+}
+
+/** Truncate fingerprint for logs: first 8 chars + "...". */
+function truncateFingerprint(fp: string | null): string {
+  if (!fp || !fp.trim()) return '(none)';
+  const s = fp.trim();
+  return s.length <= 12 ? s : `${s.slice(0, 8)}...`;
+}
 
 /** Synthetic path for response normalization (mutation). */
 const LOOKUP_FETCH_NORMALIZE_PATH = '/api/data/lookups/0';
@@ -43,6 +61,25 @@ export async function POST(
   } catch {
     // Invalid JSON or empty body: use empty object
   }
+
+  const tenantDomain = request.headers.get('x-tenant-domain') ?? '';
+  const itemsSummary =
+    Object.keys(body).length === 0
+      ? '(empty)'
+      : JSON.stringify(
+          Object.fromEntries(
+            Object.entries(body).map(([k, v]) => [
+              k,
+              Array.isArray(v) ? `[${v.length}]` : typeof v === 'object' && v !== null ? '{...}' : String(v).slice(0, 80),
+            ])
+          )
+        );
+  // Log: items (body summary), token masked, fingerprint truncated, xTenantDomain full
+  loggingCustom(
+    LogType.INFRA_LOG,
+    'info',
+    `[lookups/fetch] lookupId=${lookupId} items=${itemsSummary} token=${maskToken(request.headers.get('authorization'))} fingerprint=${truncateFingerprint(request.headers.get('x-fingerprint'))} xTenantDomain=${tenantDomain}`
+  );
 
   const sanitizeLabels = body?.sanitizeLabels === true;
   if (sanitizeLabels) {

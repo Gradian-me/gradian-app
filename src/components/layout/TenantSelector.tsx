@@ -376,7 +376,7 @@ export const TenantSelector: React.FC<TenantSelectorProps> = ({
   const avatarBorderClass = isDarkVariant ? "border-gray-700" : "border-gray-100";
   const chevronColorClass = isDarkVariant ? "text-gray-300" : "text-gray-500";
   const menuContentClasses = cn(
-    "z-50 overflow-hidden rounded-xl border p-1 shadow-lg",
+    "z-[140] overflow-hidden rounded-xl border p-1 shadow-lg",
     fullWidth ? "w-full" : "min-w-44",
     "data-[state=open]:animate-in data-[state=closed]:animate-out",
     "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",

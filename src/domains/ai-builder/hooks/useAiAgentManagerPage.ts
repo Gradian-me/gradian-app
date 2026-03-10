@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { AiAgent } from '../types';
+import { useOptionsFromUrl } from '@/gradian-ui/form-builder/form-elements';
+import { buildReferenceFilterUrl } from '@/gradian-ui/form-builder/utils/reference-filter-builder';
 
 interface DeleteDialogState {
   open: boolean;
@@ -45,6 +47,7 @@ export const useAiAgentManagerPage = () => {
 
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedEntityTypeId, setSelectedEntityTypeId] = useState<string | 'all'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
   const [deleteDialog, setDeleteDialog] = useState<DeleteDialogState>({ open: false, agent: null });
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -63,22 +66,69 @@ export const useAiAgentManagerPage = () => {
     }
   }, [agentsError]);
 
-  // Filter agents based on search query
+  // Build reference-based URL to load all AI Agent Types (entity-type-items) via relations
+  const entityTypeSourceUrl = useMemo(
+    () =>
+      buildReferenceFilterUrl({
+        referenceSchema: 'entity-type-groups',
+        referenceRelationTypeId: 'HAS_ENTITY_TYPE_ITEM',
+        referenceEntityId: '01KAIGROUPAITYPES0000000001',
+        targetSchema: 'entity-type-items',
+      }),
+    [],
+  );
+
+  // Load entity type options from /api/data/all-relations similar to form field reference filters
+  const { options: entityTypeOptions } = useOptionsFromUrl({
+    sourceUrl: entityTypeSourceUrl,
+    transform: (groups: any[]) => {
+      // groups: [{ schema, direction, relation_type, data: [...] }]
+      if (!Array.isArray(groups)) return [];
+      const items: any[] = [];
+      for (const group of groups) {
+        if (Array.isArray(group?.data)) {
+          items.push(...group.data);
+        }
+      }
+      return items;
+    },
+  });
+
+  const availableEntityTypes = useMemo(
+    () =>
+      entityTypeOptions
+        .map((opt) => ({
+          id: opt.id,
+          label: opt.label ?? opt.id,
+          icon: opt.icon,
+          color: opt.color,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [entityTypeOptions],
+  );
+
+  // Filter agents based on search query and selected entity type
   const filteredAgents = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return agents;
+    let result = agents;
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter((agent) => {
+        return (
+          agent.id.toLowerCase().includes(query) ||
+          agent.label.toLowerCase().includes(query) ||
+          (agent.description && agent.description.toLowerCase().includes(query)) ||
+          (agent.model && agent.model.toLowerCase().includes(query))
+        );
+      });
     }
 
-    const query = searchQuery.toLowerCase();
-    return agents.filter((agent) => {
-      return (
-        agent.id.toLowerCase().includes(query) ||
-        agent.label.toLowerCase().includes(query) ||
-        (agent.description && agent.description.toLowerCase().includes(query)) ||
-        (agent.model && agent.model.toLowerCase().includes(query))
-      );
-    });
-  }, [agents, searchQuery]);
+    if (selectedEntityTypeId !== 'all') {
+      result = result.filter((agent) => agent.entityType?.id === selectedEntityTypeId);
+    }
+
+    return result;
+  }, [agents, searchQuery, selectedEntityTypeId]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -190,6 +240,9 @@ export const useAiAgentManagerPage = () => {
     refreshing,
     searchQuery,
     setSearchQuery,
+    selectedEntityTypeId,
+    setSelectedEntityTypeId,
+    availableEntityTypes,
     viewMode,
     setViewMode,
     filteredAgents,

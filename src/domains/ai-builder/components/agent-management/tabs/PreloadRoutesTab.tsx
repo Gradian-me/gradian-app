@@ -152,17 +152,20 @@ export function PreloadRoutesTab({ agent, onUpdate, readonly = false }: PreloadR
                       disabled={readonly}
                     />
                   </div>
-                  <div className="flex items-center justify-between rounded-lg border p-4">
-                    <div>
-                      <p className="font-medium">Use integrated authentication</p>
-                      <p className="text-sm text-muted-foreground">
-                        When on, the app calls this route via its API (e.g. /api/lookups/fetch/[id]) so the server handles auth to the external URL.
-                      </p>
-                    </div>
+                  <div className="rounded-lg border p-4">
                     <Switch
-                      config={{ name: 'useIntegratedAuth', label: '' }}
+                      config={{
+                        name: 'useIntegratedAuth',
+                        label: 'Use integrated authentication',
+                        placeholder:
+                          'When on, the app calls this route via its API (e.g. /api/lookups/fetch/[id]) so the server handles auth to the external URL.',
+                      }}
                       checked={route.useIntegratedAuthentication === true}
-                      onChange={(checked) => updateRoute(index, { useIntegratedAuthentication: checked ? true : undefined })}
+                      onChange={(checked) =>
+                        updateRoute(index, {
+                          useIntegratedAuthentication: checked ? true : undefined,
+                        })
+                      }
                       disabled={readonly}
                     />
                   </div>

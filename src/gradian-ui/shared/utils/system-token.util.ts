@@ -341,8 +341,9 @@ async function getRelatedServers(urlRepositoryId: string): Promise<any[]> {
 
 /**
  * Get system access token from OAuth2 endpoint
+ * Exported for server-side integrations (e.g., lookup CRUD calls).
  */
-async function getSystemAccessToken(audience: string): Promise<string | null> {
+export async function getSystemAccessToken(audience: string): Promise<string | null> {
   const authUrl = process.env.URL_AUTHENTICATION;
   const appId = process.env.APP_ID;
   const appSecretKey = process.env.APP_SECRET_KEY;

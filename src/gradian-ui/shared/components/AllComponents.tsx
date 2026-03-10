@@ -125,7 +125,7 @@ export const AllComponents: React.FC<AllComponentsProps> = ({ initialComponents 
                 onCheckedChange={setHasDemoOnly}
               />
               <Label htmlFor="has-demo" className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer whitespace-nowrap">
-                Has Demo
+                DEMO
               </Label>
             </div>
           )}
@@ -199,9 +199,6 @@ export const AllComponents: React.FC<AllComponentsProps> = ({ initialComponents 
                               {renderHighlightedText(comp.usecase, catalogQuery)}
                             </p>
                           )}
-                          <code className="mt-2 text-[11px] bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded block overflow-x-auto text-gray-700 dark:text-gray-300">
-                            {renderHighlightedText(comp.directory, catalogQuery)}
-                          </code>
                           <div className="mt-3 flex flex-wrap items-center gap-2">
                             <Button
                               variant="secondary"
@@ -220,7 +217,7 @@ export const AllComponents: React.FC<AllComponentsProps> = ({ initialComponents 
                                 onClick={() => router.push(comp.demoUrl!)}
                               >
                                 <FileText className="h-3.5 w-3.5" />
-                                Details & samples
+                                DEMO
                               </Button>
                             ) : null}
                           </div>
@@ -291,14 +288,7 @@ export const AllComponents: React.FC<AllComponentsProps> = ({ initialComponents 
                     <p className="text-sm text-gray-700 dark:text-gray-300">{dialogComponent.usecase}</p>
                   </section>
                 ) : null}
-                <section>
-                  <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">
-                    Source
-                  </h4>
-                  <code className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-1.5 rounded block overflow-x-auto text-gray-700 dark:text-gray-300">
-                    {dialogComponent.directory}
-                  </code>
-                </section>
+                {/* Source directory intentionally hidden to reduce noise */}
                 {dialogComponent.configSchema?.fields?.length ? (
                   <section>
                     <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">

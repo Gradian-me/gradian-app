@@ -8406,6 +8406,68 @@
           ]
         }
       ],
+      "title": "AI Agent Types",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KAIGROUPAITYPES0000000001",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "entity-type-items-section": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
+        }
+      ],
+      "title": "Task Types",
+      "incomplete": false,
+      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
+      "id": "01KCDZTASKGROUP0000000000001",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "entity-type-items-section": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": [
+            {
+              "en": "CinnaGen",
+              "fa": "سیناژن"
+            }
+          ]
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": [
+            {
+              "en": "AryoGen",
+              "fa": "آریوژن"
+            }
+          ]
+        }
+      ],
       "title": "Project Types",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
@@ -8593,6 +8655,105 @@
       "id": "01KCDZTASK005EDUCATION0000005",
       "createdAt": "2025-12-14T08:30:00.000Z",
       "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Builders & Development",
+      "icon": "Hammer",
+      "color": "blue",
+      "incomplete": false,
+      "id": "01KAITYPE001BUILDERSDEV000001",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Content Generator",
+      "icon": "FileText",
+      "color": "purple",
+      "incomplete": false,
+      "id": "01KAITYPE002CONTENTGEN0000002",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Analysis & Research",
+      "icon": "BarChart3",
+      "color": "emerald",
+      "incomplete": false,
+      "id": "01KAITYPE003ANALYSISRES000003",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Human Resources",
+      "icon": "Users",
+      "color": "pink",
+      "incomplete": false,
+      "id": "01KAITYPE004HUMANRES0000004",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Business & Process",
+      "icon": "GitBranch",
+      "color": "amber",
+      "incomplete": false,
+      "id": "01KAITYPE005BUSPROCESS000005",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Pharmaceutical & Life Sciences",
+      "icon": "FlaskConical",
+      "color": "indigo",
+      "incomplete": false,
+      "id": "01KAITYPE006PHARMLIFE000006",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "General",
+      "icon": "Globe",
+      "color": "slate",
+      "incomplete": false,
+      "id": "01KAITYPE007GENERAL00000007",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Assistants",
+      "icon": "Brain",
+      "color": "cyan",
+      "incomplete": false,
+      "id": "01KAITYPE008ASSISTANTS00008",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Utilities",
+      "icon": "Wrench",
+      "color": "gray",
+      "incomplete": false,
+      "id": "01KAITYPE009UTILITIES000009",
+      "createdAt": "2026-01-01T00:00:00.000Z",
+      "updatedAt": "2026-01-01T00:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },

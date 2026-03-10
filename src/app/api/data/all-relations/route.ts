@@ -48,7 +48,16 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     const schema = searchParams.get('schema');
-    const id = searchParams.get('id');
+    // Support both a single comma-separated id value and multiple id query params:
+    // ?id=ID1,ID2 or ?id=ID1&id=ID2
+    const rawIds = searchParams.getAll('id');
+    const ids = rawIds
+      .flatMap((raw) =>
+        raw
+          .split(',')
+          .map((value) => value.trim())
+          .filter((value) => value.length > 0)
+      );
     const direction = searchParams.get('direction') as 'source' | 'target' | 'both' | null;
     const otherSchema = searchParams.get('otherSchema');
     const relationTypeId = searchParams.get('relationTypeId');
@@ -56,7 +65,7 @@ export async function GET(request: NextRequest) {
       searchParams.get('includeFieldRelations') === 'true';
 
     // Validate required parameters
-    if (!schema || !id) {
+    if (!schema || ids.length === 0) {
       return NextResponse.json(
         {
           success: false,
@@ -75,7 +84,7 @@ export async function GET(request: NextRequest) {
 
     if (queryDirection === 'source' || queryDirection === 'both') {
       const sourceRelations = allRelations.filter(
-        r => r.sourceSchema === schema && r.sourceId === id
+        r => r.sourceSchema === schema && ids.includes(r.sourceId)
       );
       filteredRelations.push(...sourceRelations.map(r => ({ 
         ...r, 
@@ -85,7 +94,7 @@ export async function GET(request: NextRequest) {
 
     if (queryDirection === 'target' || queryDirection === 'both') {
       const targetRelations = allRelations.filter(
-        r => r.targetSchema === schema && r.targetId === id
+        r => r.targetSchema === schema && ids.includes(r.targetId)
       );
       filteredRelations.push(...targetRelations.map(r => ({ 
         ...r, 
@@ -152,8 +161,11 @@ export async function GET(request: NextRequest) {
       }
 
       // Determine direction for grouping (use relation.direction if available, otherwise infer from context)
-      const relationDirection = relation.direction || 
-        (relation.sourceSchema === schema && relation.sourceId === id ? 'source' : 'target') as 'source' | 'target';
+      const relationDirection =
+        (relation.direction as 'source' | 'target' | undefined) ||
+        ((relation.sourceSchema === schema && ids.includes(relation.sourceId) ? 'source' : 'target') as
+          | 'source'
+          | 'target');
       
       // Create a unique key for grouping: schema-direction-relationType
       const groupKey = `${schemaToFetch}-${relationDirection}-${relation.relationTypeId}`;

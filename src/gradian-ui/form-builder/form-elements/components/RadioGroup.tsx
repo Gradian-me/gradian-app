@@ -18,6 +18,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { useLanguageStore } from '@/stores/language.store';
 import { getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { resolveLocalizedField } from '@/gradian-ui/shared/utils/localization';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function getOptionDisplayLabel(raw: unknown, lang: string | undefined, defaultLang: string): string {
   if (raw == null) return '';
@@ -235,7 +236,14 @@ export const RadioGroup = forwardRef<FormElementRef, RadioProps>(
               {resolveDisplayLabel(config.label, language ?? undefined, defaultLang)}
             </legend>
             {isLoadingOptions ? (
-              <div className="text-sm text-gray-500 py-2">Loading options...</div>
+              <div className="py-2 space-y-2">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Skeleton className="h-4 w-4 rounded-full" />
+                    <Skeleton className="h-3 w-28" />
+                  </div>
+                ))}
+              </div>
             ) : optionsError ? (
               <div className="text-xs text-red-600 py-2">{optionsError}</div>
             ) : (

@@ -55,6 +55,7 @@ export function SystemPromptTab({ agent, onUpdate, readonly = false }: SystemPro
               rows={12}
               disabled={readonly}
               className="font-mono text-sm"
+              aiAgentId="professional-writing"
             />
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               The system prompt defines the AI agent's behavior, capabilities, and instructions.

@@ -3,11 +3,54 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth } from '@/gradian-ui/shared/utils/api-auth.util';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import {
   fetchLookupDefinition,
   fetchLookupRaw,
   sanitizeLookupRows,
 } from '../../utils/lookup-fetch';
+
+/** Mask Bearer token for logs: "Bearer ***...last4" or "Bearer ***" if short. */
+function maskToken(auth: string | null): string {
+  if (!auth || typeof auth !== 'string') return '(none)';
+  const t = auth.trim();
+  if (!t.toLowerCase().startsWith('bearer ')) return '***';
+  const token = t.slice(7).trim();
+  return token.length <= 4 ? 'Bearer ***' : `Bearer ***...${token.slice(-4)}`;
+}
+
+/** Truncate fingerprint for logs: first 8 chars + "..." */
+function truncateFingerprint(fp: string | null): string {
+  if (!fp || !fp.trim()) return '(none)';
+  const s = fp.trim();
+  return s.length <= 12 ? s : `${s.slice(0, 8)}...`;
+}
+
+type LookupOption = {
+  id: string;
+  label: unknown;
+  icon?: string;
+  color?: string;
+};
+
+function dedupeOptionsById(options: LookupOption[]): LookupOption[] {
+  const seen = new Set<string>();
+  const out: LookupOption[] = [];
+  let emptyCounter = 0;
+
+  for (const opt of options) {
+    const rawId = typeof opt?.id === 'string' ? opt.id.trim() : '';
+    const stableId = rawId || `__empty_id__:${emptyCounter++}`;
+    if (seen.has(stableId)) {
+      continue;
+    }
+    seen.add(stableId);
+    out.push({ ...opt, id: stableId });
+  }
+
+  return out;
+}
 
 export async function GET(
   request: NextRequest,
@@ -30,6 +73,18 @@ export async function GET(
   }
 
   const { 'lookup-id': lookupId } = await params;
+  const searchParams = request.nextUrl.searchParams;
+  const page = searchParams.get('page') ?? '';
+  const limit = searchParams.get('limit') ?? '';
+  const tenantDomain = request.headers.get('x-tenant-domain') ?? '';
+  const tenantId = request.headers.get('x-tenant-id') ?? '';
+  const items = Object.fromEntries([...searchParams.entries()]);
+  // Log: items (query params), token masked, fingerprint truncated, xTenantDomain full
+  loggingCustom(
+    LogType.INFRA_LOG,
+    'info',
+    `[lookups/options] lookupId=${lookupId} items=${JSON.stringify(items)} token=${maskToken(request.headers.get('authorization'))} fingerprint=${truncateFingerprint(request.headers.get('x-fingerprint'))} xTenantDomain=${tenantDomain} xTenantId=${tenantId}`
+  );
   const def = await fetchLookupDefinition(baseUrl, lookupId, request);
   const { ok, data: rawRows } = await fetchLookupRaw(baseUrl, lookupId, request, {});
   if (!ok) {
@@ -45,6 +100,7 @@ export async function GET(
     resultColorColumn: 'color',
     resultIconColumn: 'icon',
   };
-  const options = sanitizeLookupRows(rawRows, defWithDefaults);
-  return NextResponse.json({ success: true, data: options });
+  const options = sanitizeLookupRows(rawRows, defWithDefaults) as LookupOption[];
+  const distinctOptions = dedupeOptionsById(options);
+  return NextResponse.json({ success: true, data: distinctOptions });
 }

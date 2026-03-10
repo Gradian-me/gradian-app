@@ -28,6 +28,7 @@ import { cn } from '@/lib/utils';
 import { useOptionsFromUrl } from '../hooks/useOptionsFromUrl';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { getLabelClasses } from '../utils/field-styles';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface SortableSelectorConfig {
   name?: string;
@@ -337,8 +338,13 @@ export const SortableSelector: React.FC<SortableSelectorProps> = ({
         </p>
         <div className="flex-1">
           {isLoadingOptions ? (
-            <div className="border border-gray-200 rounded-lg p-4 text-center text-sm text-gray-500">
-              Loading options...
+            <div className={cn("space-y-2 overflow-hidden border border-gray-200 rounded-lg p-3", maxHeight)}>
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <Skeleton className="h-4 w-4 rounded" />
+                  <Skeleton className="h-3 w-40" />
+                </div>
+              ))}
             </div>
           ) : optionsError ? (
             <div className="border border-red-200 rounded-lg p-4 text-center text-sm text-red-600">

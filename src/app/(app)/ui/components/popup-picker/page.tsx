@@ -67,6 +67,19 @@ const staticPickerUsageCode = `<PopupPicker
   onSelect={(normalized, raw) => setLastSelection(raw)}
 />`;
 
+// Lookup ID from tests/httpbook/lookup_test.http – options via GET /api/lookups/options/[lookup-id]
+const LOOKUP_DEMO_ID = '01KJ06YM685FYANN2ZVV4CGSGH';
+
+const lookupPickerUsageCode = `<PopupPicker
+  isOpen={isLookupPickerOpen}
+  onClose={() => setLookupPickerOpen(false)}
+  sourceUrl={\`/api/lookups/options/${LOOKUP_DEMO_ID}\`}
+  allowMultiselect
+  pageSize={200}
+  onSelect={(normalized, raw) => setLastSelection(raw)}
+  title="Select from lookup"
+/>`;
+
 export default function PopupPickerDemoPage() {
   useSetLayoutProps({
     title: 'PopupPicker',
@@ -76,6 +89,7 @@ export default function PopupPickerDemoPage() {
 
   const [isTodosPickerOpen, setTodosPickerOpen] = useState(false);
   const [isStaticPickerOpen, setStaticPickerOpen] = useState(false);
+  const [isLookupPickerOpen, setLookupPickerOpen] = useState(false);
   const [lastSelection, setLastSelection] = useState<any[]>([]);
 
   return (
@@ -143,6 +157,36 @@ export default function PopupPickerDemoPage() {
           onSelect={async (_n, raw) => setLastSelection(raw)}
           title="Select Items"
           description="Using sample static items"
+        />
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">Lookup options</h2>
+        <p className="text-sm text-muted-foreground">
+          PopupPicker with lookup options API (same as lookup_test.http). Uses{' '}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">/api/lookups/options/{LOOKUP_DEMO_ID}</code>.
+          Requires auth and tenant context (e.g. logged in, tenant/domain headers).
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" onClick={() => setLookupPickerOpen(true)}>
+            Open Lookup Picker
+          </Button>
+          <Button type="button" variant="outline" onClick={() => setLastSelection([])}>
+            Clear Last Selection
+          </Button>
+        </div>
+        <div className="grid gap-3">
+          <CodeViewer title="Usage" programmingLanguage="tsx" code={lookupPickerUsageCode} />
+        </div>
+        <PopupPicker
+          isOpen={isLookupPickerOpen}
+          onClose={() => setLookupPickerOpen(false)}
+          sourceUrl={`/api/lookups/options/${LOOKUP_DEMO_ID}`}
+          allowMultiselect
+          pageSize={200}
+          onSelect={async (_n, raw) => setLastSelection(raw)}
+          title="Select from lookup"
+          description="Options from lookup_test.http lookup ID"
         />
       </section>
 

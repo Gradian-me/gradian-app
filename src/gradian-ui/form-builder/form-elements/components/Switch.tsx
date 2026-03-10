@@ -8,6 +8,8 @@ import { cn, validateField } from '../../../shared/utils';
 import { Switch as RadixSwitch } from '../../../../components/ui/switch';
 import { Label } from '../../../../components/ui/label';
 import { getLabelClasses, errorTextClasses } from '../utils/field-styles';
+import { useLanguageStore } from '@/stores/language.store';
+import { getDefaultLanguage, resolveSchemaFieldPlaceholder } from '@/gradian-ui/shared/utils/translation-utils';
 
 export const Switch = forwardRef<FormElementRef, SwitchProps>(
   (
@@ -27,6 +29,8 @@ export const Switch = forwardRef<FormElementRef, SwitchProps>(
     ref
   ) => {
     const switchRef = useRef<React.ElementRef<typeof RadixSwitch>>(null);
+    const language = useLanguageStore((s) => s.getLanguage?.()) ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
 
     useImperativeHandle(ref, () => ({
       focus: () => switchRef.current?.focus(),
@@ -54,6 +58,8 @@ export const Switch = forwardRef<FormElementRef, SwitchProps>(
     };
 
     const isChecked = checked !== undefined ? checked : value;
+    const description =
+      config && resolveSchemaFieldPlaceholder(config as any, language, defaultLang);
 
     // Filter out non-DOM props that shouldn't be passed to RadixSwitch
     const { touched, ...radixProps } = props;
@@ -91,6 +97,9 @@ export const Switch = forwardRef<FormElementRef, SwitchProps>(
             </Label>
           )}
         </div>
+        {description && (
+          <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+        )}
         {error && (
           <p className={errorTextClasses} role="alert">
             {error}

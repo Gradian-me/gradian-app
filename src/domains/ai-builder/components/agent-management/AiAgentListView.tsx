@@ -43,7 +43,7 @@ const AiAgentListItemComponent = memo(
           scale: 1.01,
           transition: { type: 'spring', stiffness: 420, damping: 22 },
         }}
-        className="group relative flex items-center gap-4 overflow-hidden rounded-xl border p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-blue-300/80 hover:shadow-lg border-blue-100/80 bg-gradient-to-r from-blue-50/90 via-white to-cyan-50/80 dark:border-slate-700/80 dark:bg-gradient-to-r dark:from-slate-900/85 dark:via-slate-900/80 dark:to-zinc-900/80"
+        className="group relative flex items-center gap-4 overflow-hidden rounded-xl border border-violet-100/80 bg-linear-to-r from-violet-50/90 via-white to-slate-50/80 p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300/80 hover:shadow-lg dark:border-violet-900/60 dark:bg-linear-to-r dark:from-slate-950/90 dark:via-slate-950/80 dark:to-slate-900/80"
       >
         <div
           className="pointer-events-none absolute inset-0 opacity-20 dark:opacity-10"
@@ -57,7 +57,7 @@ const AiAgentListItemComponent = memo(
           {agent.icon && (
             <IconRenderer
               iconName={agent.icon}
-              className="h-8 w-8 shrink-0 text-blue-600 dark:text-blue-300"
+              className="h-8 w-8 shrink-0 text-violet-600 dark:text-violet-300"
             />
           )}
           <div className="flex-1 min-w-0">
@@ -66,7 +66,7 @@ const AiAgentListItemComponent = memo(
                 {agent.label}
               </h3>
               {agent.model && (
-                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
                   {agent.model}
                 </Badge>
               )}
@@ -92,7 +92,10 @@ const AiAgentListItemComponent = memo(
                 {preloadRoutesCount > 0 && (
                   <div className="flex items-center gap-1.5">
                     <Sparkles className="h-3.5 w-3.5" />
-                    <span>{preloadRoutesCount} Routes</span>
+                    <span>
+                      {preloadRoutesCount}{' '}
+                      {preloadRoutesCount === 1 ? 'RAG' : 'RAGs'}
+                    </span>
                   </div>
                 )}
               </div>
@@ -104,7 +107,7 @@ const AiAgentListItemComponent = memo(
             variant="ghost"
             size="icon"
             onClick={() => onView(agent)}
-            className="h-8 w-8 rounded-full text-gray-500 hover:text-blue-700 hover:bg-blue-50/80 dark:text-gray-400 dark:hover:text-blue-200 dark:hover:bg-blue-500/10"
+            className="h-8 w-8 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:text-violet-200 dark:hover:bg-violet-500/10"
             title="View Agent"
           >
             <Sparkles className="h-4 w-4" />
@@ -113,7 +116,7 @@ const AiAgentListItemComponent = memo(
             variant="ghost"
             size="icon"
             onClick={() => onEdit(agent)}
-            className="h-8 w-8 rounded-full text-gray-500 hover:text-blue-700 hover:bg-blue-50/80 dark:text-gray-400 dark:hover:text-blue-200 dark:hover:bg-blue-500/10"
+            className="h-8 w-8 rounded-full text-gray-500 hover:text-violet-700 hover:bg-violet-50/80 dark:text-gray-400 dark:hover:text-violet-200 dark:hover:bg-violet-500/10"
             title="Edit Agent"
           >
             <PencilRuler className="h-4 w-4" />

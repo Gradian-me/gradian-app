@@ -28,7 +28,7 @@ const FNC_CHAR = String.fromCharCode(29);
  * NOTE: this only affects how we parse inbound strings; the generator still emits the real GS
  * character (0x1D) when rendering DataMatrix.
  */
-const FNC1_ALIASES: readonly string[] = ["\\F", "<GS>"];
+const FNC1_ALIASES: readonly string[] = ["\\F", "<GS>", FNC_CHAR];
 
 /**
  * Normalizes barcode input:

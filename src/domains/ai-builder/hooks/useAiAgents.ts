@@ -19,6 +19,7 @@ interface UseAiAgentsOptions {
   agentId?: string; // If provided, fetch only this specific agent
   enabled?: boolean; // If false, don't fetch agents (default: true)
   summary?: boolean; // If true, fetch only summary fields (id, label, icon, description, agentType)
+  tenantId?: string; // If provided, filter agents by related tenant ID on the server
 }
 
 // Client-side cache to prevent duplicate requests
@@ -49,8 +50,8 @@ if (typeof window !== 'undefined') {
   }
 }
 
-function getCacheKey(agentId?: string, summary?: boolean): string {
-  return `${agentId || 'all'}_${summary ? 'summary' : 'full'}`;
+function getCacheKey(agentId?: string, summary?: boolean, tenantId?: string): string {
+  return `${agentId || 'all'}_${summary ? 'summary' : 'full'}_${tenantId || 'all-tenants'}`;
 }
 
 function isCacheValid(entry: CacheEntry): boolean {
@@ -62,13 +63,13 @@ function isCacheValid(entry: CacheEntry): boolean {
  * @param options - Optional configuration including agentId to fetch a single agent
  */
 export function useAiAgents(options?: UseAiAgentsOptions): UseAiAgentsReturn {
-  const { agentId, enabled = true, summary = false } = options || {};
+  const { agentId, enabled = true, summary = false, tenantId } = options || {};
   const [agents, setAgents] = useState<AiAgent[]>([]);
   const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
 
   const fetchAgents = useCallback(async () => {
-    const cacheKey = getCacheKey(agentId, summary);
+    const cacheKey = getCacheKey(agentId, summary, tenantId);
     const cached = cache.get(cacheKey);
     
     // If we have valid cached data, use it immediately
@@ -120,6 +121,9 @@ export function useAiAgents(options?: UseAiAgentsOptions): UseAiAgentsReturn {
         }
         if (agentId) {
           params.append('id', agentId);
+        }
+        if (tenantId) {
+          params.append('tenantId', tenantId);
         }
         // Add nocache parameter on page refresh to bypass server cache
         if (typeof window !== 'undefined') {
@@ -197,7 +201,7 @@ export function useAiAgents(options?: UseAiAgentsOptions): UseAiAgentsReturn {
     } finally {
       setLoading(false);
     }
-  }, [agentId, summary]);
+  }, [agentId, summary, tenantId]);
 
   useEffect(() => {
     if (enabled) {

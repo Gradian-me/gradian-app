@@ -132,24 +132,67 @@ export async function fetchOptionsFromSchemaOrUrl(
     const separator = sourceUrl!.includes('?') ? '&' : '?';
     const url = `${sourceUrl}${queryString ? `${separator}${queryString}` : ''}`;
 
-    const response = await fetch(url, { cache: 'no-store' });
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch items (${response.status})`);
-    }
+    // For internal Next.js API routes (e.g. /api/lookups/options/[id]),
+    // use apiRequest so Authorization, X-Tenant-Domain, and X-Fingerprint
+    // are applied consistently (same behavior as other app API calls).
+    const isInternalApiEndpoint =
+      url.startsWith('/api/') ||
+      url.startsWith('api/');
 
-    const payload = await response.json();
-    
-    // Extract items using column mapping if provided
-    data = extractItemsFromPayload(payload, columnMap);
-    
-    // Extract metadata if available
-    meta = extractMetaFromPayload(payload, columnMap, {
-      page: queryParams.page ? Number(queryParams.page) : undefined,
-      limit: queryParams.limit ? Number(queryParams.limit) : undefined,
-      totalItems: undefined,
-      hasMore: undefined,
-    });
+    if (isInternalApiEndpoint) {
+      const response = await apiRequest<any>(url, {
+        method: 'GET',
+        disableCache: true,
+      });
+
+      if (!response.success || response.data === undefined) {
+        throw new Error(
+          response.error ||
+            `Failed to fetch items (${response.statusCode ?? 'unknown'})`
+        );
+      }
+
+      const payload = response;
+
+      // Extract items using column mapping if provided
+      data = extractItemsFromPayload(payload, columnMap);
+
+      // Extract metadata if available on the API response
+      const responseMeta =
+        (payload as {
+          meta?: { page?: number; limit?: number; totalItems?: number; hasMore?: boolean };
+        }).meta;
+      if (responseMeta) {
+        meta = responseMeta;
+      } else {
+        meta = extractMetaFromPayload(payload, columnMap, {
+          page: queryParams.page ? Number(queryParams.page) : undefined,
+          limit: queryParams.limit ? Number(queryParams.limit) : undefined,
+          totalItems: undefined,
+          hasMore: undefined,
+        });
+      }
+    } else {
+      // External URLs: use plain fetch (no app auth headers)
+      const response = await fetch(url, { cache: 'no-store' });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch items (${response.status})`);
+      }
+
+      const payload = await response.json();
+
+      // Extract items using column mapping if provided
+      data = extractItemsFromPayload(payload, columnMap);
+
+      // Extract metadata if available
+      meta = extractMetaFromPayload(payload, columnMap, {
+        page: queryParams.page ? Number(queryParams.page) : undefined,
+        limit: queryParams.limit ? Number(queryParams.limit) : undefined,
+        totalItems: undefined,
+        hasMore: undefined,
+      });
+    }
 
     // Apply transform if provided
     if (transform) {

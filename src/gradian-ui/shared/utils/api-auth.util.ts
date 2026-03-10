@@ -257,6 +257,44 @@ async function refreshTokenFromRequest(request: NextRequest, refreshToken: strin
 }
 
 /**
+ * Resolve access token for the request (header → cookie → server cache → refresh).
+ * Returns raw access token or null.
+ */
+async function getResolvedToken(request: NextRequest): Promise<string | null> {
+  const authHeader = request.headers.get('authorization');
+  let token = extractTokenFromHeader(authHeader);
+  if (!token) {
+    const cookies = request.headers.get('cookie');
+    token = extractTokenFromCookies(cookies, AUTH_CONFIG.ACCESS_TOKEN_COOKIE);
+  }
+  if (!token) {
+    const cookies = request.headers.get('cookie');
+    let refreshToken = extractTokenFromCookies(cookies, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
+    if (refreshToken) {
+      refreshToken = refreshToken.trim();
+      const serverToken = getAccessToken(refreshToken);
+      if (serverToken) {
+        token = serverToken;
+      } else {
+        token = await refreshTokenFromRequest(request, refreshToken);
+      }
+    }
+  }
+  return token || null;
+}
+
+/**
+ * Get Authorization header value for proxied requests (e.g. lookup service).
+ * Resolves token from: header → cookie → server cache → automatic refresh.
+ * Returns "Bearer <token>" or null.
+ */
+export async function getResolvedAccessTokenForProxy(request: NextRequest): Promise<string | null> {
+  const token = await getResolvedToken(request);
+  if (!token) return null;
+  return token.toLowerCase().startsWith('bearer ') ? token : `Bearer ${token}`;
+}
+
+/**
  * Extract and validate user ID from request
  * Returns userId if valid, null otherwise
  * 
@@ -267,129 +305,7 @@ async function refreshTokenFromRequest(request: NextRequest, refreshToken: strin
  * 4. Automatic refresh if refresh token exists but access token is missing
  */
 async function getUserIdFromRequest(request: NextRequest): Promise<string | null> {
-  // Try Authorization header first
-  const authHeader = request.headers.get('authorization');
-  let token = extractTokenFromHeader(authHeader);
-
-  // If not in header, try access token cookie
-  if (!token) {
-    const cookies = request.headers.get('cookie');
-    token = extractTokenFromCookies(cookies, AUTH_CONFIG.ACCESS_TOKEN_COOKIE);
-  }
-
-  // If still no token, try server-side token cache using refresh token
-  if (!token) {
-    const cookies = request.headers.get('cookie');
-    
-    // Enhanced debugging: log all cookie names present
-    const cookieNamesList: string[] = [];
-    const cookieNamesWithValues: Record<string, string> = {};
-    if (cookies) {
-      cookies.split(';').forEach((cookie) => {
-        const [name, ...valueParts] = cookie.trim().split('=');
-        const value = valueParts.join('=');
-        cookieNamesList.push(name);
-        cookieNamesWithValues[name] = value.length > 50 ? `${value.substring(0, 50)}...` : value;
-      });
-      
-      loggingCustom(
-        LogType.LOGIN_LOG,
-        'debug',
-        `[API_AUTH] Cookie debugging ${JSON.stringify({
-          lookingFor: AUTH_CONFIG.REFRESH_TOKEN_COOKIE,
-          availableCookieNames: cookieNamesList,
-          cookieCount: cookieNamesList.length,
-          cookieNamesWithPreview: cookieNamesWithValues,
-          hasCookies: !!cookies,
-          cookiesLength: cookies?.length || 0,
-        })}`
-      );
-    }
-    
-    let refreshToken = extractTokenFromCookies(cookies, AUTH_CONFIG.REFRESH_TOKEN_COOKIE);
-    
-    if (refreshToken) {
-      // Normalize refresh token (trim whitespace)
-      refreshToken = refreshToken.trim();
-      
-      // Log refresh token preview for debugging
-      loggingCustom(
-        LogType.LOGIN_LOG,
-        'debug',
-        `[API_AUTH] Attempting to retrieve access token from server-side cache ${JSON.stringify({
-          refreshTokenPreview: `${refreshToken.substring(0, 30)}...`,
-          refreshTokenLength: refreshToken.length,
-          cookieName: AUTH_CONFIG.REFRESH_TOKEN_COOKIE,
-        })}`
-      );
-      
-      // Determine refresh route URL for logging
-      const useDemoMode = isServerDemoMode();
-      const refreshRoute = useDemoMode 
-        ? '/api/auth/token/refresh' 
-        : buildAuthServiceUrl('/refresh');
-      
-      // Look up access token from server memory using refresh token as key
-      const serverToken = getAccessToken(refreshToken);
-      if (serverToken) {
-        loggingCustom(
-          LogType.LOGIN_LOG,
-          'debug',
-          `[API_AUTH] ✅ Retrieved access token from server-side cache using refresh token ${JSON.stringify({
-            refreshRoute,
-            refreshTokenPreview: `${refreshToken.substring(0, 30)}...`,
-            accessTokenLength: serverToken.length,
-            expiresIn: '668s',
-            cacheSize: 1,
-            usingGlobalCache: true,
-          })}`
-        );
-        token = serverToken;
-      } else {
-        loggingCustom(
-          LogType.LOGIN_LOG,
-          'debug',
-          `[API_AUTH] ❌ Refresh token found in cookies but no access token in server-side cache. Attempting automatic refresh... ${JSON.stringify({
-            refreshTokenPreview: `${refreshToken.substring(0, 30)}...`,
-            refreshTokenLength: refreshToken.length,
-            cookieName: AUTH_CONFIG.REFRESH_TOKEN_COOKIE,
-            possibleCauses: [
-              'Token not yet stored in cache',
-              'Refresh token mismatch (cookie value differs from stored key)',
-              'Token expired and cleaned up',
-              'Cache cleared or server restarted',
-            ],
-          })}`
-        );
-        
-        // Automatically refresh the token when it's missing from cache
-        const refreshedToken = await refreshTokenFromRequest(request, refreshToken);
-        if (refreshedToken) {
-          loggingCustom(
-            LogType.LOGIN_LOG,
-            'debug',
-            `[API_AUTH] ✅ Successfully refreshed access token automatically`
-          );
-          token = refreshedToken;
-        } else {
-          loggingCustom(
-            LogType.LOGIN_LOG,
-            'warn',
-            `[API_AUTH] ❌ Failed to refresh access token automatically`
-          );
-        }
-      }
-    } else {
-      loggingCustom(
-        LogType.LOGIN_LOG,
-        'debug',
-        `[API_AUTH] No refresh token found in cookies ${JSON.stringify({
-          cookieName: AUTH_CONFIG.REFRESH_TOKEN_COOKIE,
-          hasCookies: !!cookies,
-        })}`
-      );
-    }
-  }
+  const token = await getResolvedToken(request);
 
   if (!token) {
     loggingCustom(

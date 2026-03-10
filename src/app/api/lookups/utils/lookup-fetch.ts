@@ -6,6 +6,20 @@
 import { NextRequest } from 'next/server';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { getResolvedAccessTokenForProxy } from '@/gradian-ui/shared/utils/api-auth.util';
+
+function maskToken(auth: string | null): string {
+  if (!auth || typeof auth !== 'string') return '(none)';
+  const t = auth.trim();
+  if (!t.toLowerCase().startsWith('bearer ')) return '***';
+  const token = t.slice(7).trim();
+  return token.length <= 4 ? 'Bearer ***' : `Bearer ***...${token.slice(-4)}`;
+}
+function truncateFingerprint(fp: string | null): string {
+  if (!fp || typeof fp !== 'string') return '(none)';
+  const s = fp.trim();
+  return s.length <= 12 ? s : `${s.slice(0, 8)}...`;
+}
 
 const DATA_LIST_PATHS = [['data'], ['data', 'data'], ['items'], ['results'], ['result'], ['rows'], ['records']];
 
@@ -65,13 +79,24 @@ export async function fetchLookupDefinition(
 ): Promise<LookupDefinition | null> {
   const url = `${baseUrl}/${encodeURIComponent(lookupId)}`;
   const headers = new Headers();
-  const auth = request.headers.get('authorization');
-  if (auth) headers.set('authorization', auth);
+  // Forward the logged-in user's Authorization: from header, server cache, or automatic refresh.
+  const authHeader = await getResolvedAccessTokenForProxy(request);
+  if (authHeader) {
+    headers.set('authorization', authHeader);
+  }
+
+  // Forward tenant / fingerprint context to external lookup service
+  const xTenantId = request.headers.get('x-tenant-id');
+  if (xTenantId) {
+    headers.set('x-tenant-id', xTenantId);
+  }
   const xTenant = request.headers.get('x-tenant-domain');
   if (xTenant) headers.set('x-tenant-domain', xTenant);
   const xFingerprint = request.headers.get('x-fingerprint');
   if (xFingerprint) headers.set('x-fingerprint', xFingerprint);
   headers.set('content-type', 'application/json');
+
+  loggingCustom(LogType.INFRA_LOG, 'info', `[lookup-fetch] definition lookupId=${lookupId} token=${maskToken(authHeader)} fingerprint=${truncateFingerprint(xFingerprint)} xTenantDomain=${xTenant ?? '(none)'}`);
 
   try {
     const res = await fetch(url, { method: 'GET', headers, cache: 'no-store' });
@@ -118,13 +143,24 @@ export async function fetchLookupRaw(
 ): Promise<{ ok: boolean; data: unknown[] }> {
   const url = `${baseUrl}/fetch/${encodeURIComponent(lookupId)}`;
   const headers = new Headers();
-  const auth = request.headers.get('authorization');
-  if (auth) headers.set('authorization', auth);
+  // Forward the logged-in user's Authorization: from header, server cache, or automatic refresh.
+  const authHeader = await getResolvedAccessTokenForProxy(request);
+  if (authHeader) {
+    headers.set('authorization', authHeader);
+  }
+
+  const xTenantId = request.headers.get('x-tenant-id');
+  if (xTenantId) {
+    headers.set('x-tenant-id', xTenantId);
+  }
   const xTenant = request.headers.get('x-tenant-domain');
   if (xTenant) headers.set('x-tenant-domain', xTenant);
   const xFingerprint = request.headers.get('x-fingerprint');
   if (xFingerprint) headers.set('x-fingerprint', xFingerprint);
   headers.set('content-type', 'application/json');
+
+  const bodyKeys = typeof body === 'object' && body !== null ? Object.keys(body as object).join(',') : '(empty)';
+  loggingCustom(LogType.INFRA_LOG, 'info', `[lookup-fetch] fetch lookupId=${lookupId} bodyKeys=${bodyKeys} token=${maskToken(authHeader)} fingerprint=${truncateFingerprint(xFingerprint)} xTenantDomain=${xTenant ?? '(none)'}`);
 
   try {
     const res = await fetch(url, {

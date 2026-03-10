@@ -39,7 +39,7 @@ export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
       className={cn(
         "flex items-center w-full border-b border-gray-700 gap-3",
         isCollapsedDesktop
-          ? "justify-center py-2 min-h-8 px-0"
+          ? "justify-center py-2 h-16 px-0"
           : "justify-between h-16 px-4",
         className
       )}

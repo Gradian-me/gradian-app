@@ -6,7 +6,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
-import type { ProfessionalWritingRequest, ProfessionalWritingResponse } from '../types';
+import type { ProfessionalWritingRequest, ProfessionalWritingResponse, WritingStyle } from '../types';
 import { SUPPORTED_LANGUAGES } from '../types';
 
 interface UseProfessionalWritingReturn {
@@ -35,7 +35,7 @@ export function useProfessionalWriting(): UseProfessionalWritingReturn {
     return language?.label || code;
   }, []);
 
-  const generateEnhancedText = useCallback(async (request: ProfessionalWritingRequest) => {
+  const generateEnhancedText = useCallback(async (request: ProfessionalWritingRequest & { customStyle?: string }) => {
     if (!request.text.trim()) {
       setError('Please enter text to enhance');
       return;
@@ -65,6 +65,8 @@ export function useProfessionalWriting(): UseProfessionalWritingReturn {
       if (request.style === 'translate' && request.targetLanguage) {
         const languageName = getLanguageName(request.targetLanguage);
         userPrompt = `Please translate the following text to ${languageName}. Maintain the original tone, meaning, and context. Ensure cultural accuracy and natural phrasing:\n\n${request.text.trim()}`;
+      } else if (request.style === 'extended') {
+        userPrompt = `Please significantly expand the following text by adding comprehensive details, context, examples, explanations, and supporting information. Enhance depth and richness while preserving the original message, intent, and core meaning. Add relevant background, clarify concepts, provide illustrations, and elaborate on key points to create a more thorough and informative version:\n\n${request.text.trim()}`;
       } else if (request.style === 'professional') {
         userPrompt = `Please enhance the following text to a professional tone. Transform it into a polished, professional tone suitable for business communications, formal documents, and professional contexts. Fix all grammatical errors, improve sentence structure, and enhance clarity:\n\n${request.text.trim()}`;
       } else if (request.style === 'casual') {
@@ -97,6 +99,12 @@ List important considerations, trade-offs, and potential challenges as bullet po
 
 User's Question/Problem:
 ${request.text.trim()}`;
+      } else if (request.style === 'summarizer') {
+        userPrompt = `Deeply analyze the following text to understand meaning, context, relationships, and key details. Then synthesize and completely rephrase all content into one or two flowing narrative paragraphs that capture the essence, main ideas, and critical information. Output MUST be plain text only - NO headings, sections, bullet points, markdown, or structured formatting. Create continuous, natural-flowing prose that reads as if written from scratch based on comprehensive understanding, not a condensed or reorganized version of the original:\n\n${request.text.trim()}`;
+      } else if (request.style === 'email-writer') {
+        userPrompt = `Analyze the following text and rewrite it as a complete, professional email. Automatically infer the appropriate greeting and closing, and structure the message with clear paragraphs, context, and calls to action. Maintain the original intent and key details while improving clarity, tone, and professionalism. Always include a suitable opening (e.g., “Dear [Name],” or “Hi [Name],”) and a courteous sign-off with regards:\n\n${request.text.trim()}`;
+      } else if (request.style === 'custom' && request.customStyle) {
+        userPrompt = `You are a professional writing assistant. Rewrite and enhance the following text according to these style instructions:\n\n${request.customStyle.trim()}\n\n---\n\nText to enhance:\n\n${request.text.trim()}`;
       } else {
         userPrompt = request.text.trim();
       }

@@ -9,7 +9,27 @@ export interface AiAgent {
   label: string;
   icon: string;
   description: string;
-  category?: string; // Category for grouping agents
+  /**
+   * Optional list of related tenant IDs.
+   * When provided, this agent will typically be shown only for these tenants.
+   * IDs should match the tenant IDs returned by `/api/data/tenants`.
+   */
+  tenantIds?: string[];
+  /**
+   * Optional entity type reference for grouping/filtering, typically pointing
+   * to an item in the `entity-type-items` schema (e.g. AI Agent Types group).
+   */
+  entityType?: {
+    id: string;
+    label: string;
+  };
+  /**
+   * Optional list of related tenants with id/label, similar to other data files.
+   */
+  relatedTenants?: Array<{
+    id: string;
+    label: string | Array<Record<string, string>>;
+  }>;
   agentType?: 'chat' | 'image-generation' | 'voice-transcription' | 'video-generation' | 'graph-generation' | 'orchestrator' | 'search'; // Type of AI agent
   requiredOutputFormat: 'json' | 'string' | 'table' | 'image' | 'video' | 'graph' | 'search-results' | 'search-card';
   model?: string;

@@ -68,7 +68,7 @@ function getAiColorClasses(ai: string): string {
   return AI_COLOR_CLASSES[idx];
 }
 
-function renderGs1ValueForDisplay(raw: string): React.ReactNode | null {
+export function renderGs1ValueForDisplay(raw: string): React.ReactNode | null {
   if (!isGS1Valid(raw)) return null;
   try {
     const result = parseGS1(raw);

@@ -201,7 +201,9 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
       )}
       <FormElementFactory
         config={{
+          // Explicitly drop any aiAgentId coming from field config so professional-writing is used by default
           ...field,
+          aiAgentId: undefined,
           label: '', // Hide default label since we're rendering custom one
         }}
         value={fieldValue}
@@ -213,12 +215,13 @@ const FieldItem: React.FC<FieldItemProps> = memo(({
         touched={fieldTouched}
         required={isRequired}
         className={customClassName}
-        {...(field.aiAgentId ? { aiAgentId: field.aiAgentId } : {})}
-        {...(field.component === 'textarea' ? {
-          enableVoiceInput: true,
-          loadingTextSwitches: selectedAgent?.loadingTextSwitches,
-          canCopy: false // Disable canCopy in Textarea since we're showing it in the label row
-        } : {})}
+        {...(field.component === 'textarea'
+          ? {
+              enableVoiceInput: true,
+              loadingTextSwitches: selectedAgent?.loadingTextSwitches,
+              canCopy: false, // Disable canCopy in Textarea since we're showing it in the label row
+            }
+          : {})}
       />
     </div>
   );
@@ -1196,7 +1199,6 @@ export function AiBuilderForm({
                             id: agent.id,
                             label: agent.label,
                             icon: agent.icon,
-                            category: agent.category,
                           })),
                         }}
                         value={selectedAgentId}
