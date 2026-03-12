@@ -100,7 +100,7 @@ export const GS1LookupContent: React.FC<GS1LookupContentProps> = ({
     return (
       <div
         className={cn(
-          "mt-1 h-4 w-32 rounded bg-slate-200 dark:bg-slate-700 animate-pulse",
+          "mt-1 h-5 w-40 rounded bg-slate-200 dark:bg-slate-700 animate-pulse",
           className,
         )}
         aria-label="Loading lookup data"
@@ -112,14 +112,14 @@ export const GS1LookupContent: React.FC<GS1LookupContentProps> = ({
     return (
       <div
         className={cn(
-          "mt-1 inline-flex items-center gap-1 text-[11px] text-red-600 dark:text-red-400 break-words",
+          "mt-1 inline-flex items-center gap-1 text-xs text-red-600 dark:text-red-400 break-words",
           className,
         )}
       >
         <span>{error}</span>
         <button
           type="button"
-          className="inline-flex h-4 w-4 items-center justify-center rounded-lg border border-red-300/60 text-red-500 dark:border-red-800/80 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors p-1"
+          className="inline-flex h-5 w-5 items-center justify-center rounded bg-red-300 dark:bg-red-200 text-red-900  dark:text-red-900 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors p-1"
           aria-label="Retry lookup"
           onClick={() => setRetryToken((t) => t + 1)}
         >

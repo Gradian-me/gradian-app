@@ -180,7 +180,7 @@ export async function fetchLookupRaw(
   lookupId: string,
   request: NextRequest,
   body: unknown
-): Promise<{ ok: boolean; data: unknown[] }> {
+): Promise<{ ok: boolean; status: number; data: unknown[] }> {
   const url = `${baseUrl}/fetch/${encodeURIComponent(lookupId)}`;
   const headers = new Headers();
   // Forward the logged-in user's Authorization: from header, server cache, or automatic refresh.
@@ -209,12 +209,27 @@ export async function fetchLookupRaw(
       body: typeof body === 'object' && body !== null ? JSON.stringify(body) : '{}',
       cache: 'no-store',
     });
-    const payload = await res.json();
+    const status = res.status;
+    let payload: unknown = null;
+    try {
+      // Upstream may or may not return JSON; swallow parse errors.
+      payload = await res.json();
+    } catch {
+      payload = null;
+    }
     const arr = findArray(payload);
-    return { ok: res.ok, data: Array.isArray(arr) ? arr : [] };
+    if (!res.ok) {
+      loggingCustom(
+        LogType.INFRA_LOG,
+        'warn',
+        `[lookup-fetch] POST fetch failed: ${status} ${url}`
+      );
+    }
+    return { ok: res.ok, status, data: Array.isArray(arr) ? arr : [] };
   } catch (e) {
     loggingCustom(LogType.INFRA_LOG, 'warn', `[lookup-fetch] POST fetch error: ${e instanceof Error ? e.message : String(e)}`);
-    return { ok: false, data: [] };
+    // Network or other unexpected error: surface as 502 to callers.
+    return { ok: false, status: 502, data: [] };
   }
 }
 

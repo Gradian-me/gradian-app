@@ -84,11 +84,13 @@ export async function POST(
   const sanitizeLabels = body?.sanitizeLabels === true;
   if (sanitizeLabels) {
     const def = await fetchLookupDefinition(baseUrl, lookupId, request);
-    const { ok, data: rawRows } = await fetchLookupRaw(baseUrl, lookupId, request, body);
+    const { ok, status, data: rawRows } = await fetchLookupRaw(baseUrl, lookupId, request, body);
     if (!ok) {
+      const httpStatus = status >= 400 && status <= 599 ? status : 502;
+      const errorMessage = httpStatus === 401 || httpStatus === 403 ? 'Unauthorized' : 'Lookup fetch failed.';
       return NextResponse.json(
-        { success: false, error: 'Lookup fetch failed.', data: [] },
-        { status: 502 }
+        { success: false, error: errorMessage, data: [] },
+        { status: httpStatus }
       );
     }
     const defWithDefaults = def ?? {
