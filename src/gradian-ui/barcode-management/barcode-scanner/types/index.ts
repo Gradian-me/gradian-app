@@ -16,7 +16,8 @@ export type BarcodeFormat =
   | "Codabar"
   | "RSS14"
   | "RSSExpanded"
-  | "Handheld";
+  | "Handheld"
+  | "RFID";
 
 export type ScanMode = "camera" | "handheld";
 

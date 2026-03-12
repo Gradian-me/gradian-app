@@ -87,6 +87,7 @@ export function Logo({
       width={width}
       height={height}
       className={cn('object-contain m-0', className)}
+      style={{ width: 'auto', height: 'auto' }}
       priority
       loading="eager"
     />

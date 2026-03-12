@@ -3,7 +3,7 @@
   "version": "1.64.005",
   "private": true,
   "scripts": {
-    "dev": "npm run sync:relation-types && npm run clean:relations && cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack",
+    "dev": "npm run sync:relation-types && npm run clean:relations && cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack --experimental-https --experimental-https-cert=./localhost+2.pem --experimental-https-key=./localhost+2-key.pem",
     "start:dev": "cross-env NODE_OPTIONS=--max-http-header-size=32768 next dev --turbopack",
     "sync:relation-types": "node scripts/sync-relation-types.js",
     "clean:relations": "node scripts/clean-relations.js",

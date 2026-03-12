@@ -125,7 +125,7 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
           )}>
             {barcode.format ?? unknownFormatLabel}
           </span>
-          {(barcode.format === "DataMatrix" || barcode.format === "Handheld") && (
+          {(barcode.format === "DataMatrix" || barcode.format === "Handheld" || barcode.format === "RFID") && (
             <GS1Badge barcodeLabel={barcode.label ?? ""} />
           )}
           {barcode.createdAt && (

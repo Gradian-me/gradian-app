@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react";
 import dynamic from "next/dynamic";
-import { useDevices, boundingBox } from "@yudiel/react-qr-scanner";
+import { boundingBox } from "@yudiel/react-qr-scanner";
 import { prepareZXingModule } from "barcode-detector/ponyfill";
 import { DrawerDialog } from "@/gradian-ui/data-display/components/DrawerDialog";
 import { BarcodeScannerCamera } from "./BarcodeScannerCamera";
@@ -33,6 +33,7 @@ import type {
   ScannedBarcode,
   ScanMode,
 } from "../types";
+import { LOG_CONFIG, LogType } from "@/gradian-ui/shared/configs/log-config";
 
 // ——— ZXing format mapping ————————————————————————————————————————————————
 /** Map our BarcodeFormat to @yudiel/react-qr-scanner format strings. */
@@ -55,6 +56,7 @@ const OUR_FORMAT_TO_LIBRARY: Record<BarcodeFormat, string[]> = {
   RSS14: ["databar"],
   RSSExpanded: ["databar_expanded"],
   Handheld: [],
+  RFID: [],
 };
 
 /** Map library format string to our display name. */
@@ -107,6 +109,54 @@ function useIsSmallScreen(): boolean {
     return () => mq.removeEventListener("change", handler);
   }, []);
   return isSmall;
+}
+
+function useCameraDevices(): MediaDeviceInfo[] | null {
+  const [devices, setDevices] = useState<MediaDeviceInfo[] | null>(null);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.mediaDevices?.enumerateDevices) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadDevices = async () => {
+      try {
+        const all = await navigator.mediaDevices.enumerateDevices();
+        if (!cancelled) {
+          setDevices(all);
+        }
+      } catch (error) {
+        if (LOG_CONFIG[LogType.CLIENT_LOG]) {
+          console.warn("[BarcodeScanner] Failed to enumerate media devices on", window.location.origin, error);
+        }
+      }
+    };
+
+    void loadDevices();
+
+    const handleChange = () => {
+      void loadDevices();
+    };
+
+    if (navigator.mediaDevices.addEventListener) {
+      navigator.mediaDevices.addEventListener("devicechange", handleChange);
+    } else if (typeof navigator.mediaDevices.ondevicechange !== "undefined") {
+      navigator.mediaDevices.ondevicechange = handleChange;
+    }
+
+    return () => {
+      cancelled = true;
+      if (navigator.mediaDevices.removeEventListener) {
+        navigator.mediaDevices.removeEventListener("devicechange", handleChange);
+      } else if (navigator.mediaDevices.ondevicechange === handleChange) {
+        navigator.mediaDevices.ondevicechange = null;
+      }
+    };
+  }, []);
+
+  return devices;
 }
 
 /** Creates a beep function that uses Web Audio API (no Audio element, works without external sources). */
@@ -204,7 +254,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   const audioContextRef = useRef<AudioContext | null>(null);
   const lastScanRef = useRef<string>("");
 
-  const devices = useDevices();
+  const devices = useCameraDevices();
   const cameras = useMemo(
     () => (devices ?? []).filter((d) => d.kind === "videoinput"),
     [devices]
@@ -238,6 +288,15 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   // Tracks the actual last scanned/entered item for statistics (not last by array position)
   const [lastScannedLabel, setLastScannedLabel] = useState<string | null>(null);
   const [lastScannedFormatForStats, setLastScannedFormatForStats] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!LOG_CONFIG[LogType.CLIENT_LOG]) return;
+    if (!devices) {
+      console.log("[BarcodeScanner] useDevices returned null/undefined on", window.location.origin);
+      return;
+    }
+    console.log("[BarcodeScanner] useDevices devices on", window.location.origin, devices);
+  }, [devices]);
 
   // Configure ZXing WASM URL to use CSP-allowed CDN before any Scanner/BarcodeDetector runs
   useLayoutEffect(() => {
@@ -416,7 +475,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       if (!raw) return;
       if (enableBeep && beepOn && beepRef.current) beepRef.current();
       setLastScannedLabel(raw);
-      setLastScannedFormatForStats("Handheld");
+      setLastScannedFormatForStats("RFID");
 
       if (enableMultipleScan) {
         setBarcodes((prev) => {
@@ -434,7 +493,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
           const newItem: ScannedBarcode = {
             id: ulid(),
             label: raw,
-            format: "Handheld",
+            format: "RFID",
             createdAt: now.toISOString(),
             count: enableChangeCount ? 1 : undefined,
           };
@@ -443,8 +502,8 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
         });
       } else {
         setScannedValue(raw);
-        setScannedFormat("Handheld");
-        onScan?.(raw, "Handheld");
+        setScannedFormat("RFID");
+        onScan?.(raw, "RFID");
       }
     },
     [enableBeep, beepOn, enableMultipleScan, enableChangeCount, markNewlyAdded, onScan]
@@ -553,6 +612,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   const handheldDescription = getT(TRANSLATION_KEYS.BARCODE_SCANNER_HANDHELD_DESCRIPTION, language, defaultLang);
   const placeholderScanOrType = getT(TRANSLATION_KEYS.BARCODE_SCANNER_PLACEHOLDER_SCAN_OR_TYPE, language, defaultLang);
   const addBarcodeAria = getT(TRANSLATION_KEYS.BARCODE_SCANNER_ADD_BARCODE, language, defaultLang);
+  const scannerDialogDescription = getT(TRANSLATION_KEYS.BARCODE_SCANNER_POINT_CAMERA, language, defaultLang);
 
   const confirmButtonNode = (
     <Button
@@ -709,6 +769,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       open={open}
       onOpenChange={onOpenChange}
       title={displayTitle}
+      description={scannerDialogDescription}
       size="lg"
       drawerDirection="bottom"
       drawerFullHeight={true}
@@ -744,7 +805,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
 
       {enableJSONResult && (
         <Dialog open={isJsonDialogOpen} onOpenChange={setIsJsonDialogOpen}>
-          <DialogContent className="w-full h-full lg:max-w-[65vw] lg:max-h-[90vh] flex flex-col" aria-describedby={undefined}>
+          <DialogContent className="w-full h-full lg:max-w-[65vw] lg:max-h-[90vh] flex flex-col">
             <DialogHeader>
               <DialogTitle>{scannedJsonTitle}</DialogTitle>
             </DialogHeader>

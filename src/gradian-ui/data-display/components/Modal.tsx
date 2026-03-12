@@ -80,6 +80,10 @@ export const Modal: React.FC<ModalProps> = ({
         className={modalClasses}
         style={maximizedStyle}
         hideCloseButton={hideCloseButton}
+        // Explicitly mark that this dialog intentionally has no description
+        // when `description` is undefined, to satisfy accessibility checks
+        // expecting either a Description or aria-describedby={undefined}.
+        aria-describedby={description ? (props as any)["aria-describedby"] : undefined}
         onInteractOutside={(e) => {
           if (!closeOnOutsideClick) {
             e.preventDefault();
