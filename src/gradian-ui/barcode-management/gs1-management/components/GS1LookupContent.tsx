@@ -119,7 +119,7 @@ export const GS1LookupContent: React.FC<GS1LookupContentProps> = ({
         <span>{error}</span>
         <button
           type="button"
-          className="inline-flex h-4 w-4 items-center justify-center rounded-full border border-red-300/60 text-red-500 dark:border-red-800/80 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
+          className="inline-flex h-4 w-4 items-center justify-center rounded-lg border border-red-300/60 text-red-500 dark:border-red-800/80 dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors p-1"
           aria-label="Retry lookup"
           onClick={() => setRetryToken((t) => t + 1)}
         >

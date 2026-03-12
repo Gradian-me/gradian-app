@@ -17,6 +17,7 @@ import { BarcodeScannerToolbar } from "./BarcodeScannerToolbar";
 import { BarcodeScannerResult } from "./BarcodeScannerResult";
 import { BarcodeScannerResultJSON } from "./BarcodeScannerResultJSON";
 import { BarcodeScannerStatistics } from "./BarcodeScannerStatistics";
+import { BarcodeHandheld } from "./BarcodeHandheld";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/gradian-ui/shared/utils";
@@ -226,8 +227,6 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
 
   // Handheld / input-mode state
   const [scanMode, setScanMode] = useState<ScanMode>("camera");
-  const [handheldInput, setHandheldInput] = useState("");
-  const handheldInputRef = useRef<HTMLInputElement>(null);
 
   // Beep on/off (toolbar switch; default true)
   const [beepOn, setBeepOn] = useState(true);
@@ -384,8 +383,6 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   useEffect(() => {
     if (scanMode === "handheld") {
       setIsScanning(false);
-      const t = window.setTimeout(() => handheldInputRef.current?.focus(), 100);
-      return () => window.clearTimeout(t);
     }
   }, [scanMode]);
 
@@ -398,7 +395,6 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       lastScanRef.current = "";
       setIsJsonDialogOpen(false);
       setScanMode("camera");
-      setHandheldInput("");
       if (newlyAddedTimerRef.current) clearTimeout(newlyAddedTimerRef.current);
       setNewlyAddedId(null);
       setLastScannedLabel(null);
@@ -414,43 +410,45 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
     setScanMode(mode);
   }, []);
 
-  const handleHandheldAdd = useCallback(() => {
-    const raw = sanitizeBarcodeValue(handheldInput);
-    if (!raw) return;
-    setHandheldInput("");
-    if (enableBeep && beepOn && beepRef.current) beepRef.current();
-    setLastScannedLabel(raw);
-    setLastScannedFormatForStats("Handheld");
+  const handleHandheldAdd = useCallback(
+    (inputValue: string) => {
+      const raw = sanitizeBarcodeValue(inputValue);
+      if (!raw) return;
+      if (enableBeep && beepOn && beepRef.current) beepRef.current();
+      setLastScannedLabel(raw);
+      setLastScannedFormatForStats("Handheld");
 
-    if (enableMultipleScan) {
-      setBarcodes((prev) => {
-        const existing = prev.find((b) => b.label === raw);
-        if (existing) {
-          const updated = prev.map((b) =>
-            b.id === existing.id
-              ? { ...b, count: enableChangeCount ? (b.count ?? 1) + 1 : b.count }
-              : b
-          );
-          window.setTimeout(() => markNewlyAdded(existing.id), 0);
-          return updated;
-        }
-        const now = new Date();
-        const newItem: ScannedBarcode = {
-          id: ulid(),
-          label: raw,
-          format: "Handheld",
-          createdAt: now.toISOString(),
-          count: enableChangeCount ? 1 : undefined,
-        };
-        window.setTimeout(() => markNewlyAdded(newItem.id), 0);
-        return [...prev, newItem];
-      });
-    } else {
-      setScannedValue(raw);
-      setScannedFormat("Handheld");
-      onScan?.(raw, "Handheld");
-    }
-  }, [handheldInput, setHandheldInput, enableBeep, beepOn, enableMultipleScan, enableChangeCount, markNewlyAdded, onScan]);
+      if (enableMultipleScan) {
+        setBarcodes((prev) => {
+          const existing = prev.find((b) => b.label === raw);
+          if (existing) {
+            const updated = prev.map((b) =>
+              b.id === existing.id
+                ? { ...b, count: enableChangeCount ? (b.count ?? 1) + 1 : b.count }
+                : b
+            );
+            window.setTimeout(() => markNewlyAdded(existing.id), 0);
+            return updated;
+          }
+          const now = new Date();
+          const newItem: ScannedBarcode = {
+            id: ulid(),
+            label: raw,
+            format: "Handheld",
+            createdAt: now.toISOString(),
+            count: enableChangeCount ? 1 : undefined,
+          };
+          window.setTimeout(() => markNewlyAdded(newItem.id), 0);
+          return [...prev, newItem];
+        });
+      } else {
+        setScannedValue(raw);
+        setScannedFormat("Handheld");
+        onScan?.(raw, "Handheld");
+      }
+    },
+    [enableBeep, beepOn, enableMultipleScan, enableChangeCount, markNewlyAdded, onScan]
+  );
 
   const handleZoomIn = useCallback(() => {
     setZoomLevel((p) => Math.min(p + ZOOM_STEP, MAX_ZOOM));
@@ -568,60 +566,18 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
     </Button>
   );
 
-  const handheldPanel = (
-    <div className={cn(
-      "flex flex-col items-center justify-center gap-4 px-4",
-      isDialogLayout ? "flex-1 py-6" : "py-6"
-    )}>
-      <div className="flex flex-col items-center gap-1 textcenter">
-        <div className="w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center mb-1">
-          <svg className="w-6 h-6 text-violet-600 dark:text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z" />
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75ZM6.75 16.5h.75v.75h-.75V16.5ZM16.5 6.75h.75v.75h-.75v-.75ZM13.5 13.5h.75v.75h-.75v-.75ZM13.5 19.5h.75v.75h-.75v-.75ZM19.5 13.5h.75v.75h-.75v-.75ZM19.5 19.5h.75v.75h-.75v-.75ZM16.5 16.5h.75v.75h-.75v-.75Z" />
-          </svg>
-        </div>
-        <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{handheldTitle}</p>
-        <p className="text-xs text-gray-400 dark:text-gray-500 max-w-[200px]">
-          {handheldDescription}
-        </p>
-      </div>
-      <div className="flex w-full max-w-xs gap-2">
-        <input
-          ref={handheldInputRef}
-          type="text"
-          value={handheldInput}
-          onChange={(e) => setHandheldInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleHandheldAdd();
-            }
-          }}
-          placeholder={placeholderScanOrType}
-          className="flex-1 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 dark:focus:ring-violet-600 dark:focus:border-violet-600 transition-colors"
-          autoComplete="off"
-          maxLength={2048}
-        />
-        <button
-          type="button"
-          onClick={handleHandheldAdd}
-          disabled={!handheldInput.trim()}
-          className="h-10 w-10 shrink-0 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1"
-          aria-label={addBarcodeAria}
-          title={addBarcodeAria}
-        >
-          <Plus className="w-5 h-5" />
-        </button>
-      </div>
-    </div>
-  );
-
   const cameraAndToolbarBlock = (
     <>
       {/* Camera / handheld + toolbar — vertically centered in dialog layout */}
       <div className={cn("flex min-h-0 flex-col items-stretch justify-around", isDialogLayout && "flex-1")}>
         {scanMode === "handheld" ? (
-          handheldPanel
+          <BarcodeHandheld
+            title={handheldTitle}
+            description={handheldDescription}
+            placeholder={placeholderScanOrType}
+            addBarcodeAria={addBarcodeAria}
+            onSubmit={handleHandheldAdd}
+          />
         ) : (
           <div className="flex flex-1 min-h-0 items-center justify-center p-1">
             <BarcodeScannerCamera
