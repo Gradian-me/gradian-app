@@ -7,11 +7,11 @@ import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useLanguageStore } from '@/stores/language.store';
 import { getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { useDynamicEntity } from '@/gradian-ui/shared/hooks/use-dynamic-entity';
-import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { QueryClientContext } from '@tanstack/react-query';
 import { getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { getSchemaWithClientCache, getSchemasWithClientCache, clearClientSchemaCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 
 interface DynamicDetailPageClientProps {
@@ -252,16 +252,6 @@ export function DynamicDetailPageClient({
     };
   }, [refreshSchema]);
 
-  // Helper function to fetch schema client-side
-  const fetchSchemaClient = useCallback(async (schemaId: string): Promise<FormSchema | null> => {
-    const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
-    if (response.success && response.data) {
-      await cacheSchemaClientSide(response.data);
-      return response.data;
-    }
-    return null;
-  }, []);
-
   // Fetch entity data and resolve picker fields
   const loadData = useCallback(
     async ({ silent }: { silent?: boolean } = {}) => {
@@ -305,7 +295,7 @@ export function DynamicDetailPageClient({
                           const resolvedEntity = resolvedResponse.data;
                           let resolvedLabel = resolvedEntity.name || resolvedEntity.title || value;
 
-                          const targetSchemaForPicker = await fetchSchemaClient(field.targetSchema);
+                          const targetSchemaForPicker = await getSchemaWithClientCache(field.targetSchema);
                           if (targetSchemaForPicker) {
                             const titleByRole = getValueByRole(
                               targetSchemaForPicker,
@@ -366,7 +356,7 @@ export function DynamicDetailPageClient({
         }
       }
     },
-    [dataId, schemaId, schemaState, fetchSchemaClient]
+    [dataId, schemaId, schemaState]
   );
 
   useEffect(() => {

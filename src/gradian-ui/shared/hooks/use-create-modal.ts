@@ -9,6 +9,7 @@ import { asFormBuilderSchema } from '@/gradian-ui/schema-manager/utils/schema-ut
 import type { FormSchema as FormBuilderSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useCompanyStore } from '@/stores/company.store';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { getSchemaWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 import { filterFormDataForSubmission } from '@/gradian-ui/form-builder/utils/form-data-filter';
 
 /**
@@ -158,19 +159,15 @@ export function useCreateModal(
     setIsLoadingSchema(true);
     
     try {
-      // Always fetch fresh schema from API to ensure we have the latest schema definition
-      // This is especially important for nested modals where schemas might have been updated
-      const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
-        disableCache: true, // Always fetch fresh schema
-      });
-      
-      if (!response.success || !response.data) {
-        throw new Error(response.error || `Schema not found: ${schemaId}`);
+      // Prefer client-side cache first; API fallback is handled inside getSchemaWithClientCache
+      const freshSchema = await getSchemaWithClientCache(schemaId);
+      if (!freshSchema) {
+        throw new Error(`Schema not found: ${schemaId}`);
       }
 
-      await cacheSchemaClientSide(response.data, { queryClient, persist: false });
+      await cacheSchemaClientSide(freshSchema, { queryClient, persist: false });
       // Reconstruct RegExp objects
-      const rawSchema = reconstructRegExp(response.data) as FormSchema;
+      const rawSchema = reconstructRegExp(freshSchema) as FormSchema;
       
       // Validate schema structure
       if (!rawSchema?.id) {

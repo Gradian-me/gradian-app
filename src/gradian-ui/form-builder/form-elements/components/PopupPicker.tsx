@@ -12,7 +12,6 @@ import { getInitials } from '@/gradian-ui/form-builder/form-elements/utils/avata
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cn } from '@/gradian-ui/shared/utils';
 import { UI_PARAMS, FORM_CONTAINER_ALT_BG_CLASSES } from '@/gradian-ui/shared/configs/ui-config';
-import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronLeft, ChevronRight, List, Loader2, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -31,6 +30,8 @@ import { getValidBadgeVariant } from '@/gradian-ui/data-display/utils/badge-vari
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { getSchemaWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { IconBox, resolveIconBoxColor } from './IconBox';
 import { AddButtonFull } from './AddButtonFull';
@@ -523,10 +524,12 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     if (!staticItems && !effectiveSourceUrl && !providedSchema && schemaId && isOpen) {
       const fetchSchema = async () => {
         try {
-          const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
-          if (response.success && response.data) {
-            await cacheSchemaClientSide(response.data, { queryClient, persist: false });
-            setSchema(response.data);
+          const cachedOrFresh = await getSchemaWithClientCache(schemaId);
+          if (cachedOrFresh && cachedOrFresh.id) {
+            await cacheSchemaClientSide(cachedOrFresh, { queryClient, persist: false });
+            setSchema(cachedOrFresh);
+          } else {
+            setSchema(null);
           }
         } catch (err) {
           loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching schema: ${err instanceof Error ? err.message : String(err)}`);

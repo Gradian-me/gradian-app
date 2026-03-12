@@ -415,6 +415,217 @@
     ]
   },
   {
+    "id": "application-config",
+    "description": "Global application configuration including general settings and barcode options",
+    "singular_name": "Application Config",
+    "plural_name": "Application Configs",
+    "singular_name_translations": [
+      {
+        "en": "Application Config"
+      },
+      {
+        "fa": "پیکربندی برنامه"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "Application Configs"
+      },
+      {
+        "fa": "پیکربندی‌های برنامه"
+      }
+    ],
+    "fields": [
+      {
+        "id": "application-config-default-language",
+        "name": "defaultLanguage",
+        "label": "Default Language",
+        "sectionId": "general-config",
+        "component": "select",
+        "translations": [
+          {
+            "en": "Default Language"
+          },
+          {
+            "fa": "زبان پیش‌فرض"
+          }
+        ],
+        "sourceUrl": "/api/languages",
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 1,
+        "caption": "Select default application language (loaded from /api/languages)",
+        "captionTranslations": [
+          {
+            "en": "Select default application language (loaded from /api/languages)"
+          },
+          {
+            "fa": "زبان پیش‌فرض برنامه را (از /api/languages) انتخاب کنید"
+          }
+        ]
+      },
+      {
+        "id": "application-config-gs1-ai-code",
+        "name": "aiCode",
+        "label": "GS1 AI Code",
+        "sectionId": "barcode-config-gs1",
+        "component": "number",
+        "translations": [
+          {
+            "en": "GS1 AI Code"
+          },
+          {
+            "fa": "کد GS1 AI"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 0,
+        "caption": "Enter GS1 Application Identifier code (numeric).",
+        "captionTranslations": [
+          {
+            "en": "Enter GS1 Application Identifier code (numeric)."
+          },
+          {
+            "fa": "کد شناسه کاربردی GS1 را به صورت عددی وارد کنید."
+          }
+        ]
+      },
+      {
+        "id": "application-config-gs1-lookup-id",
+        "name": "lookupId",
+        "label": "Lookup ID",
+        "sectionId": "barcode-config-gs1",
+        "component": "text",
+        "translations": [
+          {
+            "en": "Lookup ID"
+          },
+          {
+            "fa": "Lookup ID"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1,
+        "caption": "Enter lookup ID for this GS1 AI (e.g. a lookup dataset key).",
+        "captionTranslations": [
+          {
+            "en": "Enter lookup ID for this GS1 AI (e.g. a lookup dataset key)."
+          },
+          {
+            "fa": "Lookup ID مربوط به این GS1 AI (مثلاً کلید دیتاست lookup) را وارد کنید."
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "general-config",
+        "title": "General Config",
+        "titleTranslations": [
+          {
+            "en": "General Config"
+          },
+          {
+            "fa": "پیکربندی عمومی"
+          }
+        ],
+        "description": "General application configuration such as default language",
+        "descriptionTranslations": [
+          {
+            "en": "General application configuration such as default language"
+          },
+          {
+            "fa": "پیکربندی عمومی برنامه مانند زبان پیش‌فرض"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2,
+        "wizardId": "wizard-application-config-general"
+      },
+      {
+        "id": "barcode-config-gs1",
+        "title": "Barcode Config - GS1 AI",
+        "titleTranslations": [
+          {
+            "en": "Barcode Config - GS1 AI"
+          },
+          {
+            "fa": "پیکربندی بارکد - شناسه‌های GS1"
+          }
+        ],
+        "description": "GS1 Application Identifiers configuration (aiCode and lookupId list)",
+        "descriptionTranslations": [
+          {
+            "en": "GS1 Application Identifiers configuration (aiCode and lookupId list)"
+          },
+          {
+            "fa": "پیکربندی شناسه‌های کاربردی GS1 (لیست aiCode و lookupId)"
+          }
+        ],
+        "initialState": "collapsed",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "fieldRelationType": "addFields",
+          "minItems": 0
+        },
+        "wizardId": "wizard-application-config-barcode"
+      }
+    ],
+    "wizards": [
+      {
+        "id": "wizard-application-config-general",
+        "title": [
+          {
+            "en": "General Config"
+          },
+          {
+            "fa": "پیکربندی عمومی"
+          }
+        ],
+        "icon": "Settings",
+        "order": 0
+      },
+      {
+        "id": "wizard-application-config-barcode",
+        "title": [
+          {
+            "en": "Barcode Config"
+          },
+          {
+            "fa": "پیکربندی بارکد"
+          }
+        ],
+        "icon": "QrCode",
+        "order": 1
+      }
+    ],
+    "showInNavigation": false,
+    "icon": "Settings2",
+    "isNotCompanyBased": true,
+    "schemaType": "system",
+    "applyToAllTenants": true,
+    "description_translations": [
+      {
+        "en": "Global application configuration including general settings and barcode options"
+      },
+      {
+        "fa": "پیکربندی سراسری برنامه شامل تنظیمات عمومی و گزینه‌های بارکد"
+      }
+    ],
+    "applications": []
+  },
+  {
     "id": "external_nodes",
     "description": "Manage external nodes from external data sources and APIs",
     "singular_name": "External Node",
@@ -36528,7 +36739,10 @@
           "payloadTemplate": {}
         }
       ]
-    }
+    },
+    "applications": [],
+    "schemaType": "system",
+    "isSystemSchema": true
   },
   {
     "id": "job-descriptions",

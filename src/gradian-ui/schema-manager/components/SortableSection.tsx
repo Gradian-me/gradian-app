@@ -12,8 +12,8 @@ import { FormSection, FormSchema, FormWizard } from '../types/form-schema';
 import { SectionEditor } from './SectionEditor';
 import { SchemaBuilderDialog } from './SchemaBuilderDialog';
 import { config } from '@/lib/config';
-import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { getSchemaWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 import { useQueryClient } from '@tanstack/react-query';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
@@ -88,17 +88,16 @@ export function SortableSection({
       setTargetSchemaId(targetSchema); // Set immediately so dialog can render
       const fetchTargetSchemaName = async () => {
         try {
-          const response = await apiRequest<FormSchema>(`/api/schemas/${targetSchema}`);
-          if (response.success && response.data) {
-            await cacheSchemaClientSide(response.data, { queryClient, persist: false });
-            const schema = response.data;
+          const schema = await getSchemaWithClientCache(targetSchema);
+          if (schema && schema.id) {
+            await cacheSchemaClientSide(schema, { queryClient, persist: false });
             setTargetSchemaName(schema.plural_name || schema.singular_name || targetSchema);
             return;
           }
         } catch (error) {
           console.error('Error fetching target schema:', error);
-          // Fallback to schema ID if fetch fails
         }
+        // Fallback to schema ID if fetch fails
         setTargetSchemaName(targetSchema || null);
       };
       fetchTargetSchemaName();

@@ -33,7 +33,7 @@ import { FormSystemSection } from './FormSystemSection';
 import { ExpandCollapseControls } from '@/gradian-ui/data-display/components/HierarchyExpandCollapseControls';
 import { replaceDynamicContext } from '../utils/dynamic-context-replacer';
 import { AiFormFillerDialog } from '@/domains/ai-builder/components/AiFormFillerDialog';
-import { Sparkles, MoreVertical, MessageCircle, Loader2 } from 'lucide-react';
+import { Sparkles, MoreVertical, MessageCircle, Loader2, ChevronRight } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { DynamicQuickActions } from '@/gradian-ui/data-display/components/DynamicQuickActions';
@@ -41,6 +41,9 @@ import { DiscussionsDialog } from '@/gradian-ui/communication';
 import { getDiscussionCount } from '@/gradian-ui/data-display/utils';
 import { WizardStepper } from './WizardStepper';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getSchemasWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
+import { useQueryClient } from '@tanstack/react-query';
+import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 
 export const useFormContext = () => {
   const context = useContext(FormContext);
@@ -453,6 +456,8 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   annotatedFields,
   ...props
 }) => {
+  const queryClient = useQueryClient();
+
   // Normalize schema so sections/fields are always arrays (never null) - prevents "Cannot read properties of null (reading 'length')"
   const safeSchema = useMemo((): FormSchema => {
     if (!schema || typeof schema !== 'object') {
@@ -488,6 +493,55 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
       detailPageMetadata,
     } as FormSchema;
   }, [schema]);
+
+  // Preload all target schemas used by this form (relation-based repeating sections and picker fields)
+  useEffect(() => {
+    const sections = Array.isArray(safeSchema.sections) ? safeSchema.sections : [];
+    const fields = Array.isArray(safeSchema.fields) ? safeSchema.fields : [];
+
+    const targetSchemaIds = new Set<string>();
+
+    // Repeating sections with relation-based targetSchema
+    sections.forEach((section) => {
+      const ts = section.repeatingConfig?.targetSchema;
+      if (section.isRepeatingSection && ts && typeof ts === 'string' && ts.trim() !== '') {
+        targetSchemaIds.add(ts.trim());
+      }
+    });
+
+    // Fields that reference other schemas (picker / popup-picker or explicit targetSchema on config)
+    fields.forEach((field) => {
+      const componentType = (field as any).component;
+      const ts = (field as any).targetSchema || (field as any).target_schema || (field as any)['target-schema'];
+      if (typeof ts === 'string' && ts.trim() !== '') {
+        if (componentType === 'picker' || componentType === 'popup-picker') {
+          targetSchemaIds.add(ts.trim());
+        }
+      }
+    });
+
+    const ids = Array.from(targetSchemaIds).filter((id) => id && id !== safeSchema.id);
+    if (ids.length === 0) {
+      return;
+    }
+
+    getSchemasWithClientCache(ids)
+      .then((schemas) => {
+        if (!queryClient || !schemas?.length) return;
+        schemas.forEach((s) => {
+          if (s?.id) {
+            void cacheSchemaClientSide(s, { queryClient, persist: false });
+          }
+        });
+      })
+      .catch((err) => {
+        loggingCustom(
+          LogType.CLIENT_LOG,
+          'warn',
+          `[SchemaFormWrapper] Failed to preload target schemas: ${err instanceof Error ? err.message : String(err)}`
+        );
+      });
+  }, [safeSchema, queryClient]);
 
   const language = useLanguageStore((s) => s.language) ?? 'en';
   const defaultLang = getDefaultLanguage();
@@ -2112,7 +2166,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           {/* Collapse/Expand All Buttons */}
           {(safeSchema.sections.length > 0) && schema?.isCollapsibleSections !== false && !hideCollapseExpandButtons && (
             <TooltipProvider>
-              <div className="flex justify-end mb-4 w-full max-w-3xl mx-auto">
+              <div className="flex justify-end mb-4 w-full">
                 <ExpandCollapseControls
                   onExpandAll={expandAll}
                   onCollapseAll={collapseAll}
@@ -2126,7 +2180,9 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             </TooltipProvider>
           )}
 
-          <div className="space-y-4 w-full max-w-3xl mx-auto">
+          {/* Wrapper uses overflow-x-hidden so wizard section slide animations
+              don't cause horizontal scrollbars on the overall form container. */}
+          <div className="space-y-4 w-full overflow-x-hidden">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={activeWizardIndex}
@@ -2151,24 +2207,30 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
               </motion.div>
             </AnimatePresence>
             {hasWizards && (
-              <div className="flex items-center justify-between gap-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+              <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleWizardPrevious}
                   disabled={activeWizardIndex === 0 || disabled}
-                  className="h-14 w-14 shrink-0 p-0 flex items-center justify-center rounded-lg border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-300 dark:hover:bg-violet-900/30 focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:outline-offset-2 focus:ring-0"
+                  className="h-9 w-20 shrink-0 px-2 flex items-center justify-center rounded-md border-violet-200 text-violet-700 hover:bg-violet-50 dark:border-violet-800 dark:text-violet-300 dark:hover:bg-violet-900/30 focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:outline-offset-2 focus:ring-0"
                 >
-                  <span className="text-xs font-medium truncate max-w-full px-1">{getT(TRANSLATION_KEYS.WIZARD_PREVIOUS, language, defaultLang)}</span>
+                  <span className="flex items-center gap-1 text-xs font-medium truncate max-w-full">
+                    <ChevronRight className="h-3 w-3 rotate-180 rtl:rotate-0 transition-transform" />
+                    {getT(TRANSLATION_KEYS.WIZARD_PREVIOUS, language, defaultLang)}
+                  </span>
                 </Button>
                 <Button
                   type="button"
                   variant="default"
                   onClick={handleWizardNext}
                   disabled={activeWizardIndex >= effectiveWizards.length - 1 || disabled}
-                  className="h-14 w-14 shrink-0 p-0 flex items-center justify-center rounded-lg bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-600 dark:hover:bg-violet-700 focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:outline-offset-2 focus:ring-0"
+                  className="h-9 w-20 shrink-0 px-2 flex items-center justify-center rounded-md bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-600 dark:hover:bg-violet-700 focus-visible:outline-2 focus-visible:outline-violet-500 focus-visible:outline-offset-2 focus:ring-0"
                 >
-                  <span className="text-xs font-medium truncate max-w-full px-1">{getT(TRANSLATION_KEYS.WIZARD_NEXT, language, defaultLang)}</span>
+                  <span className="flex items-center gap-1 text-xs font-medium truncate max-w-full">
+                    {getT(TRANSLATION_KEYS.WIZARD_NEXT, language, defaultLang)}
+                    <ChevronRight className="h-3 w-3 rotate-0 rtl:rotate-180 transition-transform" />
+                  </span>
                 </Button>
               </div>
             )}

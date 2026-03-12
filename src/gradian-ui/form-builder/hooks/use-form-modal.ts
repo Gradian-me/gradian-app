@@ -11,6 +11,7 @@ import { asFormBuilderSchema, getSchemaTranslatedSingularName } from '@/gradian-
 import type { FormSchema as FormBuilderSchema, DataRelation } from '@/gradian-ui/schema-manager/types/form-schema';
 import { useCompanyStore } from '@/stores/company.store';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { getSchemaWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 import { toast } from 'sonner';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
@@ -415,25 +416,15 @@ export function useFormModal(
         }
       }
 
-      // 2) If no cached schema available, fetch from API
+      // 2) If no cached schema available, fetch via client-side cache helper (IndexedDB + API fallback)
       if (!schemaSource) {
-        const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`, {
-          // Allow HTTP / browser caching; apiRequest still adds auth / tenant headers
-          disableCache: false,
-        });
-        
-        if (response.success && response.data) {
-          // Handle both { data: schema } and { data: { data: schema } } response structures
-          const rawData = response.data as any;
-          const hasSchemaStructure = rawData?.id != null && typeof rawData === 'object';
-          const nestedSchema = rawData?.data && typeof rawData.data === 'object' && rawData.data?.id != null;
-          schemaSource = hasSchemaStructure ? rawData : (nestedSchema ? rawData.data : rawData);
-          if (schemaSource?.id) {
-            await cacheSchemaClientSide(schemaSource, { queryClient, persist: false });
-          }
-        } else {
-          // If still no schema, throw error
-          throw new Error(response.error || `Schema not found: ${schemaId}`);
+        const cachedOrFresh = await getSchemaWithClientCache(schemaId);
+        if (!cachedOrFresh) {
+          throw new Error(`Schema not found: ${schemaId}`);
+        }
+        schemaSource = cachedOrFresh;
+        if (schemaSource.id) {
+          await cacheSchemaClientSide(schemaSource, { queryClient, persist: false });
         }
       }
 

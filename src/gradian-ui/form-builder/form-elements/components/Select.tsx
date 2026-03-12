@@ -87,6 +87,11 @@ export interface SelectWithBadgesProps extends Omit<SelectProps, 'children'> {
    */
   transform?: (data: any) => Array<{ id?: string; label?: string; name?: string; title?: string; icon?: string; color?: string; disabled?: boolean; value?: string }>;
   /**
+   * Column mapping configuration for API responses (primarily for sourceUrl).
+   * When provided, overrides any columnMap defined in config.
+   */
+  columnMap?: ColumnMapConfig;
+  /**
    * Sort order for options: 'ASC' (ascending), 'DESC' (descending), or null (no sorting, default)
    */
   sortType?: SortType;
@@ -123,6 +128,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   sourceUrl,
   queryParams,
   transform,
+  columnMap,
   sortType = null,
   enableSearch = true,
   sortAtoZ = true,
@@ -227,6 +233,11 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   const referenceSchema = config?.referenceSchema;
   const referenceRelationTypeId = config?.referenceRelationTypeId;
   const referenceEntityId = config?.referenceEntityId;
+
+  // Support sourceUrl defined on the field config (schema JSON) as well as via props.
+  // Props take precedence so callers can override config when needed.
+  const configSourceUrl = (config as any)?.sourceUrl as string | undefined;
+  const explicitSourceUrl = sourceUrl || configSourceUrl;
   
   // Extract targetSchema with defensive checks for production
   // Try multiple possible property names and handle empty strings
@@ -274,7 +285,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
 
   // Build sourceUrl from reference fields if they're present and no explicit sourceUrl is provided
   const referenceBasedSourceUrl = React.useMemo(() => {
-    if (!referenceEntityId || sourceUrl) {
+    if (!referenceEntityId || explicitSourceUrl) {
       return null;
     }
     const shouldUseContext = !isStaticReferenceId;
@@ -304,11 +315,11 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
       values: contextValues,
     });
     return url && url.trim() !== '' ? url : null;
-  }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, schemaId, sourceUrl, isStaticReferenceId, dynamicContext.formSchema, dynamicContext.formData]);
+  }, [referenceSchema, referenceRelationTypeId, referenceEntityId, targetSchemaFromConfig, schemaId, explicitSourceUrl, isStaticReferenceId, dynamicContext.formSchema, dynamicContext.formData]);
 
   // Use explicit sourceUrl if provided, otherwise use reference-based sourceUrl
   // If reference-based URL is empty, fall back to using schemaId or targetSchema
-  const effectiveSourceUrl = sourceUrl || referenceBasedSourceUrl || undefined;
+  const effectiveSourceUrl = explicitSourceUrl || referenceBasedSourceUrl || undefined;
   // Determine effective schemaId: use schemaId prop if provided, otherwise use targetSchemaFromConfig
   // This ensures targetSchema works even when schemaId prop is not explicitly passed
   const effectiveSchemaId = React.useMemo(() => {
@@ -334,8 +345,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
     },
   }), [targetSchemaFromConfig]);
 
-  // Get columnMap from config if provided
-  const configColumnMap = (config as any)?.columnMap as ColumnMapConfig | undefined;
+  // Get columnMap from props/config (props take precedence)
+  const configColumnMap = columnMap ?? ((config as any)?.columnMap as ColumnMapConfig | undefined);
 
   // Use provided columnMap or fallback to default when using reference-based filtering
   const effectiveColumnMap = React.useMemo(() => {
@@ -362,6 +373,8 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
   } = useOptionsFromSchemaOrUrl({
     schemaId: effectiveSchemaId || schemaId,
     sourceUrl: effectiveSourceUrl,
+    // Fetch whenever we have a schemaId or sourceUrl.
+    // The hook is already memoized and will not refetch unnecessarily.
     enabled: Boolean(effectiveSchemaId || schemaId || effectiveSourceUrl),
     transform,
     queryParams,
@@ -782,7 +795,7 @@ export const Select: React.FC<SelectWithBadgesProps> = ({
           value={selectValue}
           onValueChange={handleRadixChange}
           disabled={disabled}
-          open={controlledOpen}
+          {...(typeof controlledOpen === 'boolean' ? { open: controlledOpen } : {})}
           onOpenChange={handleOpenChange}
           dir={rtl ? 'rtl' : undefined}
           {...props}

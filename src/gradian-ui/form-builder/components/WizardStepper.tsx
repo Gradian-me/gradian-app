@@ -36,10 +36,10 @@ export function WizardStepper({
   const progressPercent = totalSteps > 0 ? ((activeIndex + 1) / totalSteps) * 100 : 0;
 
   return (
-    <div className={cn('flex flex-col items-center w-full', className)}>
-      {/* Wrapper so progress bar and buttons share the same width (width = buttons row) */}
-      <div className="flex flex-col items-center w-max max-w-full">
-        {/* Progress bar — w-full = same width as buttons row */}
+    <div className={cn('flex flex-col items-stretch w-full', className)}>
+      {/* Wrapper so progress bar and buttons share the same width (full width of container) */}
+      <div className="flex flex-col items-stretch w-full">
+        {/* Progress bar — w-full = same width as container */}
         <div
           className="h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden mb-6"
           role="progressbar"
@@ -54,11 +54,11 @@ export function WizardStepper({
           />
         </div>
 
-        {/* Step buttons — no lines between */}
+        {/* Step buttons — full width, scrollable if overflow */}
         <div
           role="tablist"
           aria-label="Form steps"
-          className="flex items-center justify-center gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden py-2 scrollbar-thin"
+          className="flex items-center justify-center gap-4 sm:gap-6 overflow-x-auto overflow-y-hidden py-2 scrollbar-thin w-full"
         >
         {sortedWizards.map((wizard, index) => {
           const isActive = index === activeIndex;

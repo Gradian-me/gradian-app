@@ -11,9 +11,9 @@ import { ChevronDown, ChevronRight, ChevronLeft, Edit, Trash2, RefreshCw, X } fr
 import { cn } from '../../shared/utils';
 import { getFieldsForSection, getValueByRole, getSingleValueByRole, getFieldsByRole, getArrayValuesByRole } from '../form-elements/utils/field-resolver';
 import { FormAlert } from '../../../components/ui/form-alert';
-import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { DataRelation, FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { getSchemaWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 import { asFormBuilderSchema } from '@/gradian-ui/schema-manager/utils/schema-utils';
 import { FormModal } from './FormModal';
 import { Rating, PopupPicker, ConfirmationMessage, AddButtonFull, CodeBadge, Badge } from '../form-elements';
@@ -36,6 +36,7 @@ import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage, getTranslationsArray, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { getSectionTranslatedTitle, getSectionTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
 
 
 export const AccordionFormSection: React.FC<FormSectionProps> = ({
@@ -147,15 +148,13 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     if (targetSchema) {
       const fetchTargetSchema = async () => {
         try {
-          const response = await apiRequest<FormSchema>(`/api/schemas/${targetSchema}`);
-          if (response.success && response.data) {
-            const rawData = response.data as any;
-            const schemaObj = rawData?.id != null ? rawData : (rawData?.data && rawData.data?.id ? rawData.data : rawData);
-            if (schemaObj?.id) {
-              const normalized = asFormBuilderSchema(schemaObj);
-              await cacheSchemaClientSide(normalized, { queryClient, persist: false });
-              setTargetSchemaData(normalized);
-            }
+          const cachedOrFresh = await getSchemaWithClientCache(targetSchema);
+          if (cachedOrFresh && cachedOrFresh.id) {
+            const normalized = asFormBuilderSchema(cachedOrFresh as any);
+            await cacheSchemaClientSide(normalized, { queryClient, persist: false });
+            setTargetSchemaData(normalized);
+          } else {
+            setTargetSchemaData(null);
           }
         } catch (error) {
           loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching target schema: ${error instanceof Error ? error.message : String(error)}`);
@@ -202,7 +201,7 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
         const uniqueTargetIds = Array.from(
           new Set(
             relationsList
-              .map((relation) => relation.targetId)
+              .map((relation: DataRelation) => relation.targetId)
               .filter((id): id is string => Boolean(id))
           )
         );
@@ -222,11 +221,11 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
 
           if (batchResponse.success && Array.isArray(batchResponse.data)) {
             const entityMap = new Map<string, any>(
-              batchResponse.data.map((entity) => [String(entity.id), entity])
+              batchResponse.data.map((entity: any) => [String(entity.id), entity])
             );
 
             resolvedEntities = relationsList
-              .map((relation) => entityMap.get(relation.targetId))
+              .map((relation: DataRelation) => entityMap.get(relation.targetId))
               .filter((entity): entity is any => Boolean(entity));
             }
           }
@@ -335,7 +334,9 @@ export const AccordionFormSection: React.FC<FormSectionProps> = ({
     }
   };
 
-  const effectiveColumns = isRepeatingSection ? (sectionView === 'list' ? 1 : columns) : columns;
+  // List/grid view should control how repeating *items* are laid out, not force fields inside each item to full width.
+  // Field layout must always respect section columns/colSpan.
+  const effectiveColumns = columns;
 
   const sectionClasses = cn(
     'space-y-3',

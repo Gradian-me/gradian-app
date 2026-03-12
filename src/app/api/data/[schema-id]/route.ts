@@ -397,6 +397,17 @@ export async function POST(
   }
   // If auth was skipped (excluded route or REQUIRE_LOGIN=false), continue
   const { 'schema-id': schemaId } = await params;
+
+  // Enforce singleton semantics for application-config: prevent creating multiple records
+  if (schemaId === 'application-config') {
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'The application-config record is a protected singleton and cannot be created via POST. Use PUT/PATCH on ID \"application-config\" to update it.',
+      },
+      { status: 405 },
+    );
+  }
   
   if (!schemaId) {
     return NextResponse.json(

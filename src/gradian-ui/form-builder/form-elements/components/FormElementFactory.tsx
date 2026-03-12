@@ -374,6 +374,12 @@ export const FormElementFactory: React.FC<FormElementFactoryProps> = (props) => 
             onNormalizedChange={handleSelectNormalizedChange}
             disabled={restProps.disabled}
             options={selectOptions}
+            schemaId={(config as any)?.schemaId}
+            sourceUrl={(config as any)?.sourceUrl}
+            queryParams={(config as any)?.queryParams}
+            transform={(config as any)?.transform}
+            sortType={(config as any)?.sortType}
+            columnMap={(config as any)?.columnMap}
             className={restProps.className}
             error={restProps.error}
             required={config.validation?.required ?? false}

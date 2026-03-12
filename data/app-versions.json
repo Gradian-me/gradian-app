@@ -7376,5 +7376,23 @@
         ]
       }
     ]
+  },
+  {
+    "id": "01KK2B9K9XKQF7FKNJBW9ES1LB",
+    "timestamp": "2026-03-11T00:00:00.000Z",
+    "version": "1.64.002",
+    "changes": [
+      {
+        "changeType": "feature",
+        "description": "UPDATE: Added application configuration schema and data structure to support global application settings, including default language and GS1 Application Identifiers. Implemented singleton enforcement for application-config in API routes to prevent duplicate records. Enhanced caching mechanisms for schema retrieval across various components, improving performance and data consistency. These changes collectively enhance the application's configuration management and data integrity.",
+        "priority": "High",
+        "affectedDomains": [
+          "configuration",
+          "api",
+          "schemas",
+          "caching"
+        ]
+      }
+    ]
   }
 ]

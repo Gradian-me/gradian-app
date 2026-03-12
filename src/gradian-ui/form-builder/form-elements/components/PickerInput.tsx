@@ -8,12 +8,12 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { PopupPicker } from './PopupPicker';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
-import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { getValueByRole, getSingleValueByRole } from '../utils/field-resolver';
 import { NormalizedOption, normalizeOptionArray, extractFirstId } from '../utils/option-normalizer';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/gradian-ui/shared/utils';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { getSchemaWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 import { getLabelClasses, errorTextClasses, inputErrorBorderClasses } from '../utils/field-styles';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
@@ -25,6 +25,7 @@ import { replaceDynamicContext } from '../../utils/dynamic-context-replacer';
 import { getT, getDefaultLanguage, resolveDisplayLabel } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { useLanguageStore } from '@/stores/language.store';
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
 
 export interface PickerInputProps {
   config: any;
@@ -266,10 +267,12 @@ export const PickerInput: React.FC<PickerInputProps> = ({
       setIsLoadingSchema(true);
       const fetchSchema = async () => {
         try {
-          const response = await apiRequest<FormSchema>(`/api/schemas/${targetSchemaId}`);
-          if (response.success && response.data) {
-            await cacheSchemaClientSide(response.data, { queryClient, persist: false });
-            setTargetSchema(response.data);
+          const cachedOrFresh = await getSchemaWithClientCache(targetSchemaId);
+          if (cachedOrFresh && cachedOrFresh.id) {
+            await cacheSchemaClientSide(cachedOrFresh, { queryClient, persist: false });
+            setTargetSchema(cachedOrFresh);
+          } else {
+            setTargetSchema(null);
           }
         } catch (err) {
           loggingCustom(LogType.CLIENT_LOG, 'error', `Error fetching target schema: ${err instanceof Error ? err.message : String(err)}`);
@@ -285,88 +288,37 @@ export const PickerInput: React.FC<PickerInputProps> = ({
   useEffect(() => {
     const fetchSelectedItem = async (primaryValue: any) => {
       try {
-        // Skip fetching if using sourceUrl instead of targetSchema
+        // Skip schema-based fetching when using sourceUrl – rely on the already-enriched
+        // option (which may come from external_nodes) instead of re-calling the sourceUrl.
         if (sourceUrl || !targetSchemaId || !targetSchema) {
           if (sourceUrl && primaryValue) {
-            const resolvedId = extractFirstId(primaryValue);
-            
-            // For sourceUrl, use the normalized option which has label/icon/color
-            if (typeof primaryValue === 'object' && primaryValue.id) {
-              // If it's a normalized option (has id, label, icon, color), use it directly
-              const hasIconOrColor = primaryValue.icon || primaryValue.color;
-              
-              if (hasIconOrColor) {
-                setSelectedItem({
-                  id: primaryValue.id,
-                  label: primaryValue.label,
-                  name: primaryValue.label || primaryValue.name || primaryValue.title,
-                  title: primaryValue.label || primaryValue.title,
-                  icon: primaryValue.icon,
-                  color: primaryValue.color,
-                });
-              } else if (resolvedId) {
-                // If no icon/color but we have an ID, fetch from sourceUrl to get icon/color
-                try {
-                  const response = await apiRequest<any>(`${sourceUrl}&includeIds=${encodeURIComponent(resolvedId)}`);
-                  if (response.success && response.data && Array.isArray(response.data) && response.data.length > 0) {
-                    const items = response.data[0]?.data || [];
-                    const matchedItem = items.find((item: any) => String(item.id) === String(resolvedId));
-                    if (matchedItem) {
-                      setSelectedItem({
-                        id: resolvedId,
-                        label: matchedItem.label || primaryValue.label,
-                        name: matchedItem.label || primaryValue.label || primaryValue.name || primaryValue.title,
-                        title: matchedItem.label || primaryValue.label || primaryValue.title,
-                        icon: matchedItem.icon || primaryValue.icon,
-                        color: matchedItem.color || primaryValue.color,
-                      });
-                      return;
-                    }
-                  }
-                } catch (err) {
-                  loggingCustom(LogType.CLIENT_LOG, 'warn', `Error fetching item from sourceUrl for icon/color: ${err instanceof Error ? err.message : String(err)}`);
-                }
-                
-                // Fallback: use what we have
-                setSelectedItem({
-                  id: primaryValue.id,
-                  label: primaryValue.label,
-                  name: primaryValue.label || primaryValue.name || primaryValue.title,
-                  title: primaryValue.label || primaryValue.title,
-                  icon: primaryValue.icon,
-                  color: primaryValue.color,
-                });
-              } else {
-                setSelectedItem(primaryValue);
-              }
-            } else if (typeof primaryValue === 'object') {
-              // Fallback for other object formats
-              setSelectedItem(primaryValue);
-            } else if (resolvedId) {
-              // If we only have an ID, fetch from sourceUrl to get icon/color
-              try {
-                const response = await apiRequest<any>(`${sourceUrl}&includeIds=${encodeURIComponent(resolvedId)}`);
-                if (response.success && response.data && Array.isArray(response.data) && response.data.length > 0) {
-                  const items = response.data[0]?.data || [];
-                  const matchedItem = items.find((item: any) => String(item.id) === String(resolvedId));
-                  if (matchedItem) {
-                    setSelectedItem({
-                      id: resolvedId,
-                      label: matchedItem.label,
-                      name: matchedItem.label,
-                      title: matchedItem.label,
-                      icon: matchedItem.icon,
-                      color: matchedItem.color,
-                    });
-                    return;
-                  }
-                }
-              } catch (err) {
-                loggingCustom(LogType.CLIENT_LOG, 'warn', `Error fetching item from sourceUrl: ${err instanceof Error ? err.message : String(err)}`);
-              }
-              setSelectedItem({ id: resolvedId });
+            // If we already have a rich object (e.g. from relations/external_nodes),
+            // just use it directly and avoid another network call.
+            if (typeof primaryValue === 'object') {
+              const label =
+                primaryValue.label ??
+                primaryValue.businessId ??
+                primaryValue.name ??
+                primaryValue.title ??
+                primaryValue.id;
+
+              setSelectedItem({
+                id: primaryValue.id ?? primaryValue.businessId,
+                label,
+                name: primaryValue.name ?? label,
+                title: primaryValue.title ?? label,
+                icon: primaryValue.icon,
+                color: primaryValue.color,
+              });
             } else {
-              setSelectedItem({ id: resolvedId });
+              // Primitive id case: keep a minimal object; caller can still open the picker
+              // to see the full list from sourceUrl.
+              const resolvedId = extractFirstId(primaryValue);
+              setSelectedItem(
+                resolvedId
+                  ? { id: resolvedId, label: String(resolvedId) }
+                  : null
+              );
             }
           } else {
             setSelectedItem(null);

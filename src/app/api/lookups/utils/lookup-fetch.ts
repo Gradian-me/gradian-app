@@ -7,6 +7,7 @@ import { NextRequest } from 'next/server';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { getResolvedAccessTokenForProxy } from '@/gradian-ui/shared/utils/api-auth.util';
+import lookupConfigRaw from '../../../../../data/lookup-config.json';
 
 function maskToken(auth: string | null): string {
   if (!auth || typeof auth !== 'string') return '(none)';
@@ -48,6 +49,23 @@ function getDef(obj: Record<string, unknown>, key: string): string | undefined {
   const snake = key.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '');
   const vSnake = obj[snake];
   return typeof vSnake === 'string' && (vSnake as string).trim() ? (vSnake as string).trim() : undefined;
+}
+
+type LookupConfigEntry = {
+  id: string;
+  column_map_id?: string;
+  column_map_title?: string;
+  column_map_icon?: string;
+  column_map_color?: string;
+};
+
+const lookupConfig: LookupConfigEntry[] = Array.isArray(lookupConfigRaw)
+  ? (lookupConfigRaw as LookupConfigEntry[])
+  : [];
+
+function getLookupConfigById(lookupId: string): LookupConfigEntry | undefined {
+  if (!lookupId) return undefined;
+  return lookupConfig.find((entry) => entry.id === lookupId);
 }
 
 export interface LookupDefinition {
@@ -109,7 +127,7 @@ export async function fetchLookupDefinition(
       ? (payload as { data: unknown }).data
       : payload) as Record<string, unknown> | undefined;
     if (!data || typeof data !== 'object') return null;
-    return {
+    const baseDef: LookupDefinition = {
       resultKeyColumn: getDef(data, 'resultKeyColumn'),
       resultValueColumn: getDef(data, 'resultValueColumn'),
       resultValueColumnEN: getDef(data, 'resultValueColumnEN'),
@@ -126,6 +144,28 @@ export async function fetchLookupDefinition(
       column_map_pagination_page: getDef(data, 'column_map_pagination_page'),
       column_map_pagination_limit: getDef(data, 'column_map_pagination_limit'),
     };
+
+    const config = getLookupConfigById(lookupId);
+    if (!config) {
+      return baseDef;
+    }
+
+    const merged: LookupDefinition = { ...baseDef };
+
+    if (!merged.column_map_id?.trim() && config.column_map_id?.trim()) {
+      merged.column_map_id = config.column_map_id.trim();
+    }
+    if (!merged.column_map_title?.trim() && config.column_map_title?.trim()) {
+      merged.column_map_title = config.column_map_title.trim();
+    }
+    if (!merged.column_map_icon?.trim() && config.column_map_icon?.trim()) {
+      merged.column_map_icon = config.column_map_icon.trim();
+    }
+    if (!merged.column_map_color?.trim() && config.column_map_color?.trim()) {
+      merged.column_map_color = config.column_map_color.trim();
+    }
+
+    return merged;
   } catch (e) {
     loggingCustom(LogType.INFRA_LOG, 'warn', `[lookup-fetch] GET definition error: ${e instanceof Error ? e.message : String(e)}`);
     return null;

@@ -47,6 +47,17 @@ export async function GET(
   }
   const { 'schema-id': schemaId, id } = await params;
 
+  // Enforce singleton semantics for application-config: only ID "application-config" is valid
+  if (schemaId === 'application-config' && id !== 'application-config') {
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Invalid application-config ID. Only the singleton ID \"application-config\" is allowed.',
+      },
+      { status: 400 },
+    );
+  }
+
   // Special-case: if schema is "schemas", delegate to /api/schemas/:id
   if (schemaId === 'schemas') {
     const targetUrl = new URL(request.nextUrl.toString());
@@ -277,6 +288,17 @@ async function handleUpdateRequest(
     return authResult; // Return 401 if not authenticated
   }
   const { 'schema-id': schemaId, id } = await params;
+
+  // Enforce singleton semantics for application-config: only update the fixed ID
+  if (schemaId === 'application-config' && id !== 'application-config') {
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Invalid application-config ID. Only the singleton ID \"application-config\" can be updated.',
+      },
+      { status: 400 },
+    );
+  }
   const targetPath = `/api/data/${schemaId}/${id}`;
 
   if (!isDemoModeEnabled()) {
@@ -562,6 +584,17 @@ export async function DELETE(
     return authResult; // Return 401 if not authenticated
   }
   const { 'schema-id': schemaId, id } = await params;
+
+  // Enforce singleton semantics for application-config: prevent deletion of the singleton record
+  if (schemaId === 'application-config') {
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'The application-config record is a protected singleton and cannot be deleted.',
+      },
+      { status: 405 },
+    );
+  }
   const targetPath = `/api/data/${schemaId}/${id}`;
 
   if (!isDemoModeEnabled()) {

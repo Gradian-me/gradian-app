@@ -2617,9 +2617,10 @@
       "incomplete": false,
       "id": "01KFTQPVC9RCRE9J8ACHECVWNK",
       "createdAt": "2026-01-25T14:07:45.553Z",
-      "updatedAt": "2026-01-31T11:14:08.614Z",
+      "updatedAt": "2026-03-11T14:24:07.789Z",
       "application-schemas": [],
-      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
     },
     {
       "name": [
@@ -23006,6 +23007,12 @@
       "icon": "MessageCircle",
       "color": "violet",
       "sourceUrl": "field-options:lims-test-parameters:lims-test-parameter-type"
+    },
+    {
+      "id": "01KKGFRVQ711E7CVRACRDJ4MRB",
+      "businessId": "01KKGFRVQ711E7CVRACRDJ4MRB",
+      "label": "English",
+      "sourceUrl": "/api/languages"
     }
   ],
   "deviation-management": [
@@ -25107,5 +25114,27 @@
       "updatedAt": "2026-03-04T09:19:34.313Z"
     }
   ],
-  "lims-external-fraction-tests": []
+  "lims-external-fraction-tests": [],
+  "application-config": [
+    {
+      "id": "application-config",
+      "defaultLanguage": [
+        {
+          "id": "01KKGFRVQ711E7CVRACRDJ4MRB"
+        }
+      ],
+      "gs1ApplicationIdentifiers": [],
+      "createdAt": "2026-03-10T00:00:00.000Z",
+      "updatedAt": "2026-03-12T08:21:49.384Z",
+      "createdBy": "system",
+      "updatedBy": "system",
+      "incomplete": false,
+      "barcode-config-gs1": [
+        {
+          "aiCode": 241,
+          "lookupId": "01KJ06YM685FYANN2ZVV4CGSGH"
+        }
+      ]
+    }
+  ]
 }

@@ -29,13 +29,63 @@ const schemaIndexedDbStore: IndexedDbStore<FormSchema> = createIndexedDbStore<Fo
   encryptData: true,
 });
 
+// Batch queue for single-ID callers so multiple getSchemaWithClientCache()
+// invocations within the same tick are aggregated into ONE
+// /api/schemas?includedSchemaIds=... request instead of N separate calls.
+const pendingSchemaIds = new Set<string>();
+const pendingResolvers = new Map<string, Array<(schema: FormSchema | null) => void>>();
+let batchTimer: ReturnType<typeof setTimeout> | null = null;
+
+function queueSchemaBatchFetch() {
+  if (batchTimer !== null) return;
+
+  batchTimer = setTimeout(async () => {
+    batchTimer = null;
+    const ids = Array.from(pendingSchemaIds);
+    pendingSchemaIds.clear();
+
+    if (ids.length === 0) {
+      return;
+    }
+
+    try {
+      // Use the existing batched helper which:
+      // - Checks IndexedDB per id
+      // - Issues a single /api/schemas?includedSchemaIds=... for all misses
+      // - Persists results back to IndexedDB
+      const loaded = await getSchemasWithClientCache(ids);
+      const byId = new Map<string, FormSchema>();
+      loaded.forEach((schema) => {
+        if (schema?.id) {
+          byId.set(schema.id, schema);
+        }
+      });
+
+      ids.forEach((id) => {
+        const resolvers = pendingResolvers.get(id) || [];
+        const schema = byId.get(id) ?? null;
+        resolvers.forEach((resolve) => resolve(schema));
+        pendingResolvers.delete(id);
+      });
+    } catch (error) {
+      ids.forEach((id) => {
+        const resolvers = pendingResolvers.get(id) || [];
+        resolvers.forEach((resolve) => resolve(null));
+        pendingResolvers.delete(id);
+      });
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn('[client-schema-cache] Batched schema fetch failed:', error);
+      }
+    }
+  }, 0);
+}
+
 /**
  * Get a schema by ID using client-side IndexedDB cache first,
- * then falling back to `/api/schemas/[schema-id]` on miss.
+ * then falling back to the batched helper on miss.
  *
- * The API route itself will:
- * - Use demo JSON when DEMO_MODE=true.
- * - Proxy to live backend when DEMO_MODE=false.
+ * Multiple callers within the same tick are aggregated into ONE
+ * /api/schemas?includedSchemaIds=... request.
  */
 export async function getSchemaWithClientCache(schemaId: string): Promise<FormSchema | null> {
   if (!schemaId) {
@@ -48,25 +98,14 @@ export async function getSchemaWithClientCache(schemaId: string): Promise<FormSc
     return cached;
   }
 
-  // 2) Fallback to API route (handles demo vs live internally)
-  const response = await apiRequest<FormSchema>(`/api/schemas/${encodeURIComponent(schemaId)}`);
-  if (!response.success || !response.data) {
-    return null;
-  }
-
-  const schema = response.data;
-
-  // 3) Store in IndexedDB for future requests (read-first: if not in IndexedDB we just fetched; persist so next time we hit cache)
-  try {
-    await schemaIndexedDbStore.set(schema.id, schema);
-  } catch (persistError) {
-    // Log but do not fail: caller still gets the schema; next load will hit API again
-    if (typeof console !== 'undefined' && console.warn) {
-      console.warn(`[client-schema-cache] Failed to persist schema "${schema.id}" to IndexedDB:`, persistError);
-    }
-  }
-
-  return schema;
+  // 2) Queue for batched fetch
+  return new Promise<FormSchema | null>((resolve) => {
+    pendingSchemaIds.add(schemaId);
+    const existing = pendingResolvers.get(schemaId) || [];
+    existing.push(resolve);
+    pendingResolvers.set(schemaId, existing);
+    queueSchemaBatchFetch();
+  });
 }
 
 /**

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { DynamicDetailPageClient } from '@/app/(app)/page/[schema-id]/[data-id]/DynamicDetailPageClient';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { FormSchema, DetailPageMetadata } from '@/gradian-ui/schema-manager/types/form-schema';
+import { getSchemaWithClientCache, getSchemasWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { PageEditorWrapper } from './PageEditorWrapper';
 
@@ -41,21 +42,19 @@ export function PageEditorClient({ pageId }: PageEditorClientProps) {
         setIsLoading(true);
         setError(null);
 
-        // Load pages schema
-        const schemaResponse = await apiRequest<FormSchema>(`/api/schemas/pages`);
-        if (!schemaResponse.success || !schemaResponse.data) {
+        // Load pages schema via client-side cache helper
+        const pagesSchemaFromCache = await getSchemaWithClientCache('pages');
+        if (!pagesSchemaFromCache) {
           setError('Failed to load pages schema');
           return;
         }
-        setPagesSchema(schemaResponse.data);
+        setPagesSchema(pagesSchemaFromCache);
 
-        // Load all schemas for navigation
-        const navResponse = await apiRequest<FormSchema[]>(`/api/schemas`);
-        if (navResponse.success && Array.isArray(navResponse.data)) {
-          setNavigationSchemas(navResponse.data);
-        } else {
-          setNavigationSchemas([schemaResponse.data]);
-        }
+        // Load all schemas for navigation using batch cache helper.
+        // When called with an empty array, getSchemasWithClientCache will
+        // return [] (no specific IDs), so fall back to just pages schema.
+        const navSchemas = await getSchemasWithClientCache([]);
+        setNavigationSchemas(navSchemas.length > 0 ? navSchemas : [pagesSchemaFromCache]);
 
         // Find page entity by pageId field
         const pagesResponse = await apiRequest<any[]>(`/api/data/pages`);

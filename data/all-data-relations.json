@@ -3450,8 +3450,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTC8Q9GZ4D69FVAAPMJ4Y",
     "createdAt": "2026-01-25T15:19:35.445Z",
-    "updatedAt": "2026-01-25T15:20:44.748Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.700Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3461,8 +3461,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCA82A13K88KJBHP6H8G",
     "createdAt": "2026-01-25T15:19:35.496Z",
-    "updatedAt": "2026-01-25T15:20:44.752Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.727Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3472,8 +3472,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCBZKG22AKZQFDXE8P7D",
     "createdAt": "2026-01-25T15:19:35.551Z",
-    "updatedAt": "2026-01-25T15:20:44.756Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.753Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3483,8 +3483,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCDBR36C6G4NZQGBDNG1",
     "createdAt": "2026-01-25T15:19:35.595Z",
-    "updatedAt": "2026-01-25T15:20:44.761Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.778Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3494,8 +3494,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCFR20JZ3PK5K671DPEJ",
     "createdAt": "2026-01-25T15:19:35.672Z",
-    "updatedAt": "2026-01-25T15:20:44.766Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.803Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3505,8 +3505,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCGWT2BT88Y1EP724KKG",
     "createdAt": "2026-01-25T15:19:35.708Z",
-    "updatedAt": "2026-01-25T15:20:44.770Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.827Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3516,8 +3516,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCJ0PEMW34D7KFVYE69P",
     "createdAt": "2026-01-25T15:19:35.744Z",
-    "updatedAt": "2026-01-25T15:20:44.776Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.852Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3527,8 +3527,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCMY7BQ24FDERCVG71D7",
     "createdAt": "2026-01-25T15:19:35.838Z",
-    "updatedAt": "2026-01-25T15:20:44.781Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.875Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3538,8 +3538,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCNZC033B9EQM9S54HFJ",
     "createdAt": "2026-01-25T15:19:35.871Z",
-    "updatedAt": "2026-01-25T15:20:44.785Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.907Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3549,8 +3549,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCPVQN10JV4813Z6M9YE",
     "createdAt": "2026-01-25T15:19:35.899Z",
-    "updatedAt": "2026-01-25T15:20:44.791Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.932Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3560,8 +3560,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCQNY4D39SRVR908FMQX",
     "createdAt": "2026-01-25T15:19:35.925Z",
-    "updatedAt": "2026-01-25T15:20:44.795Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.958Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3571,8 +3571,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCRHHFWKYQ9BAAVEXFMQ",
     "createdAt": "2026-01-25T15:19:35.953Z",
-    "updatedAt": "2026-01-25T15:20:44.800Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:34.983Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3582,8 +3582,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCSVE7G0VE9YZ6YCSXZG",
     "createdAt": "2026-01-25T15:19:35.995Z",
-    "updatedAt": "2026-01-25T15:20:44.820Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:35.006Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3593,8 +3593,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCTXFQC77M801PDBP5KP",
     "createdAt": "2026-01-25T15:19:36.029Z",
-    "updatedAt": "2026-01-25T15:20:44.833Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:35.031Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3604,8 +3604,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVTCVTG5QCQTSSK1PR6H2V",
     "createdAt": "2026-01-25T15:19:36.058Z",
-    "updatedAt": "2026-01-25T15:20:44.840Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:35.055Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3615,8 +3615,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW69Z45Y5AZDMNWWRGHN7",
     "createdAt": "2026-01-25T15:20:34.879Z",
-    "updatedAt": "2026-01-25T15:20:44.845Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:35.079Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3626,8 +3626,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW6B8RGY7F7HQGADXY41J",
     "createdAt": "2026-01-25T15:20:34.920Z",
-    "updatedAt": "2026-01-25T15:20:44.852Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:35.103Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3637,8 +3637,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW6C4H09EB61ZZNGNSP89",
     "createdAt": "2026-01-25T15:20:34.948Z",
-    "updatedAt": "2026-01-25T15:20:44.856Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:35.146Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3648,8 +3648,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW6D7N7W30PEVXNHEH1AN",
     "createdAt": "2026-01-25T15:20:34.983Z",
-    "updatedAt": "2026-01-25T15:20:44.861Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:20:35.166Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3659,8 +3659,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW6E8ZZ0K1XA9HNG0W65N",
     "createdAt": "2026-01-25T15:20:35.016Z",
-    "updatedAt": "2026-01-25T15:20:44.866Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.174Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3670,8 +3670,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW6F9QGAQ4WPWSZ14HHX3",
     "createdAt": "2026-01-25T15:20:35.049Z",
-    "updatedAt": "2026-01-25T15:20:44.870Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.201Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3681,8 +3681,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW6GAS12X6X78V2JFSKS6",
     "createdAt": "2026-01-25T15:20:35.082Z",
-    "updatedAt": "2026-01-25T15:20:44.875Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.231Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3692,8 +3692,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW6HTWK065V1DH8873KGC",
     "createdAt": "2026-01-25T15:20:35.130Z",
-    "updatedAt": "2026-01-25T15:20:44.880Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.249Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3703,8 +3703,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW6JKPAV8GEMCPW21FM0K",
     "createdAt": "2026-01-25T15:20:35.155Z",
-    "updatedAt": "2026-01-25T15:20:44.885Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.272Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3714,8 +3714,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW6KGH9GGD1HEY0QSY6NK",
     "createdAt": "2026-01-25T15:20:35.184Z",
-    "updatedAt": "2026-01-25T15:20:44.890Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.297Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3725,8 +3725,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW6M8PCTA1BCJ2HPXCPP1",
     "createdAt": "2026-01-25T15:20:35.208Z",
-    "updatedAt": "2026-01-25T15:20:44.893Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.320Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3736,8 +3736,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFTVW6N131H3ZW678EJ29HNF",
     "createdAt": "2026-01-25T15:20:35.233Z",
-    "updatedAt": "2026-01-25T15:20:44.899Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.347Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3879,8 +3879,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFZFX70P337SAKPX04NZXXN1",
     "createdAt": "2026-01-27T10:27:37.622Z",
-    "updatedAt": "2026-01-27T10:27:39.875Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.371Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3890,8 +3890,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KFZFX71BF5VMHW98HNJKQB3G",
     "createdAt": "2026-01-27T10:27:37.643Z",
-    "updatedAt": "2026-01-27T10:27:39.881Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.392Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3912,8 +3912,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KG9W575EGQB4B1RMSF74JYQ2",
     "createdAt": "2026-01-31T11:14:07.150Z",
-    "updatedAt": "2026-01-31T11:14:08.676Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.415Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -3923,8 +3923,8 @@
     "relationTypeId": "HAS_SCHEMA",
     "id": "01KG9W576HSJ6HJHR51YTM3BHY",
     "createdAt": "2026-01-31T11:14:07.185Z",
-    "updatedAt": "2026-01-31T11:14:08.681Z",
-    "inactive": false
+    "updatedAt": "2026-03-11T14:24:08.438Z",
+    "inactive": true
   },
   {
     "sourceSchema": "applications",
@@ -6370,5 +6370,37 @@
     "fieldId": "effectiveness-result",
     "createdAt": "2026-03-08T15:56:04.416Z",
     "updatedAt": "2026-03-08T15:56:04.416Z"
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KFTQPVC9RCRE9J8ACHECVWNK",
+    "targetSchema": "schemas",
+    "targetId": "application-config",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KKEMAP398RG5RNTQMH9HV486",
+    "createdAt": "2026-03-11T14:20:35.304Z",
+    "updatedAt": "2026-03-11T14:24:08.461Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "applications",
+    "sourceId": "01KFTQPVC9RCRE9J8ACHECVWNK",
+    "targetSchema": "schemas",
+    "targetId": "lookups",
+    "relationTypeId": "HAS_SCHEMA",
+    "id": "01KKEMH6BCHAP47JB8BQS7D6FT",
+    "createdAt": "2026-03-11T14:24:08.556Z",
+    "updatedAt": "2026-03-11T14:24:08.556Z"
+  },
+  {
+    "id": "01KKGFRVR2P6Z64PQ0A9MQRBYY",
+    "sourceSchema": "application-config",
+    "sourceId": "application-config",
+    "targetSchema": "external_nodes",
+    "targetId": "01KKGFRVQ711E7CVRACRDJ4MRB",
+    "relationTypeId": "HAS_FIELD_VALUE",
+    "fieldId": "application-config-default-language",
+    "createdAt": "2026-03-12T07:39:25.825Z",
+    "updatedAt": "2026-03-12T08:21:49.305Z"
   }
 ]

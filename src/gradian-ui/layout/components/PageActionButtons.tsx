@@ -21,6 +21,13 @@ import { ModeToggle } from '../mode-toggle';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { useUserStore } from '@/stores/user.store';
+import { canAccessSystemAdminRoute } from '@/gradian-ui/shared/utils/access-control';
+import { FormDialog } from '@/gradian-ui/form-builder/components/FormDialog';
+import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
+import { Settings2 } from 'lucide-react';
+import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
+import { LogType } from '@/gradian-ui/shared/configs/log-config';
 
 // Dynamically import QRCodeDialog to avoid SSR issues with HTMLCanvasElement
 const QRCodeDialog = dynamic(
@@ -62,6 +69,7 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
   const pathname = usePathname();
   const { isMaximized, title, icon } = useLayoutContext();
   const language = useLanguageStore((s) => s.language);
+  const user = useUserStore((s) => s.user);
   const defaultLang = getDefaultLanguage();
   const labelGoToApps = getT(TRANSLATION_KEYS.ACTION_GO_TO_APPS, language, defaultLang);
   const labelToggleTheme = getT(TRANSLATION_KEYS.ACTION_TOGGLE_THEME, language, defaultLang);
@@ -69,8 +77,45 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
   const labelShare = getT(TRANSLATION_KEYS.ACTION_SHARE, language, defaultLang);
   const labelMaximizeView = getT(TRANSLATION_KEYS.ACTION_MAXIMIZE_VIEW, language, defaultLang);
   const labelMinimizeView = getT(TRANSLATION_KEYS.ACTION_MINIMIZE_VIEW, language, defaultLang);
+  const labelOpenSettings = 'Application Settings';
   const titleSharePage = getT(TRANSLATION_KEYS.TITLE_SHARE_THIS_PAGE, language, defaultLang);
   const textSharePage = getT(TRANSLATION_KEYS.TEXT_CHECK_OUT_THIS_PAGE, language, defaultLang);
+
+  const [isAppConfigDialogOpen, setIsAppConfigDialogOpen] = useState(false);
+  const [appConfigSchema, setAppConfigSchema] = useState<FormSchema | null>(null);
+  const [isLoadingAppConfigSchema, setIsLoadingAppConfigSchema] = useState(false);
+
+  const isSystemAdministrator = user ? canAccessSystemAdminRoute(user) : false;
+
+  const handleOpenApplicationConfig = async () => {
+    if (!isSystemAdministrator) return;
+    try {
+      setIsLoadingAppConfigSchema(true);
+      if (!appConfigSchema) {
+        const response = await fetch('/api/schemas/application-config', {
+          method: 'GET',
+          headers: { accept: 'application/json' },
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to load application-config schema: ${response.status}`);
+        }
+        const payload = await response.json();
+        const schema = payload?.data ?? payload;
+        setAppConfigSchema(schema as FormSchema);
+      }
+      setIsAppConfigDialogOpen(true);
+    } catch (error) {
+      loggingCustom(
+        LogType.CLIENT_LOG,
+        'error',
+        `[PageActionButtons] Failed to load application-config schema: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    } finally {
+      setIsLoadingAppConfigSchema(false);
+    }
+  };
 
   useEffect(() => {
     // Use provided value or current URL
@@ -216,6 +261,28 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
             className={isInline ? 'h-11 w-11 p-0 flex items-center justify-center' : 'flex items-center justify-center'}
           />
         )}
+
+        {isSystemAdministrator && (
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={handleOpenApplicationConfig}
+                  variant="square"
+                  size="sm"
+                  className={isInline ? 'h-11 w-11 p-0' : undefined}
+                  aria-label={labelOpenSettings}
+                  disabled={isLoadingAppConfigSchema}
+                >
+                  <Settings2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{labelOpenSettings}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </div>
 
       {/* QR Code Dialog */}
@@ -225,6 +292,17 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
         onOpenChange={setIsQRDialogOpen}
         showGoToUrl={showGoToUrl}
       />
+
+      {isSystemAdministrator && appConfigSchema && (
+        <FormDialog
+          isOpen={isAppConfigDialogOpen}
+          onClose={() => setIsAppConfigDialogOpen(false)}
+          schema={appConfigSchema}
+          title={labelOpenSettings}
+          description="Manage global application configuration."
+          size="lg"
+        />
+      )}
     </div>
   );
 };

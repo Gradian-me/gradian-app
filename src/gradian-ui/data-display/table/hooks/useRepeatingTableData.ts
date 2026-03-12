@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { useSchemaById } from '@/gradian-ui/schema-manager/hooks/use-schema-by-id';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { resolveFieldById, getValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
@@ -11,6 +10,8 @@ import {
 } from '../types';
 import { formatRelationType } from '../utils';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { getSchemaWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { replaceDynamicContext } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
@@ -61,10 +62,10 @@ function inferFieldsFromFirstRow(firstRow: Record<string, unknown>): any[] {
 }
 
 async function fetchSchemaClient(schemaId: string): Promise<FormSchema | null> {
-  const response = await apiRequest<FormSchema>(`/api/schemas/${schemaId}`);
-  if (response.success && response.data) {
-    await cacheSchemaClientSide(response.data);
-    return response.data;
+  const schema = await getSchemaWithClientCache(schemaId);
+  if (schema) {
+    await cacheSchemaClientSide(schema);
+    return schema;
   }
   return null;
 }
@@ -179,8 +180,8 @@ export function useRepeatingTableData(
           if (referenceRelationsResponse.success && Array.isArray(referenceRelationsResponse.data)) {
             referenceFilteredTargetIds = new Set(
               referenceRelationsResponse.data
-                .map((rel) => rel.targetId)
-                .filter(Boolean)
+                .map((rel: { targetId?: string }) => rel.targetId)
+                .filter((id): id is string => Boolean(id))
                 .map(String)
             );
           }
@@ -214,15 +215,16 @@ export function useRepeatingTableData(
           // Apply reference filtering if enabled
           let filteredData = group.data;
           if (referenceFilteredTargetIds !== null) {
-            filteredData = group.data.filter((item) => 
-              item?.id && referenceFilteredTargetIds!.has(String(item.id))
+            filteredData = group.data.filter(
+              (item: { id?: string }) =>
+                item?.id && referenceFilteredTargetIds!.has(String(item.id))
             );
           }
 
           if (filteredData.length === 0) continue;
 
           directionsSet.add(group.direction);
-          const annotatedData = filteredData.map((item) => ({
+          const annotatedData = filteredData.map((item: any) => ({
             ...item,
             // __relationType and __relationId are now provided by /api/data/all-relations
             // We still ensure __relationType is set from the group for robustness.

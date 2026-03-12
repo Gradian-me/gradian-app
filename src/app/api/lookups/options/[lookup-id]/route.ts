@@ -101,6 +101,23 @@ export async function GET(
     resultIconColumn: 'icon',
   };
   const options = sanitizeLookupRows(rawRows, defWithDefaults) as LookupOption[];
-  const distinctOptions = dedupeOptionsById(options);
+
+  // Optional filtering by includeIds / includeIds[] to mirror /api/data semantics
+  const includeIdsArray = searchParams.getAll('includeIds[]');
+  const includeIdsCsv = searchParams.get('includeIds');
+  const includeIdsFromCsv = includeIdsCsv
+    ? includeIdsCsv
+        .split(',')
+        .map((id) => id.trim())
+        .filter((id) => id.length > 0)
+    : [];
+  const includeIds = [...includeIdsArray, ...includeIdsFromCsv].filter((id) => id && id.trim().length > 0);
+
+  const filteredOptions =
+    includeIds.length > 0
+      ? options.filter((opt) => typeof opt.id === 'string' && includeIds.includes(opt.id.trim()))
+      : options;
+
+  const distinctOptions = dedupeOptionsById(filteredOptions);
   return NextResponse.json({ success: true, data: distinctOptions });
 }

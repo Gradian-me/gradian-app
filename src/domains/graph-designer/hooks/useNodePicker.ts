@@ -1,8 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
+import { getSchemaWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import type { NormalizedOption } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 import type { GraphNodeData } from '../types';
@@ -26,13 +27,13 @@ export function useNodePicker(
 
   const openPicker = useCallback(async (node: GraphNodeData) => {
     try {
-      const response = await apiRequest<FormSchema>(`/api/schemas/${node.schemaId}`);
-      if (response.success && response.data) {
-        await cacheSchemaClientSide(response.data, { queryClient, persist: false });
+      const schema = await getSchemaWithClientCache(node.schemaId);
+      if (schema && schema.id) {
+        await cacheSchemaClientSide(schema, { queryClient, persist: false });
         setPickerState({
           isOpen: true,
           node,
-          schema: response.data,
+          schema,
         });
       } else {
         toast.error('Failed to load schema');
