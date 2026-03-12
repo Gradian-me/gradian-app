@@ -154,7 +154,7 @@ const MOCK_FORMATS = ["Code128", "QR", "DataMatrix", "EAN"] as const;
 
 /** GS1-style mock barcode (DataMatrix) for testing Application Identifiers / ticket. */
 const MOCK_GS1_LABEL =
-  "]C101040123456789011715012910ABC123\\F39329784711\\F310300052539224711\\F42127649716";
+  "]C101040123456789011715012910ABC123\\F39329784711\\F310300052539224711\\F42127649716\\F2413247";
 
 function randomMockBarcode(enableChangeCount: boolean): ScannedBarcode {
   const now = new Date();

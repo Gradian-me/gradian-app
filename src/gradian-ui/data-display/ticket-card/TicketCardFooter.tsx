@@ -85,14 +85,14 @@ export function renderGs1ValueForDisplay(raw: string): React.ReactNode | null {
             >
               <span
                 className={cn(
-                  "inline-flex items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-mono",
+                  "inline-flex items-center justify-center rounded-md p-0.5 text-xs font-mono tracking-normal",
                   getAiColorClasses(item.ai)
                 )}
               >
                 ({item.ai})
               </span>
               {rawValue && (
-                <span className="font-mono text-foreground text-[11px] tracking-normal">
+                <span className="font-mono text-foreground text-xs tracking-normal">
                   {rawValue}
                 </span>
               )}

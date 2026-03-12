@@ -19,6 +19,7 @@ import { loggingCustom } from './logging-custom';
 import { LogType } from '../configs/log-config';
 import { REQUIRE_LOGIN } from '../configs/env-config';
 import { AuthEventType, dispatchAuthEvent } from './auth-events';
+import { apiRequest } from './api';
 
 type QueuedRequest = {
   resolve: (token: string | null) => void;
@@ -121,6 +122,10 @@ class AuthTokenManager {
       }
       // Update last interaction when token is set (user is actively using the app)
       updateLastInteraction();
+
+      // Warm critical IndexedDB-backed caches after login / token refresh.
+      // Fire-and-forget: failures are handled by apiRequest and should not block auth.
+      void apiRequest<any>("/api/data/application-config/application-config");
     }
     
     loggingCustom(LogType.CLIENT_LOG, 'log', `[AUTH_TOKEN] setAccessToken() ${JSON.stringify({

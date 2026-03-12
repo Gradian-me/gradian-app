@@ -64,7 +64,7 @@ export function TicketCardContent({
       <div className={cn("grid gap-4 text-left", mobileCols, mdCols)}>
         {items.map((item, index) => (
           <div key={index}>
-            <p className="text-xs text-gray-500 dark:text-gray-500 uppercase tracking-wider">
+            <p className="text-sm text-gray-500 dark:text-gray-500 uppercase tracking-wider">
               {item.label}
             </p>
             <div className="font-medium text-foreground mt-0.5 break-all">

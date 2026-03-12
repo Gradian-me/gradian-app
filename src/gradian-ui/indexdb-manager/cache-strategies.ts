@@ -9,6 +9,10 @@ import {
   readSchemasSummaryFromCache,
   persistSchemasSummaryToCache,
 } from './schemas-summary-cache';
+import {
+  readApplicationConfigFromCache,
+  persistApplicationConfigToCache,
+} from './application-config-cache';
 import type { CompanyRecord } from './types';
 
 export interface CacheStrategyContext {
@@ -89,9 +93,33 @@ const schemasSummaryCacheStrategy: IndexedDbCacheStrategy<FormSchema[]> = {
   },
 };
 
+const applicationConfigCacheStrategy: IndexedDbCacheStrategy<unknown> = {
+  async preRequest() {
+    const cacheResult = await readApplicationConfigFromCache();
+    if (cacheResult.hit && cacheResult.config != null) {
+      return {
+        hit: true,
+        data: cacheResult.config,
+      };
+    }
+    return { hit: false };
+  },
+
+  async postRequest(_context, response) {
+    if (!response.success || !response.data) {
+      return response;
+    }
+
+    // Persist the raw data payload as-is; consumers handle shape (wrapped vs bare entity)
+    await persistApplicationConfigToCache(response.data as unknown);
+    return response;
+  },
+};
+
 const strategyImplementations: Record<string, IndexedDbCacheStrategy<any>> = {
   companies: companiesCacheStrategy,
   'schemas-summary': schemasSummaryCacheStrategy,
+  'application-config': applicationConfigCacheStrategy,
 };
 
 const indexedDbStrategies = getIndexedDbCacheKeys().reduce<Record<string, IndexedDbCacheStrategy<any>>>(

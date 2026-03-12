@@ -24,7 +24,7 @@ export function TicketCardHeader({
 }: TicketCardHeaderProps) {
   return (
     <div
-      className={cn("p-8 flex flex-col items-center text-center", className)}
+      className={cn("p-4 flex flex-col items-center text-center", className)}
       aria-labelledby="ticket-card-title"
     >
       {icon && (
@@ -39,7 +39,7 @@ export function TicketCardHeader({
       )}
       <h2
         id="ticket-card-title"
-        className="text-2xl font-semibold mt-4 text-foreground"
+        className="text-2xl font-semibold mt-2 text-foreground"
       >
         {title}
       </h2>

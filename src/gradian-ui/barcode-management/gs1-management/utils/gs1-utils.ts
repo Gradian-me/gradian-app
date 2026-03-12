@@ -4,6 +4,8 @@
  * Parser logic adapted from GS1 BarcodeParser (e.g. PeterBrockfeld/BarcodeParser).
  */
 
+import { apiRequest } from "@/gradian-ui/shared/utils/api";
+
 export interface GS1ParsedElement {
   ai: string;
   dataTitle: string;
@@ -910,5 +912,83 @@ export function isGS1Valid(barcode: string): boolean {
   } catch {
     return false;
   }
+}
+
+/**
+ * Configuration entry for barcode-config-gs1 in the application-config singleton.
+ */
+export interface Gs1BarcodeConfigEntry {
+  aiCode: number;
+  lookupId: string;
+  // Allow future extension without breaking callers
+  [key: string]: unknown;
+}
+
+type Gs1BarcodeConfigMap = Map<string, { lookupId: string }>;
+
+let cachedBarcodeConfigMap: Gs1BarcodeConfigMap | null = null;
+let barcodeConfigPromise: Promise<Gs1BarcodeConfigMap> | null = null;
+
+/**
+ * Fetches and caches the GS1 barcode configuration from the application-config singleton.
+ * Always uses the API route; never reads JSON files directly.
+ */
+export async function getGs1BarcodeConfigMap(): Promise<Gs1BarcodeConfigMap> {
+  if (cachedBarcodeConfigMap) {
+    return cachedBarcodeConfigMap;
+  }
+
+  if (!barcodeConfigPromise) {
+    barcodeConfigPromise = (async () => {
+      try {
+        const response = await apiRequest<any>("/api/data/application-config/application-config");
+        // If the API explicitly reports failure, bail out early
+        if (response.success === false) {
+          return new Map();
+        }
+
+        // Support both wrapped ({ success, data: entity }) and bare entity responses
+        const container: any =
+          (response as any)?.data && typeof (response as any).data === "object"
+            ? (response as any).data
+            : (response as any);
+
+        const rawConfig =
+          container["barcode-config-gs1"] ??
+          container.barcodeConfigGs1 ??
+          container.barcode_config_gs1 ??
+          [];
+
+        if (!Array.isArray(rawConfig)) {
+          return new Map();
+        }
+
+        const map: Gs1BarcodeConfigMap = new Map();
+
+        for (const item of rawConfig as Gs1BarcodeConfigEntry[]) {
+          if (!item || typeof item.aiCode !== "number" || !Number.isFinite(item.aiCode)) {
+            continue;
+          }
+          if (!item.lookupId || typeof item.lookupId !== "string") {
+            continue;
+          }
+
+          const aiKey = String(item.aiCode).trim();
+          if (!aiKey) continue;
+
+          map.set(aiKey, { lookupId: item.lookupId });
+        }
+
+        cachedBarcodeConfigMap = map;
+        return map;
+      } catch {
+        // Fail-soft: treat missing or failing config as \"no mappings\"
+        return new Map();
+      }
+    })();
+  }
+
+  cachedBarcodeConfigMap = await barcodeConfigPromise;
+  return cachedBarcodeConfigMap;
 }
 

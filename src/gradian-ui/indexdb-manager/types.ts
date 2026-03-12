@@ -63,6 +63,21 @@ export interface CompaniesCacheEventDetail {
   reason: 'update' | 'clear';
 }
 
+// Application-config cache
+export const APPLICATION_CONFIG_CACHE_KEY = 'application-config';
+export const APPLICATION_CONFIG_CACHE_VERSION = 1;
+
+export interface ApplicationConfigCachePayload {
+  version: number;
+  updatedAt: number;
+  config: unknown | null;
+}
+
+export interface ApplicationConfigCacheLookupResult {
+  hit: boolean;
+  config: unknown | null;
+}
+
 /** IndexedDB cache for GET /api/schemas?summary=true response (unified with api layer). */
 export const SCHEMAS_SUMMARY_CACHE_VERSION = 1;
 

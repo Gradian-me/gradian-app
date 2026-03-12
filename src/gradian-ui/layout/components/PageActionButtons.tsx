@@ -28,6 +28,7 @@ import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { Settings2 } from 'lucide-react';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
+import { apiRequest } from '@/gradian-ui/shared/utils/api';
 
 // Dynamically import QRCodeDialog to avoid SSR issues with HTMLCanvasElement
 const QRCodeDialog = dynamic(
@@ -84,6 +85,8 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
   const [isAppConfigDialogOpen, setIsAppConfigDialogOpen] = useState(false);
   const [appConfigSchema, setAppConfigSchema] = useState<FormSchema | null>(null);
   const [isLoadingAppConfigSchema, setIsLoadingAppConfigSchema] = useState(false);
+  const [appConfigInitialValues, setAppConfigInitialValues] = useState<Record<string, any> | null>(null);
+  const [isSavingAppConfig, setIsSavingAppConfig] = useState(false);
 
   const isSystemAdministrator = user ? canAccessSystemAdminRoute(user) : false;
 
@@ -91,18 +94,35 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
     if (!isSystemAdministrator) return;
     try {
       setIsLoadingAppConfigSchema(true);
-      if (!appConfigSchema) {
-        const response = await fetch('/api/schemas/application-config', {
-          method: 'GET',
-          headers: { accept: 'application/json' },
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to load application-config schema: ${response.status}`);
+      let schema = appConfigSchema;
+      if (!schema) {
+        const response = await apiRequest<FormSchema>('/api/schemas/application-config');
+        if (!response.success || !response.data) {
+          throw new Error(response.error || 'Failed to load application-config schema');
         }
-        const payload = await response.json();
-        const schema = payload?.data ?? payload;
-        setAppConfigSchema(schema as FormSchema);
+        schema = response.data as FormSchema;
+        setAppConfigSchema(schema);
       }
+
+      // Load current singleton application-config data; if not found, start with default id
+      const entityResponse = await apiRequest<any>('/api/data/application-config/application-config');
+      if (entityResponse.success && entityResponse.data) {
+        setAppConfigInitialValues({
+          id: 'application-config',
+          ...entityResponse.data,
+        });
+      } else if (entityResponse.statusCode === 404) {
+        // No existing config yet – initialize with fixed singleton id
+        setAppConfigInitialValues({ id: 'application-config' });
+      } else if (!entityResponse.success) {
+        loggingCustom(
+          LogType.CLIENT_LOG,
+          'error',
+          `[PageActionButtons] Failed to load application-config entity: ${entityResponse.error || 'Unknown error'}`,
+        );
+        setAppConfigInitialValues({ id: 'application-config' });
+      }
+
       setIsAppConfigDialogOpen(true);
     } catch (error) {
       loggingCustom(
@@ -301,6 +321,45 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
           title={labelOpenSettings}
           description="Manage global application configuration."
           size="lg"
+          initialValues={appConfigInitialValues ?? { id: 'application-config' }}
+          disabled={isSavingAppConfig}
+          onSubmit={async (values) => {
+            try {
+              setIsSavingAppConfig(true);
+              const response = await apiRequest<any>('/api/data/application-config/application-config', {
+                method: 'PUT',
+                body: {
+                  ...values,
+                  id: 'application-config',
+                },
+              });
+              if (!response.success) {
+                throw new Error(response.error || 'Failed to save application configuration');
+              }
+              if (response.data) {
+                setAppConfigInitialValues({
+                  id: 'application-config',
+                  ...response.data,
+                });
+              } else {
+                setAppConfigInitialValues({
+                  id: 'application-config',
+                  ...values,
+                });
+              }
+            } catch (error) {
+              loggingCustom(
+                LogType.CLIENT_LOG,
+                'error',
+                `[PageActionButtons] Failed to save application-config entity: ${
+                  error instanceof Error ? error.message : String(error)
+                }`,
+              );
+              throw error;
+            } finally {
+              setIsSavingAppConfig(false);
+            }
+          }}
         />
       )}
     </div>

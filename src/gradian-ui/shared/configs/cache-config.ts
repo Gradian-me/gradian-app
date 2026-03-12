@@ -94,12 +94,20 @@ export const CACHE_CONFIG: Record<string, RouteCacheConfig> = {
     description: 'Entity list by schema ID',
   },
   'data/:schemaId/:id': {
-    ttl: 0, // Always fetch fresh data on the server
-    staleTime: 0, // Always treat client data as stale
-    gcTime: 0, // Allow React Query to drop immediately
+    ttl: 0, // Always fetch fresh data on the server (except when explicitly overridden by path key)
+    staleTime: 0, // Always treat client data as stale by default
+    gcTime: 0, // Allow React Query to drop immediately by default
     reactQueryKeys: ['entities'],
     disableServerCache: true,
-    description: 'Single entity by schema ID and entity ID (no caching)',
+    description: 'Single entity by schema ID and entity ID (no caching by default)',
+  },
+  'data/application-config/application-config': {
+    ttl: 10 * 60 * 1000, // 10 minutes - server-side cache is still disabled below
+    staleTime: 10 * 60 * 1000, // 10 minutes - React Query / client-side freshness
+    gcTime: 30 * 60 * 1000, // 30 minutes - keep config around on client
+    indexedDbKey: 'application-config',
+    disableServerCache: true, // Do not cache in server process; rely on client/IndexedDB only
+    description: 'Global application configuration singleton (cached in IndexedDB for reuse)',
   },
   
   // Relation types
@@ -186,6 +194,11 @@ export function resolveRouteKeyByPath(apiPath: string): string {
 
   if (cleanPath === '') {
     return cleanPath;
+  }
+
+  // Special-case: application-config singleton should use its dedicated cache key
+  if (cleanPath === 'data/application-config/application-config') {
+    return 'data/application-config/application-config';
   }
 
   if (cleanPath === 'data/companies') {

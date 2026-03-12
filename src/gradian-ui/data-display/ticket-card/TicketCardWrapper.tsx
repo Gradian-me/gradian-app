@@ -109,13 +109,6 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
         if (!dataUrl || typeof dataUrl !== "string") {
           return;
         }
-        if (dataUrl.length > MAX_QR_DATA_URL_LENGTH) {
-          console.warn(
-            "[TicketCardWrapper] QR payload too large for QR code; length=",
-            dataUrl.length
-          );
-          return;
-        }
         const pngDataUrl = ensurePngDataUrl(dataUrl);
         setQrValue(pngDataUrl);
         setQrDialogOpen(true);

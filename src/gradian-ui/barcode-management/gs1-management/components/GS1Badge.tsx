@@ -1,6 +1,6 @@
  "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { format as dateFormat } from "date-fns";
 import { cn } from "@/gradian-ui/shared/utils";
@@ -10,7 +10,7 @@ import {
   GS1_DATE_AI_EXPIRY,
   formatGS1DateFriendly,
 } from "@/gradian-ui/shared/utils/date-utils";
-import { isGS1Valid, parseGS1, type GS1ParsedElement } from "../utils/gs1-utils";
+import { isGS1Valid, parseGS1, type GS1ParsedElement, getGs1BarcodeConfigMap } from "../utils/gs1-utils";
 import { getGS1AIMeta } from "../utils/gs1-ai-dictionary";
 import { formatGS1Unit } from "../utils/gs1-unit-formatter";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -22,6 +22,7 @@ import {
   TicketCardFooter,
   type TicketCardContentItem,
 } from "@/gradian-ui/data-display/ticket-card";
+import { GS1LookupContent } from "@/gradian-ui/barcode-management/gs1-management/components/GS1LookupContent";
 
 const AI_COLOR_CLASSES = [
   "text-rose-600 dark:text-rose-300",
@@ -73,8 +74,32 @@ function formatElementData(element: GS1ParsedElement): string {
 
 export function GS1Badge({ barcodeLabel, className }: GS1BadgeProps) {
   const [open, setOpen] = useState(false);
+  const [barcodeConfigMap, setBarcodeConfigMap] = useState<Map<string, { lookupId: string }> | null>(null);
   const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
   const locale = language === "fa" ? "fa" : "en";
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadConfig = async () => {
+      try {
+        const map = await getGs1BarcodeConfigMap();
+        if (isMounted) {
+          setBarcodeConfigMap(map);
+        }
+      } catch {
+        if (isMounted) {
+          setBarcodeConfigMap(new Map());
+        }
+      }
+    };
+
+    void loadConfig();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const isValid = useMemo(() => isGS1Valid(barcodeLabel ?? ""), [barcodeLabel]);
   const parsed = useMemo(() => {
@@ -93,16 +118,16 @@ export function GS1Badge({ barcodeLabel, className }: GS1BadgeProps) {
       const titleText =
         meta?.label[locale] ?? meta?.label.en ?? element.dataTitle ?? `AI ${element.ai}`;
       const labelNode = (
-        <span className="inline-flex items-center gap-1">
-          <span>{titleText}</span>
+        <span className="inline-flex items-baseline">
           <span
             className={cn(
-              "inline-flex items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-mono",
+              "inline-flex items-center justify-center rounded-md px-1.5 py-0.5 text-xs font-mono",
               getAiColorClasses(element.ai)
             )}
           >
             ({element.ai})
           </span>
+          <span className="ml-1">{titleText}</span>
         </span>
       );
       const unit =
@@ -150,9 +175,39 @@ export function GS1Badge({ barcodeLabel, className }: GS1BadgeProps) {
       ) : (
         valueDisplay
       );
-      return { label: labelNode, value: valueWithUnit };
+
+      const lookupConfig = barcodeConfigMap?.get(element.ai);
+
+      let finalValue: React.ReactNode = valueWithUnit;
+
+      if (lookupConfig) {
+        const lookupValueSource =
+          typeof element.rawValue === "string" || typeof element.rawValue === "number"
+            ? element.rawValue
+            : typeof element.data === "string" || typeof element.data === "number"
+              ? element.data
+              : contents;
+
+        const lookupValue =
+          typeof lookupValueSource === "string" || typeof lookupValueSource === "number"
+            ? lookupValueSource
+            : String(lookupValueSource ?? "");
+
+        finalValue = (
+          <span className="inline-flex flex-col">
+            {valueWithUnit}
+            <GS1LookupContent
+              ai={element.ai}
+              value={lookupValue}
+              lookupId={lookupConfig.lookupId}
+            />
+          </span>
+        );
+      }
+
+      return { label: labelNode, value: finalValue };
     });
-  }, [parsed, locale, language]);
+  }, [parsed, locale, language, barcodeConfigMap]);
 
   if (!isValid) return null;
 
