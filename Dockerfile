@@ -17,7 +17,7 @@
     
     # Install production dependencies – with cache mount
     RUN --mount=type=cache,target=/root/.npm \
-        npm ci --only=production \
+        npm ci --only=production --registry=https://reg.cinnagen.com/repository/npm-group/ --verbose --no-audit \
         && rm -rf /tmp/* /var/tmp/* /root/.node-gyp
     
     
@@ -51,7 +51,7 @@
     
     # Install all dependencies (dev + prod) – with cache mount
     RUN --mount=type=cache,target=/root/.npm \
-        npm ci --legacy-peer-deps --include=optional --no-audit
+        npm ci --registry=https://reg.cinnagen.com/repository/npm-group/ --verbose --legacy-peer-deps --include=optional --no-audit
     
     # Copy full source code
     COPY . .
