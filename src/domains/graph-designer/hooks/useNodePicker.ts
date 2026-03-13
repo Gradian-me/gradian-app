@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { getSchemaWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';

@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { MessageBox } from '@/gradian-ui/layout/message-box';
 import { AiAgentDeleteConfirmDialog } from './AiAgentDeleteConfirmDialog';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { Save, RotateCcw, RefreshCw, Trash2 } from 'lucide-react';
 import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { AiAgentNotFound } from '../AiAgentNotFound';

@@ -31,7 +31,7 @@ import {
 import { useLanguageStore } from '@/stores/language.store';
 import { resolveDisplayLabel, getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 
 export interface DynamicQuickActionsProps {
   actions: QuickAction[];

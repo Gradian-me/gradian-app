@@ -4,6 +4,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Delete, RotateCcw } from 'lucide-react';
 import { cn } from '@/gradian-ui/shared/utils';
 import { parseFormula } from '../utils/formula-parser';
+import { triggerSelection } from '@/gradian-ui/shared/haptic-utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
@@ -202,6 +203,7 @@ export const Calculator: React.FC<CalculatorProps> = ({
 
   const handleButtonClick = useCallback(
     (btn: string) => {
+      triggerSelection();
       if (btn === 'C') {
         clear();
       } else if (btn === '=') {
@@ -386,7 +388,10 @@ export const Calculator: React.FC<CalculatorProps> = ({
         <div className="flex space-x-1">
           <button
             type="button"
-            onClick={backspace}
+            onClick={() => {
+              triggerSelection();
+              backspace();
+            }}
             className="text-gray-400 hover:text-white p-1 rounded"
             aria-label="Backspace"
           >
@@ -395,7 +400,10 @@ export const Calculator: React.FC<CalculatorProps> = ({
           {enableHistory && (
             <button
               type="button"
-              onClick={clearHistory}
+              onClick={() => {
+                triggerSelection();
+                clearHistory();
+              }}
               className="text-gray-400 hover:text-white p-1 rounded"
               aria-label="Clear history"
             >
@@ -635,6 +643,7 @@ export const Calculator: React.FC<CalculatorProps> = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              triggerSelection();
               onCancel?.();
             }}
           >
@@ -646,6 +655,7 @@ export const Calculator: React.FC<CalculatorProps> = ({
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              triggerSelection();
               handleApply();
             }}
           >

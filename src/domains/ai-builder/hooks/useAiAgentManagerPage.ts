@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { AiAgent } from '../types';
 import { useOptionsFromUrl } from '@/gradian-ui/form-builder/form-elements';
 import { buildReferenceFilterUrl } from '@/gradian-ui/form-builder/utils/reference-filter-builder';

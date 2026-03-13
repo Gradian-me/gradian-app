@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
+import { X } from 'lucide-react';
 import { cn } from '@/gradian-ui/shared/utils';
 import { useDialogBackHandler } from '@/gradian-ui/shared/contexts/DialogContext';
 import { useLanguageStore } from '@/stores/language.store';
@@ -177,7 +178,18 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className={cn(sizeClasses[size], variantStyles[variant], showSwipe && 'max-w-sm', className)}>
+      <DialogContent
+        className={cn(sizeClasses[size], variantStyles[variant], showSwipe && 'max-w-sm', className)}
+        hideCloseButton
+      >
+        <button
+          type="button"
+          onClick={handleClose}
+          className="absolute end-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
+          aria-label={cancelLabel}
+        >
+          <X className="h-4 w-4" />
+        </button>
         <DialogHeader>
           <DialogTitle>
             {title}
@@ -208,9 +220,9 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
                 }}
                 onChange={(confirmed) => {
                   if (!confirmed) return;
-                  if (swipeVariant === 'success') {
-                    triggerNotification('success');
-                  }
+                  if (swipeVariant === 'success') triggerNotification('success');
+                  else if (swipeVariant === 'warning') triggerNotification('warning');
+                  else if (swipeVariant === 'error') triggerNotification('error');
                   primaryButton.action();
                 }}
               />

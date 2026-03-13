@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import type { GraphRecord } from '../types';
 import { saveGraphRecord } from '../utils/graph-db';
 import { validateGraph, formatValidationMessage } from '../utils/graph-validation';

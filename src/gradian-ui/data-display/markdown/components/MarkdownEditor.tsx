@@ -7,7 +7,7 @@ import '@milkdown/crepe/theme/nord-dark.css';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Save, Loader2, Check } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 
 export interface MarkdownEditorProps {
   content: string;

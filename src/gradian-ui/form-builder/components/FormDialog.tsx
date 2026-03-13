@@ -13,7 +13,7 @@ import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import type { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
 import { getActionConfig, isEditMode } from '../utils/action-config';
 import { getSchemaTranslatedSingularName } from '@/gradian-ui/schema-manager/utils/schema-utils';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';

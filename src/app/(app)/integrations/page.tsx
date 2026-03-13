@@ -36,7 +36,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 
 // Card-specific Tenant Selector Component (uses local state, not global store)
 interface CardTenantSelectorProps {

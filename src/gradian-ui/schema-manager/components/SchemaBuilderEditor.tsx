@@ -21,7 +21,7 @@ import { FormAlert } from '@/components/ui/form-alert';
 import { MessageBoxContainer } from '@/gradian-ui/layout/message-box';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';

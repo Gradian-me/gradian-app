@@ -42,7 +42,7 @@ import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-
 import { QueryClientContext } from '@tanstack/react-query';
 import { RepeatingTableRendererConfig } from '@/gradian-ui/schema-manager/types/form-schema';
 import { normalizeOptionArray } from '../../form-builder/form-elements/utils/option-normalizer';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { EntityMetadata } from './CreateUpdateDetail';
 import { BadgeViewer } from '../../form-builder/form-elements/utils/badge-viewer';
 import { CardWrapper, CardHeader, CardContent, CardTitle } from '../card/components/CardWrapper';

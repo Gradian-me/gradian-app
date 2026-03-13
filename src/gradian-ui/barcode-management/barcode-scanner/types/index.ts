@@ -31,6 +31,8 @@ export interface ScannedBarcode {
   createdAt: string;
   /** Optional count when multi-scan with quantity tracking is enabled. */
   count?: number;
+  /** User ID of the user who performed the scan (logged-in user). */
+  createdBy?: string;
 }
 
 export interface BarcodeScannerProps {
@@ -66,6 +68,8 @@ export interface BarcodeScannerCameraProps {
   cameraError?: string | null;
   /** When true (e.g. drawer mode), constrains camera to max-w-[200px]. */
   compact?: boolean;
+  /** When true, NFC/RFID listener is active (camera mode can scan tags simultaneously). */
+  nfcActive?: boolean;
 }
 
 export interface BarcodeScannerToolbarProps {
@@ -156,5 +160,9 @@ export interface BarcodeScannerResultJSONProps {
    * When true, plays a short beep when quantity is changed in the multi-scan results.
    */
   enableBeepForCountChange?: boolean;
+  /**
+   * Called when the GS1 details dialog (from GS1Badge) opens or closes. Use to pause camera while open.
+   */
+  onGS1BadgeOpenChange?: (open: boolean) => void;
 }
 

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { CTAButton } from '@/gradian-ui/form-builder/form-elements';

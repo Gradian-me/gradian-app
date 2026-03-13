@@ -322,7 +322,9 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
     <AccordionTrigger className={cn(
       "px-3 py-2 text-gray-300 hover:text-white",
       "hover:bg-gray-800 rounded-lg transition-colors",
-      "data-[state=open]:text-white"
+      "data-[state=open]:text-white",
+      // Ensure chevron rotation stays in sync even when sidebar is collapsed
+      isAccordionOpen && "[&>svg]:rotate-180"
     )}>
       <div className={cn(
         "flex items-center flex-1",
@@ -482,7 +484,9 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                     "px-3 py-2.5 min-h-9 hover:no-underline rounded-lg transition-colors",
                                     "text-gray-300 hover:text-white hover:bg-gray-800/50",
                                     "data-[state=open]:text-white data-[state=open]:bg-gray-800/70",
-                                    "border-s-2 border-s-transparent data-[state=open]:border-s-violet-500"
+                                    "border-s-2 border-s-transparent data-[state=open]:border-s-violet-500",
+                                    // Keep group chevron direction accurate in collapsed sidebar
+                                    isGroupOpen && "[&>svg]:rotate-180"
                                   )}
                                 >
                                   <div className={cn(
@@ -528,7 +532,9 @@ export const SidebarNavigationDynamic: React.FC<SidebarNavigationDynamicProps> =
                                 "px-3 py-2.5 min-h-9 hover:no-underline rounded-lg transition-colors",
                                 "text-gray-300 hover:text-white hover:bg-gray-800/50",
                                 "data-[state=open]:text-white data-[state=open]:bg-gray-800/70",
-                                "border-s-2 border-s-transparent data-[state=open]:border-s-violet-500"
+                                "border-s-2 border-s-transparent data-[state=open]:border-s-violet-500",
+                                // Keep group chevron direction accurate in collapsed sidebar
+                                isGroupOpen && "[&>svg]:rotate-180"
                               )}
                             >
                               <div className={cn(

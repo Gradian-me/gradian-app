@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import type { GraphNodeData, GraphEdgeData } from '../types';
 
 interface UseGraphResetParams {

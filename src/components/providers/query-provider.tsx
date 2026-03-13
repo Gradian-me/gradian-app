@@ -4,7 +4,7 @@ import { MutationCache, QueryCache, QueryClient, QueryClientProvider, useQueryCl
 import { ReactNode, useEffect } from 'react';
 import { getCacheConfig } from '@/gradian-ui/shared/configs/cache-config';
 import { clearCompaniesCache } from '@/gradian-ui/indexdb-manager/companies-cache';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { LOG_CONFIG, LogType } from '@/gradian-ui/shared/configs/log-config';
 import { clearMenuItemsCache } from '@/stores/menu-items.store';
 import { clearClientSchemaCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';

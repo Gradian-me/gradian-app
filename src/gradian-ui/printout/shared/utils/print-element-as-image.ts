@@ -62,6 +62,13 @@ export interface CaptureElementAsDataUrlOptions extends PrintElementAsImageOptio
   maxDimension?: number;
 }
 
+/** Normalize thrown value (e.g. Event from html-to-image img.onerror) to an Error with a clear message. */
+function normalizeCaptureError(err: unknown): Error {
+  if (err instanceof Error) return err;
+  if (err instanceof Event) return new Error(`Capture failed: ${err.type || "image load error"}`);
+  return new Error(String(err));
+}
+
 /** Filter out nodes that should not appear in the printed image (e.g. print button). */
 function defaultFilter(node: HTMLElement): boolean {
   if (node.classList?.contains("print:hidden")) return false;
@@ -236,7 +243,7 @@ export async function printElementAsImage(
       restoreShadows();
     }
   } catch (err) {
-    const error = err instanceof Error ? err : new Error(String(err));
+    const error = normalizeCaptureError(err);
     onError?.(error);
     throw error;
   }
@@ -316,7 +323,7 @@ export async function captureElementAsDataUrl(
       restoreShadows();
     }
   } catch (err) {
-    const error = err instanceof Error ? err : new Error(String(err));
+    const error = normalizeCaptureError(err);
     onError?.(error);
     throw error;
   }
@@ -398,7 +405,7 @@ export async function downloadElementAsImage(
       restoreShadows();
     }
   } catch (err) {
-    const error = err instanceof Error ? err : new Error(String(err));
+    const error = normalizeCaptureError(err);
     onError?.(error);
     throw error;
   }

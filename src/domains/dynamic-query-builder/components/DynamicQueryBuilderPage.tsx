@@ -3,7 +3,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { PanelRightClose, PanelRightOpen, Layers, ExternalLink } from 'lucide-react';
 import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { Badge } from '@/components/ui/badge';

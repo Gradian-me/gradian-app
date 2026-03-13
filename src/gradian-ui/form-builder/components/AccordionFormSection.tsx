@@ -31,7 +31,7 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DynamicCardRenderer } from '../../data-display/components/DynamicCardRenderer';
 import { ViewSwitcher } from '@/gradian-ui/data-display/components/ViewSwitcher';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage, getTranslationsArray, isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';

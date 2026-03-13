@@ -23,11 +23,13 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/gradian-ui/shared/utils";
 import { createBeep } from "@/gradian-ui/shared/utils/sound-utils";
 import { CodeViewer } from "@/gradian-ui/shared/components/CodeViewer";
-import { CheckCircle2, Plus } from "lucide-react";
+import { CheckCircle2, Plus, ScanLine } from "lucide-react";
 import { sanitizeBarcodeValue, sanitizeFormat } from "../utils/sanitize";
+import { useNfcReader } from "../utils/use-nfc-reader";
 import { TRANSLATION_KEYS } from "@/gradian-ui/shared/constants/translations";
 import { getDefaultLanguage, getT } from "@/gradian-ui/shared/utils/translation-utils";
 import { useLanguageStore } from "@/stores/language.store";
+import { useUserStore } from "@/stores/user.store";
 import type {
   BarcodeScannerProps,
   BarcodeFormat,
@@ -36,6 +38,7 @@ import type {
 } from "../types";
 import { LOG_CONFIG, LogType } from "@/gradian-ui/shared/configs/log-config";
 import { triggerSelection } from "@/gradian-ui/shared/haptic-utils";
+import { ulid } from "ulid";
 
 // ——— ZXing format mapping ————————————————————————————————————————————————
 /** Map our BarcodeFormat to @yudiel/react-qr-scanner format strings. */
@@ -161,20 +164,19 @@ function useCameraDevices(): MediaDeviceInfo[] | null {
   return devices;
 }
 
-function ulid(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-}
-
 const MOCK_FORMATS = ["Code128", "QR", "DataMatrix", "EAN"] as const;
 
 /** GS1-style mock barcode (DataMatrix) for testing Application Identifiers / ticket. Uses real ASCII 29 (GS) separators. */
 const MOCK_GS1_LABEL =
   "]C101040123456789011715012910ABC123\x1D39329784711\x1D310300052539224711\x1D42127649716\x1D2413247";
 
-function randomMockBarcode(enableChangeCount: boolean): ScannedBarcode {
+function createMockBarcode(
+  enableChangeCount: boolean,
+  overrides: { label?: string; format?: string }
+): ScannedBarcode {
   const now = new Date();
-  const format = MOCK_FORMATS[Math.floor(Math.random() * MOCK_FORMATS.length)];
-  const label = `MOCK-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+  const format = overrides.format ?? MOCK_FORMATS[Math.floor(Math.random() * MOCK_FORMATS.length)];
+  const label = overrides.label ?? `MOCK-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
   return {
     id: ulid(),
     label,
@@ -184,15 +186,17 @@ function randomMockBarcode(enableChangeCount: boolean): ScannedBarcode {
   };
 }
 
-function mockGS1Barcode(enableChangeCount: boolean): ScannedBarcode {
-  const now = new Date();
-  return {
-    id: ulid(),
+function randomMockBarcode(enableChangeCount: boolean, createdBy?: string): ScannedBarcode {
+  const b = createMockBarcode(enableChangeCount, {});
+  return createdBy != null ? { ...b, createdBy } : b;
+}
+
+function mockGS1Barcode(enableChangeCount: boolean, createdBy?: string): ScannedBarcode {
+  const b = createMockBarcode(enableChangeCount, {
     label: MOCK_GS1_LABEL,
     format: "DataMatrix",
-    createdAt: now.toISOString(),
-    count: enableChangeCount ? Math.floor(Math.random() * 5) + 1 : undefined,
-  };
+  });
+  return createdBy != null ? { ...b, createdBy } : b;
 }
 
 export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
@@ -213,6 +217,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   const defaultLang = getDefaultLanguage();
   const defaultTitle = getT(TRANSLATION_KEYS.BARCODE_SCANNER_TITLE, language, defaultLang);
   const displayTitle = title === "Barcode Scanner" ? defaultTitle : title;
+  const createdBy = useUserStore((s) => s.getUserId()) ?? undefined;
 
   const beepRef = useRef<(() => void) | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -252,6 +257,9 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   // Tracks the actual last scanned/entered item for statistics (not last by array position)
   const [lastScannedLabel, setLastScannedLabel] = useState<string | null>(null);
   const [lastScannedFormatForStats, setLastScannedFormatForStats] = useState<string | null>(null);
+
+  // Pause camera when GS1 details dialog is open (so user can read without camera running)
+  const [cameraPausedByGS1, setCameraPausedByGS1] = useState(false);
 
   useEffect(() => {
     if (!LOG_CONFIG[LogType.CLIENT_LOG]) return;
@@ -396,6 +404,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
               format: fmt,
               createdAt: new Date().toISOString(),
               count: enableChangeCount ? 1 : undefined,
+              createdBy,
             };
             window.setTimeout(() => markNewlyAdded(newItem.id), 0);
             return [...prev, newItem];
@@ -412,7 +421,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
         }, 0);
       }
     },
-    [enableBeep, beepOn, enableMultipleScan, enableChangeCount, onScan, markNewlyAdded]
+    [enableBeep, beepOn, enableMultipleScan, enableChangeCount, onScan, markNewlyAdded, createdBy]
   );
 
   const handleScanError = useCallback((error: unknown) => {
@@ -451,11 +460,54 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       lastScanRef.current = "";
       setIsJsonDialogOpen(false);
       setScanMode("camera");
+      setCameraPausedByGS1(false);
       if (newlyAddedTimerRef.current) clearTimeout(newlyAddedTimerRef.current);
       setNewlyAddedId(null);
       setLastScannedLabel(null);
       setLastScannedFormatForStats(null);
     }
+  }, [open]);
+
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !navigator.wakeLock) return;
+
+    const requestLock = async () => {
+      try {
+        const sentinel = await navigator.wakeLock.request("screen");
+        wakeLockRef.current = sentinel;
+        sentinel.addEventListener("release", () => {
+          wakeLockRef.current = null;
+        });
+      } catch {
+        // Not supported, denied, or low battery
+      }
+    };
+
+    const releaseLock = () => {
+      if (wakeLockRef.current) {
+        wakeLockRef.current.release().catch(() => {});
+        wakeLockRef.current = null;
+      }
+    };
+
+    if (open) {
+      void requestLock();
+    } else {
+      releaseLock();
+    }
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible" && open) {
+        void requestLock();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      releaseLock();
+    };
   }, [open]);
 
   const handleCameraChange = useCallback((id: string) => {
@@ -471,6 +523,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       const raw = sanitizeBarcodeValue(inputValue);
       if (!raw) return;
       if (enableBeep && beepOn && beepRef.current) beepRef.current();
+      triggerSelection();
       const fmt = source === "nfc" ? "RFID" : "Handheld";
       setLastScannedLabel(raw);
       setLastScannedFormatForStats(fmt);
@@ -494,6 +547,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
             format: fmt,
             createdAt: now.toISOString(),
             count: enableChangeCount ? 1 : undefined,
+            createdBy,
           };
           window.setTimeout(() => markNewlyAdded(newItem.id), 0);
           return [...prev, newItem];
@@ -504,8 +558,17 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
         onScan?.(raw, fmt);
       }
     },
-    [enableBeep, beepOn, enableMultipleScan, enableChangeCount, markNewlyAdded, onScan]
+    [enableBeep, beepOn, enableMultipleScan, enableChangeCount, markNewlyAdded, onScan, createdBy]
   );
+
+  const onNfcRead = useCallback(
+    (value: string) => handleHandheldAdd(value, "nfc"),
+    [handleHandheldAdd]
+  );
+  const { nfcActive: cameraNfcActive } = useNfcReader({
+    onRead: onNfcRead,
+    enabled: open && scanMode === "camera",
+  });
 
   const handleZoomIn = useCallback(() => {
     setZoomLevel((p) => Math.min(p + ZOOM_STEP, MAX_ZOOM));
@@ -540,21 +603,21 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
 
   const handleAddMockData = useCallback(() => {
     const items = [
-      mockGS1Barcode(enableChangeCount),
-      randomMockBarcode(enableChangeCount),
-      randomMockBarcode(enableChangeCount),
+      mockGS1Barcode(enableChangeCount, createdBy),
+      randomMockBarcode(enableChangeCount, createdBy),
+      randomMockBarcode(enableChangeCount, createdBy),
     ];
     setBarcodes((prev) => [...prev, ...items]);
     markNewlyAdded(items[items.length - 1].id);
-  }, [enableChangeCount, markNewlyAdded]);
+  }, [enableChangeCount, markNewlyAdded, createdBy]);
 
   const handleAddMockSingle = useCallback(() => {
     const b =
-      Math.random() < 0.5 ? mockGS1Barcode(false) : randomMockBarcode(false);
+      Math.random() < 0.5 ? mockGS1Barcode(false, createdBy) : randomMockBarcode(false, createdBy);
     setScannedValue(b.label);
     setScannedFormat(b.format ?? "QR");
     onScan?.(b.label, b.format ?? "QR");
-  }, [onScan]);
+  }, [onScan, createdBy]);
 
   const handleCountChange = useCallback((id: string, count: number) => {
     setBarcodes((prev) =>
@@ -577,7 +640,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   const statisticsBarcodes = enableMultipleScan
     ? barcodes
     : scannedValue !== null
-      ? [{ id: "single", label: scannedValue, format: scannedFormat, createdAt: new Date().toISOString() }]
+      ? [{ id: "single", label: scannedValue, format: scannedFormat, createdAt: new Date().toISOString(), createdBy }]
       : [];
 
   const jsonData = enableMultipleScan
@@ -589,9 +652,18 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
             label: scannedValue,
             format: scannedFormat,
             createdAt: new Date().toISOString(),
+            createdBy: createdBy ?? null,
           },
         ]
       : [];
+
+  const jsonDataForExport = useMemo(
+    () =>
+      Array.isArray(jsonData)
+        ? jsonData.map((b) => ({ ...b, createdBy: b.createdBy ?? null }))
+        : jsonData,
+    [jsonData]
+  );
 
   const hasMultiScanItems = enableMultipleScan && barcodes.length > 0;
   const confirmLabelKey = hasMultiScanItems ? TRANSLATION_KEYS.BARCODE_SCANNER_CONFIRM_N : TRANSLATION_KEYS.BARCODE_SCANNER_CONFIRM;
@@ -643,6 +715,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
               lastScannedFormat={lastScannedFormat}
               cameraError={cameraError}
               compact={!isDialogLayout}
+              nfcActive={cameraNfcActive}
             >
               {open &&
                 scanMode === "camera" &&
@@ -653,6 +726,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
                 <Scanner
                   onScan={handleScan}
                   onError={handleScanError}
+                  paused={cameraPausedByGS1}
                   constraints={
                     selectedCameraId && selectedCameraId !== "default"
                       ? { deviceId: { exact: selectedCameraId } }
@@ -718,7 +792,9 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
     <div
       className={cn(
         "flex flex-col",
-        isDialogLayout ? "flex-1 min-h-0 min-w-0 overflow-auto h-full" : "flex-1 min-h-0 mt-2"
+        isDialogLayout
+          ? "flex-1 min-h-0 min-w-0 overflow-auto h-full"
+          : "flex-1 min-h-0 mt-2 overflow-y-auto"
       )}
     >
       {showResult ? (
@@ -739,6 +815,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
           onAddMockData={handleAddMockData}
           hideFooterConfirm={enableMultipleScan}
           fillHeight={isDialogLayout}
+          onGS1BadgeOpenChange={setCameraPausedByGS1}
           newlyAddedId={newlyAddedId}
           enableBeepForCountChange={enableBeep && beepOn}
         />
@@ -767,16 +844,22 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
     <DrawerDialog
       open={open}
       onOpenChange={onOpenChange}
-      title={displayTitle}
+      title={
+        <span className="inline-flex items-center gap-2">
+          <ScanLine className="size-5 shrink-0 text-violet-500 dark:text-violet-400" aria-hidden />
+          {displayTitle}
+        </span>
+      }
       description={scannerDialogDescription}
       size="lg"
       drawerDirection="bottom"
       drawerFullHeight={true}
-      bodyScrollable={false}
+      bodyScrollable={scanMode === "handheld"}
       hideCloseButton={enableMultipleScan}
       showCloseButton={true}
       enableMaximize={isDialogLayout}
       showConfirmationOnClose={hasUnsavedBarcodes}
+      noDragOnContent={scanMode === "handheld"}
       confirmOnCloseTitle={closeScannerTitle}
       confirmOnCloseMessage={barcodes.length > 0 ? closeMessageItems : closeMessageEmpty}
       confirmOnCloseLabel={discardCloseLabel}
@@ -786,7 +869,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
       <div
         className={cn(
           "flex",
-          isDialogLayout ? "flex-1 min-h-0 h-full flex-row gap-2 p-2" : "flex-col gap-0 min-h-full"
+          isDialogLayout ? "flex-1 min-h-0 h-full flex-row gap-2 p-2" : "flex-col gap-0 min-h-0 flex-1"
         )}
       >
         <div
@@ -794,7 +877,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
             "bg-white/95 dark:bg-gray-900/95 backdrop-blur-xs border-gray-200 dark:border-gray-800",
             isDialogLayout
               ? "w-[min(420px,45%)] shrink-0 flex flex-col min-h-0 border rounded-xl overflow-hidden"
-              : "sticky top-0 z-20 border-b flex flex-col"
+              : "shrink-0 z-20 border-b flex flex-col"
           )}
         >
           {cameraAndToolbarBlock}
@@ -810,7 +893,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
             </DialogHeader>
             <div className="flex-1 min-h-0 overflow-auto">
               <CodeViewer
-                code={JSON.stringify(jsonData, null, 2)}
+                code={JSON.stringify(jsonDataForExport, null, 2)}
                 programmingLanguage="json"
                 initialLineNumbers={20}
               />

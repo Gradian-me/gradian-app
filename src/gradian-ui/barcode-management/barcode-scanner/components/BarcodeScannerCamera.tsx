@@ -13,6 +13,7 @@ export const BarcodeScannerCamera: React.FC<BarcodeScannerCameraProps> = ({
   lastScannedFormat,
   cameraError,
   compact = false,
+  nfcActive = false,
 }) => {
   const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
   const defaultLang = getDefaultLanguage();
@@ -39,14 +40,28 @@ export const BarcodeScannerCamera: React.FC<BarcodeScannerCameraProps> = ({
             {lastScannedFormat}
           </div>
         )}
-        <div
-          className={cn(
-            "absolute top-3 right-3 w-2 h-2 rounded-full",
-            isScanning
-              ? "bg-emerald-400 animate-pulse"
-              : "bg-gray-400"
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          {nfcActive && (
+            <span className="px-2 py-0.5 rounded-full bg-fuchsia-500/80 backdrop-blur-sm text-white text-[10px] font-medium tracking-wide">
+              NFC
+            </span>
           )}
-        />
+          {/* Green dot with ping when camera is active (feed showing); gray when not */}
+          <span className="relative flex h-2 w-2">
+            {children && !cameraError && (
+              <span
+                className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 animate-ping opacity-75"
+                aria-hidden
+              />
+            )}
+            <span
+              className={cn(
+                "relative inline-block h-2 w-2 rounded-full",
+                children && !cameraError ? "bg-emerald-400" : "bg-gray-400"
+              )}
+            />
+          </span>
+        </div>
       </div>
 
       {/* Camera error message */}

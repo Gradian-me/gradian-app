@@ -595,6 +595,7 @@ export const FormModal: React.FC<FormModalProps> = ({
       title={getT(TRANSLATION_KEYS.TITLE_UNSAVED_CHANGES, language, defaultLang)}
       message={getT(TRANSLATION_KEYS.MESSAGE_UNSAVED_CHANGES_LEAVE, language, defaultLang)}
       variant="warning"
+      showSwipe
       buttons={[
         {
           label: getT(TRANSLATION_KEYS.BUTTON_STAY, language, defaultLang),

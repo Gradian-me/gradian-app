@@ -9,7 +9,7 @@ import {
 } from '@/gradian-ui/indexdb-manager/cache-strategies';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType, LOG_CONFIG } from '@/gradian-ui/shared/configs/log-config';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { getFingerprintCookie } from '@/domains/auth/utils/fingerprint-cookie.util';
 import { useTenantStore } from '@/stores/tenant.store';
 import { authTokenManager, RateLimitError } from './auth-token-manager';

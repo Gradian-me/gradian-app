@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { Plus, RefreshCw, Settings, Building2, FileText, Zap, ChevronDown, ChevronRight } from 'lucide-react';
 import { useBackIcon } from '@/gradian-ui/shared/hooks';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';

@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { Button } from '@/components/ui/button';
 import { cn } from '../../../shared/utils';
 import { useLanguageStore } from '@/stores/language.store';

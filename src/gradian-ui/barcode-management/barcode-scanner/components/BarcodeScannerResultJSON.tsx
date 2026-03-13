@@ -65,6 +65,8 @@ type BarcodeCardProps = {
   unknownFormatLabel?: string;
   /** When true, plays a short beep when the quantity changes. */
   enableBeepForCountChange?: boolean;
+  /** Called when the GS1 details dialog opens or closes. */
+  onGS1BadgeOpenChange?: (open: boolean) => void;
 };
 
 const BarcodeCard: React.FC<BarcodeCardProps> = ({
@@ -82,6 +84,7 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
   deleteScanTitle = "Delete scan",
   unknownFormatLabel = "Unknown",
   enableBeepForCountChange = false,
+  onGS1BadgeOpenChange,
 }) => {
   const displayValue = barcode.label ?? "";
   const isUrl = useMemo(() => isValidUrl(displayValue), [displayValue]);
@@ -182,7 +185,7 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
             {highlightMatch(displayValue, query)}
           </p>
           {(barcode.format === "DataMatrix" || barcode.format === "Handheld" || barcode.format === "RFID") && (
-            <GS1Badge barcodeLabel={barcode.label ?? ""} />
+            <GS1Badge barcodeLabel={barcode.label ?? ""} onOpenChange={onGS1BadgeOpenChange} />
           )}
         </div>
         {isUrl && href && (
@@ -215,6 +218,7 @@ export const BarcodeScannerResultJSON: React.FC<BarcodeScannerResultJSONProps> =
   newlyAddedId = null,
   receiptOptions,
   enableBeepForCountChange = false,
+  onGS1BadgeOpenChange,
 }) => {
   const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
   const defaultLang = getDefaultLanguage();
@@ -412,6 +416,7 @@ export const BarcodeScannerResultJSON: React.FC<BarcodeScannerResultJSONProps> =
               deleteScanTitle={deleteScanTitle}
               unknownFormatLabel={unknownFormatLabel}
               enableBeepForCountChange={enableBeepForCountChange}
+              onGS1BadgeOpenChange={onGS1BadgeOpenChange}
             />
           ))
         )}

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Loader2, Trash2 } from 'lucide-react';
 import { useBackIcon } from '@/gradian-ui/shared/hooks';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

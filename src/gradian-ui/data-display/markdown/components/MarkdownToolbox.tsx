@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Button } from '@/components/ui/button';
 import { Eye, FileCode, FileDown, Loader2, Pencil, Printer, Sparkles } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { cn } from '@/lib/utils';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';

@@ -12,7 +12,7 @@ import type { FormSchema as FormBuilderSchema, DataRelation } from '@/gradian-ui
 import { useCompanyStore } from '@/stores/company.store';
 import { cacheSchemaClientSide } from '@/gradian-ui/schema-manager/utils/schema-client-cache';
 import { getSchemaWithClientCache } from '@/gradian-ui/schema-manager/utils/client-schema-cache';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';

@@ -8,9 +8,30 @@ import {
   TriangleAlertIcon,
 } from "lucide-react"
 import { useTheme } from "next-themes"
-import { Toaster as Sonner, type ToasterProps } from "sonner"
+import { Toaster as Sonner, type ToasterProps, toast as sonnerToast } from "sonner"
 import { useLanguageStore } from "@/stores/language.store"
+import { triggerNotification } from "@/gradian-ui/shared/haptic-utils"
 import { isRTL, getDefaultLanguage } from "@/gradian-ui/shared/utils/translation-utils"
+
+const toast = Object.assign(
+  (message: Parameters<typeof sonnerToast>[0], data?: Parameters<typeof sonnerToast>[1]) =>
+    sonnerToast(message, data),
+  {
+    ...sonnerToast,
+    success: (...args: Parameters<typeof sonnerToast.success>) => {
+      triggerNotification("success")
+      return sonnerToast.success(...args)
+    },
+    warning: (...args: Parameters<typeof sonnerToast.warning>) => {
+      triggerNotification("warning")
+      return sonnerToast.warning(...args)
+    },
+    error: (...args: Parameters<typeof sonnerToast.error>) => {
+      triggerNotification("error")
+      return sonnerToast.error(...args)
+    },
+  }
+)
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme()
@@ -46,5 +67,5 @@ const Toaster = ({ ...props }: ToasterProps) => {
   )
 }
 
-export { Toaster }
+export { Toaster, toast }
 

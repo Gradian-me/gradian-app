@@ -2,7 +2,7 @@
 
 import React, { useCallback } from "react";
 import type { RefObject } from "react";
-import { Download } from "lucide-react";
+import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn, getExportTimestamp } from "@/gradian-ui/shared/utils";
 import { downloadElementAsImage, type PrintExportType } from "../utils/print-element-as-image";
@@ -76,11 +76,17 @@ export function DownloadElementButton({
       onClick={handleDownload}
       disabled={downloading || disabledProp}
       className={cn("print:hidden", className)}
-      title={label}
-      aria-label={label}
+      title={downloading ? "Saving…" : label}
+      aria-label={downloading ? "Saving…" : label}
     >
-      <Download className="h-4 w-4 shrink-0" aria-hidden />
-      {size !== "icon" && label ? <span className="ml-1.5">{label}</span> : null}
+      {downloading ? (
+        <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden />
+      ) : (
+        <Download className="h-4 w-4 shrink-0" aria-hidden />
+      )}
+      {size !== "icon" && label ? (
+        <span className="ml-1.5">{downloading ? "Saving…" : label}</span>
+      ) : null}
     </Button>
   );
 }

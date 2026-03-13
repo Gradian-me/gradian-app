@@ -26,7 +26,7 @@ import { Avatar } from '@/gradian-ui/form-builder/form-elements/components/Avata
 import { ForceIcon } from '@/gradian-ui/form-builder/form-elements/components/ForceIcon';
 import { Countdown } from '@/gradian-ui/form-builder/form-elements/components/Countdown';
 import { AvatarUser } from '../../components/AvatarUser';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { cn } from '@/gradian-ui/shared/utils';
 import { CodeBadge } from '@/gradian-ui/form-builder/form-elements/components/CodeBadge';
 import { FormulaDisplay } from '@/gradian-ui/form-builder/form-elements/components/FormulaDisplay';

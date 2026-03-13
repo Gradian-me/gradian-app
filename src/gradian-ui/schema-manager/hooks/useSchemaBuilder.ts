@@ -2,7 +2,7 @@
 // Main hook for managing schema builder state and operations
 
 import { useState, useCallback } from 'react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { FormSchema, FormField, FormSection } from '../types/form-schema';
 import { config as appConfig } from '../../../lib/config';
 import { 

@@ -29,7 +29,7 @@ import { FormModal } from '@/gradian-ui/form-builder/components/FormModal';
 import { PopupPicker } from '@/gradian-ui/form-builder/form-elements/components/PopupPicker';
 import { NormalizedOption } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { DEFAULT_LIMIT } from '@/gradian-ui/shared/utils/pagination-utils';
 import { getSchemaTranslatedSingularName, getSchemaTranslatedPluralName, getSectionTranslatedDescription } from '@/gradian-ui/schema-manager/utils/schema-utils';
 

@@ -104,6 +104,11 @@ export interface DrawerDialogProps {
    * Label for the confirm-close action button. Defaults to "Close anyway".
    */
   confirmOnCloseLabel?: string;
+  /**
+   * When true (drawer only), drag/swipe on the content area will not close the drawer.
+   * Use when the content has inputs or scroll so that scrolling does not trigger close.
+   */
+  noDragOnContent?: boolean;
 }
 
 function useIsSmallScreen(): boolean {
@@ -146,6 +151,7 @@ export const DrawerDialog: React.FC<DrawerDialogProps> = ({
   confirmOnCloseTitle = 'Close',
   confirmOnCloseMessage = 'Are you sure you want to close?',
   confirmOnCloseLabel = 'Close anyway',
+  noDragOnContent = false,
 }) => {
   const language = useLanguageStore((s) => s.language) || 'en';
   const isRTLLanguage = isRTL(language);
@@ -268,6 +274,7 @@ export const DrawerDialog: React.FC<DrawerDialogProps> = ({
             'no-scrollbar flex-1',
             bodyScrollable ? 'overflow-y-auto' : 'overflow-y-hidden'
           )}
+          data-vaul-no-drag={showConfirmationOnClose || noDragOnContent ? '' : undefined}
         >
           {children}
         </div>

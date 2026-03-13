@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { HealthService, ServiceHealthStatus, HealthCheckResponse } from '../types';
 import { Email } from '@/gradian-ui/communication';
 

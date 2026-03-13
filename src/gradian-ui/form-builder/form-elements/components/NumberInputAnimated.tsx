@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import { Minus, Plus } from 'lucide-react';
 import { Calculator } from '@/gradian-ui/formula-engine';
 import { createBeep } from '@/gradian-ui/shared/utils/sound-utils';
+import { triggerSelection } from '@/gradian-ui/shared/haptic-utils';
 
 export type NumberInputAnimatedProps = {
   value?: number;
@@ -55,6 +56,7 @@ export const NumberInputAnimated: React.FC<NumberInputAnimatedProps> = ({
         max ?? Infinity
       );
       onChange?.(next);
+      triggerSelection();
       if (enableBeep && beepRef.current) {
         beepRef.current();
       }

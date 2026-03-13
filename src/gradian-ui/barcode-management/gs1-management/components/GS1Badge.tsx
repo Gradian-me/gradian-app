@@ -13,6 +13,7 @@ import {
 import { isGS1Valid, parseGS1, type GS1ParsedElement, getGs1BarcodeConfigMap } from "../utils/gs1-utils";
 import { getGS1AIMeta } from "../utils/gs1-ai-dictionary";
 import { formatGS1Unit } from "../utils/gs1-unit-formatter";
+import { useBackButtonClose } from "@/gradian-ui/shared/utils/layout-utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   TicketCardWrapper,
@@ -59,6 +60,8 @@ export interface GS1BadgeProps {
   barcodeLabel: string;
   /** Optional class name for the badge container. */
   className?: string;
+  /** Called when the GS1 details dialog opens or closes. Use to e.g. pause camera while open. */
+  onOpenChange?: (open: boolean) => void;
 }
 
 function formatElementData(element: GS1ParsedElement): string {
@@ -72,8 +75,16 @@ function formatElementData(element: GS1ParsedElement): string {
   return String(data ?? "");
 }
 
-export function GS1Badge({ barcodeLabel, className }: GS1BadgeProps) {
+export function GS1Badge({ barcodeLabel, className, onOpenChange }: GS1BadgeProps) {
   const [open, setOpen] = useState(false);
+
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next);
+    onOpenChange?.(next);
+  };
+
+  useBackButtonClose(open, handleOpenChange, { markerKey: "gs1Badge" });
+
   const [barcodeConfigMap, setBarcodeConfigMap] = useState<Map<string, { lookupId: string }> | null>(null);
   const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
   const locale = language === "fa" ? "fa" : "en";
@@ -228,7 +239,7 @@ export function GS1Badge({ barcodeLabel, className }: GS1BadgeProps) {
         <CheckCircle2 className="w-3 h-3 shrink-0" aria-hidden />
         <span>GS1</span>
       </button>
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent
           className="w-full h-full lg:h-fit rounded-none lg:rounded-2xl lg:max-w-2xl lg:max-h-[85vh] overflow-x-visible overflow-y-auto flex flex-col p-2 gap-0 bg-white dark:bg-gray-800"
           aria-describedby="gs1-dialog-description"

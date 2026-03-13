@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { HealthService, ServiceHealthStatus } from '../types';
 
 export interface UseHealthServiceReturn {

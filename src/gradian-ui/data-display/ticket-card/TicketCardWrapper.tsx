@@ -2,6 +2,7 @@
 
 import React, { useCallback, useState } from "react";
 import dynamic from "next/dynamic";
+import { toast } from "@/components/ui/sonner";
 import { QrCode, Loader2 } from "lucide-react";
 import { cn } from "@/gradian-ui/shared/utils";
 import {
@@ -103,7 +104,7 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
           quality: "draft",
           maxDimension: 100,
           onError: (err) => {
-            console.error("[TicketCardWrapper] QR capture failed:", err);
+            toast.error("QR capture failed", { description: err.message });
           },
         });
         if (!dataUrl || typeof dataUrl !== "string") {
@@ -113,7 +114,8 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
         setQrValue(pngDataUrl);
         setQrDialogOpen(true);
       } catch (err) {
-        console.error("[TicketCardWrapper] QR capture error:", err);
+        const message = err instanceof Error ? err.message : "QR capture failed";
+        toast.error("QR capture failed", { description: message });
       } finally {
         setQrLoading(false);
       }
@@ -162,6 +164,7 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
               variant="secondary"
               disabled={qrLoading}
               className="h-8 w-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 hover:bg-gray-100 dark:hover:bg-gray-700"
+              onError={(err) => toast.error("Download failed", { description: err.message })}
             />
             <PrintElementButton
               elementRef={internalRef}
@@ -170,6 +173,7 @@ const TicketCardWrapper = React.forwardRef<HTMLDivElement, TicketCardWrapperProp
               variant="secondary"
               disabled={qrLoading}
               className="h-8 w-8 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-gray-800/90 hover:bg-gray-100 dark:hover:bg-gray-700"
+              onError={(err) => toast.error("Print failed", { description: err.message })}
             />
           </div>
         )}

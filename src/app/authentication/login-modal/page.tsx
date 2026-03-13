@@ -10,7 +10,7 @@ import { useTenantStore } from '@/stores/tenant.store';
 import { clearMenuItemsCache } from '@/stores/menu-items.store';
 import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import {

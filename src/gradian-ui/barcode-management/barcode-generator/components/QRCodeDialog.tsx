@@ -15,7 +15,7 @@ import {
 import { QRCodeCanvas } from './QRCodeCanvas';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { useQrcodeDownload } from 'react-qrcode-pretty';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';

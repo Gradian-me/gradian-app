@@ -4,7 +4,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ulid } from 'ulid';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { useSchemas as useSchemaSummaries } from '@/gradian-ui/schema-manager/hooks/use-schemas';

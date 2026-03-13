@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, LockIcon, UserIcon } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 
 import { useUserStore } from '@/stores/user.store';
 import { useTenantStore } from '@/stores/tenant.store';

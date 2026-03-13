@@ -42,7 +42,7 @@ import { useCompanies } from '@/gradian-ui/shared/hooks/use-companies';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { debounce } from '@/gradian-ui/shared/utils';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { buildHierarchyTree } from '@/gradian-ui/schema-manager/utils/hierarchy-utils';
 import { UI_PARAMS } from '@/gradian-ui/shared/configs/ui-config';
 import { TableWrapper, TableConfig, buildTableColumns, TableColumn } from '@/gradian-ui/data-display/table';

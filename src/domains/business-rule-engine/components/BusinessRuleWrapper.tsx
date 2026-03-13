@@ -15,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Save, TestTube, RefreshCw, CheckCircle, Loader2 } from 'lucide-react';
 import { validateRule } from '../utils/rule-operations';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 
 interface BusinessRuleWrapperProps {

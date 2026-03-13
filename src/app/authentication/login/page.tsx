@@ -13,7 +13,7 @@ import { AUTH_CONFIG } from '@/gradian-ui/shared/configs/auth-config';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { TenantSelector } from '@/components/layout/TenantSelector';
 import { Logo } from '@/gradian-ui/layout/logo/components/Logo';
-import { toast } from 'sonner';
+import { toast } from '@/components/ui/sonner';
 import { decryptReturnUrl } from '@/gradian-ui/shared/utils/url-encryption.util';
 import { authTokenManager } from '@/gradian-ui/shared/utils/auth-token-manager';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
