@@ -17,16 +17,26 @@
 
 import type { FormSchema } from '../types/form-schema';
 import { clearSchemasSummaryCache } from '@/gradian-ui/indexdb-manager/schemas-summary-cache';
+import { isEncryptionAvailable } from '@/gradian-ui/indexdb-manager/utils/crypto';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
 import {
   createIndexedDbStore,
   type IndexedDbStore,
 } from '@/gradian-ui/shared/utils/indexdb-utils';
 
+// Decide encryption for schema cache at runtime:
+// - Prefer encryption when WebCrypto + NEXT_PUBLIC_ENCRYPTION_KEY are available.
+// - Gracefully fall back to plaintext so cache still works when misconfigured.
+const SCHEMA_CACHE_ENCRYPTION_ENABLED =
+  typeof process !== 'undefined' &&
+  typeof process.env !== 'undefined' &&
+  !!process.env.NEXT_PUBLIC_ENCRYPTION_KEY &&
+  isEncryptionAvailable();
+
 // Dedicated IndexedDB "collection" for schemas
 const schemaIndexedDbStore: IndexedDbStore<FormSchema> = createIndexedDbStore<FormSchema>({
   namespace: 'schemas',
-  encryptData: true,
+  encryptData: SCHEMA_CACHE_ENCRYPTION_ENABLED,
 });
 
 // Batch queue for single-ID callers so multiple getSchemaWithClientCache()

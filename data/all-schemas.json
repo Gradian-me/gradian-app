@@ -623,7 +623,39 @@
         "fa": "پیکربندی سراسری برنامه شامل تنظیمات عمومی و گزینه‌های بارکد"
       }
     ],
-    "applications": []
+    "applications": [
+      {
+        "id": "01KFTQPVC9RCRE9J8ACHECVWNK",
+        "name": [
+          {
+            "en": "System Administration"
+          },
+          {
+            "fa": "مدیریت سیستم"
+          },
+          {
+            "ar": "إدارة النظام"
+          },
+          {
+            "es": "Administración del sistema"
+          },
+          {
+            "fr": "Administration système"
+          },
+          {
+            "de": "Systemverwaltung"
+          },
+          {
+            "it": "Amministrazione di sistema"
+          },
+          {
+            "ru": "Администрирование системы"
+          }
+        ],
+        "icon": "Verified"
+      }
+    ],
+    "syncStrategy": "schema-and-data"
   },
   {
     "id": "external_nodes",
