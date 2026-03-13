@@ -8,8 +8,12 @@ import React, {
 import { ScanBarcode } from 'lucide-react';
 import { ulid } from 'ulid';
 import { Button } from '@/components/ui/button';
-import { BarcodeScannerWrapper } from '@/gradian-ui/barcode-management';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { BarcodeScannerWrapper, BarcodeScannerResultFlat } from '@/gradian-ui/barcode-management';
 import type { ScannedBarcode as BarcodeValue, BarcodeFormat } from '@/gradian-ui/barcode-management';
+import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
+import { getDefaultLanguage, getT } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 import { cn, validateField } from '../../../shared/utils';
 import { getLabelClasses, errorTextClasses, baseInputClasses } from '../utils/field-styles';
 import type { FormElementProps, FormElementRef } from '../types';
@@ -72,6 +76,11 @@ export const BarcodeScannerInput = forwardRef<FormElementRef, BarcodeScannerInpu
     const enableMultipleScan = (config as any)?.enableMultipleScan ?? true;
     const enableJSONResult = (config as any)?.enableJSONResult ?? false;
     const enableChangeCount = (config as any)?.enableChangeCount ?? false;
+
+    const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
+    const itemsLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_ITEMS, language, defaultLang);
+    const totalLabel = getT(TRANSLATION_KEYS.BARCODE_SCANNER_TOTAL, language, defaultLang);
 
     useImperativeHandle(ref, () => ({
       focus: () => {
@@ -142,12 +151,20 @@ export const BarcodeScannerInput = forwardRef<FormElementRef, BarcodeScannerInpu
             className={inputClasses}
           >
             {hasValue ? (
-              <BadgeRenderer
-                items={badgeItems}
-                maxBadges={4}
-                badgeVariant="outline"
-                className="flex-1"
-              />
+              enableMultipleScan ? (
+                <BarcodeScannerResultFlat
+                  items={items}
+                  showCount={enableChangeCount}
+                  className="flex-1"
+                />
+              ) : (
+                <BadgeRenderer
+                  items={badgeItems}
+                  maxBadges={4}
+                  badgeVariant="outline"
+                  className="flex-1"
+                />
+              )
             ) : (
               <span className="text-xs text-gray-400 dark:text-gray-500 select-none">
                 {placeholder}
@@ -155,20 +172,42 @@ export const BarcodeScannerInput = forwardRef<FormElementRef, BarcodeScannerInpu
             )}
           </div>
 
-          <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleOpenScanner}
-              disabled={disabled}
-              className="h-7 w-7 p-0 hover:bg-violet-100 hover:text-violet-600"
-              title="Open barcode scanner"
-              aria-label="Open barcode scanner"
-              tabIndex={-1}
-            >
-              <ScanBarcode className="h-4 w-4" />
-            </Button>
+          {hasValue && (
+            <div className="mt-1 flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400">
+              <span>
+                {itemsLabel}: {items.length}
+              </span>
+              <span>
+                {totalLabel}:{' '}
+                {enableChangeCount
+                  ? items.reduce((sum, item) => sum + (item.count ?? 1), 0)
+                  : items.length}
+              </span>
+            </div>
+          )}
+
+          <div className="absolute right-1 top-1.5 flex items-center gap-1">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleOpenScanner}
+                    disabled={disabled}
+                    className="h-7 w-7 p-0 hover:bg-violet-100 hover:text-violet-600"
+                    aria-label="Open barcode scanner"
+                    tabIndex={-1}
+                  >
+                    <ScanBarcode className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  Open barcode scanner
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
 

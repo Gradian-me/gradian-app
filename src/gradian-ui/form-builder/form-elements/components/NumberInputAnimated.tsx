@@ -6,12 +6,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import { Minus, Plus } from 'lucide-react';
 import { Calculator } from '@/gradian-ui/formula-engine';
+import { createBeep } from '@/gradian-ui/shared/utils/sound-utils';
 
 export type NumberInputAnimatedProps = {
   value?: number;
   min?: number;
   max?: number;
   onChange?: (value: number) => void;
+  /** When true, plays a short beep on value change (Web Audio). */
+  enableBeep?: boolean;
 };
 
 export const NumberInputAnimated: React.FC<NumberInputAnimatedProps> = ({
@@ -19,9 +22,12 @@ export const NumberInputAnimated: React.FC<NumberInputAnimatedProps> = ({
   min = 1,
   max = 200,
   onChange,
+  enableBeep = false,
 }) => {
   const defaultValue = React.useRef(value);
   const [calculatorOpen, setCalculatorOpen] = React.useState(false);
+  const audioContextRef = React.useRef<AudioContext | null>(null);
+  const beep = React.useMemo(() => (enableBeep ? createBeep(audioContextRef) : null), [enableBeep]);
 
   const handlePointerDown =
     (diff: number) => (event: React.PointerEvent<HTMLButtonElement>) => {
@@ -33,6 +39,9 @@ export const NumberInputAnimated: React.FC<NumberInputAnimatedProps> = ({
         max ?? Infinity
       );
       onChange?.(next);
+      if (enableBeep && beep) {
+        beep();
+      }
     };
 
   const handleCalculatorApply = React.useCallback(

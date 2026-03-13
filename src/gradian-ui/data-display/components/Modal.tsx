@@ -9,7 +9,7 @@ import { useLanguageStore } from '@/stores/language.store';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import React from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../../../components/ui/dialog';
-import { cn } from '../../shared/utils';
+import { cn, useBackButtonClose } from '../../shared/utils';
 import { ModalProps } from '../types';
 import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 import { Badge } from '@/gradian-ui/form-builder/form-elements/components/Badge';
@@ -73,6 +73,17 @@ export const Modal: React.FC<ModalProps> = ({
   // Always render DialogTitle for accessibility (Radix UI requirement)
   // Hide it visually when hideDialogHeader is true
   const titleContent = title || 'Dialog';
+
+  // Close this modal when the browser back button pops our marker entry.
+  useBackButtonClose(
+    isOpen,
+    (next) => {
+      if (!next) {
+        onClose();
+      }
+    },
+    { markerKey: '__gradianDialog' }
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

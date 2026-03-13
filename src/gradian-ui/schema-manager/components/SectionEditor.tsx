@@ -11,6 +11,7 @@ import { AddButtonFull } from '@/gradian-ui/form-builder/form-elements';
 import { useMemo, useState, useEffect } from 'react';
 import { FormSchema } from '../types/form-schema';
 import { generateSchemaId } from '../utils/schema-form';
+import { buildAllowedCharConfig, sanitizeByAllowedConfig } from '@/gradian-ui/shared/utils/text-utils';
 import {
   getDefaultLanguage,
   getT,
@@ -126,6 +127,17 @@ export function SectionEditor({
   const sectionOptionAddOnly = getT(TRANSLATION_KEYS.SECTION_OPTION_ADD_ONLY, language, defaultLang);
   const sectionOptionCanSelectFromData = getT(TRANSLATION_KEYS.SECTION_OPTION_CAN_SELECT_FROM_DATA, language, defaultLang);
   const sectionOptionMustSelectFromData = getT(TRANSLATION_KEYS.SECTION_OPTION_MUST_SELECT_FROM_DATA, language, defaultLang);
+
+  const sectionIdCharConfig = buildAllowedCharConfig('a-');
+
+  const normalizeSectionId = (rawTitle: string): string => {
+    const base = generateSchemaId(rawTitle || '');
+    return sanitizeByAllowedConfig(base, sectionIdCharConfig, {
+      collapseWhitespaceToDash: true,
+      trimEdgeDashes: true,
+      normalizeCase: 'lower',
+    });
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -280,13 +292,17 @@ export function SectionEditor({
                 const title = resolveFromTranslationsArray(value, defaultLang, defaultLang) || tempSection.title || '';
                 setTempSection((prev) => {
                   const updated = { ...prev, titleTranslations: value, title };
-                  if (!isSectionIdCustom) updated.id = generateSchemaId(title);
+                  if (!isSectionIdCustom) {
+                    updated.id = normalizeSectionId(title);
+                  }
                   return updated;
                 });
               } else if (typeof value === 'string') {
                 setTempSection((prev) => {
                   const updated = { ...prev, title: value };
-                  if (!isSectionIdCustom) updated.id = generateSchemaId(value);
+                  if (!isSectionIdCustom) {
+                    updated.id = normalizeSectionId(value);
+                  }
                   return updated;
                 });
               }
@@ -302,7 +318,14 @@ export function SectionEditor({
           />
           <div>
             <NameInput
-              config={{ name: 'section-id', label: sectionLabelId, placeholder: sectionPlaceholderId }}
+              config={{
+                name: 'section-id',
+                label: sectionLabelId,
+                placeholder: sectionPlaceholderId,
+                validation: {
+                  pattern: 'a-',
+                },
+              }}
               value={tempSection.id}
               onChange={(newValue) => setTempSection(prev => ({ ...prev, id: newValue }))}
               isCustomizable
@@ -311,7 +334,7 @@ export function SectionEditor({
                 if (!custom) {
                   setTempSection(prev => ({
                     ...prev,
-                    id: generateSchemaId(prev.title || ''),
+                    id: normalizeSectionId(prev.title || ''),
                   }));
                 }
                 setIsSectionIdCustom(custom);

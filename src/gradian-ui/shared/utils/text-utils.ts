@@ -42,6 +42,307 @@ export const toPascalCase = (input: string | null | undefined): string =>
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join('');
 
+export type AllowedCharConfig = {
+  allowUpper: boolean;
+  allowLower: boolean;
+  allowDigits: boolean;
+  allowUnderscore: boolean;
+  allowDash: boolean;
+  allowDot: boolean;
+  allowAt: boolean;
+  extraChars: string;
+};
+
+/**
+ * Interpret a validation.pattern style value as a symbolic pattern template.
+ * Supported symbols:
+ * - A => uppercase A-Z
+ * - a => lowercase a-z
+ * - 0 => digits 0-9
+ * - _ => underscore
+ * - - => hyphen/dash
+ * - . => dot
+ * - @ => at symbol
+ *
+ * Any other characters are treated as literal single allowed characters.
+ * Non-string (e.g. RegExp) patterns return null.
+ */
+export function getPatternTemplate(rawPattern: unknown): string | null {
+  if (!rawPattern) return null;
+  if (rawPattern instanceof RegExp) return null;
+  const str = String(rawPattern).trim();
+  if (!str) return null;
+  return str;
+}
+
+export function buildAllowedCharConfig(
+  patternTemplate: string | null,
+  defaultConfig?: AllowedCharConfig,
+): AllowedCharConfig {
+  if (!patternTemplate) {
+    // Backward-compatible default when no template is provided.
+    return (
+      defaultConfig ?? {
+        allowUpper: false,
+        allowLower: true,
+        allowDigits: true,
+        allowUnderscore: true,
+        allowDash: true,
+        allowDot: true,
+        allowAt: true,
+        extraChars: '',
+      }
+    );
+  }
+
+  let allowUpper = false;
+  let allowLower = false;
+  let allowDigits = false;
+  let allowUnderscore = false;
+  let allowDash = false;
+  let allowDot = false;
+  let allowAt = false;
+  const extraChars: string[] = [];
+
+  for (const ch of patternTemplate) {
+    switch (ch) {
+      case 'A':
+        allowUpper = true;
+        break;
+      case 'a':
+        allowLower = true;
+        break;
+      case '0':
+        allowDigits = true;
+        break;
+      case '_':
+        allowUnderscore = true;
+        break;
+      case '-':
+        allowDash = true;
+        break;
+      case '.':
+        allowDot = true;
+        break;
+      case '@':
+        allowAt = true;
+        break;
+      default:
+        if (!extraChars.includes(ch)) {
+          extraChars.push(ch);
+        }
+        break;
+    }
+  }
+
+  return {
+    allowUpper,
+    allowLower,
+    allowDigits,
+    allowUnderscore,
+    allowDash,
+    allowDot,
+    allowAt,
+    extraChars: extraChars.join(''),
+  };
+}
+
+export function buildAllowedRegex(config: AllowedCharConfig): RegExp {
+  const parts: string[] = [];
+  if (config.allowUpper) parts.push('A-Z');
+  if (config.allowLower) parts.push('a-z');
+  if (config.allowDigits) parts.push('0-9');
+  if (config.allowUnderscore) parts.push('_');
+  if (config.allowDash) parts.push('\\-');
+  if (config.allowDot) parts.push('\\.');
+  if (config.allowAt) parts.push('@');
+  if (config.extraChars) {
+    const escaped = config.extraChars.replace(/[-\\/^$*+?.()|[\]{}]/g, '\\$&');
+    parts.push(escaped);
+  }
+
+  if (parts.length === 0) {
+    // Fallback: disallow everything (sanitization will yield empty string).
+    return /^$/;
+  }
+
+  return new RegExp(`^[${parts.join('')}]+$`);
+}
+
+export function buildHelperTextFromPattern(
+  patternTemplate: string | null,
+  fallbackMessage: string,
+): string {
+  if (!patternTemplate) {
+    return fallbackMessage;
+  }
+
+  const descriptions: string[] = [];
+  let hasUpper = false;
+  let hasLower = false;
+  let hasDigits = false;
+  let hasUnderscore = false;
+  let hasDash = false;
+  let hasDot = false;
+  let hasAt = false;
+  const literals: string[] = [];
+
+  for (const ch of patternTemplate) {
+    switch (ch) {
+      case 'A':
+        if (!hasUpper) {
+          descriptions.push('uppercase letters (A-Z)');
+          hasUpper = true;
+        }
+        break;
+      case 'a':
+        if (!hasLower) {
+          descriptions.push('lowercase letters (a-z)');
+          hasLower = true;
+        }
+        break;
+      case '0':
+        if (!hasDigits) {
+          descriptions.push('digits (0-9)');
+          hasDigits = true;
+        }
+        break;
+      case '_':
+        if (!hasUnderscore) {
+          descriptions.push('underscores (_)');
+          hasUnderscore = true;
+        }
+        break;
+      case '-':
+        if (!hasDash) {
+          descriptions.push('hyphens (-)');
+          hasDash = true;
+        }
+        break;
+      case '.':
+        if (!hasDot) {
+          descriptions.push('dots (.)');
+          hasDot = true;
+        }
+        break;
+      case '@':
+        if (!hasAt) {
+          descriptions.push('the @ symbol');
+          hasAt = true;
+        }
+        break;
+      default:
+        if (!literals.includes(ch)) {
+          literals.push(ch);
+        }
+        break;
+    }
+  }
+
+  if (literals.length > 0) {
+    descriptions.push(
+      literals.length === 1
+        ? `the "${literals[0]}" character`
+        : `these characters: "${literals.join('')}"`
+    );
+  }
+
+  if (descriptions.length === 0) {
+    return fallbackMessage;
+  }
+
+  if (descriptions.length === 1) {
+    return `${descriptions[0]} are allowed.`;
+  }
+
+  const last = descriptions.pop();
+  return `${descriptions.join(', ')} and ${last} are allowed.`;
+}
+
+export function sanitizeByAllowedConfig(
+  rawValue: string,
+  config: AllowedCharConfig,
+  options?: {
+    collapseWhitespaceToDash?: boolean;
+    trimEdgeDashes?: boolean;
+    normalizeCase?: 'auto' | 'lower' | 'upper' | 'preserve';
+  },
+): string {
+  const collapseWhitespaceToDash = options?.collapseWhitespaceToDash ?? true;
+  const trimEdgeDashes = options?.trimEdgeDashes ?? true;
+  const normalizeCase = options?.normalizeCase ?? 'auto';
+
+  let value = String(rawValue ?? '');
+
+  value = value.trim();
+  if (collapseWhitespaceToDash) {
+    value = value.replace(/\s+/g, '-');
+  }
+
+  // Case normalization strategy:
+  // - 'lower' / 'upper' are explicit.
+  // - 'auto': if only lower or only upper is allowed, normalize accordingly.
+  // - 'preserve': do nothing.
+  if (normalizeCase === 'lower') {
+    value = value.toLowerCase();
+  } else if (normalizeCase === 'upper') {
+    value = value.toUpperCase();
+  } else if (normalizeCase === 'auto') {
+    if (config.allowLower && !config.allowUpper) {
+      value = value.toLowerCase();
+    } else if (config.allowUpper && !config.allowLower) {
+      value = value.toUpperCase();
+    }
+  }
+
+  const result: string[] = [];
+
+  for (const ch of value) {
+    if (config.allowLower && ch >= 'a' && ch <= 'z') {
+      result.push(ch);
+      continue;
+    }
+    if (config.allowUpper && ch >= 'A' && ch <= 'Z') {
+      result.push(ch);
+      continue;
+    }
+    if (config.allowDigits && ch >= '0' && ch <= '9') {
+      result.push(ch);
+      continue;
+    }
+    if (config.allowUnderscore && ch === '_') {
+      result.push(ch);
+      continue;
+    }
+    if (config.allowDash && ch === '-') {
+      result.push(ch);
+      continue;
+    }
+    if (config.allowDot && ch === '.') {
+      result.push(ch);
+      continue;
+    }
+    if (config.allowAt && ch === '@') {
+      result.push(ch);
+      continue;
+    }
+    if (config.extraChars && config.extraChars.includes(ch)) {
+      result.push(ch);
+    }
+  }
+
+  let sanitized = result.join('');
+
+  if (trimEdgeDashes) {
+    sanitized = sanitized
+      .replace(/-+/g, '-')
+      .replace(/^-+/, '')
+      .replace(/-+$/, '');
+  }
+
+  return sanitized;
+}
+
 /**
  * Format JSON for markdown code blocks with proper indentation
  * Ensures consistent 2-space indentation and removes any formatting inconsistencies

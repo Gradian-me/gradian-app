@@ -108,6 +108,14 @@ export interface BarcodeScannerResultProps {
   onReset: () => void;
 }
 
+export interface BarcodeScannerResultFlatProps {
+  items: ScannedBarcode[];
+  /** When true, shows quantity and divider line for items that have a count. */
+  showCount?: boolean;
+  /** Optional extra classes for the root <ul>. */
+  className?: string;
+}
+
 export interface BarcodeScannerResultJSONProps {
   barcodes: ScannedBarcode[];
   enableChangeCount: boolean;
@@ -144,5 +152,9 @@ export interface BarcodeScannerResultJSONProps {
    * Passed to the print receipt builder for a modern receipt layout.
    */
   receiptOptions?: import("@/gradian-ui/printout").ReceiptDocOptions;
+  /**
+   * When true, plays a short beep when quantity is changed in the multi-scan results.
+   */
+  enableBeepForCountChange?: boolean;
 }
 

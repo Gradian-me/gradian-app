@@ -63,6 +63,8 @@ type BarcodeCardProps = {
   copyValueAria?: string;
   deleteScanTitle?: string;
   unknownFormatLabel?: string;
+  /** When true, plays a short beep when the quantity changes. */
+  enableBeepForCountChange?: boolean;
 };
 
 const BarcodeCard: React.FC<BarcodeCardProps> = ({
@@ -79,6 +81,7 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
   copyValueAria = "Copy value",
   deleteScanTitle = "Delete scan",
   unknownFormatLabel = "Unknown",
+  enableBeepForCountChange = false,
 }) => {
   const displayValue = barcode.label ?? "";
   const isUrl = useMemo(() => isValidUrl(displayValue), [displayValue]);
@@ -105,7 +108,7 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
       "transition-all duration-200",
       isNew && "animate-barcode-pulse ring-1 ring-violet-300 dark:ring-violet-700"
     )}>
-      {/* Top row: index + format badge + GS1 badge (DataMatrix only) + time + count editor + actions */}
+      {/* Top row: index + format badge + time + count editor + actions */}
       <div className="flex items-center gap-1 px-3 py-2 min-w-0">
         {/* Index bubble */}
         <span className={cn(
@@ -117,17 +120,14 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
           {displayIndex}
         </span>
 
-        {/* Format badge + GS1 badge (DataMatrix only) + time — can shrink/truncate so number input stays in card */}
+        {/* Format badge + time — can shrink/truncate so number input stays in card */}
         <div className="flex items-center gap-1 min-w-0 flex-1 overflow-hidden">
           <span className={cn(
-            "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold font-mono tracking-wide min-w-0 max-w-24 truncate",
+            "inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold font-sans tracking-wide min-w-0 max-w-24 truncate",
             getFormatBadgeClass(barcode.format)
           )}>
             {barcode.format ?? unknownFormatLabel}
           </span>
-          {(barcode.format === "DataMatrix" || barcode.format === "Handheld" || barcode.format === "RFID") && (
-            <GS1Badge barcodeLabel={barcode.label ?? ""} />
-          )}
           {barcode.createdAt && (
             <span className="text-[10px] text-gray-400 dark:text-gray-500 tabular-nums shrink-0">
               {dateFormat(new Date(barcode.createdAt), "HH:mm:ss")}
@@ -166,6 +166,7 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
               min={1}
               max={200}
               onChange={(next) => onChangeCount?.(next)}
+              enableBeep={enableBeepForCountChange}
             />
           )}
         </div>
@@ -173,11 +174,17 @@ const BarcodeCard: React.FC<BarcodeCardProps> = ({
 
       {/* Value row */}
       <div className="px-3 pb-2.5 -mt-0.5">
-        <p
-          className="text-sm font-mono text-gray-900 dark:text-gray-100 break-all leading-snug"
-        >
-          {highlightMatch(displayValue, query)}
-        </p>
+        <div className="flex items-center gap-1.5">
+          <p
+            className="text-sm font-sans text-gray-900 dark:text-gray-100 break-all leading-snug flex-1 text-left"
+            dir="auto"
+          >
+            {highlightMatch(displayValue, query)}
+          </p>
+          {(barcode.format === "DataMatrix" || barcode.format === "Handheld" || barcode.format === "RFID") && (
+            <GS1Badge barcodeLabel={barcode.label ?? ""} />
+          )}
+        </div>
         {isUrl && href && (
           <a
             href={href}
@@ -207,6 +214,7 @@ export const BarcodeScannerResultJSON: React.FC<BarcodeScannerResultJSONProps> =
   fillHeight = false,
   newlyAddedId = null,
   receiptOptions,
+  enableBeepForCountChange = false,
 }) => {
   const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
   const defaultLang = getDefaultLanguage();
@@ -403,6 +411,7 @@ export const BarcodeScannerResultJSON: React.FC<BarcodeScannerResultJSONProps> =
               copyValueAria={copyValueAria}
               deleteScanTitle={deleteScanTitle}
               unknownFormatLabel={unknownFormatLabel}
+              enableBeepForCountChange={enableBeepForCountChange}
             />
           ))
         )}

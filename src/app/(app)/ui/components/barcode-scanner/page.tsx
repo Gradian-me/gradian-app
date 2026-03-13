@@ -5,6 +5,7 @@ import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsConte
 import { Button } from '@/components/ui/button';
 import {
   BarcodeScannerWrapper,
+  BarcodeScannerResultFlat,
 } from '@/gradian-ui/barcode-management';
 import type {
   ScannedBarcode,
@@ -95,20 +96,7 @@ export default function BarcodeScannerPage() {
               No items scanned yet.
             </div>
           ) : (
-            <ul className="text-xs space-y-1">
-              {multiValues.map((item) => (
-                <li key={item.id} className="flex items-center justify-between gap-2">
-                  <span className="font-mono break-all min-w-0 flex-1" dir="auto">
-                    {item.label}
-                  </span>
-                  {item.count != null && (
-                    <span className="shrink-0 whitespace-nowrap text-[11px] text-gray-500 dark:text-gray-400">
-                      × {item.count}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <BarcodeScannerResultFlat items={multiValues} showCount />
           )}
         </div>
       </section>
@@ -136,13 +124,7 @@ export default function BarcodeScannerPage() {
               No QR codes scanned yet.
             </div>
           ) : (
-            <ul className="text-xs space-y-1">
-              {restrictedValues.map((item) => (
-                <li key={item.id} className="font-mono break-all" dir="auto">
-                  {item.label}
-                </li>
-              ))}
-            </ul>
+            <BarcodeScannerResultFlat items={restrictedValues} showCount={false} />
           )}
         </div>
       </section>

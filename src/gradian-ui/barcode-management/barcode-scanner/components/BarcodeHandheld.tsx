@@ -10,7 +10,7 @@ interface BarcodeHandheldProps {
   description: string;
   placeholder: string;
   addBarcodeAria: string;
-  onSubmit: (value: string) => void;
+  onSubmit: (value: string, source: "manual" | "nfc") => void;
 }
 
 type NdefReaderLike = {
@@ -65,11 +65,11 @@ export const BarcodeHandheld: React.FC<BarcodeHandheldProps> = ({
   }, []);
 
   const handleSubmit = useCallback(
-    (raw: string) => {
+    (raw: string, source: "manual" | "nfc") => {
       const trimmed = raw.trim();
       if (!trimmed) return;
       setValue("");
-      onSubmit(trimmed);
+      onSubmit(trimmed, source);
     },
     [onSubmit]
   );
@@ -134,7 +134,7 @@ export const BarcodeHandheld: React.FC<BarcodeHandheldProps> = ({
           const candidate = (textPayload || String(event?.serialNumber ?? "")).trim();
           if (!candidate) return;
 
-          handleSubmit(candidate);
+          handleSubmit(candidate, "nfc");
         } catch {
           // Swallow parse errors but keep the scanner active
         }
@@ -237,17 +237,17 @@ export const BarcodeHandheld: React.FC<BarcodeHandheldProps> = ({
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
-              handleSubmit(value);
+              handleSubmit(value, "manual");
             }
           }}
           placeholder={placeholder}
-          className="flex-1 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-mono text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 dark:focus:ring-violet-600 dark:focus:border-violet-600 transition-colors"
+          className="flex-1 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-sans text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 dark:focus:ring-violet-600 dark:focus:border-violet-600 transition-colors"
           autoComplete="off"
           maxLength={2048}
         />
         <button
           type="button"
-          onClick={() => handleSubmit(value)}
+          onClick={() => handleSubmit(value, "manual")}
           disabled={!value.trim()}
           className="h-10 w-10 shrink-0 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1"
           aria-label={addBarcodeAria}

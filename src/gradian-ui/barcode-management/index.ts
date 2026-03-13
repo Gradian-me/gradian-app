@@ -8,6 +8,7 @@ export {
   BarcodeScannerToolbar,
   BarcodeScannerResult,
   BarcodeScannerResultJSON,
+  BarcodeScannerResultFlat,
 } from "./barcode-scanner";
 
 export type {
@@ -18,6 +19,7 @@ export type {
   BarcodeScannerToolbarProps,
   BarcodeScannerResultProps,
   BarcodeScannerResultJSONProps,
+  BarcodeScannerResultFlatProps,
 } from "./barcode-scanner";
 
 export { GS1Badge } from "./gs1-management";

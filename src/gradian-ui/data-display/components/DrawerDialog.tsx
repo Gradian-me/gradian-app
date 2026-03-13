@@ -9,7 +9,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer';
 import { Modal } from './Modal';
-import { cn } from '@/gradian-ui/shared/utils';
+import { cn, useBackButtonClose } from '@/gradian-ui/shared/utils';
 import { useLanguageStore } from '@/stores/language.store';
 import { isRTL } from '@/gradian-ui/shared/utils/translation-utils';
 import { ConfirmationMessage } from '@/gradian-ui/form-builder/form-elements/components/ConfirmationMessage';
@@ -164,6 +164,7 @@ export const DrawerDialog: React.FC<DrawerDialogProps> = ({
     },
     [showConfirmationOnClose, onOpenChange],
   );
+  useBackButtonClose(open, handleCloseRequest, { markerKey: '__gradianDialog' });
 
   const closeConfirmNode = showConfirmationOnClose ? (
     <ConfirmationMessage

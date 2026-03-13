@@ -21,6 +21,7 @@ import { BarcodeHandheld } from "./BarcodeHandheld";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/gradian-ui/shared/utils";
+import { createBeep } from "@/gradian-ui/shared/utils/sound-utils";
 import { CodeViewer } from "@/gradian-ui/shared/components/CodeViewer";
 import { CheckCircle2, Plus } from "lucide-react";
 import { sanitizeBarcodeValue, sanitizeFormat } from "../utils/sanitize";
@@ -159,53 +160,15 @@ function useCameraDevices(): MediaDeviceInfo[] | null {
   return devices;
 }
 
-/** Creates a beep function that uses Web Audio API (no Audio element, works without external sources). */
-function createBeep(audioContextRef: React.MutableRefObject<AudioContext | null>): () => void {
-  return () => {
-    try {
-      let ctx = audioContextRef.current;
-      if (!ctx) {
-        ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
-        audioContextRef.current = ctx;
-      }
-      const play = () => {
-        if (!audioContextRef.current) return;
-        const c = audioContextRef.current;
-        const osc = c.createOscillator();
-        const gain = c.createGain();
-        osc.connect(gain);
-        gain.connect(c.destination);
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(1200, c.currentTime);
-        gain.gain.setValueAtTime(0.4, c.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.18);
-        osc.start(c.currentTime);
-        osc.stop(c.currentTime + 0.18);
-        osc.onended = () => {
-          osc.disconnect();
-          gain.disconnect();
-        };
-      };
-      if (ctx.state === "suspended") {
-        ctx.resume().then(play).catch(() => {});
-      } else {
-        play();
-      }
-    } catch {
-      // AudioContext unavailable — silently ignore
-    }
-  };
-}
-
 function ulid(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
 const MOCK_FORMATS = ["Code128", "QR", "DataMatrix", "EAN"] as const;
 
-/** GS1-style mock barcode (DataMatrix) for testing Application Identifiers / ticket. */
+/** GS1-style mock barcode (DataMatrix) for testing Application Identifiers / ticket. Uses real ASCII 29 (GS) separators. */
 const MOCK_GS1_LABEL =
-  "]C101040123456789011715012910ABC123\\F39329784711\\F310300052539224711\\F42127649716\\F2413247";
+  "]C101040123456789011715012910ABC123\x1D39329784711\x1D310300052539224711\x1D42127649716\x1D2413247";
 
 function randomMockBarcode(enableChangeCount: boolean): ScannedBarcode {
   const now = new Date();
@@ -372,41 +335,70 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   const handleScan = useCallback(
     (detectedCodes: { rawValue: string; format?: string }[]) => {
       if (detectedCodes.length === 0) return;
-      const first = detectedCodes[0];
-      const raw = sanitizeBarcodeValue(first.rawValue);
-      const libFmt = (first as { format?: string }).format ?? "";
-      const fmt = sanitizeFormat(LIBRARY_FORMAT_TO_OUR[libFmt] ?? (libFmt || "Unknown"));
-      if (raw === lastScanRef.current) return;
-      lastScanRef.current = raw;
-      setTimeout(() => { lastScanRef.current = ""; }, 1500);
+
+      // Normalize, sanitize, and de-duplicate by raw value
+      const seen = new Set<string>();
+      const normalized = detectedCodes
+        .map((code) => {
+          const raw = sanitizeBarcodeValue(code.rawValue);
+          if (!raw) return null;
+          const libFmt = (code as { format?: string }).format ?? "";
+          const fmt = sanitizeFormat(LIBRARY_FORMAT_TO_OUR[libFmt] ?? (libFmt || "Unknown"));
+          return { raw, fmt };
+        })
+        .filter((item): item is { raw: string; fmt: string } => !!item && !seen.has(item.raw) && (seen.add(item.raw), true));
+
+      if (normalized.length === 0) return;
+
+      // Ignore immediate re-scan of the same content as the very last scan
+      const filtered =
+        normalized.length === 1 && normalized[0].raw === lastScanRef.current
+          ? []
+          : normalized.filter((item) => item.raw !== lastScanRef.current || normalized.length === 1);
+
+      if (filtered.length === 0) return;
+
+      const last = filtered[filtered.length - 1];
+      lastScanRef.current = last.raw;
+      setTimeout(() => {
+        lastScanRef.current = "";
+      }, 1500);
+
       // Use Web Audio beep when enabled and toolbar switch is on
       if (enableBeep && beepOn && beepRef.current) beepRef.current();
-      setLastScannedFormat(fmt);
-      setLastScannedLabel(raw);
-      setLastScannedFormatForStats(fmt);
+
+      setLastScannedFormat(last.fmt);
+      setLastScannedLabel(last.raw);
+      setLastScannedFormatForStats(last.fmt);
       setIsScanning(true);
+
       if (enableMultipleScan) {
-        setBarcodes((prev) => {
-          const existing = prev.find((b) => b.label === raw);
-          if (existing) {
-            // Camera mode: do not auto-increment count on duplicate; user changes count manually.
-            const updated = prev.map((b) =>
-              b.id === existing.id ? { ...b } : b
-            );
-            window.setTimeout(() => markNewlyAdded(existing.id), 0);
-            return updated;
-          }
-          const newItem: ScannedBarcode = {
-            id: ulid(),
-            label: raw,
-            format: fmt,
-            createdAt: new Date().toISOString(),
-            count: enableChangeCount ? 1 : undefined,
-          };
-          window.setTimeout(() => markNewlyAdded(newItem.id), 0);
-          return [...prev, newItem];
+        // Add/update all detected barcodes in this frame
+        filtered.forEach(({ raw, fmt }) => {
+          setBarcodes((prev) => {
+            const existing = prev.find((b) => b.label === raw);
+            if (existing) {
+              // Camera mode: do not auto-increment count on duplicate; user changes count manually.
+              const updated = prev.map((b) =>
+                b.id === existing.id ? { ...b } : b
+              );
+              window.setTimeout(() => markNewlyAdded(existing.id), 0);
+              return updated;
+            }
+            const newItem: ScannedBarcode = {
+              id: ulid(),
+              label: raw,
+              format: fmt,
+              createdAt: new Date().toISOString(),
+              count: enableChangeCount ? 1 : undefined,
+            };
+            window.setTimeout(() => markNewlyAdded(newItem.id), 0);
+            return [...prev, newItem];
+          });
         });
       } else {
+        // Single-scan mode: keep existing behavior, use only the last detected code
+        const { raw, fmt } = last;
         // Defer so Scanner can finish and clean up before we unmount it (avoids "no supported sources" error)
         window.setTimeout(() => {
           setScannedValue(raw);
@@ -470,12 +462,13 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
   }, []);
 
   const handleHandheldAdd = useCallback(
-    (inputValue: string) => {
+    (inputValue: string, source: "manual" | "nfc") => {
       const raw = sanitizeBarcodeValue(inputValue);
       if (!raw) return;
       if (enableBeep && beepOn && beepRef.current) beepRef.current();
+      const fmt = source === "nfc" ? "RFID" : "Handheld";
       setLastScannedLabel(raw);
-      setLastScannedFormatForStats("RFID");
+      setLastScannedFormatForStats(fmt);
 
       if (enableMultipleScan) {
         setBarcodes((prev) => {
@@ -493,7 +486,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
           const newItem: ScannedBarcode = {
             id: ulid(),
             label: raw,
-            format: "RFID",
+            format: fmt,
             createdAt: now.toISOString(),
             count: enableChangeCount ? 1 : undefined,
           };
@@ -502,8 +495,8 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
         });
       } else {
         setScannedValue(raw);
-        setScannedFormat("RFID");
-        onScan?.(raw, "RFID");
+        setScannedFormat(fmt);
+        onScan?.(raw, fmt);
       }
     },
     [enableBeep, beepOn, enableMultipleScan, enableChangeCount, markNewlyAdded, onScan]
@@ -742,6 +735,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
           hideFooterConfirm={enableMultipleScan}
           fillHeight={isDialogLayout}
           newlyAddedId={newlyAddedId}
+          enableBeepForCountChange={enableBeep && beepOn}
         />
       ) : (
         <div className="flex flex-col items-center justify-center py-8 gap-3 text-gray-400 dark:text-gray-500">

@@ -90,7 +90,7 @@ export const Switch = forwardRef<FormElementRef, SwitchProps>(
                 error: Boolean(error),
                 required,
                 disabled,
-                className: 'text-xs cursor-pointer mb-0',
+                className: 'text-xs cursor-pointer mb-0!',
               })}
             >
               {config.label}

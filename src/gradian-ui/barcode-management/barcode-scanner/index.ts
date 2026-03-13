@@ -4,6 +4,7 @@ export {
   BarcodeScannerToolbar,
   BarcodeScannerResult,
   BarcodeScannerResultJSON,
+  BarcodeScannerResultFlat,
 } from "./components";
 
 export type {
@@ -14,5 +15,6 @@ export type {
   BarcodeScannerToolbarProps,
   BarcodeScannerResultProps,
   BarcodeScannerResultJSONProps,
+  BarcodeScannerResultFlatProps,
 } from "./types";
 
