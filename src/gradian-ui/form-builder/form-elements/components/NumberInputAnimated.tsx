@@ -27,7 +27,23 @@ export const NumberInputAnimated: React.FC<NumberInputAnimatedProps> = ({
   const defaultValue = React.useRef(value);
   const [calculatorOpen, setCalculatorOpen] = React.useState(false);
   const audioContextRef = React.useRef<AudioContext | null>(null);
-  const beep = React.useMemo(() => (enableBeep ? createBeep(audioContextRef) : null), [enableBeep]);
+  const beepRef = React.useRef<(() => void) | null>(null);
+
+  React.useEffect(() => {
+    if (enableBeep) {
+      beepRef.current = createBeep(audioContextRef);
+    } else {
+      beepRef.current = null;
+    }
+
+    return () => {
+      beepRef.current = null;
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {});
+        audioContextRef.current = null;
+      }
+    };
+  }, [enableBeep]);
 
   const handlePointerDown =
     (diff: number) => (event: React.PointerEvent<HTMLButtonElement>) => {
@@ -39,8 +55,8 @@ export const NumberInputAnimated: React.FC<NumberInputAnimatedProps> = ({
         max ?? Infinity
       );
       onChange?.(next);
-      if (enableBeep && beep) {
-        beep();
+      if (enableBeep && beepRef.current) {
+        beepRef.current();
       }
     };
 

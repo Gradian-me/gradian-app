@@ -17,6 +17,7 @@ import { useLanguageStore } from '@/stores/language.store';
 import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 import { SwipeButton } from './SwipeButton';
+import { triggerNotification } from '@/gradian-ui/shared/haptic-utils';
 
 /**
  * Title/message can be a plain string or inline translations:
@@ -207,6 +208,9 @@ export const ConfirmationMessage: React.FC<ConfirmationMessageProps> = ({
                 }}
                 onChange={(confirmed) => {
                   if (!confirmed) return;
+                  if (swipeVariant === 'success') {
+                    triggerNotification('success');
+                  }
                   primaryButton.action();
                 }}
               />

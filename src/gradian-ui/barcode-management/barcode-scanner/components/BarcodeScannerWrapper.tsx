@@ -35,6 +35,7 @@ import type {
   ScanMode,
 } from "../types";
 import { LOG_CONFIG, LogType } from "@/gradian-ui/shared/configs/log-config";
+import { triggerSelection } from "@/gradian-ui/shared/haptic-utils";
 
 // ——— ZXing format mapping ————————————————————————————————————————————————
 /** Map our BarcodeFormat to @yudiel/react-qr-scanner format strings. */
@@ -366,6 +367,10 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
 
       // Use Web Audio beep when enabled and toolbar switch is on
       if (enableBeep && beepOn && beepRef.current) beepRef.current();
+      // Best-effort haptic tick alongside beep on supported devices
+      if (enableBeep && beepOn) {
+        triggerSelection();
+      }
 
       setLastScannedFormat(last.fmt);
       setLastScannedLabel(last.raw);
