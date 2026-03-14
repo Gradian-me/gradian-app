@@ -380,7 +380,7 @@ export const BarcodeScannerResultJSON: React.FC<BarcodeScannerResultJSONProps> =
       <div
         className={cn(
           "flex-1 overflow-y-auto min-h-0 py-1",
-          !fillHeight && "max-h-64"
+          !fillHeight && "max-h-72"
         )}
       >
         <div ref={scrollTopRef} />

@@ -14,6 +14,7 @@ export {
 export type {
   BarcodeFormat,
   ScannedBarcode,
+  ScannerLibraryFormat,
   BarcodeScannerProps,
   BarcodeScannerCameraProps,
   BarcodeScannerToolbarProps,

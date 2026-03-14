@@ -14,14 +14,16 @@ export const MAX_FORMAT_LENGTH = 64;
 /**
  * Clamps a raw scanned string to a safe display length.
  * Trims leading/trailing whitespace and removes ASCII control characters
- * (C0 range: 0x00–0x1F, except tab 0x09 and newline 0x0A) that could
+ * (C0 range: 0x00–0x1F, except tab 0x09, newline 0x0A, and 0x1D GS) that could
  * cause unexpected rendering or terminal-injection if the value is later
  * logged or exported.
+ * Preserves 0x1D (ASCII 29, GS1 Group Separator) so GS1/DataMatrix barcodes
+ * can be re-encoded correctly.
  */
 export function sanitizeBarcodeValue(raw: string): string {
   return raw
     .slice(0, MAX_BARCODE_LENGTH)
-    .replace(/[\x00-\x08\x0B-\x1F\x7F]/g, "")
+    .replace(/[\x00-\x08\x0B-\x1C\x1E-\x1F\x7F]/g, "")
     .trim();
 }
 

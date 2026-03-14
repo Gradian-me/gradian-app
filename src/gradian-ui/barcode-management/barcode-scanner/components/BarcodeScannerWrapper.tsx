@@ -17,7 +17,7 @@ import { BarcodeScannerToolbar } from "./BarcodeScannerToolbar";
 import { BarcodeScannerResult } from "./BarcodeScannerResult";
 import { BarcodeScannerResultJSON } from "./BarcodeScannerResultJSON";
 import { BarcodeScannerStatistics } from "./BarcodeScannerStatistics";
-import { BarcodeHandheld } from "./BarcodeHandheld";
+import { BarcodeHandheld, BarcodeManualEntryRow } from "./BarcodeHandheld";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/gradian-ui/shared/utils";
@@ -35,6 +35,7 @@ import type {
   BarcodeFormat,
   ScannedBarcode,
   ScanMode,
+  ScannerLibraryFormat,
 } from "../types";
 import { LOG_CONFIG, LogType } from "@/gradian-ui/shared/configs/log-config";
 import { triggerSelection } from "@/gradian-ui/shared/haptic-utils";
@@ -66,14 +67,50 @@ const OUR_FORMAT_TO_LIBRARY: Record<BarcodeFormat, string[]> = {
 
 /** Map library format string to our display name. */
 const LIBRARY_FORMAT_TO_OUR: Record<string, string> = {
-  qr_code: "QR", code_128: "Code128", code_39: "Code39", code_93: "Code93",
-  ean_8: "EAN8", ean_13: "EAN13", upc_a: "UPCA", upc_e: "UPCE",
-  data_matrix: "DataMatrix", pdf417: "PDF417", aztec: "Aztec", itf: "ITF",
-  codabar: "Codabar", databar: "RSS14", databar_expanded: "RSSExpanded",
-  micro_qr_code: "QR", rm_qr_code: "QR", unknown: "Unknown",
+  qr_code: "QR",
+  code_128: "Code128",
+  code_39: "Code39",
+  code_93: "Code93",
+  ean_8: "EAN8",
+  ean_13: "EAN13",
+  upc_a: "UPCA",
+  upc_e: "UPCE",
+  data_matrix: "DataMatrix",
+  pdf417: "PDF417",
+  aztec: "Aztec",
+  itf: "ITF",
+  codabar: "Codabar",
+  databar: "RSS14",
+  databar_expanded: "RSSExpanded",
+  micro_qr_code: "QR",
+  rm_qr_code: "QR",
+  dx_film_edge: "DxFilmEdge",
+  maxi_code: "MaxiCode",
+  linear_codes: "Linear",
+  matrix_codes: "Matrix",
+  unknown: "Unknown",
 };
 
-const DEFAULT_FORMATS: BarcodeFormat[] = ["Code128", "QR", "DataMatrix", "EAN"];
+/** All camera-decodable formats (GS1-capable symbologies + DataMatrix). Handheld/RFID are manual/NFC only. */
+const DEFAULT_FORMATS: BarcodeFormat[] = [
+  "Code128",
+  "Code39",
+  "Code93",
+  "EAN",
+  "EAN8",
+  "EAN13",
+  "UPC",
+  "UPCA",
+  "UPCE",
+  "QR",
+  "DataMatrix",
+  "PDF417",
+  "Aztec",
+  "ITF",
+  "Codabar",
+  "RSS14",
+  "RSSExpanded",
+];
 
 /** Point ZXing WASM to local copy in public/zxing-wasm (avoids CDN and CSP connect-src). */
 const ZXING_READER_WASM_URL = "/cdn/zxing_reader.wasm";
@@ -327,12 +364,13 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
     }
   }, [open, enableMultipleScan, initialBarcodes]);
 
-  const scannerFormats = useMemo(() => {
+  const scannerFormats = useMemo((): ScannerLibraryFormat[] => {
     const set = new Set<string>();
     for (const f of allowedFormats) {
       for (const lib of OUR_FORMAT_TO_LIBRARY[f] ?? []) set.add(lib);
     }
-    return set.size > 0 ? Array.from(set) : ["qr_code", "code_128", "ean_13", "data_matrix"];
+    const fallback: ScannerLibraryFormat[] = ["qr_code", "code_128", "ean_13", "data_matrix"];
+    return (set.size > 0 ? Array.from(set) : fallback) as ScannerLibraryFormat[];
   }, [allowedFormats]);
 
   const markNewlyAdded = useCallback((id: string) => {
@@ -732,7 +770,7 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
                       ? { deviceId: { exact: selectedCameraId } }
                       : { facingMode: { ideal: "environment" } }
                   }
-                  formats={scannerFormats as ("qr_code" | "code_128" | "code_39" | "ean_13" | "ean_8" | "upc_a" | "upc_e" | "codabar" | "itf" | "pdf417" | "aztec" | "data_matrix" | "code_93" | "databar" | "databar_expanded" | "micro_qr_code" | "rm_qr_code")[]}
+                  formats={scannerFormats}
                   scanDelay={500}
                   allowMultiple={enableMultipleScan}
                   sound={false}
@@ -747,6 +785,16 @@ export const BarcodeScannerWrapper: React.FC<BarcodeScannerProps> = ({
                 />
               )}
             </BarcodeScannerCamera>
+          </div>
+        )}
+        {scanMode === "camera" && (
+          <div className="shrink-0 py-2">
+            <BarcodeManualEntryRow
+              placeholder={placeholderScanOrType}
+              addBarcodeAria={addBarcodeAria}
+              onSubmit={(value) => handleHandheldAdd(value, "manual")}
+              autoFocus={false}
+            />
           </div>
         )}
         <div>

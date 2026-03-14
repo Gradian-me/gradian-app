@@ -224,7 +224,7 @@ export const DrawerDialog: React.FC<DrawerDialogProps> = ({
   const showSideHandle = !isBottom && handlerPosition === 'side';
   const vaulDirection = isBottom ? 'bottom' : (isRTLLanguage ? 'left' : 'right');
   const bottomMaxHeight =
-    drawerHeight ?? (drawerFullHeight ? '95dvh' : (isSmallScreen ? '95vh' : '85vh'));
+    drawerHeight ?? (drawerFullHeight ? '100dvh' : (isSmallScreen ? '95vh' : '85vh'));
   const bottomDrawerFull = isBottom && drawerFullHeight;
 
   return (
@@ -243,7 +243,7 @@ export const DrawerDialog: React.FC<DrawerDialogProps> = ({
               ),
           drawerClassName,
         )}
-        style={isBottom ? { maxHeight: bottomMaxHeight, height: bottomDrawerFull ? '95dvh' : undefined } : undefined}
+        style={isBottom ? { maxHeight: bottomMaxHeight, height: bottomDrawerFull ? '100dvh' : undefined } : undefined}
       >
         {showSideHandle ? (
           <div

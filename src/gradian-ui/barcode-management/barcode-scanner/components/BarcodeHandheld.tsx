@@ -6,6 +6,80 @@ import { cn } from "@/gradian-ui/shared/utils";
 import { Switch as FormSwitch } from "@/gradian-ui/form-builder/form-elements/components/Switch";
 import { useNfcReader } from "../utils/use-nfc-reader";
 
+export interface BarcodeManualEntryRowProps {
+  placeholder: string;
+  addBarcodeAria: string;
+  onSubmit: (value: string) => void;
+  autoFocus?: boolean;
+}
+
+export const BarcodeManualEntryRow: React.FC<BarcodeManualEntryRowProps> = ({
+  placeholder,
+  addBarcodeAria,
+  onSubmit,
+  autoFocus = true,
+}) => {
+  const [value, setValue] = useState("");
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleSubmit = useCallback(() => {
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    setValue("");
+    onSubmit(trimmed);
+  }, [value, onSubmit]);
+
+  const scrollInputIntoView = useCallback(() => {
+    const input = inputRef.current;
+    if (!input) return;
+    const delay = typeof window !== "undefined" && /Android|webOS|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ? 400 : 100;
+    window.setTimeout(() => {
+      input.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, delay);
+  }, []);
+
+  useEffect(() => {
+    if (!autoFocus) return;
+    const t = window.setTimeout(() => inputRef.current?.focus(), 100);
+    return () => window.clearTimeout(t);
+  }, [autoFocus]);
+
+  return (
+    <div className="flex w-full gap-2 px-4">
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onFocus={scrollInputIntoView}
+        style={{ scrollMarginBottom: "min(40vh, 280px)" }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleSubmit();
+          }
+        }}
+        placeholder={placeholder}
+        className="flex-1 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-sans text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 dark:focus:ring-violet-600 dark:focus:border-violet-600 transition-colors"
+        autoComplete="off"
+        maxLength={2048}
+      />
+      <button
+        type="button"
+        onClick={handleSubmit}
+        disabled={!value.trim()}
+        className="h-10 w-10 shrink-0 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1"
+        aria-label={addBarcodeAria}
+        title={addBarcodeAria}
+      >
+        <Plus className="w-5 h-5" />
+      </button>
+    </div>
+  );
+};
+
+BarcodeManualEntryRow.displayName = "BarcodeManualEntryRow";
+
 interface BarcodeHandheldProps {
   title: string;
   description: string;
@@ -21,15 +95,12 @@ export const BarcodeHandheld: React.FC<BarcodeHandheldProps> = ({
   addBarcodeAria,
   onSubmit,
 }) => {
-  const [value, setValue] = useState("");
-  const inputRef = useRef<HTMLInputElement | null>(null);
   const [rfidEnabled, setRfidEnabled] = useState(true);
 
   const handleSubmit = useCallback(
     (raw: string, source: "manual" | "nfc") => {
       const trimmed = raw.trim();
       if (!trimmed) return;
-      setValue("");
       onSubmit(trimmed, source);
     },
     [onSubmit]
@@ -45,16 +116,10 @@ export const BarcodeHandheld: React.FC<BarcodeHandheldProps> = ({
     enabled: rfidEnabled,
   });
 
-  useEffect(() => {
-    if (!nfcSupported) setRfidEnabled(false);
-  }, [nfcSupported]);
-
-  useEffect(() => {
-    const t = window.setTimeout(() => {
-      inputRef.current?.focus();
-    }, 100);
-    return () => window.clearTimeout(t);
-  }, []);
+  const handleManualSubmit = useCallback(
+    (v: string) => handleSubmit(v, "manual"),
+    [handleSubmit]
+  );
 
   return (
     <div className={cn("flex flex-col items-center justify-center gap-4 px-4 py-6")}>
@@ -92,7 +157,7 @@ export const BarcodeHandheld: React.FC<BarcodeHandheldProps> = ({
                 placeholder: !nfcSupported ? "NFC not supported in this browser." : undefined,
               } as any
             }
-            value={rfidEnabled && nfcSupported}
+            value={rfidEnabled}
             onChange={(checked: boolean) => {
               if (!nfcSupported) return;
               setRfidEnabled(checked);
@@ -111,34 +176,12 @@ export const BarcodeHandheld: React.FC<BarcodeHandheldProps> = ({
           </p>
         )}
       </div>
-      <div className="flex w-full gap-2">
-        <input
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleSubmit(value, "manual");
-            }
-          }}
-          placeholder={placeholder}
-          className="flex-1 h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 text-sm font-sans text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-violet-400 dark:focus:ring-violet-600 dark:focus:border-violet-600 transition-colors"
-          autoComplete="off"
-          maxLength={2048}
-        />
-        <button
-          type="button"
-          onClick={() => handleSubmit(value, "manual")}
-          disabled={!value.trim()}
-          className="h-10 w-10 shrink-0 rounded-lg bg-violet-600 hover:bg-violet-700 disabled:opacity-40 disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1"
-          aria-label={addBarcodeAria}
-          title={addBarcodeAria}
-        >
-          <Plus className="w-5 h-5" />
-        </button>
-      </div>
+      <BarcodeManualEntryRow
+        placeholder={placeholder}
+        addBarcodeAria={addBarcodeAria}
+        onSubmit={handleManualSubmit}
+        autoFocus={true}
+      />
     </div>
   );
 };
