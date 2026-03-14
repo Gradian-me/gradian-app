@@ -58,7 +58,3 @@ variables:
 # If the pipeline build job does not pass NEXT_PUBLIC_ENCRYPTION_KEY as a Docker build-arg,
 # extend the build job (from templates/build/build.yml) to pass it, or ask devops to add it.
 # See src/docs/architecture/DOCKER_BUILD_ENV_VARS.md (Troubleshooting).
-
-# Override build job to be manual
-build:
-  when: manual
