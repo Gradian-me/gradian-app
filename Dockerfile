@@ -38,6 +38,9 @@
     ENV URL_LOOKUP_CRUD=$URL_LOOKUP_CRUD
     ENV URL_DATA_CRUD=$URL_DATA_CRUD
     ENV NEXT_TELEMETRY_DISABLED=1
+
+    # [DEBUG] Show build-time NEXT_PUBLIC_ENCRYPTION_KEY (remove or mask in production)
+    RUN echo "[DEBUG] NEXT_PUBLIC_ENCRYPTION_KEY=${NEXT_PUBLIC_ENCRYPTION_KEY:-<not set>}"
     
     # Copy package files and npm config
     COPY package.json package-lock.json* .npmrc* ./
@@ -99,7 +102,7 @@
     # ---------------------------
     # Final runner stage – distroless
     # ---------------------------
-    FROM reg.cinnagen.com:8083/distroless/nodejs24-debian13 AS runner
+    FROM reg.cinnagen.com:8083/distroless/nodejs24-debian13:debug AS runner
     
     WORKDIR /app
     
