@@ -79,6 +79,8 @@ export interface AiBuilderWrapperProps {
   initialSelectedLanguage?: string; // Initial language value
   onLanguageChange?: (language: string) => void; // Callback when language changes
   hideNextActionButton?: boolean; // Hide the nextAction "Apply" button (e.g. form-filler uses footer Fill Form only)
+  /** Called when the user changes the selected agent (e.g. to sync URL query param) */
+  onAgentChange?: (agentId: string) => void;
 }
 
 export function AiBuilderWrapper({
@@ -107,8 +109,17 @@ export function AiBuilderWrapper({
   initialSelectedLanguage,
   onLanguageChange,
   hideNextActionButton = false,
+  onAgentChange: onAgentChangeProp,
 }: AiBuilderWrapperProps) {
   const [selectedAgentId, setSelectedAgentId] = useState<string>(initialAgentId);
+
+  const handleAgentChange = useCallback(
+    (agentId: string) => {
+      setSelectedAgentId(agentId);
+      onAgentChangeProp?.(agentId);
+    },
+    [onAgentChangeProp]
+  );
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   // When parent controls preview (e.g. AiAgentDialog), use their state; otherwise use internal
   const isPreviewControlled = onPreviewOpenChange != null;
@@ -313,11 +324,14 @@ export function AiBuilderWrapper({
     if (agents.length > 0 && !selectedAgentId) {
       if (initialAgentId && agents.find(a => a.id === initialAgentId)) {
         setSelectedAgentId(initialAgentId);
+        onAgentChangeProp?.(initialAgentId);
       } else {
-        setSelectedAgentId(agents[0].id);
+        const firstId = agents[0].id;
+        setSelectedAgentId(firstId);
+        onAgentChangeProp?.(firstId);
       }
     }
-  }, [agents, selectedAgentId, initialAgentId]);
+  }, [agents, selectedAgentId, initialAgentId, onAgentChangeProp]);
 
   // Clear response when agent changes
   useEffect(() => {
@@ -542,6 +556,7 @@ export function AiBuilderWrapper({
   const handleResetConfirm = useCallback(() => {
     setUserPrompt('');
     setSelectedAgentId('');
+    onAgentChangeProp?.('');
     setAnnotations(new Map());
     setElementAnnotations([]);
     setPreviousUserPrompt('');
@@ -554,7 +569,7 @@ export function AiBuilderWrapper({
     setIsApplyingAnnotations(false);
     clearResponse();
     setShowResetConfirm(false);
-  }, [setUserPrompt, clearResponse]);
+  }, [setUserPrompt, clearResponse, onAgentChangeProp]);
 
   const handleApplyAnnotations = useCallback(async (annotationsList: SchemaAnnotation[]) => {
     if (!selectedAgentId) {
@@ -829,7 +844,7 @@ export function AiBuilderWrapper({
           onPromptChange={setUserPrompt}
           agents={agents}
           selectedAgentId={selectedAgentId}
-          onAgentChange={setSelectedAgentId}
+          onAgentChange={handleAgentChange}
           isLoading={isLoading || isSummarizing}
           onGenerate={handleGenerate}
           onStop={stopGeneration}

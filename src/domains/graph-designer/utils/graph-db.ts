@@ -32,22 +32,51 @@ class GraphDesignerDb extends Dexie {
 }
 
 let dbInstance: GraphDesignerDb | null = null;
+let graphDbOpenFailed = false;
 
 function getDb(): GraphDesignerDb | null {
   if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
     return null;
   }
+  if (graphDbOpenFailed) {
+    return null;
+  }
 
   if (!dbInstance) {
-    dbInstance = new GraphDesignerDb();
+    try {
+      dbInstance = new GraphDesignerDb();
+    } catch (err) {
+      graphDbOpenFailed = true;
+      dbInstance = null;
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn(
+          '[graph-db] IndexedDB unavailable (e.g. private mode, storage disabled):',
+          err instanceof Error ? err.message : String(err)
+        );
+      }
+      return null;
+    }
   }
 
   return dbInstance;
 }
 
+function isIndexedDbUnavailableError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const name = (error as { name?: string }).name ?? '';
+  const message = String((error as { message?: string }).message ?? '');
+  return (
+    name === 'DatabaseClosedError' ||
+    name === 'UnknownError' ||
+    /backing store|indexedDB\.open|quota|disabled/i.test(message)
+  );
+}
+
 export async function saveGraphRecord(record: GraphRecord): Promise<void> {
   const db = getDb();
   if (!db) return;
+
+  try {
 
   // Save full node data to graphNodes table
   // nodeId is the selected entity's ID, not the graph node's ID
@@ -81,12 +110,20 @@ export async function saveGraphRecord(record: GraphRecord): Promise<void> {
     };
 
   await db.graphs.put(storedGraph);
+  } catch (err) {
+    if (isIndexedDbUnavailableError(err)) {
+      graphDbOpenFailed = true;
+      dbInstance = null;
+    }
+    throw err;
+  }
 }
 
 export async function getGraphRecord(graphId: string): Promise<GraphRecord | null> {
   const db = getDb();
   if (!db) return null;
 
+  try {
   const storedGraph = await db.graphs.get(graphId);
   if (!storedGraph) return null;
 
@@ -117,6 +154,11 @@ export async function getGraphRecord(graphId: string): Promise<GraphRecord | nul
     nodes,
     edges,
   };
+  } catch (err) {
+    if (isIndexedDbUnavailableError(err)) {
+      graphDbOpenFailed = true;
+      dbInstance = null;
+    }
+    return null;
+  }
 }
-
-

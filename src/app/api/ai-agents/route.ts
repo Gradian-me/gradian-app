@@ -99,9 +99,10 @@ function getSummaryAgents(agents: any[]): any[] {
 }
 
 /**
- * Clear cache (useful after POST/PUT/DELETE operations)
+ * Clear cache (useful after POST/PUT/DELETE operations).
+ * Exported so PUT/DELETE in [agent-id] can invalidate list cache.
  */
-function clearCache() {
+export function clearAiAgentsCache() {
   cachedAgents = null;
   cachedSummaryAgents = null;
   cacheTimestamp = 0;
@@ -396,7 +397,7 @@ export async function POST(request: NextRequest) {
     fs.writeFileSync(agentsFilePath, JSON.stringify(agents, null, 2), 'utf8');
 
     // Clear cache after modification
-    clearCache();
+    clearAiAgentsCache();
 
     // Return created agents
     return NextResponse.json({

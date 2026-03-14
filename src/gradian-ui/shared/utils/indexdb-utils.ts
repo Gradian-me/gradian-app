@@ -8,9 +8,20 @@
  * not for highly sensitive secrets (prefer server-side or secure stores for that).
  */
 
-import { getIndexedDb } from '@/gradian-ui/indexdb-manager/db';
+import { getIndexedDb, invalidateIndexedDb } from '@/gradian-ui/indexdb-manager/db';
 import { encryptPayload, decryptPayload, type EncryptedPayload } from '@/gradian-ui/indexdb-manager/utils/crypto';
 import type { EncryptedStoreEntry } from '@/gradian-ui/indexdb-manager/types';
+
+function isIndexedDbUnavailableError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const name = (error as { name?: string }).name ?? '';
+  const message = String((error as { message?: string }).message ?? '');
+  return (
+    name === 'DatabaseClosedError' ||
+    name === 'UnknownError' ||
+    /backing store|indexedDB\.open|quota|disabled/i.test(message)
+  );
+}
 
 export interface IndexedDbCrudOptions {
   /**
@@ -108,6 +119,9 @@ export async function setIndexedDbItem<T>(
     await db.kvStore.put(entry);
     return true;
   } catch (error) {
+    if (isIndexedDbUnavailableError(error)) {
+      invalidateIndexedDb();
+    }
     console.error(`[indexdb-utils] Failed to set item for key "${storeKey}":`, error);
     return false;
   }
@@ -159,6 +173,9 @@ export async function getIndexedDbItem<T>(
       return null;
     }
   } catch (error) {
+    if (isIndexedDbUnavailableError(error)) {
+      invalidateIndexedDb();
+    }
     console.error(`[indexdb-utils] Failed to get item for key "${storeKey}":`, error);
     return null;
   }
@@ -215,6 +232,9 @@ export async function removeIndexedDbItem(
       db.kvStore.delete(plainKey),
     ]);
   } catch (error) {
+    if (isIndexedDbUnavailableError(error)) {
+      invalidateIndexedDb();
+    }
     console.error(`[indexdb-utils] Failed to remove item for key "${key}":`, error);
   }
 }
@@ -244,6 +264,9 @@ export async function clearIndexedDbNamespace(
       .startsWith(fullPrefix)
       .delete();
   } catch (error) {
+    if (isIndexedDbUnavailableError(error)) {
+      invalidateIndexedDb();
+    }
     console.error(`[indexdb-utils] Failed to clear namespace "${namespace}" (encrypted=${encryptData}):`, error);
   }
 }

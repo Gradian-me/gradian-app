@@ -8,7 +8,7 @@ import {
   getDefaultLanguage,
 } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
-import { getDisplayStrings } from '@/gradian-ui/data-display/utils/value-display';
+import { getDisplayStrings, getPrimaryDisplayString } from '@/gradian-ui/data-display/utils/value-display';
 
 /**
  * Apply default properties to a field if they are not specified
@@ -81,9 +81,9 @@ export const getValueByRole = (schema: FormSchema, data: any, role: string): str
       if (isTranslationArray(rawValue)) {
         return resolveFromTranslationsArray(rawValue, lang, defaultLang);
       }
-      // API localized format: [{ en: "X", fa: "Y" }] or { en: "X", fa: "Y" } (single object with multiple keys)
+      // Option-like or localized object: { id, label } (label may be translated) – use getPrimaryDisplayString so label is resolved
       if (rawValue !== undefined && rawValue !== null && typeof rawValue === 'object') {
-        const resolved = resolveDisplayLabel(rawValue, lang, defaultLang);
+        const resolved = getPrimaryDisplayString(rawValue);
         if (resolved && resolved.trim() !== '') return resolved;
       }
 
@@ -162,9 +162,9 @@ export const getSingleValueByRole = (schema: FormSchema, data: any, role: string
   if (isTranslationArray(rawValue)) {
     return resolveFromTranslationsArray(rawValue, lang, defaultLang) || defaultValue;
   }
-  // API localized format: [{ en: "X", fa: "Y" }] or { en: "X", fa: "Y" }
+  // Option-like or localized object: { id, label } – use getPrimaryDisplayString so label is resolved
   if (typeof rawValue === 'object' && rawValue !== null) {
-    const resolved = resolveDisplayLabel(rawValue, lang, defaultLang);
+    const resolved = getPrimaryDisplayString(rawValue);
     if (resolved && resolved.trim() !== '') return resolved;
   }
 

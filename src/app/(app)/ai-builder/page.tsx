@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useSetLayoutProps } from '@/gradian-ui/layout/contexts/LayoutPropsContext';
 import { AiBuilderWrapper } from '@/domains/ai-builder/components/AiBuilderWrapper';
 import { Button } from '@/components/ui/button';
@@ -13,10 +14,29 @@ import { getT, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-
 import { TRANSLATION_KEYS } from '@/gradian-ui/shared/constants/translations';
 
 export default function AiBuilderPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [showModelBadge, setShowModelBadge] = useState(false);
   const language = useLanguageStore((s) => s.language) ?? getDefaultLanguage();
   const defaultLang = getDefaultLanguage();
+
+  const initialAgentId = searchParams.get('agentId') ?? '';
+
+  const handleAgentChange = useCallback(
+    (agentId: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (agentId) {
+        params.set('agentId', agentId);
+      } else {
+        params.delete('agentId');
+      }
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -53,7 +73,7 @@ export default function AiBuilderPage() {
             </Button>
           </Link>
         </div>
-        <AiBuilderWrapper mode="page" />
+        <AiBuilderWrapper mode="page" initialAgentId={initialAgentId} onAgentChange={handleAgentChange} />
       </div>
   );
 }

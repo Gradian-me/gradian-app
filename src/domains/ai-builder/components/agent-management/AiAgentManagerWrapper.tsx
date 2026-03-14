@@ -59,7 +59,7 @@ export function AiAgentManagerWrapper() {
     clearMessages,
   } = useAiAgentManagerPage();
 
-  const handleViewAgent = (agent: AiAgent) => router.push(`/builder/ai-agents/${agent.id}`);
+  const handleViewAgent = (agent: AiAgent) => router.push(`/ai-builder?agentId=${encodeURIComponent(agent.id)}`);
   const handleEditAgent = (agent: AiAgent) => router.push(`/builder/ai-agents/${agent.id}`);
 
   const handleCreateAgent = async (agentData: Omit<AiAgent, 'id'> & { id: string }) => {

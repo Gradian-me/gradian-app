@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { clearAiAgentsCache } from '../route';
 
 /**
  * Load AI agents (always fresh, no caching)
@@ -162,6 +163,9 @@ export async function PUT(
     const agentsFilePath = path.join(process.cwd(), 'data', 'ai-agents.json');
     fs.writeFileSync(agentsFilePath, JSON.stringify(agents, null, 2), 'utf8');
 
+    // Invalidate list cache so GET /api/ai-agents returns fresh data (e.g. entityType grouping)
+    clearAiAgentsCache();
+
     return NextResponse.json({
       success: true,
       data: updatedAgent,
@@ -224,6 +228,9 @@ export async function DELETE(
     // Write back to file
     const agentsFilePath = path.join(process.cwd(), 'data', 'ai-agents.json');
     fs.writeFileSync(agentsFilePath, JSON.stringify(agents, null, 2), 'utf8');
+
+    // Invalidate list cache so GET /api/ai-agents returns fresh data
+    clearAiAgentsCache();
 
     return NextResponse.json({
       success: true,

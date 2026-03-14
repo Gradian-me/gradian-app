@@ -91,7 +91,13 @@ const COLOR_MAP: Record<string, ColorScheme> = {
     border: '#0284c7', // sky-600
     text: '#0c4a6e', // sky-800
   },
-  // Slate/Gray
+  // Lime
+  lime: {
+    background: '#f7fee7', // lime-50
+    border: '#65a30d', // lime-600
+    text: '#3f6212', // lime-800
+  },
+  // Slate/Gray/Stone/Neutral/Zinc
   slate: {
     background: '#f8fafc', // slate-50
     border: '#475569', // slate-600
@@ -101,6 +107,21 @@ const COLOR_MAP: Record<string, ColorScheme> = {
     background: '#f9fafb', // gray-50
     border: '#4b5563', // gray-600
     text: '#1f2937', // gray-800
+  },
+  stone: {
+    background: '#fafaf9', // stone-50
+    border: '#57534e', // stone-600
+    text: '#292524', // stone-800
+  },
+  neutral: {
+    background: '#fafafa', // neutral-50
+    border: '#525252', // neutral-600
+    text: '#262626', // neutral-800
+  },
+  zinc: {
+    background: '#fafafa', // zinc-50
+    border: '#52525b', // zinc-600
+    text: '#27272a', // zinc-800
   },
   // Rose
   rose: {

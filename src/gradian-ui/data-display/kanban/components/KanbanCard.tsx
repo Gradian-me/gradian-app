@@ -9,9 +9,11 @@ interface KanbanCardProps {
   children: React.ReactNode;
   handleLabel: string;
   isRecentlyDropped?: boolean;
+  /** Rendered on the opposite side of the action buttons (e.g. code badge). */
+  code?: React.ReactNode;
 }
 
-export function KanbanCard({ id, children, handleLabel, isRecentlyDropped = false }: KanbanCardProps) {
+export function KanbanCard({ id, children, handleLabel, isRecentlyDropped = false, code }: KanbanCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   });
@@ -40,6 +42,7 @@ export function KanbanCard({ id, children, handleLabel, isRecentlyDropped = fals
     ? React.cloneElement(children as React.ReactElement<Record<string, unknown>>, {
         kanbanDragHandle: dragHandle,
         kanbanDragging: isDragging,
+        kanbanCodeSlot: code,
       })
     : (
       <div className="rounded-xl overflow-hidden">

@@ -378,6 +378,8 @@ export interface PopupPickerProps {
   canViewList?: boolean; // If true, shows a button to navigate to the list page
   viewListUrl?: string; // Custom URL for the list page (defaults to /page/{schemaId})
   allowMultiselect?: boolean; // Enables multi-select mode with confirm button
+  /** When true, selection is applied only when user clicks Apply (e.g. change parent flow). Works with single-select. */
+  requireConfirm?: boolean;
   confirmButtonText?: string; // Custom text for the confirm button in multiselect mode (default: "Apply")
   columnMap?: ColumnMapConfig; // Optional mapping for request/response and item fields
   staticItems?: any[]; // Optional dataset (skips API calls when provided)
@@ -402,6 +404,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   canViewList = false,
   viewListUrl,
   allowMultiselect = false,
+  requireConfirm = false,
   confirmButtonText,
   columnMap,
   staticItems,
@@ -1152,6 +1155,11 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
     }
 
     if (!allowMultiselect) {
+      if (requireConfirm) {
+        const itemId = String(item?.id ?? '');
+        if (itemId) setSessionSelectedIds(new Set([itemId]));
+        return;
+      }
       void commitSingleSelection(item);
       return;
     }
@@ -1252,6 +1260,22 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
   };
 
   const handleConfirmSelections = async () => {
+    if (requireConfirm && !allowMultiselect) {
+      if (sessionSelectedIds.size === 0) return;
+      setIsSubmitting(true);
+      try {
+        const id = Array.from(sessionSelectedIds)[0];
+        const data = buildSelectionData(id);
+        await onSelect([data.normalized], [data.raw]);
+        onClose();
+      } catch (error) {
+        loggingCustom(LogType.CLIENT_LOG, 'error', `Error confirming selection: ${error instanceof Error ? error.message : String(error)}`);
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
     if (!allowMultiselect) {
       return;
     }
@@ -2147,7 +2171,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
         onClose();
       }
     }}>
-      <DialogContent className="max-w-3xl w-full h-full rounded-none md:rounded-2xl md:max-h-[85vh] flex flex-col" dir={rtl ? 'rtl' : undefined} onPointerDownOutside={(e) => {
+      <DialogContent className="max-w-3xl w-full max-h-[85vh] flex flex-col fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-none md:rounded-2xl" dir={rtl ? 'rtl' : undefined} onPointerDownOutside={(e) => {
         // Prevent closing on outside click during loading or submission
         if (isLoading || isSubmitting) {
           e.preventDefault();
@@ -2158,12 +2182,18 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
           e.preventDefault();
         }
       }}>
+        {isSubmitting && (
+          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-background/80 dark:bg-background/90 rounded-none md:rounded-2xl cursor-wait" aria-busy="true" aria-live="polite">
+            <Loader2 className="h-10 w-10 animate-spin text-violet-600 dark:text-violet-400 shrink-0" />
+            <span className="text-sm font-medium text-foreground">{applyingLabel}</span>
+          </div>
+        )}
         <DialogHeader>
             <div className="flex items-center justify-between">
             <div className="flex-1">
               <DialogTitle>{resolvedTitle}</DialogTitle>
             </div>
-            <div className="flex items-center gap-2 me-8">
+            <div className="flex flex-wrap items-center gap-2 me-0 sm:me-8 min-w-0">
               {!isHierarchical && (
                 <PopupViewSwitcher
                   value={viewMode}
@@ -2202,10 +2232,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                     setIsAddModalOpen(true);
                   }}
                   disabled={isSubmitting || isLoading}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 shrink-0"
                 >
-                  <Plus className="h-4 w-4" />
-                  {getT(TRANSLATION_KEYS.BUTTON_ADD, language, defaultLang)} {translatedSingularName}
+                  <Plus className="h-4 w-4 shrink-0" />
+                  <span className="whitespace-nowrap">{getT(TRANSLATION_KEYS.BUTTON_ADD, language, defaultLang)} {translatedSingularName}</span>
                 </Button>
               )}
               {canViewList && (
@@ -2219,10 +2249,10 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                     handleViewList();
                   }}
                   disabled={isSubmitting}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 shrink-0"
                 >
-                  <List className="h-4 w-4" />
-                  {getT(TRANSLATION_KEYS.BUTTON_VIEW_LIST, language, defaultLang)}
+                  <List className="h-4 w-4 shrink-0" />
+                  <span className="whitespace-nowrap">{getT(TRANSLATION_KEYS.BUTTON_VIEW_LIST, language, defaultLang)}</span>
                 </Button>
               )}
             </div>
@@ -2351,7 +2381,7 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
               {getT(TRANSLATION_KEYS.BUTTON_CLEAR_SELECTION, language, defaultLang)}
             </Button>
           )}
-          {allowMultiselect && (
+          {(allowMultiselect || requireConfirm) && (
             <Button
               type="button"
               onClick={(e) => {
@@ -2359,13 +2389,13 @@ export const PopupPicker: React.FC<PopupPickerProps> = ({
                 e.stopPropagation();
                 void handleConfirmSelections();
               }}
-              disabled={!hasPendingSelections || isSubmitting}
+              disabled={(allowMultiselect ? !hasPendingSelections : !requireConfirm || selectedCount === 0) || isSubmitting}
               className="inline-flex items-center gap-2"
             >
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {isSubmitting
                 ? applyingLabel
-                : `${effectiveConfirmButtonText}${hasPendingSelections ? ` (${selectedCount})` : ''}`}
+                : `${effectiveConfirmButtonText}${(allowMultiselect && hasPendingSelections) || (requireConfirm && selectedCount > 0) ? ` (${selectedCount})` : ''}`}
             </Button>
           )}
         </div>

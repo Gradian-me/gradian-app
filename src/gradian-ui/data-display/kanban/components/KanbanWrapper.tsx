@@ -30,6 +30,8 @@ interface KanbanWrapperProps<TItem extends { id: string | number }> {
   onColumnOrderChange?: (orderedColumnIds: string[]) => void;
   allowColumnReorder?: boolean;
   renderCard: (item: TItem, index: number) => React.ReactNode;
+  /** Optional slot (e.g. code badge) rendered on the opposite side of the action buttons. */
+  codeForItem?: (item: TItem) => React.ReactNode;
   emptyColumnLabel: string;
   cardHandleLabel: string;
   columnHandleLabel: string;
@@ -58,6 +60,7 @@ export function KanbanWrapper<TItem extends { id: string | number }>({
   onColumnOrderChange,
   allowColumnReorder = false,
   renderCard,
+  codeForItem,
   emptyColumnLabel,
   cardHandleLabel,
   columnHandleLabel,
@@ -332,6 +335,7 @@ export function KanbanWrapper<TItem extends { id: string | number }>({
                       id={`card:${item.id}`}
                       handleLabel={cardHandleLabel}
                       isRecentlyDropped={recentlyDroppedCardId === String(item.id)}
+                      code={codeForItem?.(item)}
                     >
                       {renderCard(item, index)}
                     </KanbanCard>

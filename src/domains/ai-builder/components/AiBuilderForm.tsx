@@ -299,6 +299,16 @@ export function AiBuilderForm({
     return agents.filter(agent => agent.showInAgentMenu !== false);
   }, [agents]);
 
+  // Agent options for the select: grouped by entityType.label (supports string or translation array e.g. [{en}, {fa}])
+  const agentSelectOptions = useMemo(() => {
+    return visibleAgents.map((agent) => ({
+      id: agent.id,
+      label: agent.label ?? agent.id,
+      icon: agent.icon,
+      category: agent.entityType?.label,
+    }));
+  }, [visibleAgents]);
+
   // Get selected agent (from all agents, not just visible ones, to support programmatic selection)
   const selectedAgent = agents.find(agent => agent.id === selectedAgentId);
 
@@ -1163,11 +1173,7 @@ export function AiBuilderForm({
                       <FormElementFactory
                         config={{
                           ...agentSelectField,
-                          options: visibleAgents.map(agent => ({
-                            id: agent.id,
-                            label: agent.label,
-                            icon: agent.icon,
-                          })),
+                          options: agentSelectOptions,
                         }}
                         value={selectedAgentId}
                         onChange={(value) => {
@@ -1195,11 +1201,7 @@ export function AiBuilderForm({
                           label: '',
                           component: 'select',
                           type: 'select',
-                          options: visibleAgents.map(agent => ({
-                            id: agent.id,
-                            label: agent.label,
-                            icon: agent.icon,
-                          })),
+                          options: agentSelectOptions,
                         }}
                         value={selectedAgentId}
                         onChange={(value) => {

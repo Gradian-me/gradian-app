@@ -56,14 +56,17 @@ export type AllowedCharConfig = {
 /**
  * Interpret a validation.pattern style value as a symbolic pattern template.
  * Supported symbols:
- * - A => uppercase A-Z
- * - a => lowercase a-z
- * - 0 => digits 0-9
+ * - A => uppercase A-Z (when only A: auto-uppercase input)
+ * - a => lowercase a-z (when only a: auto-lowercase input)
+ * - Aa or aA => both cases allowed (no auto-replace)
+ * - 0 or 1 => digits 0-9
  * - _ => underscore
  * - - => hyphen/dash
  * - . => dot
  * - @ => at symbol
  *
+ * If the pattern looks like a regex (e.g. "^A-.+$"), we derive a template
+ * so the input allows the right characters (e.g. "^A-.+$" → "A-0" for uppercase, dash, digits).
  * Any other characters are treated as literal single allowed characters.
  * Non-string (e.g. RegExp) patterns return null.
  */
@@ -72,6 +75,12 @@ export function getPatternTemplate(rawPattern: unknown): string | null {
   if (rawPattern instanceof RegExp) return null;
   const str = String(rawPattern).trim();
   if (!str) return null;
+  // Regex-like pattern: derive a template so allowed-char config matches what the regex allows
+  if (str.startsWith('^') && str.endsWith('$')) {
+    const body = str.slice(1, -1);
+    // "^A-.+$" or "^A-.*$" → allow uppercase, dash, digits → template "A-0"
+    if (body === 'A-.+' || body === 'A-.*') return 'A-0';
+  }
   return str;
 }
 
@@ -113,6 +122,7 @@ export function buildAllowedCharConfig(
         allowLower = true;
         break;
       case '0':
+      case '1':
         allowDigits = true;
         break;
       case '_':
@@ -202,6 +212,7 @@ export function buildHelperTextFromPattern(
         }
         break;
       case '0':
+      case '1':
         if (!hasDigits) {
           descriptions.push('digits (0-9)');
           hasDigits = true;

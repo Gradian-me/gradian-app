@@ -17,17 +17,37 @@ class GradianIndexedDb extends Dexie {
 }
 
 let dbInstance: GradianIndexedDb | null = null;
+let dbOpenFailed = false;
 
 export function getIndexedDb(): GradianIndexedDb | null {
   if (typeof window === 'undefined' || typeof indexedDB === 'undefined') {
     return null;
   }
+  if (dbOpenFailed) {
+    return null;
+  }
 
   if (!dbInstance) {
-    dbInstance = new GradianIndexedDb();
+    try {
+      dbInstance = new GradianIndexedDb();
+    } catch (err) {
+      dbOpenFailed = true;
+      dbInstance = null;
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn(
+          '[indexdb] IndexedDB unavailable (e.g. private mode, storage disabled, or quota):',
+          err instanceof Error ? err.message : String(err)
+        );
+      }
+      return null;
+    }
   }
 
   return dbInstance;
 }
 
-
+/** Call when an operation fails due to DB closed/unavailable so we stop using the broken instance. */
+export function invalidateIndexedDb(): void {
+  dbInstance = null;
+  dbOpenFailed = true;
+}

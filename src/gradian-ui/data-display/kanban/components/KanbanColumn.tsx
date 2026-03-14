@@ -7,6 +7,7 @@ import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { GripVertical } from 'lucide-react';
 import { resolveDisplayLabel, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
+import { getNodeBorderColor } from '@/domains/graph-designer/utils/color-mapper';
 
 /** Label may be a string or a localized value (e.g. { en: "To Do", fa: "انجام شود" } or array of same). */
 export interface KanbanColumnMeta {
@@ -27,25 +28,8 @@ interface KanbanColumnProps {
 }
 
 function getDotColor(color?: string): string {
-  if (!color) return '#8b5cf6';
-  if (color.startsWith('#')) return color;
-  const normalized = color.toLowerCase();
-  const map: Record<string, string> = {
-    red: '#ef4444',
-    green: '#22c55e',
-    blue: '#3b82f6',
-    yellow: '#f59e0b',
-    orange: '#f97316',
-    purple: '#8b5cf6',
-    pink: '#ec4899',
-    gray: '#6b7280',
-    slate: '#64748b',
-    cyan: '#06b6d4',
-    teal: '#14b8a6',
-    lime: '#84cc16',
-    indigo: '#6366f1',
-  };
-  return map[normalized] ?? '#8b5cf6';
+  if (!color) return getNodeBorderColor('violet');
+  return getNodeBorderColor(color);
 }
 
 export function KanbanColumn({ column, count, emptyLabel, handleLabel, allowReorder = false, isDropHovered = false, children }: KanbanColumnProps) {

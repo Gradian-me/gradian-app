@@ -23,8 +23,8 @@ export const BarcodeScannerCamera: React.FC<BarcodeScannerCameraProps> = ({
       className={cn(
         "relative aspect-square min-h-0 bg-black rounded-xl mx-auto overflow-hidden",
         compact
-          ? "w-full max-h-full max-w-[230px]"
-          : "w-full h-full max-w-[280px] max-h-[280px]"
+          ? "w-full max-h-full max-w-[220px]"
+          : "w-full h-full max-w-[250px] max-h-[250px]"
       )}
     >
       {children && (

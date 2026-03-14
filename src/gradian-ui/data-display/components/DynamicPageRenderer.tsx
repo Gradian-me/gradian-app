@@ -30,7 +30,7 @@ import { asFormSchema, getSchemaTranslatedSingularName, getSchemaTranslatedPlura
 import { useDynamicEntity } from '@/gradian-ui/shared/hooks';
 import { FormModal } from '../../form-builder';
 import { ConfirmationMessage } from '../../form-builder';
-import { getValueByRole, getSingleValueByRole } from '../../form-builder/form-elements/utils/field-resolver';
+import { getValueByRole, getSingleValueByRole, getConcatenatedValueByRole } from '../../form-builder/form-elements/utils/field-resolver';
 import { LoadingSkeleton } from '@/gradian-ui/layout/components';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { useCompanyStore } from '@/stores/company.store';
@@ -80,7 +80,7 @@ import type { NormalizedOption } from '@/gradian-ui/form-builder/form-elements/u
 import { KanbanWrapper, type KanbanColumnMeta } from '@/gradian-ui/data-display/kanban';
 import { fetchOptionsFromSchemaOrUrl } from '@/gradian-ui/form-builder/form-elements/utils/fetch-options-utils';
 import { buildReferenceFilterUrl } from '@/gradian-ui/form-builder/utils/reference-filter-builder';
-import { replaceDynamicContext } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
+import { replaceDynamicContext, extractValueFromContext } from '@/gradian-ui/form-builder/utils/dynamic-context-replacer';
 
 type DisplayViewMode = 'grid' | 'list' | 'table' | 'hierarchy' | 'kanban';
 
@@ -425,7 +425,12 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
   const kanbanEligibleFieldByKey = useMemo(() => {
     const m = new Map<string, FormSchema['fields'][number]>();
     for (const field of schema?.fields ?? []) {
-      if (!field.allowKanbanView) continue;
+      const hasAllowKanban = Boolean(field.allowKanbanView);
+      const hasReferenceRelation =
+        Boolean(field.referenceSchema && field.referenceRelationTypeId && field.referenceEntityId);
+      const hasOptionSource =
+        Boolean(field.targetSchema || field.sourceUrl || (Array.isArray(field.options) && field.options.length > 0));
+      if (!hasAllowKanban && !hasReferenceRelation && !hasOptionSource) continue;
       if (field.id) m.set(field.id, field as any);
       if (field.name) m.set(field.name, field as any);
     }
@@ -696,7 +701,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               const label = item?.label ?? item?.name ?? item?.title ?? item?.otherEntityLabel ?? id;
               return {
                 id: String(id),
-                label: String(label),
+                label: typeof label === 'string' ? label : (label ?? id),
                 color: item?.color,
                 icon: item?.icon,
                 value: item?.value ?? id,
@@ -747,7 +752,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
               const label = item?.label ?? item?.name ?? item?.title ?? item?.otherEntityLabel ?? id;
               return {
                 id: String(id),
-                label: String(label),
+                label: typeof label === 'string' ? label : (label ?? id),
                 color: item?.color,
                 icon: item?.icon,
                 value: item?.value ?? id,
@@ -757,6 +762,66 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
 
           if (!cancelled) setKanbanFieldOptions(normalizedEntityTypeItems);
           return;
+        }
+
+        // Reference-relation grouping (e.g. Equipment Type → parameter-items via parameter-groups)
+        const hasReferenceRelation =
+          field?.referenceSchema &&
+          field?.referenceRelationTypeId &&
+          field?.referenceEntityId;
+        if (hasReferenceRelation) {
+          let resolvedRefId: string = '';
+          const refId = String(field.referenceEntityId).trim();
+          if (refId.includes('{{') && refId.includes('}}')) {
+            const match = refId.match(/\{\{(\w+)\.([^}]+)\}\}/);
+            if (match) {
+              const [, contextKey, path] = match;
+              if (contextKey === 'formSchema' && schema) {
+                resolvedRefId = extractValueFromContext('formSchema', path, { formSchema: schema }) ?? '';
+              }
+            }
+          } else {
+            resolvedRefId = refId;
+          }
+          if (resolvedRefId) {
+            const refResponse = await apiRequest<any>('/api/data/all-relations', {
+              params: {
+                schema: field.referenceSchema,
+                direction: 'both',
+                relationTypeId: field.referenceRelationTypeId,
+                id: resolvedRefId,
+                otherSchema: sanitizeDynamicValue(field.targetSchema) || undefined,
+                page: '1',
+                limit: '200',
+              },
+              disableCache: true,
+            });
+            if (refResponse.success) {
+              const payload = refResponse.data as any;
+              const relationItems = Array.isArray(payload)
+                ? (Array.isArray(payload[0]?.data) ? payload[0].data : payload)
+                : Array.isArray(payload?.data?.[0]?.data)
+                  ? payload.data[0].data
+                  : Array.isArray(payload?.data)
+                    ? payload.data
+                    : [];
+              const normalizedRefItems = normalizeOptionArray(
+                relationItems.map((item: any) => {
+                  const id = item?.id ?? item?.otherEntityId ?? item?.value ?? '';
+                  const label = item?.label ?? item?.name ?? item?.title ?? item?.otherEntityLabel ?? id;
+                  return {
+                    id: String(id),
+                    label: typeof label === 'string' ? label : (label ?? id),
+                    color: item?.color,
+                    icon: item?.icon,
+                    value: item?.value ?? id,
+                  };
+                })
+              );
+              if (!cancelled) setKanbanFieldOptions(normalizedRefItems);
+              return;
+            }
+          }
         }
 
         if (!field) {
@@ -812,7 +877,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
             const label = item.label ?? item.name ?? item.title ?? item.singular_name ?? item.plural_name ?? id;
             return {
               id: String(id),
-              label: String(label),
+              label: typeof label === 'string' ? label : (label ?? id),
               icon: item.icon,
               color: item.color,
               disabled: item.disabled,
@@ -1335,21 +1400,34 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           'name', 'title', 'email', 'phone', 'description',
           'productName', 'requestId', 'batchNumber', 'productSku',
           'companyName', 'tenderTitle', 'projectName',
-          'code'
+          'code', 'subtitle'
         ];
         
-        return searchableFields.some(field => {
+        const matchesDirectField = searchableFields.some(field => {
           const value = entity[field];
-          if (value && typeof value === 'string') {
+          if (value != null && typeof value === 'string') {
             return value.toLowerCase().includes(searchLower);
           }
           return false;
         });
+        if (matchesDirectField) return true;
+
+        if (schema) {
+          const titleStr = getValueByRole(schema, entity, 'title');
+          const subtitleStr = getConcatenatedValueByRole(schema, entity, 'subtitle', ' | ');
+          const codeStr = getSingleValueByRole(schema, entity, 'code');
+          const titleMatch = typeof titleStr === 'string' && titleStr.toLowerCase().includes(searchLower);
+          const subtitleMatch = typeof subtitleStr === 'string' && subtitleStr.toLowerCase().includes(searchLower);
+          const codeMatch = codeStr != null && String(codeStr).toLowerCase().includes(searchLower);
+          if (titleMatch || subtitleMatch || codeMatch) return true;
+        }
+
+        return false;
       });
     }
     
     return sourceEntities;
-  }, [entities, debouncedSearchTerm, entityName, schema?.id]);
+  }, [entities, debouncedSearchTerm, entityName, schema]);
 
   // Collapse all hierarchy nodes when search is cleared
   const prevSearchRef = React.useRef<string>('');
@@ -2908,6 +2986,7 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
           canViewList={true}
           viewListUrl={`/page/${schema.id}`}
           allowMultiselect={false}
+          requireConfirm={true}
         />
       )}
       

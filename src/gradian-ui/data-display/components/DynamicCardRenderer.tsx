@@ -59,6 +59,8 @@ export interface DynamicCardRendererProps {
   cardVariant?: 'default' | 'kanban';
   kanbanDragHandle?: React.ReactNode;
   kanbanDragging?: boolean;
+  /** When set, rendered on the opposite side of the action buttons (e.g. code badge). */
+  kanbanCodeSlot?: React.ReactNode;
 }
 
 export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
@@ -81,6 +83,7 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
   cardVariant = 'default',
   kanbanDragHandle,
   kanbanDragging = false,
+  kanbanCodeSlot,
 }) => {
   const router = useRouter();
   const language = useLanguageStore((s) => s.language) || getDefaultLanguage();
@@ -552,16 +555,11 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
             }
           }}
         >
-          <div className="mb-1 flex items-start justify-between gap-2">
-            <div className="flex min-w-0 items-start gap-2">
-              {kanbanDragHandle}
-              <h4 className="line-clamp-2 text-sm font-semibold text-gray-900 dark:text-gray-100">
-                {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
-              </h4>
-            </div>
-            {hasCodeField && cardConfig.codeField ? (
-              <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
-            ) : null}
+          <div className="mb-1 flex items-start gap-2">
+            {kanbanDragHandle}
+            <h4 className="line-clamp-2 min-w-0 flex-1 text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {renderHighlightedText(cardConfig.title, normalizedHighlightQuery)}
+            </h4>
           </div>
           {cardConfig.subtitle ? (
             <p className="mb-2 line-clamp-2 text-xs text-gray-500 dark:text-gray-400">
@@ -589,10 +587,13 @@ export const DynamicCardRenderer: React.FC<DynamicCardRendererProps> = ({
           </div>
           {(onView || onViewDetail || onEdit || onDelete || onDiscussions) && (
             <div
-              className="mt-2 flex justify-end"
+              className="mt-2 flex items-center justify-between gap-2"
               onClick={(e) => e.stopPropagation()}
               onMouseDown={(e) => e.stopPropagation()}
             >
+              {kanbanCodeSlot ?? (hasCodeField && cardConfig.codeField ? (
+                <CodeBadge code={cardConfig.codeField} highlightQuery={normalizedHighlightQuery} />
+              ) : null)}
               <HierarchyActionsMenu
                 stopPropagation
                 outOfEllipsis={['view', 'edit']}

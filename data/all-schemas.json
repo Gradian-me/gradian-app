@@ -4180,6 +4180,782 @@
     ]
   },
   {
+    "id": "equipments",
+    "description": "Manage equipment with code, title, type, group, production group and remarks",
+    "singular_name": "Equipment",
+    "plural_name": "Equipments",
+    "singular_name_translations": [
+      {
+        "en": "Equipment"
+      },
+      {
+        "fa": "تجهیزات"
+      },
+      {
+        "ar": "المعدات"
+      },
+      {
+        "es": "Equipo"
+      },
+      {
+        "fr": "Équipement"
+      },
+      {
+        "de": "Ausrüstung"
+      },
+      {
+        "it": "Attrezzatura"
+      },
+      {
+        "ru": "Оборудование"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "Equipments"
+      },
+      {
+        "fa": "تجهیزات"
+      },
+      {
+        "ar": "المعدات"
+      },
+      {
+        "es": "Equipos"
+      },
+      {
+        "fr": "Équipements"
+      },
+      {
+        "de": "Ausrüstungen"
+      },
+      {
+        "it": "Attrezzature"
+      },
+      {
+        "ru": "Оборудование"
+      }
+    ],
+    "customButtons": [
+      {
+        "id": "go-to-schemas",
+        "label": [
+          {
+            "en": "Back to Schemas"
+          },
+          {
+            "fa": "بازگشت به طرح‌ها"
+          },
+          {
+            "ar": "العودة إلى الأشكال"
+          },
+          {
+            "es": "Volver a esquemas"
+          },
+          {
+            "fr": "Retour aux schémas"
+          },
+          {
+            "de": "Zurück zu Schemata"
+          },
+          {
+            "it": "Torna agli schemi"
+          },
+          {
+            "ru": "Вернуться к схемам"
+          }
+        ],
+        "icon": "ArrowLeft",
+        "variant": "outline",
+        "action": "goToUrl",
+        "targetUrl": "/builder/schemas"
+      }
+    ],
+    "cardMetadata": [],
+    "fields": [
+      {
+        "id": "equipment-code",
+        "name": "equipmentCode",
+        "label": "Equipment Code",
+        "sectionId": "general-information",
+        "component": "name",
+        "role": "code",
+        "translations": [
+          {
+            "en": "Equipment Code"
+          },
+          {
+            "fa": "کد تجهیز"
+          },
+          {
+            "ar": "رمز المعدة"
+          },
+          {
+            "es": "Código de equipo"
+          },
+          {
+            "fr": "Code équipement"
+          },
+          {
+            "de": "Ausrüstungscode"
+          },
+          {
+            "it": "Codice attrezzatura"
+          },
+          {
+            "ru": "Код оборудования"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 1,
+        "order": 1,
+        "caption": "Enter equipment code (must start with A-)",
+        "captionTranslations": [
+          {
+            "en": "Enter equipment code (must start with A-)"
+          },
+          {
+            "fa": "کد تجهیز را وارد کنید (باید با A- شروع شود)"
+          },
+          {
+            "ar": "أدخل رمز المعدة (يجب أن يبدأ بـ A-)"
+          },
+          {
+            "es": "Ingrese código de equipo (debe comenzar con A-)"
+          },
+          {
+            "fr": "Entrez le code équipement (doit commencer par A-)"
+          },
+          {
+            "de": "Ausrüstungscode eingeben (muss mit A- beginnen)"
+          },
+          {
+            "it": "Inserisci codice attrezzatura (deve iniziare con A-)"
+          },
+          {
+            "ru": "Введите код оборудования (должен начинаться с A-)"
+          }
+        ]
+      },
+      {
+        "id": "equipment-title",
+        "name": "equipmentTitle",
+        "label": "Equipment Title",
+        "sectionId": "general-information",
+        "component": "text",
+        "role": "title",
+        "translations": [
+          {
+            "en": "Equipment Title"
+          },
+          {
+            "fa": "عنوان تجهیز"
+          },
+          {
+            "ar": "عنوان المعدة"
+          },
+          {
+            "es": "Título del equipo"
+          },
+          {
+            "fr": "Titre de l'équipement"
+          },
+          {
+            "de": "Ausrüstungstitel"
+          },
+          {
+            "it": "Titolo attrezzatura"
+          },
+          {
+            "ru": "Название оборудования"
+          }
+        ],
+        "validation": {
+          "required": true
+        },
+        "colSpan": 2,
+        "order": 2,
+        "caption": "Enter equipment title",
+        "captionTranslations": [
+          {
+            "en": "Enter equipment title"
+          },
+          {
+            "fa": "عنوان تجهیز را وارد کنید"
+          },
+          {
+            "ar": "أدخل عنوان المعدة"
+          },
+          {
+            "es": "Ingrese el título del equipo"
+          },
+          {
+            "fr": "Entrez le titre de l'équipement"
+          },
+          {
+            "de": "Ausrüstungstitel eingeben"
+          },
+          {
+            "it": "Inserisci titolo attrezzatura"
+          },
+          {
+            "ru": "Введите название оборудования"
+          }
+        ]
+      },
+      {
+        "id": "equipment-category",
+        "name": "equipmentCategory",
+        "label": "Equipment Category",
+        "sectionId": "general-information",
+        "component": "select",
+        "translations": [
+          {
+            "en": "Equipment Category"
+          },
+          {
+            "fa": "دسته‌بندی تجهیز"
+          },
+          {
+            "ar": "فئة المعدات"
+          },
+          {
+            "es": "Categoría de equipo"
+          },
+          {
+            "fr": "Catégorie d'équipement"
+          },
+          {
+            "de": "Ausrüstungskategorie"
+          },
+          {
+            "it": "Categoria attrezzatura"
+          },
+          {
+            "ru": "Категория оборудования"
+          }
+        ],
+        "targetSchema": "equipment-categories",
+        "referenceSchema": "equipment-categories",
+        "colSpan": 1,
+        "order": 4,
+        "caption": "Select equipment category",
+        "captionTranslations": [
+          {
+            "en": "Select equipment category"
+          },
+          {
+            "fa": "دسته‌بندی تجهیز را انتخاب کنید"
+          },
+          {
+            "ar": "اختر فئة المعدات"
+          },
+          {
+            "es": "Seleccione categoría de equipo"
+          },
+          {
+            "fr": "Sélectionnez la catégorie d'équipement"
+          },
+          {
+            "de": "Ausrüstungskategorie auswählen"
+          },
+          {
+            "it": "Seleziona categoria attrezzatura"
+          },
+          {
+            "ru": "Выберите категорию оборудования"
+          }
+        ],
+        "role": "subtitle"
+      },
+      {
+        "id": "production-group",
+        "name": "productionGroup",
+        "label": "Production Group",
+        "sectionId": "general-information",
+        "component": "select",
+        "translations": [
+          {
+            "en": "Production Group"
+          },
+          {
+            "fa": "گروه تولیدی"
+          },
+          {
+            "ar": "مجموعة الإنتاج"
+          },
+          {
+            "es": "Grupo de producción"
+          },
+          {
+            "fr": "Groupe de production"
+          },
+          {
+            "de": "Produktionsgruppe"
+          },
+          {
+            "it": "Gruppo di produzione"
+          },
+          {
+            "ru": "Производственная группа"
+          }
+        ],
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KKP2Z7CMPB6DPPVGHJNGTHDX",
+        "colSpan": 1,
+        "order": 5,
+        "caption": "Select production group",
+        "captionTranslations": [
+          {
+            "en": "Select production group"
+          },
+          {
+            "fa": "گروه تولیدی را انتخاب کنید"
+          },
+          {
+            "ar": "اختر مجموعة الإنتاج"
+          },
+          {
+            "es": "Seleccione grupo de producción"
+          },
+          {
+            "fr": "Sélectionnez le groupe de production"
+          },
+          {
+            "de": "Produktionsgruppe auswählen"
+          },
+          {
+            "it": "Seleziona gruppo di produzione"
+          },
+          {
+            "ru": "Выберите производственную группу"
+          }
+        ],
+        "role": "subtitle"
+      },
+      {
+        "id": "equipment-remarks",
+        "name": "remarks",
+        "label": "Remarks",
+        "sectionId": "general-information",
+        "component": "textarea",
+        "required": false,
+        "translations": [
+          {
+            "en": "Remarks"
+          },
+          {
+            "fa": "توضیحات"
+          },
+          {
+            "ar": "ملاحظات"
+          },
+          {
+            "es": "Observaciones"
+          },
+          {
+            "fr": "Remarques"
+          },
+          {
+            "de": "Anmerkungen"
+          },
+          {
+            "it": "Osservazioni"
+          },
+          {
+            "ru": "Примечания"
+          }
+        ],
+        "colSpan": 2,
+        "order": 6,
+        "caption": "Enter remarks",
+        "captionTranslations": [
+          {
+            "en": "Enter remarks"
+          },
+          {
+            "fa": "توضیحات را وارد کنید"
+          },
+          {
+            "ar": "أدخل الملاحظات"
+          },
+          {
+            "es": "Ingrese observaciones"
+          },
+          {
+            "fr": "Entrez les remarques"
+          },
+          {
+            "de": "Anmerkungen eingeben"
+          },
+          {
+            "it": "Inserisci osservazioni"
+          },
+          {
+            "ru": "Введите примечания"
+          }
+        ],
+        "role": "description"
+      }
+    ],
+    "sections": [
+      {
+        "id": "general-information",
+        "title": "General Information",
+        "titleTranslations": [
+          {
+            "en": "General Information"
+          },
+          {
+            "fa": "اطلاعات کلی"
+          },
+          {
+            "ar": "المعلومات العامة"
+          },
+          {
+            "es": "Información general"
+          },
+          {
+            "fr": "Informations générales"
+          },
+          {
+            "de": "Allgemeine Informationen"
+          },
+          {
+            "it": "Informazioni generali"
+          },
+          {
+            "ru": "Общая информация"
+          }
+        ],
+        "description": "Equipment code, title, type, group and remarks",
+        "descriptionTranslations": [
+          {
+            "en": "Equipment code, title, type, group and remarks"
+          },
+          {
+            "fa": "کد، عنوان، نوع، گروه و توضیحات تجهیز"
+          },
+          {
+            "ar": "رمز المعدة وعنوانها ونوعها ومجموعتها والملاحظات"
+          },
+          {
+            "es": "Código, título, tipo, grupo y observaciones del equipo"
+          },
+          {
+            "fr": "Code, titre, type, groupe et remarques de l'équipement"
+          },
+          {
+            "de": "Ausrüstungscode, -titel, -typ, -gruppe und Anmerkungen"
+          },
+          {
+            "it": "Codice, titolo, tipo, gruppo e osservazioni attrezzatura"
+          },
+          {
+            "ru": "Код, название, тип, группа и примечания оборудования"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "detailPageMetadata": {
+      "sections": [
+        {
+          "id": "equipment-general-overview",
+          "title": "General Information",
+          "description": "Equipment code, title, type, group and remarks",
+          "colSpan": 2,
+          "fieldIds": [
+            "equipment-code",
+            "equipment-title",
+            "equipment-type",
+            "equipment-group",
+            "production-group",
+            "equipment-remarks"
+          ]
+        }
+      ]
+    },
+    "showInNavigation": true,
+    "icon": "Backpack",
+    "schemaType": "business",
+    "syncStrategy": "schema-and-data",
+    "description_translations": [
+      {
+        "en": "Manage equipment with code, title, type, group, production group and remarks"
+      },
+      {
+        "fa": "مدیریت تجهیز با کد، عنوان، نوع، گروه و توضیحات"
+      },
+      {
+        "ar": "إدارة المعدات بالرمز والعنوان والنوع والمجموعة والملاحظات"
+      },
+      {
+        "es": "Gestionar equipos con código, título, tipo, grupo y observaciones"
+      },
+      {
+        "fr": "Gérer les équipements avec code, titre, type, groupe et remarques"
+      },
+      {
+        "de": "Ausrüstung mit Code, Titel, Typ, Gruppe und Anmerkungen verwalten"
+      },
+      {
+        "it": "Gestisci attrezzature con codice, titolo, tipo, gruppo e osservazioni"
+      },
+      {
+        "ru": "Управление оборудованием с кодом, названием, типом, группой и примечаниями"
+      }
+    ],
+    "applications": [],
+    "allowDataInactive": true,
+    "allowHierarchicalParent": true,
+    "statusGroup": [
+      {
+        "id": "01KBCXZ2KX7N336B5GDGKEKNRC",
+        "label": "Active / Inactive"
+      }
+    ],
+    "relatedTenants": [
+      {
+        "id": "01KH39DYCW17SXF2APAV1KZZQT",
+        "label": "Gradian App"
+      }
+    ],
+    "isSystemSchema": false,
+    "entityTypeGroup": [
+      {
+        "id": "01KEQTPGRP00000000000001",
+        "label": "Equipment Types"
+      }
+    ]
+  },
+  {
+    "id": "equipment-categories",
+    "description": "Hierarchical equipment categories with string title",
+    "singular_name": "Equipment Category",
+    "plural_name": "Equipment Categories",
+    "singular_name_translations": [
+      {
+        "en": "Equipment Category"
+      },
+      {
+        "fa": "دسته‌بندی تجهیز"
+      },
+      {
+        "ar": "فئة المعدات"
+      },
+      {
+        "es": "Categoría de equipo"
+      },
+      {
+        "fr": "Catégorie d'équipement"
+      },
+      {
+        "de": "Ausrüstungskategorie"
+      },
+      {
+        "it": "Categoria attrezzatura"
+      },
+      {
+        "ru": "Категория оборудования"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "Equipment Categories"
+      },
+      {
+        "fa": "دسته‌بندی‌های تجهیز"
+      },
+      {
+        "ar": "فئات المعدات"
+      },
+      {
+        "es": "Categorías de equipo"
+      },
+      {
+        "fr": "Catégories d'équipement"
+      },
+      {
+        "de": "Ausrüstungskategorien"
+      },
+      {
+        "it": "Categorie attrezzature"
+      },
+      {
+        "ru": "Категории оборудования"
+      }
+    ],
+    "allowHierarchicalParent": true,
+    "isNotCompanyBased": true,
+    "schemaType": "business",
+    "showInNavigation": true,
+    "icon": "FolderTree",
+    "fields": [
+      {
+        "id": "equipment-category-title",
+        "name": "title",
+        "label": "Title",
+        "sectionId": "basic-information",
+        "component": "text",
+        "role": "title",
+        "allowTranslation": false,
+        "translations": [
+          {
+            "en": "Title"
+          },
+          {
+            "fa": "عنوان"
+          },
+          {
+            "ar": "العنوان"
+          },
+          {
+            "es": "Título"
+          },
+          {
+            "fr": "Titre"
+          },
+          {
+            "de": "Titel"
+          },
+          {
+            "it": "Titolo"
+          },
+          {
+            "ru": "Название"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 2,
+        "order": 1,
+        "caption": "Enter category title",
+        "captionTranslations": [
+          {
+            "en": "Enter category title"
+          },
+          {
+            "fa": "عنوان دسته را وارد کنید"
+          },
+          {
+            "ar": "أدخل عنوان الفئة"
+          },
+          {
+            "es": "Ingrese el título de la categoría"
+          },
+          {
+            "fr": "Entrez le titre de la catégorie"
+          },
+          {
+            "de": "Kategorietitel eingeben"
+          },
+          {
+            "it": "Inserisci titolo categoria"
+          },
+          {
+            "ru": "Введите название категории"
+          }
+        ]
+      }
+    ],
+    "sections": [
+      {
+        "id": "basic-information",
+        "title": "Basic Information",
+        "titleTranslations": [
+          {
+            "en": "Basic Information"
+          },
+          {
+            "fa": "اطلاعات پایه"
+          },
+          {
+            "ar": "المعلومات الأساسية"
+          },
+          {
+            "es": "Información básica"
+          },
+          {
+            "fr": "Informations de base"
+          },
+          {
+            "de": "Grundinformationen"
+          },
+          {
+            "it": "Informazioni di base"
+          },
+          {
+            "ru": "Основная информация"
+          }
+        ],
+        "description": "Category title and hierarchy",
+        "descriptionTranslations": [
+          {
+            "en": "Category title and hierarchy"
+          },
+          {
+            "fa": "عنوان و سلسله‌مراتب دسته"
+          },
+          {
+            "ar": "عنوان الفئة والتسلسل الهرمي"
+          },
+          {
+            "es": "Título de categoría y jerarquía"
+          },
+          {
+            "fr": "Titre de catégorie et hiérarchie"
+          },
+          {
+            "de": "Kategorietitel und Hierarchie"
+          },
+          {
+            "it": "Titolo categoria e gerarchia"
+          },
+          {
+            "ru": "Название категории и иерархия"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      }
+    ],
+    "cardMetadata": [],
+    "description_translations": [
+      {
+        "en": "Manage hierarchical equipment categories with string titles"
+      },
+      {
+        "fa": "مدیریت دسته‌بندی‌های سلسله‌مراتبی تجهیز با عنوان قابل ترجمه"
+      },
+      {
+        "ar": "إدارة فئات المعدات الهرمية مع عناوين قابلة للترجمة"
+      },
+      {
+        "es": "Gestionar categorías de equipo jerárquicas con títulos traducibles"
+      },
+      {
+        "fr": "Gérer les catégories d'équipement hiérarchiques avec titres traduisibles"
+      },
+      {
+        "de": "Hierarchische Ausrüstungskategorien mit übersetzbaren Titeln verwalten"
+      },
+      {
+        "it": "Gestisci categorie attrezzature gerarchiche con titoli traducibili"
+      },
+      {
+        "ru": "Управление иерархическими категориями оборудования с переводимыми названиями"
+      }
+    ]
+  },
+  {
     "id": "users",
     "description": "Manage user accounts and profiles",
     "singular_name": "User",

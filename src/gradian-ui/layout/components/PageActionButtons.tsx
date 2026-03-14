@@ -7,13 +7,12 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/gradian-ui/shared/utils';
 import { URL_HOME } from '@/gradian-ui/shared/configs/ui-config';
-import { LayoutDashboard, QrCode } from 'lucide-react';
+import { LayoutDashboard, MoreVertical, QrCode, ScanBarcode, Share2 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShareButton } from './ShareButton';
 import { MaximizeButton } from './MaximizeButton';
 import { useLayoutContext } from '../contexts/LayoutContext';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
@@ -29,6 +28,13 @@ import { Settings2 } from 'lucide-react';
 import { loggingCustom } from '@/gradian-ui/shared/utils/logging-custom';
 import { LogType } from '@/gradian-ui/shared/configs/log-config';
 import { apiRequest } from '@/gradian-ui/shared/utils/api';
+import { toast } from '@/components/ui/sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 // Dynamically import QRCodeDialog to avoid SSR issues with HTMLCanvasElement
 const QRCodeDialog = dynamic(
@@ -36,6 +42,13 @@ const QRCodeDialog = dynamic(
     import('@/gradian-ui/barcode-management/barcode-generator/components/QRCodeDialog').then(
       (mod) => ({ default: mod.QRCodeDialog })
     ),
+  { ssr: false }
+);
+
+// Dynamically import BarcodeScannerWrapper (camera/media APIs)
+const BarcodeScannerWrapper = dynamic(
+  () =>
+    import('@/gradian-ui/barcode-management').then((mod) => ({ default: mod.BarcodeScannerWrapper })),
   { ssr: false }
 );
 
@@ -47,6 +60,7 @@ export interface PageActionButtonsProps {
   showDownload?: boolean;
   showGoToUrl?: boolean;
   showHome?: boolean;
+  showBarcodeScanner?: boolean;
   /**
    * Layout variant:
    * - "default": full-width bar with left/right sections
@@ -63,9 +77,11 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
   showDownload = true,
   showGoToUrl = true,
   showHome = true,
+  showBarcodeScanner = true,
   layout = 'default',
 }) => {
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
+  const [isBarcodeScannerOpen, setIsBarcodeScannerOpen] = useState(false);
   const [currentValue, setCurrentValue] = useState<string>('');
   const pathname = usePathname();
   const { isMaximized, title, icon } = useLayoutContext();
@@ -75,6 +91,8 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
   const labelGoToApps = getT(TRANSLATION_KEYS.ACTION_GO_TO_APPS, language, defaultLang);
   const labelToggleTheme = getT(TRANSLATION_KEYS.ACTION_TOGGLE_THEME, language, defaultLang);
   const labelShowQRCode = getT(TRANSLATION_KEYS.ACTION_SHOW_QR_CODE, language, defaultLang);
+  const labelOpenBarcodeScanner = getT(TRANSLATION_KEYS.ACTION_OPEN_BARCODE_SCANNER, language, defaultLang);
+  const labelMoreActions = getT(TRANSLATION_KEYS.ACTION_MORE_ACTIONS, language, defaultLang);
   const labelShare = getT(TRANSLATION_KEYS.ACTION_SHARE, language, defaultLang);
   const labelMaximizeView = getT(TRANSLATION_KEYS.ACTION_MAXIMIZE_VIEW, language, defaultLang);
   const labelMinimizeView = getT(TRANSLATION_KEYS.ACTION_MINIMIZE_VIEW, language, defaultLang);
@@ -146,7 +164,30 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
     }
   }, [value, pathname]);
 
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: titleSharePage || undefined,
+          text: textSharePage || currentValue,
+          url: currentValue,
+        });
+      } catch (err) {
+        if (err instanceof Error && err.name !== 'AbortError') {
+          loggingCustom(LogType.CLIENT_LOG, 'error', `[PageActionButtons] Share failed: ${err.message}`);
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(currentValue);
+        toast.success(labelShare, { description: 'Link copied to clipboard' });
+      } catch {
+        toast.error('Failed to copy link');
+      }
+    }
+  };
 
+  const hasActionsMenuItems = showQRCode || showShare || showBarcodeScanner;
   const isInline = layout === 'inline';
 
   return (
@@ -249,37 +290,60 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        {showQRCode && (
-          <TooltipProvider delayDuration={200}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  onClick={() => setIsQRDialogOpen(true)}
-                  variant="square"
-                  size="sm"
-                  className={isInline ? 'h-11 w-11 p-0' : undefined}
-                  aria-label={labelShowQRCode}
+        {hasActionsMenuItems && (
+          <DropdownMenu>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="square"
+                      size="sm"
+                      className={cn(isInline && 'h-11 w-11 p-0')}
+                      aria-label={labelMoreActions}
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{labelMoreActions}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <DropdownMenuContent
+              align="end"
+              className="min-w-44 rounded-xl border border-gray-200/80 bg-white/95 p-1.5 shadow-xl shadow-gray-200/50 backdrop-blur-md dark:border-gray-600/80 dark:bg-gray-800/95 dark:shadow-gray-950/50"
+            >
+              {showQRCode && (
+                <DropdownMenuItem
+                  onSelect={() => setIsQRDialogOpen(true)}
+                  className="flex items-center gap-2.5 rounded-lg py-2 text-xs cursor-pointer text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700/80"
                 >
-                  <QrCode className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{labelShowQRCode}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-
-        {showShare && (
-          <ShareButton
-            value={currentValue}
-            title={titleSharePage}
-            text={textSharePage}
-            tooltipLabel={labelShare}
-            variant="square"
-            size={isInline ? 'sm' : 'md'}
-            className={isInline ? 'h-11 w-11 p-0 flex items-center justify-center' : 'flex items-center justify-center'}
-          />
+                  <QrCode className="h-3.5 w-3.5 shrink-0 text-violet-600 dark:text-violet-400" />
+                  {labelShowQRCode}
+                </DropdownMenuItem>
+              )}
+              {showShare && (
+                <DropdownMenuItem
+                  onSelect={() => handleShare()}
+                  className="flex items-center gap-2.5 rounded-lg py-2 text-xs cursor-pointer text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700/80"
+                >
+                  <Share2 className="h-3.5 w-3.5 shrink-0 text-violet-600 dark:text-violet-400" />
+                  {labelShare}
+                </DropdownMenuItem>
+              )}
+              {showBarcodeScanner && (
+                <DropdownMenuItem
+                  onSelect={() => setIsBarcodeScannerOpen(true)}
+                  className="flex items-center gap-2.5 rounded-lg py-2 text-xs cursor-pointer text-gray-700 transition-colors hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700/80"
+                >
+                  <ScanBarcode className="h-3.5 w-3.5 shrink-0 text-violet-600 dark:text-violet-400" />
+                  {labelOpenBarcodeScanner}
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         )}
 
         {isSystemAdministrator && (
@@ -312,6 +376,30 @@ export const PageActionButtons: React.FC<PageActionButtonsProps> = ({
         onOpenChange={setIsQRDialogOpen}
         showGoToUrl={showGoToUrl}
       />
+
+      {/* Single barcode scanner drawer */}
+      {showBarcodeScanner && (
+        <BarcodeScannerWrapper
+          open={isBarcodeScannerOpen}
+          onOpenChange={setIsBarcodeScannerOpen}
+          allowedFormats={['Code128', 'QR', 'DataMatrix', 'EAN']}
+          enableBeep
+          enableMultipleScan={false}
+          enableChangeCount={false}
+          enableMockData
+          onScan={async (value) => {
+            try {
+              await navigator.clipboard.writeText(value);
+              toast.success('Scanned', {
+                description: value.length > 40 ? `${value.slice(0, 40)}…` : value,
+              });
+            } catch {
+              toast.success('Scanned', { description: value });
+            }
+          }}
+          title={labelOpenBarcodeScanner}
+        />
+      )}
 
       {isSystemAdministrator && appConfigSchema && (
         <FormDialog

@@ -73,6 +73,7 @@ export const NameInput = forwardRef<FormElementRef, NameInputProps>(
       () => buildAllowedRegex(allowedCharConfig),
       [allowedCharConfig]
     );
+    const templateAllowsDash = Boolean(patternTemplate?.includes('-'));
 
     const handleCustomModeToggle = () => {
       if (!isCustomizable || disabled || customizeDisabled) return;
@@ -104,7 +105,7 @@ export const NameInput = forwardRef<FormElementRef, NameInputProps>(
         onChange?.(
           sanitizeByAllowedConfig(newValue ?? '', allowedCharConfig, {
             collapseWhitespaceToDash: true,
-            trimEdgeDashes: true,
+            trimEdgeDashes: !templateAllowsDash,
             normalizeCase: 'auto',
           }),
         ),
@@ -114,7 +115,7 @@ export const NameInput = forwardRef<FormElementRef, NameInputProps>(
       if (disabled || (isCustomizable && !isCustomMode)) return;
       const sanitizedValue = sanitizeByAllowedConfig(event.target.value, allowedCharConfig, {
         collapseWhitespaceToDash: true,
-        trimEdgeDashes: true,
+        trimEdgeDashes: !templateAllowsDash,
         normalizeCase: 'auto',
       });
       if (sanitizedValue !== event.target.value) {

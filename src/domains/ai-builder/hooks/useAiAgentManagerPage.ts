@@ -20,7 +20,7 @@ interface MessagesResponse {
 }
 
 async function fetchAiAgents(): Promise<AiAgent[]> {
-  const response = await fetch('/api/ai-agents', {
+  const response = await fetch('/api/ai-agents?nocache=true', {
     cache: 'no-store',
     headers: {
       'Cache-Control': 'no-cache, no-store, must-revalidate',

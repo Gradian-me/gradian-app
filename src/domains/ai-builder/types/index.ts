@@ -21,7 +21,8 @@ export interface AiAgent {
    */
   entityType?: {
     id: string;
-    label: string;
+    /** Display label; can be a string or translation array e.g. [{ en: "Content Generator" }, { fa: "..." }] */
+    label: string | Array<Record<string, string>>;
   };
   /**
    * Optional list of related tenants with id/label, similar to other data files.

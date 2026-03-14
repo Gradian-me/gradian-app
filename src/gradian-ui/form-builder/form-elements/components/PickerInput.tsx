@@ -470,14 +470,20 @@ export const PickerInput: React.FC<PickerInputProps> = ({
     }
 
     // Enrich selectedOptions with proper labels/icon/color from rawItems for targetSchema
-    // This ensures the saved data has proper labels, not just IDs
+    // This ensures the saved data has proper labels (resolved to string to avoid [object Object])
+    const lang = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
+    const defaultLang = getDefaultLanguage();
+    const ensureLabelString = (raw: unknown, fallback: string) =>
+      typeof raw === 'string' && raw.trim() !== '' ? raw : (resolveDisplayLabel(raw, lang, defaultLang) || fallback);
+
     let enrichedOptions = selectedOptions;
     if (!sourceUrl && targetSchema && rawItems && rawItems.length > 0) {
       enrichedOptions = selectedOptions.map((option, idx) => {
         const rawItem = rawItems[idx];
         if (rawItem && String(option.id) === String(rawItem.id)) {
-          // Get proper label from rawItem using role-based lookup
-          const properLabel = getValueByRole(targetSchema, rawItem, 'title') || rawItem.name || rawItem.title || rawItem.label || option.label;
+          // Get proper label from rawItem using role-based lookup; resolve so we never store translation objects
+          const rawLabel = getValueByRole(targetSchema, rawItem, 'title') || rawItem.name || rawItem.title || rawItem.label || option.label;
+          const properLabel = ensureLabelString(rawLabel, String(option.id));
           return {
             ...option,
             label: properLabel,
@@ -485,7 +491,7 @@ export const PickerInput: React.FC<PickerInputProps> = ({
             color: option.color || rawItem.color,
           };
         }
-        return option;
+        return { ...option, label: ensureLabelString(option.label, String(option.id)) };
       });
     }
 

@@ -195,12 +195,19 @@ const getBadgePresentation = (color?: string) => {
     className
   );
 
+  const lang = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+
   // Render a badge with optional animation
   const renderBadgeItem = (item: string | BadgeItem, idx: number) => {
-    // Handle string or object item
+    // Handle string or object item; resolve label so translation objects never render as [object Object]
     const isItemObject = typeof item !== 'string';
     const itemId = isItemObject ? (item as BadgeItem).id : `${item}-${idx}`;
-    const itemLabel = isItemObject ? (item as BadgeItem).label : item as string;
+    const rawLabel = isItemObject ? (item as BadgeItem).label : item as string;
+    const itemLabel =
+      typeof rawLabel === 'string'
+        ? rawLabel
+        : resolveDisplayLabel(rawLabel, lang, defaultLang) || (typeof itemId === 'string' ? itemId : '');
     const itemIcon = isItemObject ? (item as BadgeItem).icon : null;
     const itemColor = !enforceVariant && isItemObject ? (item as BadgeItem).color : null;
     

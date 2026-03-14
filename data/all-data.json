@@ -120,6 +120,2533 @@
       ]
     }
   ],
+  "equipments": [],
+  "equipment-categories": [
+    {
+      "title": "Production",
+      "id": "01KEQCAT0001PROD00000001",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Upstream & Bioreaction",
+      "parent": "01KEQCAT0001PROD00000001",
+      "id": "01KEQCAT0H01UPSTREAM0000208",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Downstream & Purification",
+      "parent": "01KEQCAT0001PROD00000001",
+      "id": "01KEQCAT0H02DOWNSTRM000209",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Formulation & Filling",
+      "parent": "01KEQCAT0001PROD00000001",
+      "id": "01KEQCAT0H03FORMFILL000210",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Vessel",
+      "parent": "01KEQCAT0H01UPSTREAM0000208",
+      "id": "01KEQCAT0010VESSEL000004",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Bioreactor",
+      "parent": "01KEQCAT0010VESSEL000004",
+      "id": "01KEQCAT0011BIOREACTOR0005",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Single-use Bioreactor",
+      "parent": "01KEQCAT0011BIOREACTOR0005",
+      "id": "01KEQCAT0011ASUB000000051",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Stainless Steel Bioreactor",
+      "parent": "01KEQCAT0011BIOREACTOR0005",
+      "id": "01KEQCAT0011BSSBIO00000052",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Fermentor",
+      "parent": "01KEQCAT0010VESSEL000004",
+      "id": "01KEQCAT0012FERMENTOR00006",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Stainless Steel Fermentor",
+      "parent": "01KEQCAT0012FERMENTOR00006",
+      "id": "01KEQCAT0012ASSFERM00000053",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Single-use Fermentor",
+      "parent": "01KEQCAT0012FERMENTOR00006",
+      "id": "01KEQCAT0012BSUFERM00000054",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Mixing Vessel",
+      "parent": "01KEQCAT0010VESSEL000004",
+      "id": "01KEQCAT0013MIXVESSEL00007",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Buffer Vessel",
+      "parent": "01KEQCAT0010VESSEL000004",
+      "id": "01KEQCAT0014BUFVESSEL00008",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Purification",
+      "parent": "01KEQCAT0H02DOWNSTRM000209",
+      "id": "01KEQCAT0030PURIF00000012",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Chromatography System",
+      "parent": "01KEQCAT0030PURIF00000012",
+      "id": "01KEQCAT0031CHROMSYS000013",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Affinity Chromatography",
+      "parent": "01KEQCAT0031CHROMSYS000013",
+      "id": "01KEQCAT0031AAFFINITY000055",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "IEX Chromatography",
+      "parent": "01KEQCAT0031CHROMSYS000013",
+      "id": "01KEQCAT0031BIEX00000000056",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "SEC Chromatography",
+      "parent": "01KEQCAT0031CHROMSYS000013",
+      "id": "01KEQCAT0031CSEC00000000057",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Filtration System",
+      "parent": "01KEQCAT0030PURIF00000012",
+      "id": "01KEQCAT0032FILTRSYS000014",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "TFF System",
+      "parent": "01KEQCAT0032FILTRSYS000014",
+      "id": "01KEQCAT0032ATFF00000000058",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Depth Filtration",
+      "parent": "01KEQCAT0032FILTRSYS000014",
+      "id": "01KEQCAT0032BDEPTH00000059",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Sterile Filtration",
+      "parent": "01KEQCAT0032FILTRSYS000014",
+      "id": "01KEQCAT0032CSTERILE0000060",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Formulation",
+      "parent": "01KEQCAT0H03FORMFILL000210",
+      "id": "01KEQCAT0090FORMUL00000034",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Mixing System",
+      "parent": "01KEQCAT0090FORMUL00000034",
+      "id": "01KEQCAT0091MIXSYS00000035",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "High-shear Mixer",
+      "parent": "01KEQCAT0091MIXSYS00000035",
+      "id": "01KEQCAT0091AHSMIX00000061",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Magnetic Mixer",
+      "parent": "01KEQCAT0091MIXSYS00000035",
+      "id": "01KEQCAT0091BMAGMIX00000062",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Overhead Mixer",
+      "parent": "01KEQCAT0091MIXSYS00000035",
+      "id": "01KEQCAT0091COHMIX00000063",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Homogenizer",
+      "parent": "01KEQCAT0090FORMUL00000034",
+      "id": "01KEQCAT0092HOMOGEN00000036",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Dispensing System",
+      "parent": "01KEQCAT0090FORMUL00000034",
+      "id": "01KEQCAT0093DISPENS0000037",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Compounding System",
+      "parent": "01KEQCAT0090FORMUL00000034",
+      "id": "01KEQCAT0094COMPOUND000038",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Filling",
+      "parent": "01KEQCAT0H03FORMFILL000210",
+      "id": "01KEQCAT0100FILLING00000039",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Filling Line",
+      "parent": "01KEQCAT0100FILLING00000039",
+      "id": "01KEQCAT0101FILLLINE0000040",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Rotary Filling Line",
+      "parent": "01KEQCAT0101FILLLINE0000040",
+      "id": "01KEQCAT0101AROTFILL000064",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Linear Filling Line",
+      "parent": "01KEQCAT0101FILLLINE0000040",
+      "id": "01KEQCAT0101BLINFILL000065",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Vial Filler",
+      "parent": "01KEQCAT0100FILLING00000039",
+      "id": "01KEQCAT0102VIALFILL0000041",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Rotary Vial Filler",
+      "parent": "01KEQCAT0102VIALFILL0000041",
+      "id": "01KEQCAT0102AROTVIAL000066",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Linear Vial Filler",
+      "parent": "01KEQCAT0102VIALFILL0000041",
+      "id": "01KEQCAT0102BLINVIAL000067",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Syringe Filler",
+      "parent": "01KEQCAT0100FILLING00000039",
+      "id": "01KEQCAT0103SYRINGEF000042",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Isolator",
+      "parent": "01KEQCAT0100FILLING00000039",
+      "id": "01KEQCAT0104ISOLATOR0000043",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Lyophilizer",
+      "parent": "01KEQCAT0100FILLING00000039",
+      "id": "01KEQCAT0105LYOPHIL0000044",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Packaging",
+      "parent": "01KEQCAT0001PROD00000001",
+      "id": "01KEQCAT0110PACKAG00000045",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Cartoner",
+      "parent": "01KEQCAT0110PACKAG00000045",
+      "id": "01KEQCAT0111CARTONER0000046",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Labeler",
+      "parent": "01KEQCAT0110PACKAG00000045",
+      "id": "01KEQCAT0112LABELER0000047",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Wrap-around Labeler",
+      "parent": "01KEQCAT0112LABELER0000047",
+      "id": "01KEQCAT0112AWRAPLBL000068",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Front-back Labeler",
+      "parent": "01KEQCAT0112LABELER0000047",
+      "id": "01KEQCAT0112BFBLABEL000069",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Capper",
+      "parent": "01KEQCAT0110PACKAG00000045",
+      "id": "01KEQCAT0113CAPPER00000048",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Blister Line",
+      "parent": "01KEQCAT0110PACKAG00000045",
+      "id": "01KEQCAT0114BLISTER0000049",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Case Packer",
+      "parent": "01KEQCAT0110PACKAG00000045",
+      "id": "01KEQCAT0115CASEPACK000050",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Incubators",
+      "parent": "01KEQCAT0H01UPSTREAM0000208",
+      "id": "01KEQCAT0116INCUB00000113",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Shaking Incubator",
+      "parent": "01KEQCAT0116INCUB00000113",
+      "id": "01KEQCAT0116ASHAKE00000114",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "CO2 Incubator",
+      "parent": "01KEQCAT0116INCUB00000113",
+      "id": "01KEQCAT0116BCO2INC0000115",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Refrigerated Incubator",
+      "parent": "01KEQCAT0116INCUB00000113",
+      "id": "01KEQCAT0116CREFRIG000116",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Laboratory",
+      "id": "01KEQCAT0002LABO00000002",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Analytical & Detection",
+      "parent": "01KEQCAT0002LABO00000002",
+      "id": "01KEQCAT0H10ANALYTIC0000211",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Cell Culture & Biology",
+      "parent": "01KEQCAT0002LABO00000002",
+      "id": "01KEQCAT0H11CELLBIO00000212",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Sample Prep & General",
+      "parent": "01KEQCAT0002LABO00000002",
+      "id": "01KEQCAT0H12SAMPLEPREP000213",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Chromatography",
+      "parent": "01KEQCAT0H10ANALYTIC0000211",
+      "id": "01KEQCAT0040CHROM00000015",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "HPLC",
+      "parent": "01KEQCAT0040CHROM00000015",
+      "id": "01KEQCAT0041HPLC0000000016",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Analytical HPLC",
+      "parent": "01KEQCAT0041HPLC0000000016",
+      "id": "01KEQCAT0041AANALHPLC00070",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Preparative HPLC",
+      "parent": "01KEQCAT0041HPLC0000000016",
+      "id": "01KEQCAT0041BPREPHPLC00071",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "UPLC",
+      "parent": "01KEQCAT0040CHROM00000015",
+      "id": "01KEQCAT0042UPLC0000000017",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "GC",
+      "parent": "01KEQCAT0040CHROM00000015",
+      "id": "01KEQCAT0043GC000000000018",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "LC-MS",
+      "parent": "01KEQCAT0040CHROM00000015",
+      "id": "01KEQCAT0044LCMS0000000019",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Single Quadrupole LC-MS",
+      "parent": "01KEQCAT0044LCMS0000000019",
+      "id": "01KEQCAT0044ASQMS000000072",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Triple Quadrupole LC-MS",
+      "parent": "01KEQCAT0044LCMS0000000019",
+      "id": "01KEQCAT0044BTQMS000000073",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Q-TOF / High-res MS",
+      "parent": "01KEQCAT0044LCMS0000000019",
+      "id": "01KEQCAT0044CQTOFMS0000074",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "PLA",
+      "parent": "01KEQCAT0050SPECTRO0000020",
+      "id": "01KEQCAT0045PLA00000000033",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Spectroscopy",
+      "parent": "01KEQCAT0H10ANALYTIC0000211",
+      "id": "01KEQCAT0050SPECTRO0000020",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "UV-Vis",
+      "parent": "01KEQCAT0050SPECTRO0000020",
+      "id": "01KEQCAT0051UVVIS000000021",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Plate Reader",
+      "parent": "01KEQCAT0050SPECTRO0000020",
+      "id": "01KEQCAT0052PLATEREAD00022",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Cell Culture",
+      "parent": "01KEQCAT0H11CELLBIO00000212",
+      "id": "01KEQCAT0060CELLCULT000023",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Biosafety Cabinet",
+      "parent": "01KEQCAT0060CELLCULT000023",
+      "id": "01KEQCAT0061BIOSAFETY000024",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Incubator",
+      "parent": "01KEQCAT0060CELLCULT000023",
+      "id": "01KEQCAT0062INCUBATOR000025",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Centrifuge",
+      "parent": "01KEQCAT0H12SAMPLEPREP000213",
+      "id": "01KEQCAT0070CENTRIF000026",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Autoclave",
+      "parent": "01KEQCAT0H12SAMPLEPREP000213",
+      "id": "01KEQCAT0071AUTOCLAVE00027",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "IT",
+      "id": "01KEQCAT0003IT00000000003",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Compute & Endpoints",
+      "parent": "01KEQCAT0003IT00000000003",
+      "id": "01KEQCAT0H20COMPUTE0000214",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Network Infrastructure",
+      "parent": "01KEQCAT0003IT00000000003",
+      "id": "01KEQCAT0H21NETINFRA000215",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Storage & Backup",
+      "parent": "01KEQCAT0003IT00000000003",
+      "id": "01KEQCAT0H22STORBACK000216",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Data Center & Rack",
+      "parent": "01KEQCAT0003IT00000000003",
+      "id": "01KEQCAT0H23DATACTR0000217",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Security & Edge",
+      "parent": "01KEQCAT0003IT00000000003",
+      "id": "01KEQCAT0H24SECURITY0000218",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Server",
+      "parent": "01KEQCAT0H20COMPUTE0000214",
+      "id": "01KEQCAT0080SERVER00000028",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Rack Server",
+      "parent": "01KEQCAT0080SERVER00000028",
+      "id": "01KEQCAT0080ARACKSRV000075",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Blade Server",
+      "parent": "01KEQCAT0080SERVER00000028",
+      "id": "01KEQCAT0080BBLADESRV00076",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Tower Server",
+      "parent": "01KEQCAT0080SERVER00000028",
+      "id": "01KEQCAT0080CTOWERSRV00077",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Storage",
+      "parent": "01KEQCAT0H22STORBACK000216",
+      "id": "01KEQCAT0081STORAGE0000029",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "SAN",
+      "parent": "01KEQCAT0081STORAGE0000029",
+      "id": "01KEQCAT0081ASAN00000000078",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "NAS",
+      "parent": "01KEQCAT0081STORAGE0000029",
+      "id": "01KEQCAT0081BNAS00000000079",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "DAS",
+      "parent": "01KEQCAT0081STORAGE0000029",
+      "id": "01KEQCAT0081CDAS00000000080",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Switch",
+      "parent": "01KEQCAT0H21NETINFRA000215",
+      "id": "01KEQCAT0082SWITCH00000030",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Managed Switch",
+      "parent": "01KEQCAT0082SWITCH00000030",
+      "id": "01KEQCAT0082AMGDSW00000081",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Unmanaged Switch",
+      "parent": "01KEQCAT0082SWITCH00000030",
+      "id": "01KEQCAT0082BUNMGSW000082",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Rack",
+      "parent": "01KEQCAT0H23DATACTR0000217",
+      "id": "01KEQCAT0083RACK0000000031",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Server Rack",
+      "parent": "01KEQCAT0083RACK0000000031",
+      "id": "01KEQCAT0083ASRVRACK000083",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Network Rack",
+      "parent": "01KEQCAT0083RACK0000000031",
+      "id": "01KEQCAT0083BNETRACK000084",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Network",
+      "parent": "01KEQCAT0H21NETINFRA000215",
+      "id": "01KEQCAT0084NETWORK0000032",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Workstation & Desktop",
+      "parent": "01KEQCAT0H20COMPUTE0000214",
+      "id": "01KEQCAT0085WORKSTN0000175",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Desktop",
+      "parent": "01KEQCAT0085WORKSTN0000175",
+      "id": "01KEQCAT0085ADESKTOP000176",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Thin Client",
+      "parent": "01KEQCAT0085WORKSTN0000175",
+      "id": "01KEQCAT0085BTHINCLT000177",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Laptop & Mobile",
+      "parent": "01KEQCAT0H20COMPUTE0000214",
+      "id": "01KEQCAT0086LAPTOP000000178",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Laptop",
+      "parent": "01KEQCAT0086LAPTOP000000178",
+      "id": "01KEQCAT0086ALAPTOP00000179",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Tablet",
+      "parent": "01KEQCAT0086LAPTOP000000178",
+      "id": "01KEQCAT0086BTABLET000000180",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Firewall",
+      "parent": "01KEQCAT0H21NETINFRA000215",
+      "id": "01KEQCAT0087FIREWALL00000181",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Router",
+      "parent": "01KEQCAT0H21NETINFRA000215",
+      "id": "01KEQCAT0088ROUTER000000182",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Wireless",
+      "parent": "01KEQCAT0H21NETINFRA000215",
+      "id": "01KEQCAT0089WIRELESS00000183",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Access Point",
+      "parent": "01KEQCAT0089WIRELESS00000183",
+      "id": "01KEQCAT0089AAP00000000184",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "WLAN Controller",
+      "parent": "01KEQCAT0089WIRELESS00000183",
+      "id": "01KEQCAT0089BWLANCTL0000185",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "KVM & Console",
+      "parent": "01KEQCAT0H23DATACTR0000217",
+      "id": "01KEQCAT0090KVM000000000186",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "KVM Switch",
+      "parent": "01KEQCAT0090KVM000000000186",
+      "id": "01KEQCAT0090AKVMSW000000187",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Serial Console",
+      "parent": "01KEQCAT0090KVM000000000186",
+      "id": "01KEQCAT0090BSERIAL00000188",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Backup",
+      "parent": "01KEQCAT0H22STORBACK000216",
+      "id": "01KEQCAT0091BACKUP000000189",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Tape Library",
+      "parent": "01KEQCAT0091BACKUP000000189",
+      "id": "01KEQCAT0091ATAPELIB0000190",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Backup Appliance",
+      "parent": "01KEQCAT0091BACKUP000000189",
+      "id": "01KEQCAT0091BBACKAPP0000191",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Cabling & Patch",
+      "parent": "01KEQCAT0H21NETINFRA000215",
+      "id": "01KEQCAT0092CABLING00000192",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Patch Panel",
+      "parent": "01KEQCAT0092CABLING00000192",
+      "id": "01KEQCAT0092APATCH000000193",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Cable Management",
+      "parent": "01KEQCAT0092CABLING00000192",
+      "id": "01KEQCAT0092BCABMGT00000194",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Load Balancer",
+      "parent": "01KEQCAT0H24SECURITY0000218",
+      "id": "01KEQCAT0093LOADBAL00000195",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Modem & WAN",
+      "parent": "01KEQCAT0H21NETINFRA000215",
+      "id": "01KEQCAT0094MODEM0000000196",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Modem",
+      "parent": "01KEQCAT0094MODEM0000000196",
+      "id": "01KEQCAT0094AMODEM000000197",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "WAN Edge",
+      "parent": "01KEQCAT0094MODEM0000000196",
+      "id": "01KEQCAT0094BWANEDGE000198",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "IT Power",
+      "parent": "01KEQCAT0H23DATACTR0000217",
+      "id": "01KEQCAT0095ITPOWER00000199",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "PDU",
+      "parent": "01KEQCAT0095ITPOWER00000199",
+      "id": "01KEQCAT0095APDU000000000200",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "IT UPS",
+      "parent": "01KEQCAT0095ITPOWER00000199",
+      "id": "01KEQCAT0095BITUPS000000201",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Security Appliance",
+      "parent": "01KEQCAT0H24SECURITY0000218",
+      "id": "01KEQCAT0096SECURITY00000202",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "IDS/IPS",
+      "parent": "01KEQCAT0096SECURITY00000202",
+      "id": "01KEQCAT0096AIDSIPS00000203",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Proxy",
+      "parent": "01KEQCAT0096SECURITY00000202",
+      "id": "01KEQCAT0096BPROXY000000204",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Monitor & Display",
+      "parent": "01KEQCAT0H20COMPUTE0000214",
+      "id": "01KEQCAT0097MONITOR00000205",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Desktop Monitor",
+      "parent": "01KEQCAT0097MONITOR00000205",
+      "id": "01KEQCAT0097ADESKMON000206",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "KVM Console Screen",
+      "parent": "01KEQCAT0097MONITOR00000205",
+      "id": "01KEQCAT0097BKVMSCRN000207",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Administrative",
+      "id": "01KEQCAT0004ADMIN00000085",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Office IT",
+      "parent": "01KEQCAT0H20COMPUTE0000214",
+      "id": "01KEQCAT0120OFFICE000000086",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T19:38:25.795Z",
+      "createdBy": {
+        "company": "Gradian",
+        "status": [
+          {
+            "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+            "label": "Active",
+            "icon": "CheckCheck",
+            "color": "emerald"
+          }
+        ],
+        "username": "gradian",
+        "firstName": "Gradian",
+        "lastName": "Administrator",
+        "email": "admin@gradian.me",
+        "postTitle": "Admin",
+        "authenticationType": [
+          {
+            "id": "form-based"
+          }
+        ],
+        "incomplete": false,
+        "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+        "id": "01KBF8N88CG4YPK6VDNQAE420Z",
+        "createdAt": "2025-01-01T10:10:10.000Z",
+        "updatedAt": "2026-02-15T06:00:22.493Z",
+        "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+        "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+        "relatedTenants": [
+          {
+            "id": "01KBFBGV9151FQN481NB2CT4MX",
+            "label": "Development Environment"
+          },
+          {
+            "id": "01KBFBD109G6CYRT7RA04TMMXC",
+            "label": [
+              {
+                "en": "AryoGen",
+                "fa": "آریوژن"
+              }
+            ]
+          },
+          {
+            "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+            "label": "Supply Chain Management"
+          },
+          {
+            "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+            "label": "Local Development"
+          },
+          {
+            "id": "01KH39DYCW17SXF2APAV1KZZQT",
+            "label": "Gradian App"
+          }
+        ],
+        "entityType": [
+          {
+            "id": "01KCXDKF6JJ392P4HMGC8T19TC",
+            "label": "System Administrator",
+            "icon": "Shield",
+            "color": "rose"
+          }
+        ],
+        "relatedCompanies": [
+          {
+            "id": "01K94V4PJSFKCXS6AVX07P86N5",
+            "label": [
+              {
+                "en": "CinnaGen",
+                "fa": "سیناژن"
+              }
+            ]
+          },
+          {
+            "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+            "label": [
+              {
+                "en": "AryoGen",
+                "fa": "آریوژن"
+              }
+            ]
+          }
+        ]
+      },
+      "updatedBy": {
+        "company": "Gradian",
+        "status": [
+          {
+            "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+            "label": "Active",
+            "icon": "CheckCheck",
+            "color": "emerald"
+          }
+        ],
+        "username": "gradian",
+        "firstName": "Gradian",
+        "lastName": "Administrator",
+        "email": "admin@gradian.me",
+        "postTitle": "Admin",
+        "authenticationType": [
+          {
+            "id": "form-based"
+          }
+        ],
+        "incomplete": false,
+        "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+        "id": "01KBF8N88CG4YPK6VDNQAE420Z",
+        "createdAt": "2025-01-01T10:10:10.000Z",
+        "updatedAt": "2026-02-15T06:00:22.493Z",
+        "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+        "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+        "relatedTenants": [
+          {
+            "id": "01KBFBGV9151FQN481NB2CT4MX",
+            "label": "Development Environment"
+          },
+          {
+            "id": "01KBFBD109G6CYRT7RA04TMMXC",
+            "label": [
+              {
+                "en": "AryoGen",
+                "fa": "آریوژن"
+              }
+            ]
+          },
+          {
+            "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+            "label": "Supply Chain Management"
+          },
+          {
+            "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+            "label": "Local Development"
+          },
+          {
+            "id": "01KH39DYCW17SXF2APAV1KZZQT",
+            "label": "Gradian App"
+          }
+        ],
+        "entityType": [
+          {
+            "id": "01KCXDKF6JJ392P4HMGC8T19TC",
+            "label": "System Administrator",
+            "icon": "Shield",
+            "color": "rose"
+          }
+        ],
+        "relatedCompanies": [
+          {
+            "id": "01K94V4PJSFKCXS6AVX07P86N5",
+            "label": [
+              {
+                "en": "CinnaGen",
+                "fa": "سیناژن"
+              }
+            ]
+          },
+          {
+            "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+            "label": [
+              {
+                "en": "AryoGen",
+                "fa": "آریوژن"
+              }
+            ]
+          }
+        ]
+      },
+      "incomplete": false
+    },
+    {
+      "title": "Printer",
+      "parent": "01KEQCAT0120OFFICE000000086",
+      "id": "01KEQCAT0120APRINTER000087",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Scanner",
+      "parent": "01KEQCAT0120OFFICE000000086",
+      "id": "01KEQCAT0120BSCANNER000088",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Copier",
+      "parent": "01KEQCAT0120OFFICE000000086",
+      "id": "01KEQCAT0120CCOPIER0000089",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Multifunction Device",
+      "parent": "01KEQCAT0120OFFICE000000086",
+      "id": "01KEQCAT0120DMFD00000000090",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Furniture & Workspace",
+      "parent": "01KEQCAT0004ADMIN00000085",
+      "id": "01KEQCAT0121FURNITURE000091",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Workstation",
+      "parent": "01KEQCAT0121FURNITURE000091",
+      "id": "01KEQCAT0121AWORKSTN000092",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Filing & Storage",
+      "parent": "01KEQCAT0121FURNITURE000091",
+      "id": "01KEQCAT0121BFILING0000093",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Communication",
+      "parent": "01KEQCAT0004ADMIN00000085",
+      "id": "01KEQCAT0122COMMS000000094",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Phone System",
+      "parent": "01KEQCAT0122COMMS000000094",
+      "id": "01KEQCAT0122APhone000000095",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Video Conferencing",
+      "parent": "01KEQCAT0122COMMS000000094",
+      "id": "01KEQCAT0122BVideoConf00096",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Utilities",
+      "id": "01KEQCAT0005UTIL0000000086",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "HVAC",
+      "parent": "01KEQCAT0005UTIL0000000086",
+      "id": "01KEQCAT0130HVAC000000097",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "AHU",
+      "parent": "01KEQCAT0130HVAC000000097",
+      "id": "01KEQCAT0130AAHU00000000098",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Chiller",
+      "parent": "01KEQCAT0130HVAC000000097",
+      "id": "01KEQCAT0130BCHILLER0000099",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "HVAC Unit",
+      "parent": "01KEQCAT0130HVAC000000097",
+      "id": "01KEQCAT0130CHVACUNIT000100",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Electrical",
+      "parent": "01KEQCAT0005UTIL0000000086",
+      "id": "01KEQCAT0131ELECTRICAL000101",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "UPS",
+      "parent": "01KEQCAT0131ELECTRICAL000101",
+      "id": "01KEQCAT0131AUPS00000000102",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Generator",
+      "parent": "01KEQCAT0131ELECTRICAL000101",
+      "id": "01KEQCAT0131BGEN000000000103",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Electrical Distribution",
+      "parent": "01KEQCAT0131ELECTRICAL000101",
+      "id": "01KEQCAT0131CELECDIST000104",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Water",
+      "parent": "01KEQCAT0005UTIL0000000086",
+      "id": "01KEQCAT0132WATER0000000105",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "WFI System",
+      "parent": "01KEQCAT0132WATER0000000105",
+      "id": "01KEQCAT0132AWFI00000000106",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Purified Water",
+      "parent": "01KEQCAT0132WATER0000000105",
+      "id": "01KEQCAT0132BPW000000000107",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Cooling Water",
+      "parent": "01KEQCAT0132WATER0000000105",
+      "id": "01KEQCAT0132CCOOLWAT000108",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Compressed Air & Gas",
+      "parent": "01KEQCAT0005UTIL0000000086",
+      "id": "01KEQCAT0133AIRGAS000000109",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Compressed Air",
+      "parent": "01KEQCAT0133AIRGAS000000109",
+      "id": "01KEQCAT0133ACOMPAIR000110",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Nitrogen",
+      "parent": "01KEQCAT0133AIRGAS000000109",
+      "id": "01KEQCAT0133BN2GAS000000111",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "CO2 Supply",
+      "parent": "01KEQCAT0133AIRGAS000000109",
+      "id": "01KEQCAT0133CCO2GAS00000112",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Calibration",
+      "id": "01KEQCAT0006CALIB00000117",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Physical Parameters",
+      "parent": "01KEQCAT0006CALIB00000117",
+      "id": "01KEQCAT0H40PHYSPARAM000222",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Chemical & Flow",
+      "parent": "01KEQCAT0006CALIB00000117",
+      "id": "01KEQCAT0H41CHEMFLOW000223",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Mass & Weight",
+      "parent": "01KEQCAT0H40PHYSPARAM000222",
+      "id": "01KEQCAT0140MASSWT00000118",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Balance",
+      "parent": "01KEQCAT0140MASSWT00000118",
+      "id": "01KEQCAT0140ABALANCE000119",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Weight Set",
+      "parent": "01KEQCAT0140MASSWT00000118",
+      "id": "01KEQCAT0140BWEIGHTS000120",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Temperature",
+      "parent": "01KEQCAT0H40PHYSPARAM000222",
+      "id": "01KEQCAT0141TEMP0000000121",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Temperature Calibrator",
+      "parent": "01KEQCAT0141TEMP0000000121",
+      "id": "01KEQCAT0141ATEMPCAL000122",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Dry Well",
+      "parent": "01KEQCAT0141TEMP0000000121",
+      "id": "01KEQCAT0141BDRYWELL000123",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Pressure",
+      "parent": "01KEQCAT0H40PHYSPARAM000222",
+      "id": "01KEQCAT0142PRESS000000124",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Pressure Calibrator",
+      "parent": "01KEQCAT0142PRESS000000124",
+      "id": "01KEQCAT0142APRESSCAL000125",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "pH",
+      "parent": "01KEQCAT0H41CHEMFLOW000223",
+      "id": "01KEQCAT0143PH000000000126",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "pH Meter Calibrator",
+      "parent": "01KEQCAT0143PH000000000126",
+      "id": "01KEQCAT0143APHCAL00000127",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Flow",
+      "parent": "01KEQCAT0H41CHEMFLOW000223",
+      "id": "01KEQCAT0144FLOW0000000128",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Flow Calibrator",
+      "parent": "01KEQCAT0144FLOW0000000128",
+      "id": "01KEQCAT0144AFLOWCAL000129",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Volume",
+      "parent": "01KEQCAT0H40PHYSPARAM000222",
+      "id": "01KEQCAT0145VOLUME000000130",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Pipette Calibrator",
+      "parent": "01KEQCAT0145VOLUME000000130",
+      "id": "01KEQCAT0145APIPETCAL000131",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Maintenance",
+      "id": "01KEQCAT0007MAINT00000132",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Tools",
+      "parent": "01KEQCAT0007MAINT00000132",
+      "id": "01KEQCAT0150TOOLS0000000133",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Hand Tools",
+      "parent": "01KEQCAT0150TOOLS0000000133",
+      "id": "01KEQCAT0150AHAND000000134",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Power Tools",
+      "parent": "01KEQCAT0150TOOLS0000000133",
+      "id": "01KEQCAT0150BPOWER000000135",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Calibration Tools",
+      "parent": "01KEQCAT0150TOOLS0000000133",
+      "id": "01KEQCAT0150CCALTOOL000136",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Spare Parts",
+      "parent": "01KEQCAT0007MAINT00000132",
+      "id": "01KEQCAT0151SPARES000000137",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Critical Spares",
+      "parent": "01KEQCAT0151SPARES000000137",
+      "id": "01KEQCAT0151ACRITSPARE00138",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Consumables",
+      "parent": "01KEQCAT0151SPARES000000137",
+      "id": "01KEQCAT0151BCONSUM00000139",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Lifting & Handling",
+      "parent": "01KEQCAT0007MAINT00000132",
+      "id": "01KEQCAT0152LIFTING00000140",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Hoist",
+      "parent": "01KEQCAT0152LIFTING00000140",
+      "id": "01KEQCAT0152AHOIST000000141",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Pallet Jack",
+      "parent": "01KEQCAT0152LIFTING00000140",
+      "id": "01KEQCAT0152BPALLET00000142",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Cleaning Equipment",
+      "parent": "01KEQCAT0007MAINT00000132",
+      "id": "01KEQCAT0153CLEAN0000000143",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "CIP System",
+      "parent": "01KEQCAT0153CLEAN0000000143",
+      "id": "01KEQCAT0153ACIP00000000144",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Pressure Washer",
+      "parent": "01KEQCAT0153CLEAN0000000143",
+      "id": "01KEQCAT0153BPRESWASH000145",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Sensors",
+      "id": "01KEQCAT0008SENSORS00000146",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Process & Physical",
+      "parent": "01KEQCAT0008SENSORS00000146",
+      "id": "01KEQCAT0H30PROCPHYS000219",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Chemical & Analytical",
+      "parent": "01KEQCAT0008SENSORS00000146",
+      "id": "01KEQCAT0H31CHEMANAL000220",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Environmental",
+      "parent": "01KEQCAT0008SENSORS00000146",
+      "id": "01KEQCAT0H32ENVIRON00000221",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Temperature Sensors",
+      "parent": "01KEQCAT0H30PROCPHYS000219",
+      "id": "01KEQCAT0160TEMPSENS000147",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "RTD",
+      "parent": "01KEQCAT0160TEMPSENS000147",
+      "id": "01KEQCAT0160ARTD00000000148",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Thermocouple",
+      "parent": "01KEQCAT0160TEMPSENS000147",
+      "id": "01KEQCAT0160BTHERMOC0000149",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "NIR Temperature",
+      "parent": "01KEQCAT0160TEMPSENS000147",
+      "id": "01KEQCAT0160CNIRTEMP000150",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Pressure Sensors",
+      "parent": "01KEQCAT0H30PROCPHYS000219",
+      "id": "01KEQCAT0161PRESSENS000151",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Gauge Pressure",
+      "parent": "01KEQCAT0161PRESSENS000151",
+      "id": "01KEQCAT0161AGAUGE000000152",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Absolute Pressure",
+      "parent": "01KEQCAT0161PRESSENS000151",
+      "id": "01KEQCAT0161BABSOLUTE000153",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Differential Pressure",
+      "parent": "01KEQCAT0161PRESSENS000151",
+      "id": "01KEQCAT0161CDIFFPRES000154",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "pH Sensors",
+      "parent": "01KEQCAT0H31CHEMANAL000220",
+      "id": "01KEQCAT0162PHSENS000000155",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "In-line pH",
+      "parent": "01KEQCAT0162PHSENS000000155",
+      "id": "01KEQCAT0162AINLINEPH000156",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Bench pH",
+      "parent": "01KEQCAT0162PHSENS000000155",
+      "id": "01KEQCAT0162BBENCHPH0000157",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Flow Sensors",
+      "parent": "01KEQCAT0H30PROCPHYS000219",
+      "id": "01KEQCAT0163FLOWSENS000158",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Mass Flow",
+      "parent": "01KEQCAT0163FLOWSENS000158",
+      "id": "01KEQCAT0163AMASSFLOW000159",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Volumetric Flow",
+      "parent": "01KEQCAT0163FLOWSENS000158",
+      "id": "01KEQCAT0163BVOLFLOW0000160",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Ultrasonic Flow",
+      "parent": "01KEQCAT0163FLOWSENS000158",
+      "id": "01KEQCAT0163CULTRFLOW000161",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Level Sensors",
+      "parent": "01KEQCAT0H30PROCPHYS000219",
+      "id": "01KEQCAT0164LEVELSENS000162",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Radar Level",
+      "parent": "01KEQCAT0164LEVELSENS000162",
+      "id": "01KEQCAT0164ARADAR000000163",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Ultrasonic Level",
+      "parent": "01KEQCAT0164LEVELSENS000162",
+      "id": "01KEQCAT0164BULTRLVL0000164",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Capacitive Level",
+      "parent": "01KEQCAT0164LEVELSENS000162",
+      "id": "01KEQCAT0164CCAPLVL00000165",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Conductivity",
+      "parent": "01KEQCAT0H31CHEMANAL000220",
+      "id": "01KEQCAT0165CONDUCT000000166",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "In-line Conductivity",
+      "parent": "01KEQCAT0165CONDUCT000000166",
+      "id": "01KEQCAT0165AINLINECON000167",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Lab Conductivity",
+      "parent": "01KEQCAT0165CONDUCT000000166",
+      "id": "01KEQCAT0165BLABCOND0000168",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Dissolved Oxygen",
+      "parent": "01KEQCAT0H31CHEMANAL000220",
+      "id": "01KEQCAT0166DO000000000169",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Optical DO",
+      "parent": "01KEQCAT0166DO000000000169",
+      "id": "01KEQCAT0166AOPTICALDO000170",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Electrochemical DO",
+      "parent": "01KEQCAT0166DO000000000169",
+      "id": "01KEQCAT0166BELECTDO0000171",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Humidity",
+      "parent": "01KEQCAT0H32ENVIRON00000221",
+      "id": "01KEQCAT0167HUMIDITY00000172",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Relative Humidity",
+      "parent": "01KEQCAT0167HUMIDITY00000172",
+      "id": "01KEQCAT0167ARH000000000173",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Dew Point",
+      "parent": "01KEQCAT0167HUMIDITY00000172",
+      "id": "01KEQCAT0167BDEWPOINT0000174",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Stability",
+      "parent": "01KEQCAT0002LABO00000002",
+      "id": "01KEQCAT0H51STABILITY0000226",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Stability Chamber",
+      "parent": "01KEQCAT0H51STABILITY0000226",
+      "id": "01KEQCAT0H51ASTABCHAM000227",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Refrigerated Stability",
+      "parent": "01KEQCAT0H51STABILITY0000226",
+      "id": "01KEQCAT0H51BREFSTAB000228",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Inspection & Release",
+      "parent": "01KEQCAT0002LABO00000002",
+      "id": "01KEQCAT0H52INSPECT00000229",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Visual Inspection",
+      "parent": "01KEQCAT0H52INSPECT00000229",
+      "id": "01KEQCAT0H52AVISUAL00000230",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Sampling Equipment",
+      "parent": "01KEQCAT0H52INSPECT00000229",
+      "id": "01KEQCAT0H52BSAMPLING000231",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "HSE (Health, Safety & Environment)",
+      "id": "01KEQCAT0010HSE00000000232",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Safety Equipment",
+      "parent": "01KEQCAT0010HSE00000000232",
+      "id": "01KEQCAT0H60SAFETY000000233",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Emergency Shower & Eyewash",
+      "parent": "01KEQCAT0H60SAFETY000000233",
+      "id": "01KEQCAT0H60AEMERGENCY000234",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Fire Suppression",
+      "parent": "01KEQCAT0H60SAFETY000000233",
+      "id": "01KEQCAT0H60BFIRE0000000235",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Environmental Monitoring",
+      "parent": "01KEQCAT0010HSE00000000232",
+      "id": "01KEQCAT0H61ENVMON000000236",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Waste Handling",
+      "parent": "01KEQCAT0010HSE00000000232",
+      "id": "01KEQCAT0H62WASTE0000000237",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Warehouse & Logistics",
+      "id": "01KEQCAT0011WHLOG0000000238",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Cold Chain",
+      "parent": "01KEQCAT0011WHLOG0000000238",
+      "id": "01KEQCAT0H70COLDCHAIN000239",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Freezer",
+      "parent": "01KEQCAT0H70COLDCHAIN000239",
+      "id": "01KEQCAT0H70AFREEZER00000240",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Cold Room",
+      "parent": "01KEQCAT0H70COLDCHAIN000239",
+      "id": "01KEQCAT0H70BCOLDROOM000241",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Refrigerator",
+      "parent": "01KEQCAT0H70COLDCHAIN000239",
+      "id": "01KEQCAT0H70CREFRIG000000242",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Material Handling",
+      "parent": "01KEQCAT0011WHLOG0000000238",
+      "id": "01KEQCAT0H71MATERIAL00000243",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Forklift",
+      "parent": "01KEQCAT0H71MATERIAL00000243",
+      "id": "01KEQCAT0H71AFORKLIFT0000244",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Conveyor",
+      "parent": "01KEQCAT0H71MATERIAL00000243",
+      "id": "01KEQCAT0H71BCONVEYOR000245",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Cleanroom",
+      "parent": "01KEQCAT0005UTIL0000000086",
+      "id": "01KEQCAT0H80CLEANROOM000247",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T20:03:58.123Z",
+      "createdBy": {
+        "company": "Gradian",
+        "status": [
+          {
+            "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+            "label": "Active",
+            "icon": "CheckCheck",
+            "color": "emerald"
+          }
+        ],
+        "username": "gradian",
+        "firstName": "Gradian",
+        "lastName": "Administrator",
+        "email": "admin@gradian.me",
+        "postTitle": "Admin",
+        "authenticationType": [
+          {
+            "id": "form-based"
+          }
+        ],
+        "incomplete": false,
+        "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+        "id": "01KBF8N88CG4YPK6VDNQAE420Z",
+        "createdAt": "2025-01-01T10:10:10.000Z",
+        "updatedAt": "2026-02-15T06:00:22.493Z",
+        "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+        "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+        "relatedTenants": [
+          {
+            "id": "01KBFBGV9151FQN481NB2CT4MX",
+            "label": "Development Environment"
+          },
+          {
+            "id": "01KBFBD109G6CYRT7RA04TMMXC",
+            "label": [
+              {
+                "en": "AryoGen",
+                "fa": "آریوژن"
+              }
+            ]
+          },
+          {
+            "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+            "label": "Supply Chain Management"
+          },
+          {
+            "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+            "label": "Local Development"
+          },
+          {
+            "id": "01KH39DYCW17SXF2APAV1KZZQT",
+            "label": "Gradian App"
+          }
+        ],
+        "entityType": [
+          {
+            "id": "01KCXDKF6JJ392P4HMGC8T19TC",
+            "label": "System Administrator",
+            "icon": "Shield",
+            "color": "rose"
+          }
+        ],
+        "relatedCompanies": [
+          {
+            "id": "01K94V4PJSFKCXS6AVX07P86N5",
+            "label": [
+              {
+                "en": "CinnaGen",
+                "fa": "سیناژن"
+              }
+            ]
+          },
+          {
+            "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+            "label": [
+              {
+                "en": "AryoGen",
+                "fa": "آریوژن"
+              }
+            ]
+          }
+        ]
+      },
+      "updatedBy": {
+        "company": "Gradian",
+        "status": [
+          {
+            "id": "01KBCZAZQ58X7BYEQXDQ4VNV07",
+            "label": "Active",
+            "icon": "CheckCheck",
+            "color": "emerald"
+          }
+        ],
+        "username": "gradian",
+        "firstName": "Gradian",
+        "lastName": "Administrator",
+        "email": "admin@gradian.me",
+        "postTitle": "Admin",
+        "authenticationType": [
+          {
+            "id": "form-based"
+          }
+        ],
+        "incomplete": false,
+        "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+        "id": "01KBF8N88CG4YPK6VDNQAE420Z",
+        "createdAt": "2025-01-01T10:10:10.000Z",
+        "updatedAt": "2026-02-15T06:00:22.493Z",
+        "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+        "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
+        "relatedTenants": [
+          {
+            "id": "01KBFBGV9151FQN481NB2CT4MX",
+            "label": "Development Environment"
+          },
+          {
+            "id": "01KBFBD109G6CYRT7RA04TMMXC",
+            "label": [
+              {
+                "en": "AryoGen",
+                "fa": "آریوژن"
+              }
+            ]
+          },
+          {
+            "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+            "label": "Supply Chain Management"
+          },
+          {
+            "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+            "label": "Local Development"
+          },
+          {
+            "id": "01KH39DYCW17SXF2APAV1KZZQT",
+            "label": "Gradian App"
+          }
+        ],
+        "entityType": [
+          {
+            "id": "01KCXDKF6JJ392P4HMGC8T19TC",
+            "label": "System Administrator",
+            "icon": "Shield",
+            "color": "rose"
+          }
+        ],
+        "relatedCompanies": [
+          {
+            "id": "01K94V4PJSFKCXS6AVX07P86N5",
+            "label": [
+              {
+                "en": "CinnaGen",
+                "fa": "سیناژن"
+              }
+            ]
+          },
+          {
+            "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+            "label": [
+              {
+                "en": "AryoGen",
+                "fa": "آریوژن"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "title": "HEPA / Laminar Flow",
+      "parent": "01KEQCAT0H80CLEANROOM000247",
+      "id": "01KEQCAT0H80AHEPA00000000248",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Pass-through",
+      "parent": "01KEQCAT0H80CLEANROOM000247",
+      "id": "01KEQCAT0H80BPASSTHRU000249",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "title": "Biosafety Cabinet (Cleanroom)",
+      "parent": "01KEQCAT0H80CLEANROOM000247",
+      "id": "01KEQCAT0H80CBSC00000000250",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    }
+  ],
   "relation-types": [
     {
       "color": "blue",
@@ -8438,37 +10965,6 @@
           ]
         }
       ],
-      "title": "Task Types",
-      "incomplete": false,
-      "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
-      "id": "01KCDZTASKGROUP0000000000001",
-      "createdAt": "2025-12-14T08:30:00.000Z",
-      "updatedAt": "2025-12-14T08:30:00.000Z",
-      "entity-type-items-section": [],
-      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
-      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
-    },
-    {
-      "relatedCompanies": [
-        {
-          "id": "01K94V4PJSFKCXS6AVX07P86N5",
-          "label": [
-            {
-              "en": "CinnaGen",
-              "fa": "سیناژن"
-            }
-          ]
-        },
-        {
-          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
-          "label": [
-            {
-              "en": "AryoGen",
-              "fa": "آریوژن"
-            }
-          ]
-        }
-      ],
       "title": "Project Types",
       "incomplete": false,
       "companyId": "01K94V8K0RJS7D9K43F2VBTSVG",
@@ -8534,6 +11030,41 @@
       "id": "01KCXDJ8JBXRP84PW59Y5ADR5A",
       "createdAt": "2025-12-20T08:21:07.292Z",
       "updatedAt": "2025-12-20T08:21:07.292Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "relatedCompanies": [
+        {
+          "id": "01K94V4PJSFKCXS6AVX07P86N5",
+          "label": [
+            {
+              "en": "CinnaGen"
+            },
+            {
+              "fa": "سیناژن"
+            }
+          ]
+        },
+        {
+          "id": "01K94V8K0RJS7D9K43F2VBTSVG",
+          "label": [
+            {
+              "en": "AryoGen"
+            },
+            {
+              "fa": "آریوژن"
+            }
+          ]
+        }
+      ],
+      "title": "Equipment Types",
+      "incomplete": false,
+      "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
+      "id": "01KEQTPGRP00000000000001",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "entity-type-items-section": [],
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     }
   ],
@@ -8755,6 +11286,116 @@
       "id": "01KAITYPE009UTILITIES000009",
       "createdAt": "2026-01-01T00:00:00.000Z",
       "updatedAt": "2026-01-01T00:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Production",
+      "icon": "Factory",
+      "color": "blue",
+      "incomplete": false,
+      "id": "01KEQTP001PROD000000000001",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Laboratory",
+      "icon": "FlaskConical",
+      "color": "indigo",
+      "incomplete": false,
+      "id": "01KEQTP002LABO000000000002",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Sensor",
+      "icon": "Gauge",
+      "color": "emerald",
+      "incomplete": false,
+      "id": "01KEQTP003SENSOR00000000003",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "IT",
+      "icon": "Monitor",
+      "color": "slate",
+      "incomplete": false,
+      "id": "01KEQTP004IT00000000000004",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Administration",
+      "icon": "Building2",
+      "color": "zinc",
+      "incomplete": false,
+      "id": "01KEQTP005ADMIN00000000005",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "HSE",
+      "icon": "ShieldCheck",
+      "color": "red",
+      "incomplete": false,
+      "id": "01KEQTP006HSE00000000000006",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Maintenance",
+      "icon": "Wrench",
+      "color": "amber",
+      "incomplete": false,
+      "id": "01KEQTP007MAINT00000000007",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Utilities",
+      "icon": "Zap",
+      "color": "amber",
+      "incomplete": false,
+      "id": "01KEQTP009UTIL000000000009",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Calibration",
+      "icon": "Crosshair",
+      "color": "violet",
+      "incomplete": false,
+      "id": "01KEQTP010CALIB00000000010",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": "Warehouse & Logistics",
+      "icon": "Package",
+      "color": "orange",
+      "incomplete": false,
+      "id": "01KEQTP011WHLOG00000000011",
+      "createdAt": "2026-03-14T12:00:00.000Z",
+      "updatedAt": "2026-03-14T12:00:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
@@ -21800,6 +24441,417 @@
       "id": "01KKNY8NF4FYQYKB1BFR76HFY4",
       "createdAt": "2026-03-14T10:28:55.916Z",
       "updatedAt": "2026-03-14T10:28:55.916Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Bioreactor"
+        },
+        {
+          "fa": "بایوراکتور"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP2PCNRD63BSBZ1PY6QADHE",
+      "createdAt": "2026-03-14T11:46:19.964Z",
+      "updatedAt": "2026-03-14T11:46:19.964Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Fermantor"
+        },
+        {
+          "fa": "فرمانتور"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP2QBMF77S6F3ZT3PVVVKVR",
+      "createdAt": "2026-03-14T11:46:51.666Z",
+      "updatedAt": "2026-03-14T11:46:51.666Z"
+    },
+    {
+      "label": [
+        {
+          "en": "HPLC"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP2R3MVA1W4A1F6N6PQH3KS",
+      "createdAt": "2026-03-14T11:47:16.256Z",
+      "updatedAt": "2026-03-14T11:47:16.256Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Production"
+        },
+        {
+          "fa": "تولیدی"
+        }
+      ],
+      "color": "blue",
+      "icon": "Settings",
+      "incomplete": false,
+      "id": "01KKP2TY00C14G0VCK3TTS2XW3",
+      "createdAt": "2026-03-14T11:48:48.771Z",
+      "updatedAt": "2026-03-14T11:48:48.771Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Laboratory"
+        },
+        {
+          "fa": "آزمایشگاهی"
+        }
+      ],
+      "color": "fuchsia",
+      "icon": "GlassWater",
+      "incomplete": false,
+      "id": "01KKP2XDFSFW8QQNNF8S7R1RZC",
+      "createdAt": "2026-03-14T11:50:10.172Z",
+      "updatedAt": "2026-03-14T11:50:10.172Z"
+    },
+    {
+      "label": [
+        {
+          "en": "General"
+        },
+        {
+          "fa": "عمومی"
+        }
+      ],
+      "color": "slate",
+      "icon": "LayoutGrid",
+      "incomplete": false,
+      "id": "01KKP30M76Y5XPJ7DXWF8RG5XH",
+      "createdAt": "2026-03-14T11:51:55.369Z",
+      "updatedAt": "2026-03-14T11:51:55.369Z"
+    },
+    {
+      "label": [
+        {
+          "en": "CHO"
+        }
+      ],
+      "color": "green",
+      "icon": "FlaskConical",
+      "incomplete": false,
+      "id": "01KKP319R9JZ9Z5PAFQGKMZYF0",
+      "createdAt": "2026-03-14T11:52:17.420Z",
+      "updatedAt": "2026-03-14T11:52:17.420Z"
+    },
+    {
+      "label": [
+        {
+          "en": "EColi"
+        }
+      ],
+      "color": "rose",
+      "icon": "Microscope",
+      "incomplete": false,
+      "id": "01KKP31QV4XQB0A6P04425RQT9",
+      "createdAt": "2026-03-14T11:52:31.847Z",
+      "updatedAt": "2026-03-14T11:52:31.847Z"
+    },
+    {
+      "label": [
+        {
+          "en": "mAb"
+        }
+      ],
+      "color": "purple",
+      "icon": "TestTube2",
+      "incomplete": false,
+      "id": "01KKP3297253VP7W2HQHEJ55YQ",
+      "createdAt": "2026-03-14T11:52:49.636Z",
+      "updatedAt": "2026-03-14T11:52:49.636Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Chemical"
+        }
+      ],
+      "color": "amber",
+      "icon": "FlaskConical",
+      "incomplete": false,
+      "id": "01KKP32Q0EY3RVBWC4N6QZDBRC",
+      "createdAt": "2026-03-14T11:53:03.761Z",
+      "updatedAt": "2026-03-14T11:53:03.761Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Blood Group"
+        }
+      ],
+      "color": "red",
+      "icon": "Droplet",
+      "incomplete": false,
+      "id": "01KKP3359SPQNVA3JM1QKPSM62",
+      "createdAt": "2026-03-14T11:53:18.398Z",
+      "updatedAt": "2026-03-14T11:53:18.398Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Sensor"
+        },
+        {
+          "fa": "سنسور"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP40TEYW15WA4Q0J1FBDND4",
+      "createdAt": "2026-03-14T12:09:30.337Z",
+      "updatedAt": "2026-03-14T12:09:30.337Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Temperature"
+        },
+        {
+          "fa": "دما"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP41ZBQT41VKFGHDCDYR3XR",
+      "createdAt": "2026-03-14T12:10:08.122Z",
+      "updatedAt": "2026-03-14T12:10:08.122Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Centrifuge"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000001",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Autoclave"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000002",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Incubator"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000003",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Biosafety Cabinet"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000004",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Thermocycler"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000005",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Mass Spectrometer"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000006",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "GC-MS"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000007",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "LC-MS"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000008",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "UV-Vis Spectrophotometer"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000009",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Lyophilizer"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ000000000000000A",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Flow Cytometer"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ000000000000000B",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Microplate Reader"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ000000000000000C",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "pH Meter"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ000000000000000D",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Filling Machine"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ000000000000000E",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Water Purification System"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ000000000000000F",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Mixing Tank"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000010",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Filtration System"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000011",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Capping Machine"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000012",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Electrophoresis System"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000013",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Column Chromatography"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000014",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Dissolved Oxygen Meter"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP5EQ0000000000000015",
+      "createdAt": "2026-03-14T12:15:00.000Z",
+      "updatedAt": "2026-03-14T12:15:00.000Z"
     }
   ],
   "parameter-groups": [
@@ -22071,6 +25123,51 @@
       "id": "01KKNX4CCG2VTNWJAREREFYC79",
       "createdAt": "2026-03-14T10:09:06.967Z",
       "updatedAt": "2026-03-14T10:29:04.084Z"
+    },
+    {
+      "parameter-items-section": [],
+      "title": [
+        {
+          "en": "Equipment Group"
+        },
+        {
+          "fa": "گروه تجهیز"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP2J492D703F86XEBTRZXTR",
+      "createdAt": "2026-03-14T11:44:00.295Z",
+      "updatedAt": "2026-03-14T11:46:22.302Z"
+    },
+    {
+      "parameter-items-section": [],
+      "title": [
+        {
+          "en": "Equipment Type"
+        },
+        {
+          "fa": "نوع تجهیز"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP2SAP07XHZ6FT770WR330S",
+      "createdAt": "2026-03-14T11:47:56.229Z",
+      "updatedAt": "2026-03-14T11:50:33.916Z"
+    },
+    {
+      "parameter-items-section": [],
+      "title": [
+        {
+          "en": "Production Group"
+        },
+        {
+          "fa": "گروه تولیدی"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKP2Z7CMPB6DPPVGHJNGTHDX",
+      "createdAt": "2026-03-14T11:51:09.463Z",
+      "updatedAt": "2026-03-14T11:53:20.356Z"
     }
   ],
   "kpi-libraries": [

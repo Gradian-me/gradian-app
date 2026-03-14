@@ -4,6 +4,15 @@ import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/ut
 import { resolveDisplayLabel, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
 import { useLanguageStore } from '@/stores/language.store';
 
+/** Resolve a display value to string (handles translation objects to avoid [object Object]). */
+function toDisplayString(raw: unknown): string {
+  if (raw == null) return '';
+  if (typeof raw === 'string') return raw;
+  const lang = useLanguageStore.getState?.()?.getLanguage?.() ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  return resolveDisplayLabel(raw, lang, defaultLang) || '';
+}
+
 export const getDisplayStrings = (value: any): string[] => {
   if (value === null || value === undefined || value === '') {
     return [];
@@ -13,8 +22,8 @@ export const getDisplayStrings = (value: any): string[] => {
   if (normalizedOptions.length > 0) {
     return normalizedOptions
       .map((opt) => opt.label ?? opt.name ?? opt.title ?? opt.value ?? opt.id)
-      .filter((entry): entry is string | number => entry !== undefined && entry !== null)
-      .map((entry) => String(entry));
+      .filter((entry) => entry !== undefined && entry !== null)
+      .map((entry) => toDisplayString(entry));
   }
 
   if (Array.isArray(value)) {
@@ -24,14 +33,14 @@ export const getDisplayStrings = (value: any): string[] => {
           return '';
         }
         if (typeof entry === 'object') {
-          return (
+          const raw =
             entry.label ??
             entry.name ??
             entry.title ??
             entry.value ??
             entry.id ??
-            ''
-          );
+            '';
+          return raw !== '' ? toDisplayString(raw) : '';
         }
         return String(entry);
       })
@@ -46,7 +55,8 @@ export const getDisplayStrings = (value: any): string[] => {
       (value as any).value ??
       (value as any).id;
     if (fallback !== undefined && fallback !== null) {
-      return [String(fallback)];
+      const resolved = toDisplayString(fallback);
+      if (resolved) return [resolved];
     }
   }
 
@@ -102,7 +112,7 @@ export const getPickerDisplayValue = (
       primaryOption.value ??
       primaryOption.id;
     if (label !== undefined && label !== null) {
-      return String(label);
+      return toDisplayString(label);
     }
   }
 

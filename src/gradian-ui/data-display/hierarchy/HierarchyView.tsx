@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { getDiscussionCount } from '@/gradian-ui/data-display/utils';
 import { RoleBasedAvatar } from '@/gradian-ui/data-display/utils';
 import { FormSchema } from '@/gradian-ui/schema-manager/types/form-schema';
-import { getSingleValueByRole, getValueByRole, getArrayValuesByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
+import { getSingleValueByRole, getValueByRole, getArrayValuesByRole, getConcatenatedValueByRole } from '@/gradian-ui/form-builder/form-elements/utils/field-resolver';
 import { renderHighlightedText } from '@/gradian-ui/shared/utils/highlighter';
 import { cn } from '@/gradian-ui/shared/utils';
 import { getPrimaryDisplayString } from '../utils/value-display';
@@ -26,6 +26,7 @@ import { Avatar } from '@/gradian-ui/form-builder/form-elements/components/Avata
 import { normalizeOptionArray } from '@/gradian-ui/form-builder/form-elements/utils/option-normalizer';
 import { AvatarUser } from '../components/AvatarUser';
 import { CodeBadge } from '@/gradian-ui/form-builder/form-elements/components/CodeBadge';
+import { CopyContent } from '@/gradian-ui/form-builder/form-elements/components/CopyContent';
 
 export interface HierarchyViewProps {
   schema: FormSchema;
@@ -306,8 +307,11 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
                         <CodeBadge code={codeFieldValue} highlightQuery={highlightQuery} />
                       </div>
                     )}
-                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100 break-words">
-                      {renderHighlightedText(String(title), highlightQuery)}
+                    <div className="inline-flex items-center gap-1.5 max-w-full min-w-0">
+                      <span className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate min-w-0">
+                        {renderHighlightedText(String(title), highlightQuery)}
+                      </span>
+                      <CopyContent content={String(title)} className="shrink-0" />
                     </div>
                   </div>
                   {hasStatusField && statusFieldWithOptions && statusValue && (
@@ -407,7 +411,7 @@ const HierarchyNodeCard: React.FC<HierarchyNodeProps> = ({
             animate="expanded"
             exit="collapsed"
             transition={{ duration: 0.18, ease: 'easeInOut' }}
-            className="mt-2 ps-6 border-s border-dashed border-gray-200 dark:border-gray-700"
+            className="mt-2 ps-3 sm:ps-5 md:ps-6 border-s border-dashed border-gray-200 dark:border-gray-700"
           >
             {node.children.map((child, idx) => (
               <HierarchyNodeCard
@@ -472,7 +476,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
       const data = node.entity;
       const candidateFields = [
         getValueByRole(schema as any, data, 'title'),
-        getSingleValueByRole(schema as any, data, 'subtitle', data.email),
+        getConcatenatedValueByRole(schema as any, data, 'subtitle', ' | '),
         getSingleValueByRole(schema as any, data, 'code'),
         data.name,
         data.title,
@@ -580,7 +584,7 @@ export const HierarchyView: React.FC<HierarchyViewProps> = ({
           </CardContent>
         </Card>
         {showNested && (
-          <div className="mt-2 ps-6 border-s border-dashed border-gray-200 dark:border-gray-700">
+          <div className="mt-2 ps-3 sm:ps-5 md:ps-6 border-s border-dashed border-gray-200 dark:border-gray-700">
             <HierarchySkeleton depth={depth + 1} index={index} />
           </div>
         )}
