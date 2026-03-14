@@ -8814,7 +8814,12 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "label": "Drug Development",
+      "label": [
+        {
+          "en": "Drug Development",
+          "fa": "توسعه دارو"
+        }
+      ],
       "icon": "FlaskConical",
       "color": "blue",
       "incomplete": false,
@@ -8825,7 +8830,12 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "label": "Process Optimization",
+      "label": [
+        {
+          "en": "Process Optimization",
+          "fa": "بهینه‌سازی فرآیند"
+        }
+      ],
       "icon": "Settings",
       "color": "slate",
       "incomplete": false,
@@ -8836,7 +8846,12 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "label": "Regulatory Affairs",
+      "label": [
+        {
+          "en": "Regulatory Affairs",
+          "fa": "امور رگولاتوری"
+        }
+      ],
       "icon": "FileCheck",
       "color": "amber",
       "incomplete": false,
@@ -8847,7 +8862,12 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "label": "Export",
+      "label": [
+        {
+          "en": "Export",
+          "fa": "صادرات"
+        }
+      ],
       "icon": "Ship",
       "color": "emerald",
       "incomplete": false,
@@ -8858,7 +8878,12 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "label": "Technology & Infrastructure",
+      "label": [
+        {
+          "en": "Technology & Infrastructure",
+          "fa": "تکنولوژیک و زیرساختی"
+        }
+      ],
       "icon": "Server",
       "color": "purple",
       "incomplete": false,
@@ -8869,11 +8894,48 @@
       "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
     },
     {
-      "label": "Construction",
+      "label": [
+        {
+          "en": "Construction",
+          "fa": "عمرانی"
+        }
+      ],
       "icon": "HardHat",
       "color": "orange",
       "incomplete": false,
       "id": "01KCDZPROJ006CONSTRUC0000000006",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": [
+        {
+          "en": "IT & Systems",
+          "fa": "فناوری اطلاعات و سیستم‌ها"
+        }
+      ],
+      "icon": "Monitor",
+      "color": "blue",
+      "incomplete": false,
+      "id": "01KCDZPROJ007ITSYSTEMS0000000007",
+      "createdAt": "2025-12-14T08:30:00.000Z",
+      "updatedAt": "2025-12-14T08:30:00.000Z",
+      "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
+      "updatedBy": "01KBF8N88CG4YPK6VDNQAE420Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Technology Transfer",
+          "fa": "انتقال تکنولوژی"
+        }
+      ],
+      "icon": "Share2",
+      "color": "cyan",
+      "incomplete": false,
+      "id": "01KCDZPROJ008TECHTRANS0000000008",
       "createdAt": "2025-12-14T08:30:00.000Z",
       "updatedAt": "2025-12-14T08:30:00.000Z",
       "createdBy": "01KBF8N88CG4YPK6VDNQAE420Z",
@@ -23320,22 +23382,18 @@
   "project-portfolio": [
     {
       "progress": 51,
-      "status": [
-        {
-          "id": "01KBHGVA9789N2GWB9XKT6RQ06",
-          "label": "In Progress",
-          "icon": "LucideClock8",
-          "color": "amber"
-        }
-      ],
-      "entityType": [
-        {
-          "id": "01KCDZPROJ001DRUGDEV00000000001",
-          "label": "Drug Development",
-          "icon": "FlaskConical",
-          "color": "blue"
-        }
-      ],
+      "status": {
+        "id": "01KBHGZWFD2YC1F0QWGFS8F37Z",
+        "label": "Completed",
+        "color": "emerald",
+        "icon": "CircleCheckBig"
+      },
+      "entityType": {
+        "id": "01KCDZPROJ003REGAFFAIRS000000003",
+        "label": "[object Object]",
+        "color": "amber",
+        "icon": "FileCheck"
+      },
       "relatedCompanies": [
         {
           "id": "01K94V4PJSFKCXS6AVX07P86N5",
@@ -23347,7 +23405,8 @@
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
       "id": "01KK6MBAD7NXYHRC7BGXP16Y81",
       "createdAt": "2026-03-08T11:47:00.650Z",
-      "updatedAt": "2026-03-08T11:47:00.650Z"
+      "updatedAt": "2026-03-14T08:10:02.805Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     }
   ],
   "notes": [
@@ -23418,49 +23477,23 @@
         "Bioreactor BR-14",
         "Automation Control System"
       ],
-      "impactProductQuality": [
-        {
-          "id": "medium"
-        }
-      ],
-      "impactPatientSafety": [
-        {
-          "id": "low"
-        }
-      ],
-      "impactDataIntegrity": [
-        {
-          "id": "medium"
-        }
-      ],
-      "impactRegulatoryCompliance": [
-        {
-          "id": "medium"
-        }
-      ],
-      "changeClassification": [
-        {
-          "id": "01KBSR8J6EWGTQ6DPKGH5XR3VE"
-        }
-      ],
+      "impactProductQuality": [],
+      "impactPatientSafety": [],
+      "impactDataIntegrity": [],
+      "impactRegulatoryCompliance": [],
+      "changeClassification": [],
       "changeClassificationJustification": "Classified as High Criticality due to the involvement of a Critical Process Parameter (CPP) affecting cell-culture viability and potential product quality, requiring hardware replacement and automation logic changes.",
       "qaFinalReview": "The temperature control module failure created a risk to process stability. Hardware replacement plus integration of enhanced redundancy logic reduced this risk and improved early-warning capability. All engineering, automation, and QA assessments concluded that bioreactors BR-12 and BR-14 are fit for continued GMP use. Redundant control logic demonstrated correct failover response during testing.",
       "closureDate": "2026-02-16",
       "justificationForClosure": "All post-change verification data met predefined acceptance criteria. No recurrence of drift or signal interruptions observed after 30-day monitoring period. Change implemented successfully without unplanned downtime. Final QA disposition: Change Closed – High Criticality, Fully Mitigated.",
       "changeIsEffective": true,
-      "changeProcedure": [
-        {
-          "id": "01KD079DB28A53ADBQAW0NMTMW"
-        }
-      ],
-      "status": [
-        {
-          "id": "01KBSSP49BTQXY12YW52SEW78B",
-          "label": "Closed",
-          "icon": "CircleCheckBig",
-          "color": "emerald"
-        }
-      ],
+      "changeProcedure": [],
+      "status": {
+        "id": "01KBSSMTA2575E5RCWHY8AV8R9",
+        "label": "Waiting For Action Plans",
+        "color": "orange",
+        "icon": "Clock"
+      },
       "incomplete": false,
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5",
       "createdBy": "01K9ABA6MQ9K64MY7M4AEBCAP2",
@@ -23469,7 +23502,8 @@
       "relatedGuidelines": [],
       "id": "01KHHSAA4AN1Z4H74FNMQH4J6S",
       "createdAt": "2026-02-15T23:14:05.583Z",
-      "updatedAt": "2026-02-15T23:14:05.996Z"
+      "updatedAt": "2026-03-14T08:10:45.862Z",
+      "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
     },
     {
       "quality-assurance-analyses": [],

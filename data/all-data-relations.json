@@ -953,6 +953,26 @@
     "updatedAt": "2025-12-14T08:30:00.000Z"
   },
   {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZPROJECTGROUP00000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZPROJ007ITSYSTEMS0000000007",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZPROJREL007ITSYSTEMS0000000007",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
+    "sourceSchema": "entity-type-groups",
+    "sourceId": "01KCDZPROJECTGROUP00000000001",
+    "targetSchema": "entity-type-items",
+    "targetId": "01KCDZPROJ008TECHTRANS0000000008",
+    "relationTypeId": "HAS_ENTITY_TYPE_ITEM",
+    "id": "01KCDZPROJREL008TECHTRANS0000000008",
+    "createdAt": "2025-12-14T08:30:00.000Z",
+    "updatedAt": "2025-12-14T08:30:00.000Z"
+  },
+  {
     "id": "01KCE5BZ1A4RWDMA73YNGRVXQA",
     "sourceSchema": "tasks",
     "sourceId": "01KBSYN40BXYQ9JNGREYPQRH2P",
