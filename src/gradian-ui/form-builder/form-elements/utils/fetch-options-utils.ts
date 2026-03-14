@@ -145,7 +145,13 @@ export async function fetchOptionsFromSchemaOrUrl(
         disableCache: true,
       });
 
-      if (!response.success || response.data === undefined) {
+      // Treat as success when we have data and (explicit success or HTTP 200).
+      // Some APIs (e.g. /api/integrations/lucide-icons) return { data, meta } without a "success" field.
+      const hasData = response.data !== undefined;
+      const isSuccess =
+        hasData &&
+        (response.success === true || response.statusCode === 200);
+      if (!isSuccess) {
         throw new Error(
           response.error ||
             `Failed to fetch items (${response.statusCode ?? 'unknown'})`

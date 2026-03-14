@@ -5,10 +5,13 @@ import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
 import { IconRenderer } from '@/gradian-ui/shared/utils/icon-renderer';
 import { GripVertical } from 'lucide-react';
+import { resolveDisplayLabel, getDefaultLanguage } from '@/gradian-ui/shared/utils/translation-utils';
+import { useLanguageStore } from '@/stores/language.store';
 
+/** Label may be a string or a localized value (e.g. { en: "To Do", fa: "انجام شود" } or array of same). */
 export interface KanbanColumnMeta {
   id: string;
-  label: string;
+  label: string | Record<string, string> | Array<Record<string, string>>;
   color?: string;
   icon?: string;
 }
@@ -46,6 +49,10 @@ function getDotColor(color?: string): string {
 }
 
 export function KanbanColumn({ column, count, emptyLabel, handleLabel, allowReorder = false, isDropHovered = false, children }: KanbanColumnProps) {
+  const language = useLanguageStore((s) => s.getLanguage?.()) ?? getDefaultLanguage();
+  const defaultLang = getDefaultLanguage();
+  const columnLabel = resolveDisplayLabel(column.label, language, defaultLang);
+
   const {
     setNodeRef: setSortableNodeRef,
     attributes,
@@ -93,7 +100,7 @@ export function KanbanColumn({ column, count, emptyLabel, handleLabel, allowReor
             <IconRenderer iconName={column.icon} className="h-4 w-4 text-gray-600 dark:text-gray-300" />
           ) : null}
           <span className="truncate text-sm font-semibold text-gray-900 dark:text-gray-100">
-            {column.label}
+            {columnLabel}
           </span>
         </div>
         <span className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-200">

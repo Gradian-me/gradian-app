@@ -21744,6 +21744,62 @@
       "createdAt": "2026-03-04T00:00:00.000Z",
       "updatedAt": "2026-03-04T00:00:00.000Z",
       "updatedBy": "01K9ABA6MQ9K64MY7M4AEBCAP2"
+    },
+    {
+      "label": [
+        {
+          "en": "HRI"
+        },
+        {
+          "fa": "HRI"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKNXA02R9PKC50PPQG039RH9",
+      "createdAt": "2026-03-14T10:12:10.971Z",
+      "updatedAt": "2026-03-14T10:12:10.971Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Logo"
+        },
+        {
+          "fa": "Logo"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKNXB0AR10SEC8JQ85C2600V",
+      "createdAt": "2026-03-14T10:12:43.995Z",
+      "updatedAt": "2026-03-14T10:12:43.995Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Title"
+        },
+        {
+          "fa": "Title"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKNXBZVSRG503MC9XSV79MDY",
+      "createdAt": "2026-03-14T10:13:16.284Z",
+      "updatedAt": "2026-03-14T10:13:16.284Z"
+    },
+    {
+      "label": [
+        {
+          "en": "Description"
+        },
+        {
+          "fa": "Description"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKNY8NF4FYQYKB1BFR76HFY4",
+      "createdAt": "2026-03-14T10:28:55.916Z",
+      "updatedAt": "2026-03-14T10:28:55.916Z"
     }
   ],
   "parameter-groups": [
@@ -21978,6 +22034,43 @@
         }
       ],
       "companyId": "01K94V4PJSFKCXS6AVX07P86N5"
+    },
+    {
+      "parameter-items-section": [],
+      "relatedTenants": [
+        {
+          "id": "01KH39DYCW17SXF2APAV1KZZQT",
+          "label": "Gradian App"
+        },
+        {
+          "id": "01KFTCQTPFEY9KCX9VQHCG2QVE",
+          "label": "Local Development"
+        },
+        {
+          "id": "01KBFBAZR3K04CS80DMHGPHMHF",
+          "label": "Supply Chain Management"
+        },
+        {
+          "id": "01KBFBD109G6CYRT7RA04TMMXC",
+          "label": "AryoGen"
+        },
+        {
+          "id": "01KBFBGV9151FQN481NB2CT4MX",
+          "label": "Development Environment"
+        }
+      ],
+      "title": [
+        {
+          "en": "Barcode Config Parameters"
+        },
+        {
+          "fa": "پارامترهای تنظیم بارکد"
+        }
+      ],
+      "incomplete": false,
+      "id": "01KKNX4CCG2VTNWJAREREFYC79",
+      "createdAt": "2026-03-14T10:09:06.967Z",
+      "updatedAt": "2026-03-14T10:29:04.084Z"
     }
   ],
   "kpi-libraries": [
@@ -25170,5 +25263,6 @@
         }
       ]
     }
-  ]
+  ],
+  "barcode-templates": []
 }

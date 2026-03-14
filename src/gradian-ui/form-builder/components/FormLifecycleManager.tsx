@@ -568,6 +568,16 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
   // Track which sections need items (for better error message)
   const [incompleteSections, setIncompleteSections] = React.useState<string[]>([]);
 
+  // Pending relations (deferred until form save): selected from picker or added via FormModal.
+  // Declared early so validateForm can include them in relation count.
+  type PendingSectionState = {
+    selectedIds: string[];
+    selectedEntities: Record<string, any>;
+    addedIds: string[];
+    addedEntities: Record<string, any>;
+  };
+  const [pendingRelations, setPendingRelations] = React.useState<Record<string, PendingSectionState>>({});
+
   // State for AI Form Filler dialog
   const [isFormFillerOpen, setIsFormFillerOpen] = React.useState(false);
   // State for Discussions dialog
@@ -992,10 +1002,12 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             let itemCount: number;
             if (isRelationBased) {
               const relationValueArray = Array.isArray(state.values[section.id]) ? state.values[section.id] : [];
+              const pending = pendingRelations[section.id];
+              const pendingCount = pending ? pending.selectedIds.length + pending.addedIds.length : 0;
               if (hasEntityId && relationCounts[section.id] !== undefined) {
-                itemCount = relationCounts[section.id];
+                itemCount = relationCounts[section.id] + pendingCount;
               } else {
-                itemCount = relationValueArray.length;
+                itemCount = relationValueArray.length + pendingCount;
               }
             } else {
               const items = state.values[section.id] || [];
@@ -1045,10 +1057,12 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
             let itemCount: number;
             if (isRelationBased) {
               const relationValueArray = Array.isArray(state.values[section.id]) ? state.values[section.id] : [];
+              const pending = pendingRelations[section.id];
+              const pendingCount = pending ? pending.selectedIds.length + pending.addedIds.length : 0;
               if (hasEntityId && relationCounts[section.id] !== undefined) {
-                itemCount = relationCounts[section.id];
+                itemCount = relationCounts[section.id] + pendingCount;
               } else {
-                itemCount = relationValueArray.length;
+                itemCount = relationValueArray.length + pendingCount;
               }
             } else {
               const items = state.values[section.id] || [];
@@ -1078,7 +1092,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     }
 
     return { isValid, isIncomplete };
-  }, [schema, state.values, state.errors, initialValues, t]);
+  }, [schema, state.values, state.errors, initialValues, t, pendingRelations]);
 
   // Check incomplete status (minItems) without full validation
   // This only checks for incomplete status, not required field validation
@@ -1146,10 +1160,12 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
           let itemCount: number;
           if (isRelationBased) {
             const relationValueArray = Array.isArray(state.values[section.id]) ? state.values[section.id] : [];
+            const pending = pendingRelations[section.id];
+            const pendingCount = pending ? pending.selectedIds.length + pending.addedIds.length : 0;
             if (hasEntityId && relationCounts[section.id] !== undefined) {
-              itemCount = relationCounts[section.id];
+              itemCount = relationCounts[section.id] + pendingCount;
             } else {
-              itemCount = relationValueArray.length;
+              itemCount = relationValueArray.length + pendingCount;
             }
           } else {
             const items = state.values[section.id] || [];
@@ -1164,7 +1180,7 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
     });
 
     return isIncomplete;
-  }, [schema, state.values]);
+  }, [schema, state.values, pendingRelations]);
 
   const resetBase = useCallback(() => {
     dispatch({ type: 'RESET', initialValues, schema, referenceEntityData: referenceEntityDataRef.current });
@@ -1181,15 +1197,6 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
 
   // Trigger to refresh relation-based sections (increments when relations are created)
   const [refreshRelationsTrigger, setRefreshRelationsTrigger] = React.useState(0);
-
-  // Pending relations (deferred until form save): selected from picker or added via FormModal
-  type PendingSectionState = {
-    selectedIds: string[];
-    selectedEntities: Record<string, any>;
-    addedIds: string[];
-    addedEntities: Record<string, any>;
-  };
-  const [pendingRelations, setPendingRelations] = React.useState<Record<string, PendingSectionState>>({});
 
   const addPendingSelected = useCallback((sectionId: string, ids: string[], entities?: any[]) => {
     setPendingRelations(prev => {
@@ -1595,11 +1602,16 @@ export const SchemaFormWrapper: React.FC<FormWrapperProps> = ({
         deferredFieldsRef.current.forEach((getValue, fieldName) => {
           submissionData[fieldName] = getValue();
         });
-        await onSubmit(submissionData, { isIncomplete });
+        const saveResult = await onSubmit(submissionData, { isIncomplete });
         loggingCustom(LogType.FORM_DATA, 'info', `Form submitted successfully${isIncomplete ? ' (with incomplete flag)' : ' (complete)'}`);
 
-        // Flush pending relations (deferred until form save)
-        const sourceId = state.values?.id ?? (state.values as any)?.[schema.id]?.id;
+        // Flush pending relations (deferred until form save).
+        // Use saved entity id from submit result when creating a new entity (state.values.id not yet set).
+        const savedEntity = saveResult && typeof saveResult === 'object' ? saveResult : undefined;
+        const sourceId =
+          (savedEntity && (savedEntity.id ?? (savedEntity as any).data?.id)) ??
+          state.values?.id ??
+          (state.values as any)?.[schema.id]?.id;
         if (sourceId && Object.keys(pendingRelations).length > 0) {
           for (const [sectionId, pending] of Object.entries(pendingRelations)) {
             const section = safeSchema.sections.find(s => s.id === sectionId);

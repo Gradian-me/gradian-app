@@ -41296,5 +41296,388 @@
     ],
     "canSelectMultiCompanies": true,
     "isNotCompanyBased": true
+  },
+  {
+    "id": "barcode-templates",
+    "description": "Barcode template definitions with general settings and GS1 Application Identifiers configuration.",
+    "singular_name": "Barcode Template",
+    "plural_name": "Barcode Templates",
+    "singular_name_translations": [
+      {
+        "en": "Barcode Template"
+      },
+      {
+        "fa": "قالب بارکد"
+      },
+      {
+        "ar": "قالب الباركود"
+      },
+      {
+        "es": "Plantilla de código de barras"
+      },
+      {
+        "fr": "Modèle de code-barres"
+      },
+      {
+        "de": "Barcode-Vorlage"
+      },
+      {
+        "it": "Modello codice a barre"
+      },
+      {
+        "ru": "Шаблон штрихкода"
+      }
+    ],
+    "plural_name_translations": [
+      {
+        "en": "Barcode Templates"
+      },
+      {
+        "fa": "قالب‌های بارکد"
+      },
+      {
+        "ar": "قوالب الباركود"
+      },
+      {
+        "es": "Plantillas de código de barras"
+      },
+      {
+        "fr": "Modèles de code-barres"
+      },
+      {
+        "de": "Barcode-Vorlagen"
+      },
+      {
+        "it": "Modelli codice a barre"
+      },
+      {
+        "ru": "Шаблоны штрихкодов"
+      }
+    ],
+    "allowDataInactive": true,
+    "fields": [
+      {
+        "id": "barcode-template-name",
+        "name": "templateName",
+        "label": "Template Name",
+        "sectionId": "general-information",
+        "component": "text",
+        "role": "title",
+        "translations": [
+          {
+            "en": "Template Name"
+          },
+          {
+            "fa": "نام قالب"
+          },
+          {
+            "ar": "اسم القالب"
+          },
+          {
+            "es": "Nombre de plantilla"
+          },
+          {
+            "fr": "Nom du modèle"
+          },
+          {
+            "de": "Vorlagenname"
+          },
+          {
+            "it": "Nome modello"
+          },
+          {
+            "ru": "Название шаблона"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "minLength": 1
+        },
+        "colSpan": 1,
+        "order": 1,
+        "caption": "Enter template name",
+        "captionTranslations": [
+          {
+            "en": "Enter template name"
+          },
+          {
+            "fa": "نام قالب را وارد کنید"
+          }
+        ]
+      },
+      {
+        "id": "barcode-enabled-configs",
+        "name": "barcodeEnabledConfigs",
+        "label": "Barcode Enabled Configs",
+        "sectionId": "general-information",
+        "component": "checkbox-list",
+        "type": "checkbox-list",
+        "targetSchema": "parameter-items",
+        "referenceSchema": "parameter-groups",
+        "referenceRelationTypeId": "HAS_PARAMETER_ITEM",
+        "referenceEntityId": "01KKNX4CCG2VTNWJAREREFYC79",
+        "translations": [
+          {
+            "en": "Barcode Enabled Configs"
+          },
+          {
+            "fa": "پیکربندی‌های فعال بارکد"
+          },
+          {
+            "ar": "إعدادات الباركود المفعّلة"
+          },
+          {
+            "es": "Configuraciones de código de barras habilitadas"
+          },
+          {
+            "fr": "Configurations code-barres activées"
+          },
+          {
+            "de": "Aktivierte Barcode-Konfigurationen"
+          },
+          {
+            "it": "Configurazioni barcode abilitate"
+          },
+          {
+            "ru": "Включённые настройки штрихкода"
+          }
+        ],
+        "colSpan": 2,
+        "order": 2,
+        "caption": "Select barcode enabled configurations",
+        "captionTranslations": [
+          {
+            "en": "Select barcode enabled configurations"
+          },
+          {
+            "fa": "پیکربندی‌های فعال بارکد را انتخاب کنید"
+          }
+        ]
+      },
+      {
+        "id": "gs1-ai-code",
+        "name": "gs1AiCode",
+        "label": "GS1 AI Code",
+        "sectionId": "gs1-application-identifiers",
+        "component": "number",
+        "translations": [
+          {
+            "en": "GS1 AI Code"
+          },
+          {
+            "fa": "کد GS1 AI"
+          },
+          {
+            "ar": "رمز GS1 AI"
+          },
+          {
+            "es": "Código AI GS1"
+          },
+          {
+            "fr": "Code AI GS1"
+          },
+          {
+            "de": "GS1-AI-Code"
+          },
+          {
+            "it": "Codice AI GS1"
+          },
+          {
+            "ru": "Код GS1 AI"
+          }
+        ],
+        "validation": {
+          "required": true,
+          "min": 0
+        },
+        "colSpan": 1,
+        "order": 1,
+        "caption": "Enter GS1 Application Identifier code (numeric)",
+        "captionTranslations": [
+          {
+            "en": "Enter GS1 Application Identifier code (numeric)"
+          },
+          {
+            "fa": "کد شناسه کاربردی GS1 را به صورت عددی وارد کنید"
+          }
+        ]
+      },
+      {
+        "id": "gs1-lookup-id",
+        "name": "lookupId",
+        "label": "Lookup ID",
+        "sectionId": "gs1-application-identifiers",
+        "component": "text",
+        "translations": [
+          {
+            "en": "Lookup ID"
+          },
+          {
+            "fa": "شناسه جستجو"
+          },
+          {
+            "ar": "معرف البحث"
+          },
+          {
+            "es": "ID de búsqueda"
+          },
+          {
+            "fr": "ID de recherche"
+          },
+          {
+            "de": "Lookup-ID"
+          },
+          {
+            "it": "ID lookup"
+          },
+          {
+            "ru": "Идентификатор поиска"
+          }
+        ],
+        "validation": {
+          "minLength": 0
+        },
+        "colSpan": 1,
+        "order": 2,
+        "caption": "Enter lookup ID for this GS1 AI (e.g. lookup dataset key)",
+        "captionTranslations": [
+          {
+            "en": "Enter lookup ID for this GS1 AI (e.g. lookup dataset key)"
+          },
+          {
+            "fa": "Lookup ID مربوط به این GS1 AI را وارد کنید"
+          }
+        ]
+      },
+      {
+        "id": "gs1-show-in-hri",
+        "name": "showInHri",
+        "label": "Show In HRI",
+        "sectionId": "gs1-application-identifiers",
+        "component": "switch",
+        "translations": [
+          {
+            "en": "Show In HRI"
+          },
+          {
+            "fa": "نمایش در HRI"
+          },
+          {
+            "ar": "عرض في HRI"
+          },
+          {
+            "es": "Mostrar en HRI"
+          },
+          {
+            "fr": "Afficher dans HRI"
+          },
+          {
+            "de": "In HRI anzeigen"
+          },
+          {
+            "it": "Mostra in HRI"
+          },
+          {
+            "ru": "Показывать в HRI"
+          }
+        ],
+        "colSpan": 1,
+        "order": 3
+      }
+    ],
+    "sections": [
+      {
+        "id": "general-information",
+        "title": "General Information",
+        "titleTranslations": [
+          {
+            "en": "General Information"
+          },
+          {
+            "fa": "اطلاعات کلی"
+          },
+          {
+            "ar": "المعلومات العامة"
+          },
+          {
+            "es": "Información general"
+          },
+          {
+            "fr": "Informations générales"
+          },
+          {
+            "de": "Allgemeine Informationen"
+          },
+          {
+            "it": "Informazioni generali"
+          },
+          {
+            "ru": "Общая информация"
+          }
+        ],
+        "description": "Template name and barcode enabled configurations",
+        "descriptionTranslations": [
+          {
+            "en": "Template name and barcode enabled configurations"
+          },
+          {
+            "fa": "نام قالب و پیکربندی‌های فعال بارکد"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2
+      },
+      {
+        "id": "gs1-application-identifiers",
+        "title": "GS1 Application Identifiers",
+        "titleTranslations": [
+          {
+            "en": "GS1 Application Identifiers"
+          },
+          {
+            "fa": "شناسه‌های کاربردی GS1"
+          },
+          {
+            "ar": "معرفات تطبيق GS1"
+          },
+          {
+            "es": "Identificadores de aplicación GS1"
+          },
+          {
+            "fr": "Identifiants d'application GS1"
+          },
+          {
+            "de": "GS1-Anwendungsidentifikatoren"
+          },
+          {
+            "it": "Identificatori applicazione GS1"
+          },
+          {
+            "ru": "Идентификаторы применения GS1"
+          }
+        ],
+        "description": "Add GS1 AI codes with lookup and HRI display options",
+        "descriptionTranslations": [
+          {
+            "en": "Add GS1 AI codes with lookup and HRI display options"
+          },
+          {
+            "fa": "کدهای GS1 AI با گزینه‌های جستجو و نمایش HRI اضافه کنید"
+          }
+        ],
+        "initialState": "expanded",
+        "columns": 2,
+        "isRepeatingSection": true,
+        "repeatingConfig": {
+          "minItems": 0,
+          "maxItems": 100,
+          "fieldRelationType": "addFields"
+        }
+      }
+    ],
+    "applications": [],
+    "isNotCompanyBased": true,
+    "applyToAllTenants": true,
+    "syncStrategy": "schema-and-data"
   }
 ]

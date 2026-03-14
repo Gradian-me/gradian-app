@@ -316,7 +316,7 @@ export interface UseFormModalReturn {
   /**
    * Handle form submission
    */
-  handleSubmit: (formData: Record<string, any>) => Promise<void>;
+  handleSubmit: (formData: Record<string, any>) => Promise<Record<string, any> | void>;
   
   /**
    * Clear form error
@@ -690,6 +690,7 @@ export function useFormModal(
           // (onSuccess callbacks often reset state that controls modal visibility)
           // Explicitly ensure modal stays open
           setIsOpen(true);
+          return result.data; // Return so FormLifecycleManager can use for flushPendingRelations sourceId
         } else {
           // Synchronize hierarchical parent relation when enabled on schema
           if ((targetSchema as any).allowHierarchicalParent) {
@@ -733,6 +734,7 @@ export function useFormModal(
           toast.success(successTitle, { description: successDescription });
           closeFormModal();
           onSuccess?.(result.data);
+          return result.data; // Return so FormLifecycleManager can use for flushPendingRelations sourceId
         }
       } else {
         const action = mode === 'edit' ? 'update' : 'create';

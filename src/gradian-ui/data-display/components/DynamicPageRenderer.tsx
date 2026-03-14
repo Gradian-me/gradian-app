@@ -1847,7 +1847,10 @@ export function DynamicPageRenderer({ schema: rawSchema, entityName, navigationS
       if (ai != null && bi != null) return ai - bi;
       if (ai != null) return -1;
       if (bi != null) return 1;
-      return a.label.localeCompare(b.label);
+
+      const aLabel = resolveDisplayLabel(a.label, language, defaultLang) || a.id;
+      const bLabel = resolveDisplayLabel(b.label, language, defaultLang) || b.id;
+      return aLabel.localeCompare(bLabel);
     });
   }, [kanbanGroupingColumn, kanbanGroupingField, kanbanFieldOptions, filteredEntities, language, defaultLang, hasKanbanOptionSource]);
 

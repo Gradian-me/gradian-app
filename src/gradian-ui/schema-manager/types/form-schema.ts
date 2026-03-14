@@ -662,7 +662,7 @@ export interface FormWrapperProps {
   schema: FormSchema;
   /** When provided in edit mode, shows a Discussions button in the form actions */
   discussionConfig?: FormDiscussionConfig;
-  onSubmit: (data: FormData, options?: { isIncomplete?: boolean }) => void | Promise<void>;
+  onSubmit: (data: FormData, options?: { isIncomplete?: boolean }) => void | Promise<void | { id?: string; data?: { id?: string } }>;
   onReset?: () => void;
   onCancel?: () => void;
   onFieldChange?: (fieldName: string, value: any) => void;

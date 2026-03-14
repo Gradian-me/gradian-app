@@ -6422,5 +6422,48 @@
     "fieldId": "application-config-default-language",
     "createdAt": "2026-03-12T07:39:25.825Z",
     "updatedAt": "2026-03-12T08:21:49.305Z"
+  },
+  {
+    "id": "01KKNX4REL0000000000000001",
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KKNX4CCG2VTNWJAREREFYC79",
+    "targetSchema": "parameter-items",
+    "targetId": "01KKNXA02R9PKC50PPQG039RH9",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "createdAt": "2026-03-14T10:15:00.000Z",
+    "updatedAt": "2026-03-14T10:29:04.150Z",
+    "inactive": true
+  },
+  {
+    "id": "01KKNX4REL0000000000000002",
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KKNX4CCG2VTNWJAREREFYC79",
+    "targetSchema": "parameter-items",
+    "targetId": "01KKNXB0AR10SEC8JQ85C2600V",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "createdAt": "2026-03-14T10:15:00.000Z",
+    "updatedAt": "2026-03-14T10:29:04.156Z",
+    "inactive": true
+  },
+  {
+    "id": "01KKNX4REL0000000000000003",
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KKNX4CCG2VTNWJAREREFYC79",
+    "targetSchema": "parameter-items",
+    "targetId": "01KKNXBZVSRG503MC9XSV79MDY",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "createdAt": "2026-03-14T10:15:00.000Z",
+    "updatedAt": "2026-03-14T10:29:04.163Z",
+    "inactive": true
+  },
+  {
+    "sourceSchema": "parameter-groups",
+    "sourceId": "01KKNX4CCG2VTNWJAREREFYC79",
+    "targetSchema": "parameter-items",
+    "targetId": "01KKNY8NF4FYQYKB1BFR76HFY4",
+    "relationTypeId": "HAS_PARAMETER_ITEM",
+    "id": "01KKNY8XPH55VWSG4YSTXSY47K",
+    "createdAt": "2026-03-14T10:29:04.336Z",
+    "updatedAt": "2026-03-14T10:29:04.336Z"
   }
 ]

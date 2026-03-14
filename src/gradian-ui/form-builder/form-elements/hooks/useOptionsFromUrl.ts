@@ -165,13 +165,27 @@ export function useOptionsFromUrl({
         if (transform) {
           data = transform(data);
         } else {
-          // Default transform: assume array of objects with id, label, name, or title
+          // Default transform: assume array of objects with id, label, name, or title.
+          // IMPORTANT: do NOT stringify label here — many backends return translation
+          // arrays (e.g. [{ en: 'HRI' }, { fa: 'HRI' }]). We must preserve the original
+          // structure so downstream normalizers (normalizeOptionArray + translation
+          // helpers) can resolve the correct localized string instead of "[object Object]".
           data = (Array.isArray(data) ? data : []).map((item: any) => {
             const id = item.id ?? item.value ?? String(item._id ?? '');
-            const label = item.label ?? item.name ?? item.title ?? item.singular_name ?? item.plural_name ?? id;
+            const rawLabel =
+              item.label ??
+              item.name ??
+              item.title ??
+              item.singular_name ??
+              item.plural_name ??
+              id;
+
             return {
               id: String(id),
-              label: String(label),
+              // Keep rawLabel as-is (string, translation array, or object).
+              // normalizeOptionArray/resolveDisplayLabel will convert it to the
+              // correct localized display string later.
+              label: rawLabel,
               icon: item.icon,
               color: item.color,
               disabled: item.disabled,
