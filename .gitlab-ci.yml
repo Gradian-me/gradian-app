@@ -4,37 +4,37 @@
 
 include:
   - project: "devops/ci-templates"
-    ref: v1
+    ref: v2
     file: templates/config/stages.yml
   - project: "devops/ci-templates"
-    ref: v1
+    ref: v2
     file: templates/config/defaults.yml
   - project: "devops/ci-templates"
-    ref: v1
+    ref: v2
     file: templates/config/variables.yml
   - project: "devops/ci-templates"
-    ref: v1
+    ref: v2
     file: templates/security/node_security_audit.yml
   - project: "devops/ci-templates"
-    ref: v1
+    ref: v2
     file: templates/security/owasp_dependency_check.yml
   - project: "devops/ci-templates"
-    ref: v1
+    ref: v2
     file: templates/security/semgrep_sast.yml
   - project: "devops/ci-templates"
-    ref: v1
+    ref: v2
     file: templates/gates/security_approval.yml
   - project: "devops/ci-templates"
-    ref: v1
+    ref: v2
     file: templates/build/build.yml
   - project: "devops/ci-templates"
-    ref: v1
+    ref: v2
     file: templates/build/trivy_image_scan.yml
   - project: "devops/ci-templates"
-    ref: v1
+    ref: v2
     file: templates/gates/image_approval.yml
   - project: "devops/ci-templates"
-    ref: v1
+    ref: v2
     file: templates/deploy/deploy_staging.yml
 
 # Project-specific overrides (set in .gitlab-ci.yml or in GitLab CI/CD Variables)
